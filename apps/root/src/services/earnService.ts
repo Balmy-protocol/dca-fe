@@ -411,7 +411,7 @@ export class EarnService extends EventsManager<EarnServiceData> {
             ?.profit || balance.profit,
       }));
 
-      const updatedDelayed = userStrategy.delayed;
+      let updatedDelayed = userStrategy.delayed || [];
 
       // Preserve locally stored historical balances
       const mergedHistoricalBalances = [
@@ -432,6 +432,7 @@ export class EarnService extends EventsManager<EarnServiceData> {
           updatedBalances,
           eventsThatWeHaveThatTheUserStrategyIsMissing
         );
+        updatedDelayed = this.applyVirtualEventsToDelayed(updatedDelayed, eventsThatWeHaveThatTheUserStrategyIsMissing);
       }
 
       const mergedHistory = [
@@ -521,6 +522,63 @@ export class EarnService extends EventsManager<EarnServiceData> {
     }, updatedBalances);
 
     return updatedBalances;
+  }
+
+  applyVirtualEventsToDelayed(
+    delayed: NonNullable<SdkEarnPosition['delayed']>,
+    missingEvents: SdkEarnPosition['history']
+  ) {
+    let updatedDelayed = [...delayed];
+    // Asc so we apply the oldest events first
+    const orderedMissingEvents = orderBy(missingEvents, 'timestamp', 'asc');
+    updatedDelayed = orderedMissingEvents.reduce<NonNullable<SdkEarnPosition['delayed']>>((acc, event) => {
+      switch (event.action) {
+        case EarnPositionActionType.WITHDREW:
+          event.withdrawn
+            .filter((withdrawn) => withdrawn.withdrawType === WithdrawType.DELAYED)
+            .forEach((withdrawn) => {
+              const initiatedDelayWithdrawIndex = acc.findIndex((b) => b.token.address === withdrawn.token.address);
+              if (initiatedDelayWithdrawIndex !== -1) {
+                const newAmount = acc[initiatedDelayWithdrawIndex].pending.amount + withdrawn.amount.amount;
+
+                const amountInUSD = parseUsdPrice(
+                  withdrawn.token as unknown as Token,
+                  newAmount,
+                  parseNumberUsdPriceToBigInt(withdrawn.token.price)
+                );
+                // eslint-disable-next-line no-param-reassign
+                acc[initiatedDelayWithdrawIndex].pending = {
+                  amount: newAmount,
+                  amountInUnits: formatUnits(newAmount, acc[initiatedDelayWithdrawIndex].token.decimals),
+                  amountInUSD: amountInUSD.toFixed(2),
+                };
+              }
+            });
+          return acc;
+        case EarnPositionActionType.DELAYED_WITHDRAWAL_CLAIMED:
+          const claimedTokenIndex = acc.findIndex((b) => b.token.address === event.token.address);
+          if (claimedTokenIndex !== -1) {
+            const newAmount = acc[claimedTokenIndex].ready.amount - event.withdrawn.amount;
+            const amountInUSD = parseUsdPrice(
+              event.token as unknown as Token,
+              newAmount,
+              parseNumberUsdPriceToBigInt(event.token.price)
+            );
+
+            // eslint-disable-next-line no-param-reassign
+            acc[claimedTokenIndex].ready = {
+              amount: newAmount,
+              amountInUnits: formatUnits(newAmount, acc[claimedTokenIndex].token.decimals),
+              amountInUSD: amountInUSD.toFixed(2),
+            };
+          }
+          return acc;
+      }
+
+      return acc;
+    }, updatedDelayed);
+
+    return updatedDelayed;
   }
 
   async fetchUserStrategy(strategyId: Parameters<typeof this.sdkService.getUserStrategy>[0]) {

@@ -25,6 +25,7 @@ const StyledBackgroundPaper = styled(BackgroundPaper).attrs({ variant: 'outlined
 
 const StyledBadge = styled(Badge)`
   & .MuiBadge-badge {
+    z-index: 0;
     right: ${({ theme: { spacing } }) => spacing(-3)};
     top: ${({ theme: { spacing } }) => spacing(-1)};
   },

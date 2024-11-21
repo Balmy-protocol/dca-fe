@@ -67,7 +67,7 @@ const useEarnClaimDelayedWithdrawAction = () => {
             strategyId: strategy.id,
             positionId: position.id,
             claim: claimToken.token,
-            withdrawn: formatCurrencyAmount({ amount: claimToken.ready.amount, token: claimToken.token, intl }),
+            withdrawn: claimToken.ready.amount.toString(),
           },
         };
 
