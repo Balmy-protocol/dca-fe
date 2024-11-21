@@ -1,7 +1,7 @@
 import ExpectedReturns from '@pages/strategy-guardian-detail/investment-data/components/expected-returns';
 import FinancialOverview from '@pages/strategy-guardian-detail/investment-data/components/financial-overview';
 import React from 'react';
-import { FormattedMessage } from 'react-intl';
+import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 import { BackgroundPaper, colors, ContainerBox, Typography } from 'ui-library';
 import EarnPositionTvlGraph from '../tvl-graph';
@@ -34,6 +34,7 @@ const EarnPortfolioFinancialData = ({
   isLoading: boolean;
 }) => {
   const showBalances = useShowBalances();
+  const intl = useIntl();
 
   return (
     <StyledPaper>
@@ -58,7 +59,17 @@ const EarnPortfolioFinancialData = ({
         </ContainerBox>
       </StyledFinancialNumbersContainer>
       {userStrategies.length !== 0 && showBalances && (
-        <EarnPositionTvlGraph isLoading={isLoading} userStrategies={userStrategies} showDots={false}/>
+        <EarnPositionTvlGraph
+          isLoading={isLoading}
+          userStrategies={userStrategies}
+          showDots={false}
+          emptyActionsTitle={intl.formatMessage(
+            defineMessage({
+              description: 'earn.portfolio.financial-data.tvl-graph.tvl-tooltip',
+              defaultMessage: 'Tvl:',
+            })
+          )}
+        />
       )}
     </StyledPaper>
   );
