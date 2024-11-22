@@ -11,6 +11,8 @@ import {
   IndexingData,
   IndexerUnits,
   WithdrawType,
+  SdkEarnPositionId,
+  StrategyId,
 } from '.';
 
 export interface BaseApiTxEvent {
@@ -163,9 +165,16 @@ export interface SwapApiEvent {
   type: TransactionEventTypes.SWAP;
 }
 
-export interface EarnDepositApiDataEvent {
+export interface BaseEarnApiDataEvent {
+  positionId: string;
+  strategyId: string;
+  vault: Address;
+}
+
+export interface EarnDepositApiDataEvent extends BaseEarnApiDataEvent {
   owner: Address;
   permissions: Record<Lowercase<Address>, ('WITHDRAW' | 'INCREASE')[]>;
+  asset: Address;
   assetPrice?: number;
   assetsDeposited: string;
   depositToken: Address;
@@ -176,7 +185,8 @@ export interface EarnDepositApiEvent {
   type: TransactionEventTypes.EARN_CREATED;
 }
 
-export interface EarnIncreaseApiDataEvent {
+export interface EarnIncreaseApiDataEvent extends BaseEarnApiDataEvent {
+  asset: Address;
   assetPrice?: number;
   assetsDeposited: string;
   depositToken: Address;
@@ -187,7 +197,7 @@ export interface EarnIncreaseApiEvent {
   type: TransactionEventTypes.EARN_INCREASE;
 }
 
-export interface EarnWithdrawApiDataEvent {
+export interface EarnWithdrawApiDataEvent extends BaseEarnApiDataEvent {
   tokens: {
     token: Address;
     withdrawn: string;
@@ -201,7 +211,7 @@ export interface EarnWithdrawApiEvent {
   type: TransactionEventTypes.EARN_WITHDRAW;
 }
 
-export interface EarnSpecialWithdrawApiDataEvent {
+export interface EarnSpecialWithdrawApiDataEvent extends BaseEarnApiDataEvent {
   tokens: {
     token: Address;
     withdrawn: string;
@@ -214,7 +224,7 @@ export interface EarnSpecialWithdrawApiEvent {
   type: TransactionEventTypes.EARN_SPECIAL_WITHDRAW;
 }
 
-export interface EarnClaimDelayedWithdrawApiDataEvent {
+export interface EarnClaimDelayedWithdrawApiDataEvent extends BaseEarnApiDataEvent {
   recipient: Address;
   token: Address;
   withdrawn: string;
@@ -365,17 +375,18 @@ export type SwapEvent = BaseEvent & {
 };
 
 export interface BaseEarnDataEvent {
-  // positionId: SdkEarnPositionId;
-  // strategyId: StrategyId;
+  positionId: SdkEarnPositionId;
+  strategyId: StrategyId;
   user: Address;
 }
 
 export interface EarnDepositDataDoneEvent
   extends BaseEarnDataEvent,
-    DistributiveOmit<EarnDepositApiDataEvent, 'depositToken' | 'depositAmount' | 'assetsDeposited'> {
+    Pick<EarnDepositApiDataEvent, 'owner' | 'permissions'> {
+  asset: TokenWithIcon;
   depositToken: TokenWithIcon;
   depositAmount: AmountsOfToken;
-  assetsDepositedAmount: bigint;
+  assetsDepositedAmount: AmountsOfToken;
   status: TransactionStatus.DONE;
   tokenFlow: TransactionEventIncomingTypes.INCOMING;
 }
@@ -393,12 +404,11 @@ export type EarnDepositEvent = BaseEvent & {
   unit: IndexerUnits.EARN;
 };
 
-export interface EarnIncreaseDataDoneEvent
-  extends BaseEarnDataEvent,
-    DistributiveOmit<EarnIncreaseApiDataEvent, 'depositToken' | 'depositAmount' | 'assetsDeposited'> {
+export interface EarnIncreaseDataDoneEvent extends BaseEarnDataEvent {
+  asset: TokenWithIcon;
   depositToken: TokenWithIcon;
   depositAmount: AmountsOfToken;
-  assetsDepositedAmount: bigint;
+  assetsDepositedAmount: AmountsOfToken;
   status: TransactionStatus.DONE;
   tokenFlow: TransactionEventIncomingTypes.INCOMING;
 }
@@ -416,9 +426,7 @@ export type EarnIncreaseEvent = BaseEvent & {
   unit: IndexerUnits.EARN;
 };
 
-export interface EarnWithdrawDataDoneEvent
-  extends BaseEarnDataEvent,
-    DistributiveOmit<EarnWithdrawApiDataEvent, 'tokens'> {
+export interface EarnWithdrawDataDoneEvent extends BaseEarnDataEvent, Pick<EarnWithdrawApiDataEvent, 'recipient'> {
   withdrawn: { token: TokenWithIcon; amount: AmountsOfToken; withdrawType: WithdrawType }[];
   status: TransactionStatus.DONE;
   tokenFlow: TransactionEventIncomingTypes.INCOMING;
@@ -439,7 +447,7 @@ export type EarnWithdrawEvent = BaseEvent & {
 
 export interface EarnSpecialWithdrawDataDoneEvent
   extends BaseEarnDataEvent,
-    DistributiveOmit<EarnSpecialWithdrawApiDataEvent, 'tokens'> {
+    Pick<EarnSpecialWithdrawApiDataEvent, 'recipient'> {
   tokens: { token: TokenWithIcon; amount: AmountsOfToken }[];
   status: TransactionStatus.DONE;
   tokenFlow: TransactionEventIncomingTypes.INCOMING;
@@ -460,7 +468,7 @@ export type EarnSpecialWithdrawEvent = BaseEvent & {
 
 export interface EarnClaimDelayedWithdrawDataDoneEvent
   extends BaseEarnDataEvent,
-    DistributiveOmit<EarnClaimDelayedWithdrawApiDataEvent, 'token' | 'withdrawn'> {
+    Pick<EarnClaimDelayedWithdrawApiDataEvent, 'recipient'> {
   token: TokenWithIcon;
   withdrawn: AmountsOfToken;
   status: TransactionStatus.DONE;
