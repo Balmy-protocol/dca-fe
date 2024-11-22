@@ -34,7 +34,6 @@ import {
   SwapApiEvent,
   SwapEvent,
   TokenList,
-  TokenListId,
   TransactionDetails,
   TransactionTypes,
   Position,
@@ -56,7 +55,7 @@ import {
   StrategyId,
 } from 'common-types';
 import { compact, find, fromPairs, isNil, isUndefined } from 'lodash';
-import { Address, formatUnits, maxUint256, parseUnits } from 'viem';
+import { Address, maxUint256, parseUnits } from 'viem';
 import {
   toToken as getToToken,
   formatCurrencyAmount,
@@ -103,12 +102,11 @@ const parseDcaCreatedApiEvent: ParseFunction<DCACreatedApiEvent, DCACreatedEvent
         amountInUnits: formatCurrencyAmount({ amount: BigInt(event.data.rate), token: dcaBaseEventData.fromToken }),
         amountInUSD: isNil(event.data.fromToken.price)
           ? undefined
-          : parseFloat(
-              formatUnits(
-                BigInt(event.data.rate) * parseNumberUsdPriceToBigInt(event.data.fromToken.price),
-                dcaBaseEventData.fromToken.decimals + 18
-              )
-            ).toFixed(2),
+          : parseUsdPrice(
+              dcaBaseEventData.fromToken,
+              BigInt(event.data.rate),
+              parseNumberUsdPriceToBigInt(event.data.fromToken.price)
+            ).toString(),
       },
       funds: {
         amount: funds,
@@ -116,12 +114,11 @@ const parseDcaCreatedApiEvent: ParseFunction<DCACreatedApiEvent, DCACreatedEvent
         amountInUSD:
           event.data.fromToken.price === null || isUndefined(event.data.fromToken.price)
             ? undefined
-            : parseFloat(
-                formatUnits(
-                  BigInt(funds) * parseNumberUsdPriceToBigInt(event.data.fromToken.price),
-                  dcaBaseEventData.fromToken.decimals + 18
-                )
-              ).toFixed(2),
+            : parseUsdPrice(
+                dcaBaseEventData.fromToken,
+                BigInt(funds),
+                parseNumberUsdPriceToBigInt(event.data.fromToken.price)
+              ).toString(),
       },
     },
     ...baseEvent,
@@ -154,36 +151,33 @@ const parseDcaModifiedApiEvent: ParseFunction<DCAModifiedApiEvent, DCAModifiedEv
         amountInUnits: formatCurrencyAmount({ amount: BigInt(event.data.oldRate), token: dcaBaseEventData.fromToken }),
         amountInUSD: isNil(event.data.fromToken.price)
           ? undefined
-          : parseFloat(
-              formatUnits(
-                BigInt(event.data.oldRate) * parseNumberUsdPriceToBigInt(event.data.fromToken.price),
-                dcaBaseEventData.fromToken.decimals + 18
-              )
-            ).toFixed(2),
+          : parseUsdPrice(
+              dcaBaseEventData.fromToken,
+              BigInt(event.data.oldRate),
+              parseNumberUsdPriceToBigInt(event.data.fromToken.price)
+            ).toString(),
       },
       difference: {
         amount: BigInt(difference),
         amountInUnits: formatCurrencyAmount({ amount: BigInt(difference), token: dcaBaseEventData.fromToken }),
         amountInUSD: isNil(event.data.fromToken.price)
           ? undefined
-          : parseFloat(
-              formatUnits(
-                BigInt(difference) * parseNumberUsdPriceToBigInt(event.data.fromToken.price),
-                dcaBaseEventData.fromToken.decimals + 18
-              )
-            ).toFixed(2),
+          : parseUsdPrice(
+              dcaBaseEventData.fromToken,
+              BigInt(difference),
+              parseNumberUsdPriceToBigInt(event.data.fromToken.price)
+            ).toString(),
       },
       rate: {
         amount: BigInt(event.data.rate),
         amountInUnits: formatCurrencyAmount({ amount: BigInt(event.data.rate), token: dcaBaseEventData.fromToken }),
         amountInUSD: isNil(event.data.fromToken.price)
           ? undefined
-          : parseFloat(
-              formatUnits(
-                BigInt(event.data.rate) * parseNumberUsdPriceToBigInt(event.data.fromToken.price),
-                dcaBaseEventData.fromToken.decimals + 18
-              )
-            ).toFixed(2),
+          : parseUsdPrice(
+              dcaBaseEventData.fromToken,
+              BigInt(event.data.rate),
+              parseNumberUsdPriceToBigInt(event.data.fromToken.price)
+            ).toString(),
       },
       remainingLiquidity: {
         amount: totalNow,
@@ -238,12 +232,11 @@ const parseDcaWithdrawApiEvent: ParseFunction<DCAWithdrawnApiEvent, DCAWithdrawn
         amountInUnits: formatCurrencyAmount({ amount: BigInt(event.data.withdrawn), token: dcaBaseEventData.toToken }),
         amountInUSD: isNil(event.data.toToken.price)
           ? undefined
-          : parseFloat(
-              formatUnits(
-                BigInt(event.data.withdrawn) * parseNumberUsdPriceToBigInt(event.data.toToken.price),
-                dcaBaseEventData.toToken.decimals + 18
-              )
-            ).toFixed(2),
+          : parseUsdPrice(
+              dcaBaseEventData.toToken,
+              BigInt(event.data.withdrawn),
+              parseNumberUsdPriceToBigInt(event.data.toToken.price)
+            ).toString(),
       },
       withdrawnYield:
         (!isUndefined(event.data.withdrawnYield) && {
@@ -254,12 +247,11 @@ const parseDcaWithdrawApiEvent: ParseFunction<DCAWithdrawnApiEvent, DCAWithdrawn
           }),
           amountInUSD: isNil(event.data.toToken.price)
             ? undefined
-            : parseFloat(
-                formatUnits(
-                  BigInt(event.data.withdrawnYield) * parseNumberUsdPriceToBigInt(event.data.toToken.price),
-                  dcaBaseEventData.toToken.decimals + 18
-                )
-              ).toFixed(2),
+            : parseUsdPrice(
+                dcaBaseEventData.toToken,
+                BigInt(event.data.withdrawnYield),
+                parseNumberUsdPriceToBigInt(event.data.toToken.price)
+              ).toString(),
         }) ||
         undefined,
     },
@@ -296,12 +288,11 @@ const parseDcaTerminateApiEvent: ParseFunction<DCATerminatedApiEvent, DCATermina
         }),
         amountInUSD: isNil(event.data.fromToken.price)
           ? undefined
-          : parseFloat(
-              formatUnits(
-                BigInt(event.data.withdrawnRemaining) * parseNumberUsdPriceToBigInt(event.data.fromToken.price),
-                dcaBaseEventData.fromToken.decimals + 18
-              )
-            ).toFixed(2),
+          : parseUsdPrice(
+              dcaBaseEventData.fromToken,
+              BigInt(event.data.withdrawnRemaining),
+              parseNumberUsdPriceToBigInt(event.data.fromToken.price)
+            ).toString(),
       },
       withdrawnSwapped: {
         amount: BigInt(event.data.withdrawnSwapped),
@@ -311,12 +302,11 @@ const parseDcaTerminateApiEvent: ParseFunction<DCATerminatedApiEvent, DCATermina
         }),
         amountInUSD: isNil(event.data.toToken.price)
           ? undefined
-          : parseFloat(
-              formatUnits(
-                BigInt(event.data.withdrawnSwapped) * parseNumberUsdPriceToBigInt(event.data.toToken.price),
-                dcaBaseEventData.toToken.decimals + 18
-              )
-            ).toFixed(2),
+          : parseUsdPrice(
+              dcaBaseEventData.toToken,
+              BigInt(event.data.withdrawnSwapped),
+              parseNumberUsdPriceToBigInt(event.data.toToken.price)
+            ).toString(),
       },
     },
     ...baseEvent,
@@ -379,7 +369,7 @@ const parseErc20ApprovalApiEvent: ParseFunction<BaseApiEvent & ERC20ApprovalApiE
   baseEvent,
   tokenList,
 }) => {
-  const approvedTokenId = `${event.tx.chainId}-${event.data.token.toLowerCase()}` as TokenListId;
+  const approvedTokenId = getTokenListId({ tokenAddress: event.data.token, chainId: event.tx.chainId });
   const approvedToken = tokenList[approvedTokenId];
 
   if (!approvedToken) return null;
@@ -416,9 +406,9 @@ const parseEarnDepositApiEvent: ParseFunction<BaseApiEvent & EarnDepositApiEvent
   tokenList,
   earnBaseEventData,
 }) => {
-  const earnDepositedTokenId = `${event.tx.chainId}-${event.data.depositToken.toLowerCase()}` as TokenListId;
+  const earnDepositedTokenId = getTokenListId({ tokenAddress: event.data.depositToken, chainId: event.tx.chainId });
   const earnDepositedToken = tokenList[earnDepositedTokenId];
-  const assetTokenId = `${event.tx.chainId}-${event.data.asset.toLowerCase()}` as TokenListId;
+  const assetTokenId = getTokenListId({ tokenAddress: event.data.asset, chainId: event.tx.chainId });
   const assetToken = tokenList[assetTokenId];
 
   if (!earnDepositedToken || !assetToken) return null;
@@ -439,12 +429,11 @@ const parseEarnDepositApiEvent: ParseFunction<BaseApiEvent & EarnDepositApiEvent
         amountInUnits: formatCurrencyAmount({ amount: BigInt(event.data.assetsDeposited), token: earnDepositedToken }),
         amountInUSD: isNil(event.data.assetPrice)
           ? undefined
-          : parseFloat(
-              formatUnits(
-                BigInt(event.data.assetsDeposited) * parseNumberUsdPriceToBigInt(event.data.assetPrice),
-                assetToken.decimals + 18
-              )
-            ).toFixed(2),
+          : parseUsdPrice(
+              assetToken,
+              BigInt(event.data.assetsDeposited),
+              parseNumberUsdPriceToBigInt(event.data.assetPrice)
+            ).toString(),
       },
       user: event.tx.initiatedBy,
       status: TransactionStatus.DONE,
@@ -464,9 +453,9 @@ const parseEarnIncreaseApiEvent: ParseFunction<BaseApiEvent & EarnIncreaseApiEve
   tokenList,
   earnBaseEventData,
 }) => {
-  const earnDepositedTokenId = `${event.tx.chainId}-${event.data.depositToken.toLowerCase()}` as TokenListId;
+  const earnDepositedTokenId = getTokenListId({ tokenAddress: event.data.depositToken, chainId: event.tx.chainId });
   const earnDepositedToken = tokenList[earnDepositedTokenId];
-  const assetTokenId = `${event.tx.chainId}-${event.data.asset.toLowerCase()}` as TokenListId;
+  const assetTokenId = getTokenListId({ tokenAddress: event.data.asset, chainId: event.tx.chainId });
   const assetToken = tokenList[assetTokenId];
 
   if (!earnDepositedToken || !assetToken) return null;
@@ -490,12 +479,11 @@ const parseEarnIncreaseApiEvent: ParseFunction<BaseApiEvent & EarnIncreaseApiEve
         amountInUnits: formatCurrencyAmount({ amount: BigInt(event.data.assetsDeposited), token: earnDepositedToken }),
         amountInUSD: isNil(event.data.assetPrice)
           ? undefined
-          : parseFloat(
-              formatUnits(
-                BigInt(event.data.assetsDeposited) * parseNumberUsdPriceToBigInt(event.data.assetPrice),
-                assetToken.decimals + 18
-              )
-            ).toFixed(2),
+          : parseUsdPrice(
+              assetToken,
+              BigInt(event.data.assetsDeposited),
+              parseNumberUsdPriceToBigInt(event.data.assetPrice)
+            ).toString(),
       },
       user: event.tx.initiatedBy,
       status: TransactionStatus.DONE,
@@ -514,7 +502,7 @@ const parseEarnWithdrawApiEvent: ParseFunction<BaseApiEvent & EarnWithdrawApiEve
   earnBaseEventData,
 }) => {
   const allTokensAreInTokenList = event.data.tokens
-    .map((withdrawnToken) => `${event.tx.chainId}-${withdrawnToken.token}` as TokenListId)
+    .map((withdrawnToken) => getTokenListId({ tokenAddress: withdrawnToken.token, chainId: event.tx.chainId }))
     .every((tokenId) => !!tokenList[tokenId]);
 
   if (!allTokensAreInTokenList) return null;
@@ -527,7 +515,7 @@ const parseEarnWithdrawApiEvent: ParseFunction<BaseApiEvent & EarnWithdrawApiEve
       withdrawn: event.data.tokens
         .filter((withdrawnToken) => BigInt(withdrawnToken.withdrawn) > 0n)
         .map((withdrawnToken) => {
-          const tokenId = `${event.tx.chainId}-${withdrawnToken.token}` as TokenListId;
+          const tokenId = getTokenListId({ tokenAddress: withdrawnToken.token, chainId: event.tx.chainId });
           const token = { ...tokenList[tokenId], price: withdrawnToken.price };
 
           return {
@@ -536,12 +524,11 @@ const parseEarnWithdrawApiEvent: ParseFunction<BaseApiEvent & EarnWithdrawApiEve
               amountInUnits: formatCurrencyAmount({ amount: BigInt(withdrawnToken.withdrawn), token }),
               amountInUSD: isNil(withdrawnToken.price)
                 ? undefined
-                : parseFloat(
-                    formatUnits(
-                      BigInt(withdrawnToken.withdrawn) * parseNumberUsdPriceToBigInt(withdrawnToken.price),
-                      token.decimals + 18
-                    )
-                  ).toFixed(2),
+                : parseUsdPrice(
+                    token,
+                    BigInt(withdrawnToken.withdrawn),
+                    parseNumberUsdPriceToBigInt(withdrawnToken.price)
+                  ).toString(),
             },
             token: { ...token, icon: <TokenIcon size={8} token={token} /> },
             withdrawType: withdrawnToken.withdrawType,
@@ -564,7 +551,7 @@ const parseEarnSpecialWithdrawApiEvent: ParseFunction<
 > = ({ event, baseEvent, tokenList, earnBaseEventData }) => {
   // We expect exactly one token in the array, the ? is just in case
   const assetTokenData = event.data.tokens[0]?.token;
-  const assetTokenKey = `${event.tx.chainId}-${assetTokenData}` as TokenListId;
+  const assetTokenKey = getTokenListId({ tokenAddress: assetTokenData, chainId: event.tx.chainId });
 
   const assetToken = tokenList[assetTokenKey];
   if (!assetToken) return null;
@@ -577,7 +564,7 @@ const parseEarnSpecialWithdrawApiEvent: ParseFunction<
       tokens: event.data.tokens
         .filter((withdrawnToken) => BigInt(withdrawnToken.withdrawn) > 0n)
         .map((withdrawnToken) => {
-          const tokenId = `${event.tx.chainId}-${withdrawnToken.token}` as TokenListId;
+          const tokenId = getTokenListId({ tokenAddress: withdrawnToken.token, chainId: event.tx.chainId });
           const token = { ...tokenList[tokenId], price: withdrawnToken.price };
 
           return {
@@ -586,12 +573,11 @@ const parseEarnSpecialWithdrawApiEvent: ParseFunction<
               amountInUnits: formatCurrencyAmount({ amount: BigInt(withdrawnToken.withdrawn), token }),
               amountInUSD: isNil(withdrawnToken.price)
                 ? undefined
-                : parseFloat(
-                    formatUnits(
-                      BigInt(withdrawnToken.withdrawn) * parseNumberUsdPriceToBigInt(withdrawnToken.price),
-                      token.decimals + 18
-                    )
-                  ).toFixed(2),
+                : parseUsdPrice(
+                    token,
+                    BigInt(withdrawnToken.withdrawn),
+                    parseNumberUsdPriceToBigInt(withdrawnToken.price)
+                  ).toString(),
             },
             token: { ...token, icon: <TokenIcon size={8} token={token} /> },
           };
@@ -611,7 +597,7 @@ const parseEarnClaimDelayedWithdrawApiEvent: ParseFunction<
   BaseApiEvent & EarnClaimDelayedWithdrawApiEvent,
   EarnClaimDelayedWithdrawEvent
 > = ({ event, baseEvent, tokenList, earnBaseEventData }) => {
-  const claimedTokenId = `${event.tx.chainId}-${event.data.token}` as TokenListId;
+  const claimedTokenId = getTokenListId({ tokenAddress: event.data.token, chainId: event.tx.chainId });
   const claimedToken = tokenList[claimedTokenId];
 
   if (!claimedToken) return null;
@@ -628,10 +614,11 @@ const parseEarnClaimDelayedWithdrawApiEvent: ParseFunction<
         amountInUSD: isNil(event.data.price)
           ? undefined
           : parseFloat(
-              formatUnits(
-                BigInt(event.data.withdrawn) * parseNumberUsdPriceToBigInt(event.data.price),
-                claimedToken.decimals + 18
-              )
+              parseUsdPrice(
+                claimedToken,
+                BigInt(event.data.withdrawn),
+                parseNumberUsdPriceToBigInt(event.data.price)
+              ).toString()
             ).toFixed(2),
       },
       recipient: event.data.recipient,
@@ -650,7 +637,7 @@ const parseErc20TransferApiEvent: ParseFunction<BaseApiEvent & ERC20TransferApiE
   baseEvent,
   tokenList,
 }) => {
-  const transferedTokenId = `${event.tx.chainId}-${event.data.token.toLowerCase()}` as TokenListId;
+  const transferedTokenId = getTokenListId({ tokenAddress: event.data.token, chainId: event.tx.chainId });
   const transferedToken = tokenList[transferedTokenId];
 
   if (!transferedToken) return null;
@@ -665,12 +652,11 @@ const parseErc20TransferApiEvent: ParseFunction<BaseApiEvent & ERC20TransferApiE
         amountInUnits: formatCurrencyAmount({ amount: BigInt(event.data.amount), token: transferedToken }),
         amountInUSD: isNil(event.data.tokenPrice)
           ? undefined
-          : parseFloat(
-              formatUnits(
-                BigInt(event.data.amount) * parseNumberUsdPriceToBigInt(event.data.tokenPrice),
-                transferedToken.decimals + 18
-              )
-            ).toFixed(2),
+          : parseUsdPrice(
+              transferedToken,
+              BigInt(event.data.amount),
+              parseNumberUsdPriceToBigInt(event.data.tokenPrice)
+            ).toString(),
       },
       from: event.data.from,
       to: event.data.to,
@@ -691,8 +677,8 @@ const parseErc20TransferApiEvent: ParseFunction<BaseApiEvent & ERC20TransferApiE
 };
 
 const parseSwapApiEvent: ParseFunction<BaseApiEvent & SwapApiEvent, SwapEvent> = ({ event, baseEvent, tokenList }) => {
-  const tokenInId = `${event.tx.chainId}-${event.data.tokenIn.address.toLowerCase()}` as TokenListId;
-  const tokenOutId = `${event.tx.chainId}-${event.data.tokenOut.address.toLowerCase()}` as TokenListId;
+  const tokenInId = getTokenListId({ tokenAddress: event.data.tokenIn.address, chainId: event.tx.chainId });
+  const tokenOutId = getTokenListId({ tokenAddress: event.data.tokenOut.address, chainId: event.tx.chainId });
   const tokenIn = tokenList[tokenInId];
   const tokenOut = tokenList[tokenOutId];
 
@@ -712,24 +698,22 @@ const parseSwapApiEvent: ParseFunction<BaseApiEvent & SwapApiEvent, SwapEvent> =
         amountInUnits: formatCurrencyAmount({ amount: BigInt(event.data.tokenIn.amount), token: tokenIn }),
         amountInUSD: isNil(event.data.tokenIn.price)
           ? undefined
-          : parseFloat(
-              formatUnits(
-                BigInt(event.data.tokenIn.amount) * parseNumberUsdPriceToBigInt(event.data.tokenIn.price),
-                tokenIn.decimals + 18
-              )
-            ).toFixed(2),
+          : parseUsdPrice(
+              tokenIn,
+              BigInt(event.data.tokenIn.amount),
+              parseNumberUsdPriceToBigInt(event.data.tokenIn.price)
+            ).toString(),
       },
       amountOut: {
         amount: BigInt(event.data.tokenOut.amount),
         amountInUnits: formatCurrencyAmount({ amount: BigInt(event.data.tokenOut.amount), token: tokenOut }),
         amountInUSD: isNil(event.data.tokenOut.price)
           ? undefined
-          : parseFloat(
-              formatUnits(
-                BigInt(event.data.tokenOut.amount) * parseNumberUsdPriceToBigInt(event.data.tokenOut.price),
-                tokenOut.decimals + 18
-              )
-            ).toFixed(2),
+          : parseUsdPrice(
+              tokenOut,
+              BigInt(event.data.tokenOut.amount),
+              parseNumberUsdPriceToBigInt(event.data.tokenOut.price)
+            ).toString(),
       },
       tokenFlow: TransactionEventIncomingTypes.INCOMING,
       status: TransactionStatus.DONE,
@@ -756,12 +740,11 @@ const parseNativeTransferApiEvent: ParseFunction<BaseApiEvent & NativeTransferAp
         amountInUnits: formatCurrencyAmount({ amount: BigInt(event.data.amount), token: protocolToken }),
         amountInUSD: isNil(event.tx.nativePrice)
           ? undefined
-          : parseFloat(
-              formatUnits(
-                BigInt(event.data.amount) * parseNumberUsdPriceToBigInt(event.tx.nativePrice),
-                protocolToken.decimals + 18
-              )
-            ).toFixed(2),
+          : parseUsdPrice(
+              protocolToken,
+              BigInt(event.data.amount),
+              parseNumberUsdPriceToBigInt(event.tx.nativePrice)
+            ).toString(),
       },
       from: event.data.from,
       to: event.data.to,
@@ -818,12 +801,11 @@ const parseTransactionApiEventToTransactionEvent = (
         amountInUnits: formatCurrencyAmount({ amount: BigInt(event.tx.spentInGas), token: protocolToken }),
         amountInUSD: isNil(event.tx.nativePrice)
           ? undefined
-          : parseFloat(
-              formatUnits(
-                BigInt(event.tx.spentInGas) * parseNumberUsdPriceToBigInt(event.tx.nativePrice),
-                protocolToken.decimals + 18
-              )
-            ).toFixed(2),
+          : parseUsdPrice(
+              protocolToken,
+              BigInt(event.tx.spentInGas),
+              parseNumberUsdPriceToBigInt(event.tx.nativePrice)
+            ).toString(),
       },
       network: {
         ...network,
@@ -871,8 +853,8 @@ const parseTransactionApiEventToTransactionEvent = (
       price: typedEvent.data.toToken.price,
     });
 
-    const fromTokenId = `${typedEvent.tx.chainId}-${fromToUse.address.toLowerCase()}` as TokenListId;
-    const toTokenId = `${typedEvent.tx.chainId}-${toToUse.address.toLowerCase()}` as TokenListId;
+    const fromTokenId = getTokenListId({ tokenAddress: fromToUse.address, chainId: typedEvent.tx.chainId });
+    const toTokenId = getTokenListId({ tokenAddress: toToUse.address, chainId: typedEvent.tx.chainId });
 
     tokenFrom = tokenList[fromTokenId];
     tokenTo = tokenList[toTokenId];
@@ -1061,7 +1043,7 @@ const transformNonIndexedEvent = ({
       break;
     case TransactionTypes.earnWithdraw: {
       const allTokensAreInTokenList = event.typeData.withdrawn
-        .map((withdrawn) => `${event.chainId}-${withdrawn.token.address}` as TokenListId)
+        .map((withdrawn) => getTokenListId({ tokenAddress: withdrawn.token.address, chainId: event.chainId }))
         .every((tokenId) => !!tokenList[tokenId]);
 
       if (!allTokensAreInTokenList) return null;
