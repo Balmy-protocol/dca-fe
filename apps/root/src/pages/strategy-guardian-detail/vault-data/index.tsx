@@ -5,6 +5,7 @@ import DataHeader from './components/data-header';
 import DataCards from './components/data-cards';
 import DataAbout from './components/data-about';
 import DataGuardian from './components/data-guardian';
+import RewardsContainer from './components/data-rewards';
 
 interface VaultDataProps {
   strategy?: DisplayStrategy;
@@ -17,6 +18,7 @@ const VaultData = ({ strategy }: VaultDataProps) => {
         <DataHeader strategy={strategy} />
         <DataCards strategy={strategy} />
         {!!strategy?.guardian && <DataGuardian strategy={strategy} />}
+        <RewardsContainer strategy={strategy} />
         <DataAbout strategy={strategy} collapsed />
       </ContainerBox>
     </BackgroundPaper>

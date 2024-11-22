@@ -55,6 +55,7 @@ const BalancesContainer = ({
 }) => {
   const intl = useIntl();
   const showBalances = useShowBalances();
+  const strategyWithRewards = rewards && rewards.tokens.length > 0;
   const { assetBalance, rewardsBalances } = React.useMemo(() => {
     if (!asset) return {};
     const mergedBalances = calculateUserStrategiesBalances(userPositions);
@@ -73,15 +74,23 @@ const BalancesContainer = ({
           <FormattedMessage defaultMessage="Balances" description="earn.strategy-details.vault-about.balances" />
         </Typography>
         <Typography variant="bodySmallRegular">
-          <FormattedMessage
-            description="earn.strategy-details.vault-about.rewards-description"
-            defaultMessage="For each {asset} deposited, you will earn {apy}% APY in {rewards}."
-            values={{
-              asset: asset?.symbol,
-              apy: rewards?.apy,
-              rewards: rewards?.tokens.map((token) => token.symbol).join(', '),
-            }}
-          />
+          {strategyWithRewards ? (
+            <FormattedMessage
+              description="earn.strategy-details.vault-about.balances-description.with-rewards"
+              defaultMessage="Your total {asset} balance and current rewards in this vault."
+              values={{
+                asset: asset?.symbol,
+              }}
+            />
+          ) : (
+            <FormattedMessage
+              description="earn.strategy-details.vault-about.balances-description"
+              defaultMessage="Your total {asset} balance in this vault."
+              values={{
+                asset: asset?.symbol,
+              }}
+            />
+          )}
         </Typography>
       </ContainerBox>
       <ContainerBox gap={4} flexWrap="wrap">

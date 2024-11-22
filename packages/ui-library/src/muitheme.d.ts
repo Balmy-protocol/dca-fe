@@ -68,6 +68,7 @@ declare module '@mui/material/styles' {
     gradient: PaletteColor & {
       earnWizard: string;
       newsBanner: string;
+      rewards: string;
     };
     typo1: string;
     typo2: string;
@@ -80,6 +81,7 @@ declare module '@mui/material/styles' {
     gradient?: PaletteColorOptions & {
       earnWizard: string;
       newsBanner: string;
+      rewards: string;
     };
     typo1: string;
     typo2: string;
