@@ -53,6 +53,8 @@ import {
   BaseEarnDataEvent,
   SdkEarnPositionId,
   StrategyId,
+  TransactionEarnTypeDataOptions,
+  TransactionDetailsBase,
 } from 'common-types';
 import { compact, find, fromPairs, isNil, isUndefined } from 'lodash';
 import { Address, maxUint256, parseUnits } from 'viem';
@@ -919,6 +921,14 @@ const buildBaseDcaPendingEventData = (position: Position): BaseDcaDataEvent => {
   };
 };
 
+const buildBaseEarnPendingEventData = (earnEvent: TransactionDetailsBase & TransactionEarnTypeDataOptions) => {
+  return {
+    positionId: earnEvent.typeData.positionId,
+    strategyId: earnEvent.typeData.strategyId,
+    user: earnEvent.from as Address,
+  };
+};
+
 const transformNonIndexedEvent = ({
   event,
   userWallets,
@@ -1012,6 +1022,8 @@ const transformNonIndexedEvent = ({
       const assetAmount = BigInt(event.typeData.assetAmount);
       const assetAmountInUnits = formatCurrencyAmount({ amount: assetAmount, token: earnToken });
 
+      baseEventData = buildBaseEarnPendingEventData(event);
+
       parsedEvent = {
         type:
           event.type === TransactionTypes.earnCreate
@@ -1019,6 +1031,7 @@ const transformNonIndexedEvent = ({
             : TransactionEventTypes.EARN_INCREASE,
         unit: IndexerUnits.EARN,
         data: {
+          ...baseEventData,
           asset: { ...assetToken, icon: <TokenIcon size={8} token={assetToken} />, price: event.typeData.asset.price },
           depositToken: { ...earnToken, icon: <TokenIcon size={8} token={earnToken} /> },
           depositAmount: {
@@ -1032,9 +1045,6 @@ const transformNonIndexedEvent = ({
               ? undefined
               : parseUsdPrice(earnToken, assetAmount, parseNumberUsdPriceToBigInt(event.typeData.asset.price)),
           },
-          positionId: event.typeData.positionId,
-          strategyId: event.typeData.strategyId,
-          user: event.from as Address,
           tokenFlow: TransactionEventIncomingTypes.INCOMING,
           status: event.receipt ? TransactionStatus.DONE : TransactionStatus.PENDING,
         },
@@ -1048,10 +1058,13 @@ const transformNonIndexedEvent = ({
 
       if (!allTokensAreInTokenList) return null;
 
+      baseEventData = buildBaseEarnPendingEventData(event);
+
       parsedEvent = {
         type: TransactionEventTypes.EARN_WITHDRAW,
         unit: IndexerUnits.EARN,
         data: {
+          ...baseEventData,
           withdrawn: event.typeData.withdrawn.map((withdrawnToken) => {
             const tokenId = getTokenListId({
               tokenAddress: withdrawnToken.token.address,
@@ -1075,7 +1088,6 @@ const transformNonIndexedEvent = ({
               withdrawType: withdrawnToken.withdrawType,
             };
           }),
-          user: event.from as Address,
           tokenFlow: TransactionEventIncomingTypes.INCOMING,
           status: event.receipt ? TransactionStatus.DONE : TransactionStatus.PENDING,
         },
@@ -1092,10 +1104,13 @@ const transformNonIndexedEvent = ({
       const specialWithdrawToken = tokenList[specialWithdrawTokenId];
       if (!specialWithdrawToken) return null;
 
+      baseEventData = buildBaseEarnPendingEventData(event);
+
       parsedEvent = {
         type: TransactionEventTypes.EARN_SPECIAL_WITHDRAW,
         unit: IndexerUnits.EARN,
         data: {
+          ...baseEventData,
           tokens: [
             {
               token: { ...specialWithdrawToken, icon: <TokenIcon size={8} token={specialWithdrawToken} /> },
@@ -1115,7 +1130,6 @@ const transformNonIndexedEvent = ({
               },
             },
           ],
-          user: event.from as Address,
           tokenFlow: TransactionEventIncomingTypes.INCOMING,
           status: event.receipt ? TransactionStatus.DONE : TransactionStatus.PENDING,
         },
@@ -1135,11 +1149,14 @@ const transformNonIndexedEvent = ({
       const claimedAmount = BigInt(event.typeData.withdrawn);
       const claimedAmountInUnits = formatCurrencyAmount({ amount: claimedAmount, token: claimedToken });
 
+      baseEventData = buildBaseEarnPendingEventData(event);
+
       parsedEvent = {
         type: TransactionEventTypes.EARN_CLAIM_DELAYED_WITHDRAW,
         unit: IndexerUnits.EARN,
         data: {
-          token: claimedToken,
+          ...baseEventData,
+          token: { ...claimedToken, icon: <TokenIcon size={8} token={claimedToken} /> },
           withdrawn: {
             amount: claimedAmount,
             amountInUnits: claimedAmountInUnits,
@@ -1151,7 +1168,6 @@ const transformNonIndexedEvent = ({
                   parseNumberUsdPriceToBigInt(event.typeData.claim.price)
                 ).toFixed(2),
           },
-          user: event.from as Address,
           tokenFlow: TransactionEventIncomingTypes.INCOMING,
           status: event.receipt ? TransactionStatus.DONE : TransactionStatus.PENDING,
         },

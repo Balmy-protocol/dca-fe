@@ -580,8 +580,17 @@ const HistoryTable = ({ search, tokens, height, solid }: HistoryTableProps) => {
     ({ chainId, positionId, hub }: { chainId: number; hub: string; positionId: number }) => {
       const version = findHubAddressVersion(hub);
       pushToHistory(`/invest/positions/${chainId}/${version}/${positionId}`);
+      trackEvent('History - Tx Receipt - View position');
     },
-    [pushToHistory]
+    [pushToHistory, trackEvent]
+  );
+
+  const onGoToEarnPosition = React.useCallback(
+    ({ chainId, strategyId }: { chainId: number; strategyId: string }) => {
+      pushToHistory(`/earn/vaults/${chainId}/${strategyId}`);
+      trackEvent('History - Tx Receipt - View earn position');
+    },
+    [pushToHistory, trackEvent]
   );
 
   React.useEffect(() => {
@@ -723,6 +732,7 @@ const HistoryTable = ({ search, tokens, height, solid }: HistoryTableProps) => {
           open={!isUndefined(showReceipt)}
           onClose={() => setShowReceipt(undefined)}
           onClickPositionId={onGoToPosition}
+          onClickEarnPositionId={onGoToEarnPosition}
           showBalances={showBalances}
         />
       </StyledBackgroundPaper>
