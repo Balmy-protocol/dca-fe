@@ -92,13 +92,13 @@ const ComingSoon = () => (
   </StyledComingSoonContainer>
 );
 
-// Enable for release before enabling earn
-// export const EARN_ROUTE = {
-//   label: defineMessage({ description: 'earn', defaultMessage: 'Earn' }),
-//   key: 'earn-group',
-//   icon: <MoneyAddIcon />,
-//   endContent: <ComingSoon />,
-// };
+export const EARN_SUBSCRIBE_ROUTE = {
+  label: defineMessage({ description: 'earn', defaultMessage: 'Earn' }),
+  key: 'earn-group',
+  icon: <MoneyAddIcon />,
+  endContent: <ComingSoon />,
+};
 
 // export const NON_NAVIGABLE_ROUTES = [EARN_ROUTE.key];
-export const NON_NAVIGABLE_ROUTES: string[] = [];
+export const NON_NAVIGABLE_ROUTES: string[] =
+  process.env.EARN_ENABLED === 'true' ? [] : [EARN_ROUTE.key, EARN_PORTFOLIO.key];

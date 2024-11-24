@@ -99,11 +99,13 @@ const PromisesInitializer = () => {
       timeoutPromise(positionService.fetchUserHasPositions(), TimeoutPromises.COMMON, {
         description: ApiErrorKeys.HISTORY,
       }).catch(handleError);
-      timeoutPromise(earnService.fetchUserStrategies(), TimeoutPromises.COMMON, {
-        description: ApiErrorKeys.EARN,
-      })
-        .then(() => void dispatch(processConfirmedTransactionsForEarn()))
-        .catch(handleError);
+      if (process.env.EARN_ENABLED === 'true') {
+        timeoutPromise(earnService.fetchUserStrategies(), TimeoutPromises.COMMON, {
+          description: ApiErrorKeys.EARN,
+        })
+          .then(() => void dispatch(processConfirmedTransactionsForEarn()))
+          .catch(handleError);
+      }
       timeoutPromise(positionService.fetchCurrentPositions(), TimeoutPromises.COMMON, {
         description: ApiErrorKeys.DCA_POSITIONS,
       })
