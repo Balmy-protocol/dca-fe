@@ -22,7 +22,8 @@ const StyledTopTokenContainer = styled(ContainerBox).attrs({
   ${!$isFirst ? 'position: absolute;' : ''}
   right: -${spacing($right)};
   border-radius: 100px;
-  background-color: ${colors[palette.mode].background.quarteryNoAlpha};
+  background-color: ${colors[palette.mode].background.quartery};
+  backdrop-filter: blur(30px);
   min-width: 16px;
   min-height: 16px;
 `}

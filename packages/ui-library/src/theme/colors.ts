@@ -122,7 +122,6 @@ export const colors = {
       secondary: '#1f162d',
       tertiary: '#2b1e3e',
       quartery: 'rgba(24, 17, 34, 0.3000)',
-      quarteryNoAlpha: '#a095b0',
       emphasis: '#2B1E3E',
     },
     aqua: {
@@ -224,7 +223,6 @@ export const colors = {
       secondary: '#f4f2f7',
       tertiary: '#f9f7fc',
       quartery: 'rgba(244, 242, 247, 0.4000)',
-      quarteryNoAlpha: '#eeeaf6',
       emphasis: '#edebf0',
     },
     aqua: {

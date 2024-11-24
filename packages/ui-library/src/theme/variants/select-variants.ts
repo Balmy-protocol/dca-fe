@@ -26,12 +26,13 @@ export const buildSelectVariant = (mode: 'light' | 'dark'): Components => ({
         paddingTop: SPACING(2.5),
         paddingBottom: SPACING(2.5),
         paddingLeft: SPACING(3),
+
         '&.MuiSelect-MuiMenu': {
           top: SPACING(2),
           boxShadow: colors[mode].dropShadow.dropShadow200,
           '& .MuiMenu-paper': {
-            backgroundColor: colors[mode].background.tertiary,
-            border: colors[mode].border.border2,
+            backgroundColor: colors[mode].background.secondary,
+            border: `1px solid ${colors[mode].border.border2}`,
             '& .MuiMenu-list': {
               padding: `${SPACING(3)} !important`,
               gap: SPACING(0.5),
@@ -41,6 +42,7 @@ export const buildSelectVariant = (mode: 'light' | 'dark'): Components => ({
               '& .MuiMenuItem-root': {
                 padding: SPACING(3),
                 borderRadius: SPACING(2),
+                border: `1px solid ${colors[mode].border.border2}`,
                 backgroundColor: colors[mode].background.secondary,
                 '&:hover': {
                   backgroundColor: colors[mode].background.emphasis,
@@ -53,6 +55,10 @@ export const buildSelectVariant = (mode: 'light' | 'dark'): Components => ({
             },
           },
         },
+      },
+      paper: {
+        backgroundColor: colors[mode].background.secondary,
+        border: `1px solid ${colors[mode].border.border2}`,
       },
     },
   },

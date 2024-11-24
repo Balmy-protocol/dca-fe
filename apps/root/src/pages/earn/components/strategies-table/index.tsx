@@ -55,7 +55,6 @@ const StyledBackgroundPaper = styled(BackgroundPaper).attrs({ variant: 'outlined
   flex-direction: column;
   align-items: center;
   position: relative;
-  backdrop-filter: blur(30px);
 `;
 
 const StyledTableEnd = styled(TableCell)`
