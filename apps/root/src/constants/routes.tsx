@@ -101,4 +101,4 @@ export const EARN_SUBSCRIBE_ROUTE = {
 
 // export const NON_NAVIGABLE_ROUTES = [EARN_ROUTE.key];
 export const NON_NAVIGABLE_ROUTES: string[] =
-  process.env.EARN_ENABLED === 'true' ? [] : [EARN_ROUTE.key, EARN_PORTFOLIO.key];
+  process.env.EARN_ENABLED === 'true' ? [] : [EARN_GROUP.key, EARN_ROUTE.key, EARN_PORTFOLIO.key];
