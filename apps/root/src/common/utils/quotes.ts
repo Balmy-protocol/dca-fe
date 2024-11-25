@@ -12,7 +12,13 @@ import {
 import { QuoteErrors, SwapOption, SwapOptionWithTx, Token } from '@types';
 import { defineMessage, useIntl } from 'react-intl';
 
-import { formatCurrencyAmount, parseNumberUsdPriceToBigInt, parseUsdPrice, toToken } from './currency';
+import {
+  formatCurrencyAmount,
+  parseExponentialNumberToString,
+  parseNumberUsdPriceToBigInt,
+  parseUsdPrice,
+  toToken,
+} from './currency';
 
 export function calculateProfit(quote?: Nullable<SwapOption>) {
   if (!quote) return undefined;
@@ -140,7 +146,7 @@ export const getBetterBy = (
     const profitBest = calculateProfit(bestQuote);
     const profitSecond = calculateProfit(secondQuote);
     if (!isUndefined(profitBest) && !isUndefined(profitSecond)) {
-      betterBy = parseUnits(parseFloat((profitBest - profitSecond).toFixed(20)).toString(), 18);
+      betterBy = parseUnits(parseExponentialNumberToString(parseFloat((profitBest - profitSecond).toFixed(20))), 18);
       // betterBy = parseUnits(Math.abs(((profitBest - profitSecond) / profitSecond) * 100).toString(), 18);
     }
   } else if (sorting === SORT_LEAST_GAS) {
@@ -181,7 +187,10 @@ export const getWorseBy = (
     const profitBest = calculateProfit(bestQuote);
     const profitSecond = calculateProfit(secondQuote);
     if (profitBest && profitSecond) {
-      worseBy = parseUnits(parseFloat(Math.abs(profitSecond - profitBest).toFixed(20)).toString(), 18);
+      worseBy = parseUnits(
+        parseExponentialNumberToString(parseFloat(Math.abs(profitSecond - profitBest).toFixed(20))),
+        18
+      );
     }
   } else if (sorting === SORT_LEAST_GAS) {
     worseBy =
