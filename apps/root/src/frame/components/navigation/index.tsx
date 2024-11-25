@@ -145,10 +145,9 @@ const Navigation = ({ children }: React.PropsWithChildren) => {
 
   const onSectionClick = useCallback(
     (section: Section, openInNewTab?: boolean) => {
-      // TODO: Re-enable for release
-      // if (section.type !== SectionType.divider && section.key === EARN_ROUTE.key) {
-      //   setShowGuardianListSubscribeModal(true);
-      // }
+      if (section.type === SectionType.link && section.key === EARN_GROUP.key) {
+        setShowGuardianListSubscribeModal(true);
+      }
 
       if (
         section.type === SectionType.divider ||
