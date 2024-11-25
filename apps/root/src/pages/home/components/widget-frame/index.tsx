@@ -2,29 +2,27 @@ import React from 'react';
 import {
   ContainerBox,
   Typography,
-  ForegroundPaper,
-  DividerBorder2,
   colors,
   Collapse,
   ArrowUpIcon,
   Button,
   Tooltip,
   Hidden,
+  BackgroundPaper,
+  DiagramIcon,
 } from 'ui-library';
 import styled from 'styled-components';
 import NetWorthNumber from '@common/components/networth-number';
 import useTrackEvent from '@hooks/useTrackEvent';
-import { useShowBalances } from '@state/config/hooks';
+import { useShowBalances, useThemeMode } from '@state/config/hooks';
+import isUndefined from 'lodash/isUndefined';
 
-const StyledContainer = styled(ForegroundPaper).attrs({ variant: 'outlined' })`
+const StyledContainer = styled(BackgroundPaper).attrs({ variant: 'outlined' })`
+  ${({ theme: { space } }) => `
+    padding: ${space.s05};
+  `}
   display: flex;
   flex: 1;
-`;
-
-const StyledContainerBox = styled(ContainerBox)`
-  ${({ theme: { spacing } }) => `
-    padding: ${spacing(6)};
-  `}
 `;
 
 const StyledCollapseIconContainer = styled(ContainerBox)<{ $isOpen: boolean }>`
@@ -32,6 +30,13 @@ const StyledCollapseIconContainer = styled(ContainerBox)<{ $isOpen: boolean }>`
     transform: rotate(${$isOpen ? 0 : 180}deg);
     transition: transform 150ms cubic-bezier(0.4,0,0.2,1) 0ms;
   `}
+`;
+
+const StyledCollapse = styled(Collapse)`
+  flex: 1;
+  display: flex;
+  margin-top: ${({ theme, in: show }) => theme.spacing(show ? 4 : 0)};
+  transition: all 300ms;
 `;
 
 const StyledPercentageBox = styled(ContainerBox)`
@@ -83,6 +88,7 @@ const WidgetFrame = ({
   const [shouldShow, setShouldShow] = React.useState(true);
   const trackEvent = useTrackEvent();
   const showBalances = useShowBalances();
+  const mode = useThemeMode();
 
   const onToggleAccordion = (open: boolean) => {
     setShouldShow(open);
@@ -91,19 +97,17 @@ const WidgetFrame = ({
 
   return (
     <StyledContainer>
-      <StyledContainerBox flex={1} flexDirection="column" gap={3}>
+      <ContainerBox flex={1} flexDirection="column">
         <ContainerBox
           alignItems="center"
           style={{ cursor: collapsable ? 'pointer' : 'auto' }}
           gap={2}
           onClick={() => collapsable && onToggleAccordion(!shouldShow)}
         >
-          {Icon && (
-            <Typography variant="h5" sx={{ display: 'flex' }}>
-              <Icon size="inherit" />
-            </Typography>
+          {(Icon && <Icon sx={{ color: colors[mode].typography.typo2 }} />) || (
+            <DiagramIcon sx={{ color: colors[mode].typography.typo2 }} />
           )}
-          <Typography variant="bodyRegular">
+          <Typography variant="bodySemibold">
             {title}
             {` · `}
           </Typography>
@@ -122,9 +126,9 @@ const WidgetFrame = ({
               </Typography>
             </Hidden>
           )}
-          {totalValue && showPercentage && (
+          {!isUndefined(totalValue) && totalValue !== 0 && showPercentage && (
             <StyledPercentageBox>
-              <Typography variant="bodySmallLabel">
+              <Typography variant="labelRegular">
                 {showBalances ? ((assetValue / totalValue) * 100).toFixed(0) : '-'}%
               </Typography>
             </StyledPercentageBox>
@@ -153,18 +157,15 @@ const WidgetFrame = ({
           {collapsable && (
             <ContainerBox flex={1} justifyContent="flex-end">
               <StyledCollapseIconContainer $isOpen={shouldShow}>
-                <ArrowUpIcon />
+                <ArrowUpIcon sx={{ color: colors[mode].typography.typo3 }} />
               </StyledCollapseIconContainer>
             </ContainerBox>
           )}
         </ContainerBox>
-        <DividerBorder2 />
         <ContainerBox flex={1}>
-          <Collapse in={shouldShow} sx={{ flex: 1, display: 'flex' }}>
-            {children}
-          </Collapse>
+          <StyledCollapse in={shouldShow}>{children}</StyledCollapse>
         </ContainerBox>
-      </StyledContainerBox>
+      </ContainerBox>
     </StyledContainer>
   );
 };

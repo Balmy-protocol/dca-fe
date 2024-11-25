@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { AmountsOfToken, Token, TokenWithIcon, TransactionEventIncomingTypes } from 'common-types';
 import {
@@ -12,11 +12,11 @@ import {
   DividerBorder1,
   TransactionReceipt,
   TransactionReceiptProp,
-  TRANSACTION_TYPE_TITLE_MAP,
+  getTransactionTypeTitle,
 } from '..';
 import { colors } from '../../theme';
 import { Address } from 'viem';
-import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
+import { FormattedMessage, MessageDescriptor, defineMessage, useIntl } from 'react-intl';
 import { SuccessCircleIcon } from '../../icons';
 import { Chains } from '@balmy/sdk';
 import { SPACING } from '../../theme/constants';
@@ -32,14 +32,15 @@ import {
 import { formatCurrencyAmount, formatUsdAmount } from '../../common/utils/currency';
 
 // Max width same as button
-const StyledOverlay = styled.div`
-  ${({ theme: { spacing } }) => `
+const StyledOverlay = styled.div<{ $isAbsolute: boolean }>`
+  ${({ theme: { spacing }, $isAbsolute }) => `
     display: flex;
     flex-direction: column;
     gap: ${spacing(6)};
     margin: 0 auto;
     border-radius: inherit;
-    max-width: ${spacing(87.5)};
+    width: ${spacing(87.5)};
+    ${$isAbsolute && `padding: ${spacing(6)};`}
   `}
 `;
 
@@ -100,35 +101,34 @@ const TIMES_PER_NETWORK = {
 
 export const DEFAULT_TIME_PER_NETWORK = 30;
 
-interface GasBalanceChangeProps {
-  protocolToken: Token;
-  gasUsed: AmountsOfToken;
-  mode: 'light' | 'dark';
+interface CostBalanceChangeProps {
+  cost: AmountsOfToken;
+  title: MessageDescriptor;
+  token: Token;
   intl: ReturnType<typeof useIntl>;
 }
 
-const GasBalanceChange = ({ protocolToken, gasUsed, mode, intl }: GasBalanceChangeProps) => (
+const CostBalanceChange = ({ cost, token, title, intl }: CostBalanceChangeProps) => (
   <StyledBalanceChange>
     <StyledBalanceChangeToken>
-      <Typography variant="bodyRegular">
-        <FormattedMessage
-          description="transactionConfirmationBalanceChangesGasUsed"
-          defaultMessage="Transaction cost:"
-        />
-      </Typography>
+      <Typography variant="bodyRegular">{intl.formatMessage(title)}</Typography>
     </StyledBalanceChangeToken>
     <StyledAmountContainer>
-      <Typography variant="bodyRegular" color={colors[mode].typography.typo2}>
-        -{formatCurrencyAmount({ amount: gasUsed.amount, token: protocolToken, intl })} {protocolToken.symbol}
+      <Typography variant="bodyBold">
+        -{formatCurrencyAmount({ amount: cost.amount, token, intl })} {token.symbol}
       </Typography>
-      {!!gasUsed.amountInUSD && (
-        <Typography variant="bodySmallRegular" color={colors[mode].typography.typo3}>
-          ${formatUsdAmount({ amount: gasUsed.amountInUSD, intl })}
-        </Typography>
+      {!!cost.amountInUSD && (
+        <Typography variant="bodySmallRegular">${formatUsdAmount({ amount: cost.amountInUSD, intl })}</Typography>
       )}
     </StyledAmountContainer>
   </StyledBalanceChange>
 );
+
+interface GasBalanceChangeProps {
+  protocolToken: Token;
+  gasUsed: AmountsOfToken;
+  intl: ReturnType<typeof useIntl>;
+}
 
 interface AmountBalanceChangeProps {
   token: TokenWithIcon;
@@ -137,16 +137,30 @@ interface AmountBalanceChangeProps {
   transferedTo?: Address;
   mode: 'light' | 'dark';
   intl: ReturnType<typeof useIntl>;
+  title?: MessageDescriptor;
+  isLast?: boolean;
 }
 
-const AmountBalanceChange = ({ token, amount, inflow, transferedTo, mode, intl }: AmountBalanceChangeProps) => (
+const AmountBalanceChange = ({
+  token,
+  amount,
+  inflow,
+  transferedTo,
+  mode,
+  intl,
+  title,
+  isLast,
+}: AmountBalanceChangeProps) => (
   <>
     <StyledBalanceChange>
-      <StyledBalanceChangeToken>
-        <Typography sx={{ display: 'flex', alignItems: 'center', gap: SPACING(2) }} variant="bodyBold">
-          {token.icon} {token.symbol}
-        </Typography>
-      </StyledBalanceChangeToken>
+      <ContainerBox flexDirection="column" gap={1}>
+        {title && <Typography variant="bodySmallRegular">{intl.formatMessage(title)}</Typography>}
+        <StyledBalanceChangeToken>
+          <Typography sx={{ display: 'flex', alignItems: 'center', gap: SPACING(2) }} variant="bodyBold">
+            {token.icon} {token.symbol}
+          </Typography>
+        </StyledBalanceChangeToken>
+      </ContainerBox>
       <StyledAmountContainer>
         <Typography
           variant="bodyBold"
@@ -175,13 +189,14 @@ const AmountBalanceChange = ({ token, amount, inflow, transferedTo, mode, intl }
         )}
       </StyledAmountContainer>
     </StyledBalanceChange>
-    <DividerBorder1 />
+    {!isLast && <DividerBorder1 />}
   </>
 );
 
 interface SuccessTransactionConfirmationProps {
-  balanceChanges?: Omit<AmountBalanceChangeProps, 'mode' | 'intl'>[];
-  gasUsed?: Omit<GasBalanceChangeProps, 'mode' | 'intl'>;
+  balanceChanges?: DistributiveOmit<AmountBalanceChangeProps, 'mode' | 'intl'>[];
+  gasUsed?: DistributiveOmit<GasBalanceChangeProps, 'intl'>;
+  feeCost?: DistributiveOmit<CostBalanceChangeProps, 'intl'>;
   successTitle?: React.ReactNode;
   successSubtitle?: React.ReactNode;
   receipt?: TransactionReceiptProp;
@@ -198,6 +213,7 @@ interface SuccessTransactionConfirmationProps {
 const SuccessTransactionConfirmation = ({
   balanceChanges,
   gasUsed,
+  feeCost,
   successTitle,
   additionalActions,
   mode,
@@ -232,10 +248,27 @@ const SuccessTransactionConfirmation = ({
         </ContainerBox>
         {((balanceChanges && !!balanceChanges.length) || gasUsed) && (
           <StyledBalanceChangesContainer>
-            {balanceChanges?.map((balanceChange) => (
-              <AmountBalanceChange mode={mode} key={balanceChange.token.address} {...balanceChange} intl={intl} />
+            {balanceChanges?.map((balanceChange, index) => (
+              <AmountBalanceChange
+                mode={mode}
+                key={balanceChange.token.address}
+                {...balanceChange}
+                intl={intl}
+                isLast={index === balanceChanges.length - 1}
+              />
             ))}
-            {gasUsed && <GasBalanceChange mode={mode} {...gasUsed} intl={intl} />}
+            {feeCost && <CostBalanceChange {...feeCost} intl={intl} />}
+            {gasUsed && (
+              <CostBalanceChange
+                cost={gasUsed.gasUsed}
+                title={defineMessage({
+                  description: 'transactionConfirmationBalanceChangesGasUsed',
+                  defaultMessage: 'Transaction cost',
+                })}
+                token={gasUsed.protocolToken}
+                intl={intl}
+              />
+            )}
           </StyledBalanceChangesContainer>
         )}
       </ContainerBox>
@@ -263,7 +296,7 @@ const SuccessTransactionConfirmation = ({
             description: 'txConfirmationSatisfactionQuestion',
             defaultMessage: 'How satisfied are you with the {operation} process you just completed?',
           }),
-          { operation: receipt ? capitalize(intl.formatMessage(TRANSACTION_TYPE_TITLE_MAP[receipt.type])) : '' }
+          { operation: receipt ? capitalize(intl.formatMessage(getTransactionTypeTitle(receipt))) : '' }
         )}
         ratingDescriptors={[
           intl.formatMessage(defineMessage({ defaultMessage: 'Very Frustrated', description: 'veryFrustrated' })),
@@ -338,7 +371,7 @@ const PendingTransactionConfirmation = ({
           }}
         />
         <StyledProgressContent>
-          <Typography variant={timer === 0 ? 'h5' : 'confirmationLoading'}>
+          <Typography variant={timer === 0 ? 'h5Bold' : 'confirmationLoading'}>
             {timer > 0 && `${`0${minutes}`.slice(-2)}:${`0${seconds}`.slice(-2)}`}
             {timer === 0 && (
               <FormattedMessage description="transactionConfirmationProcessing" defaultMessage="Processing" />
@@ -372,8 +405,9 @@ const PendingTransactionConfirmation = ({
 };
 
 interface TransactionConfirmationProps {
-  balanceChanges?: Omit<AmountBalanceChangeProps, 'mode' | 'intl'>[];
-  gasUsed?: Omit<GasBalanceChangeProps, 'mode' | 'intl'>;
+  balanceChanges?: DistributiveOmit<AmountBalanceChangeProps, 'mode' | 'intl'>[];
+  gasUsed?: DistributiveOmit<GasBalanceChangeProps, 'mode' | 'intl'>;
+  feeCost?: DistributiveOmit<CostBalanceChangeProps, 'intl'>;
   successTitle?: React.ReactNode;
   loadingSubtitle?: string;
   loadingTitle?: React.ReactNode;
@@ -391,7 +425,31 @@ interface TransactionConfirmationProps {
   success: boolean;
   successSubtitle?: React.ReactNode;
   onClickSatisfactionOption: (value: number) => void;
+  setHeight?: (a?: number) => void;
 }
+
+const StyledContainer = styled(ContainerBox).attrs({ gap: 10, fullWidth: true, flexDirection: 'column' })<{
+  $isAbsolute: boolean;
+}>`
+  ${({
+    $isAbsolute,
+    theme: {
+      palette: { mode },
+      spacing,
+    },
+  }) =>
+    $isAbsolute &&
+    `
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      background-color: ${colors[mode].background.quartery};
+      backdrop-filter: blur(30px);
+      border-radius: ${spacing(4)};
+      right: 0;
+    `}
+`;
 
 const TransactionConfirmation = ({
   shouldShow,
@@ -400,6 +458,7 @@ const TransactionConfirmation = ({
   onGoToEtherscan,
   balanceChanges,
   gasUsed,
+  feeCost,
   successTitle,
   additionalActions,
   successSubtitle,
@@ -407,34 +466,55 @@ const TransactionConfirmation = ({
   onClickSatisfactionOption,
   loadingSubtitle,
   loadingTitle,
+  setHeight,
 }: TransactionConfirmationProps) => {
   const {
     palette: { mode },
   } = useTheme();
+
+  const innerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (setHeight && shouldShow) {
+      setHeight(innerRef.current?.offsetHeight);
+    }
+  });
+
+  const handleResize = useCallback(() => {
+    if (setHeight) setHeight(innerRef.current?.offsetHeight);
+  }, [setHeight]);
+
+  const handleExit = useCallback(() => {
+    if (setHeight) setHeight(undefined);
+  }, [setHeight]);
+
   return (
-    <Slide direction="up" in={shouldShow} mountOnEnter unmountOnExit>
-      <StyledOverlay>
-        {success ? (
-          <SuccessTransactionConfirmation
-            mode={mode}
-            balanceChanges={balanceChanges}
-            gasUsed={gasUsed}
-            successTitle={successTitle}
-            additionalActions={additionalActions}
-            successSubtitle={successSubtitle}
-            receipt={receipt}
-            onClickSatisfactionOption={onClickSatisfactionOption}
-          />
-        ) : (
-          <PendingTransactionConfirmation
-            loadingSubtitle={loadingSubtitle}
-            loadingTitle={loadingTitle}
-            chainId={chainId}
-            onGoToEtherscan={onGoToEtherscan}
-            mode={mode}
-          />
-        )}
-      </StyledOverlay>
+    <Slide direction="up" in={shouldShow} mountOnEnter unmountOnExit onExit={handleExit} onEnter={handleResize}>
+      <StyledContainer $isAbsolute={!!setHeight}>
+        <StyledOverlay $isAbsolute={!!setHeight} ref={innerRef}>
+          {success ? (
+            <SuccessTransactionConfirmation
+              mode={mode}
+              balanceChanges={balanceChanges}
+              gasUsed={gasUsed}
+              successTitle={successTitle}
+              additionalActions={additionalActions}
+              successSubtitle={successSubtitle}
+              receipt={receipt}
+              onClickSatisfactionOption={onClickSatisfactionOption}
+              feeCost={feeCost}
+            />
+          ) : (
+            <PendingTransactionConfirmation
+              loadingSubtitle={loadingSubtitle}
+              loadingTitle={loadingTitle}
+              chainId={chainId}
+              onGoToEtherscan={onGoToEtherscan}
+              mode={mode}
+            />
+          )}
+        </StyledOverlay>
+      </StyledContainer>
     </Slide>
   );
 };

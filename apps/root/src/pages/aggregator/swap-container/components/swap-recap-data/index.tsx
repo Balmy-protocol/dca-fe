@@ -38,7 +38,7 @@ const ValueWithIcon = ({ icon, title, subTitle, showIcon = true }: AmountsWithIc
   >
     {showIcon && <Box sx={{ gridColumn: '1', gridRow: '1', display: 'flex', alignItems: 'center' }}>{icon}</Box>}
     <Box sx={{ gridColumn: showIcon ? '2' : '1', gridRow: '1' }}>
-      <Typography variant="bodySmallBold" color={({ palette: { mode } }) => colors[mode].typography.typo2}>
+      <Typography variant="bodySmallSemibold" color={({ palette: { mode } }) => colors[mode].typography.typo2}>
         {title}
       </Typography>
     </Box>
@@ -119,7 +119,7 @@ const SwapRecapData = () => {
       <ContainerBox gap={8} flexWrap="wrap">
         <ContainerBox gap={3} alignItems="center">
           <RecapDataContainer>
-            <Typography variant="bodySmallLabel">
+            <Typography variant="labelRegular">
               <FormattedMessage description="youPay" defaultMessage="You pay" />
             </Typography>
             <ValueWithIcon
@@ -129,7 +129,7 @@ const SwapRecapData = () => {
                 token: selectedRoute.sellToken,
                 sigFigs: 2,
                 intl,
-              })} ${selectedRoute.sellToken.symbol}`}
+              })} ${from?.symbol || selectedRoute.sellToken.symbol}`}
               subTitle={
                 fromUsdValueToUse?.toString() ? `$${formatUsdAmount({ intl, amount: fromUsdValueToUse })}` : '-'
               }
@@ -137,7 +137,7 @@ const SwapRecapData = () => {
           </RecapDataContainer>
           <EastIcon sx={{ color: colors[themeMode].typography.typo3 }} />
           <RecapDataContainer>
-            <Typography variant="bodySmallLabel">
+            <Typography variant="labelRegular">
               <FormattedMessage description="youReceive" defaultMessage="You receive" />
             </Typography>
             <ValueWithIcon
@@ -147,7 +147,7 @@ const SwapRecapData = () => {
                 token: selectedRoute.buyToken,
                 sigFigs: 2,
                 intl,
-              })} ${selectedRoute.buyToken.symbol}`}
+              })} ${to?.symbol || selectedRoute.buyToken.symbol}`}
               subTitle={toUsdValueToUse ? `$${formatUsdAmount({ amount: toUsdValueToUse, intl })}` : '-'}
             />
           </RecapDataContainer>
@@ -155,7 +155,7 @@ const SwapRecapData = () => {
         <DividerBorder1 orientation="vertical" flexItem />
         <ContainerBox gap={6}>
           <RecapDataContainer>
-            <Typography variant="bodySmallLabel">
+            <Typography variant="labelRegular">
               <FormattedMessage description="transactionCost" defaultMessage="Transaction cost" />
             </Typography>
             {selectedRoute.gas ? (
@@ -175,13 +175,13 @@ const SwapRecapData = () => {
                 icon={<TokenIcon token={selectedRoute.buyToken} size={5} />}
               />
             ) : (
-              <Typography variant="bodyBold" color={({ palette: { mode } }) => colors[mode].typography.typo2}>
+              <Typography variant="bodyBold" color={({ palette: { mode } }) => colors[mode].typography.typo3}>
                 -
               </Typography>
             )}
           </RecapDataContainer>
           <RecapDataContainer>
-            <Typography variant="bodySmallLabel">
+            <Typography variant="labelRegular">
               <FormattedMessage description="network" defaultMessage="Network" />
             </Typography>
             <ValueWithIcon

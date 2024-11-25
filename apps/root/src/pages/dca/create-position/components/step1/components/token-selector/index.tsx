@@ -25,11 +25,11 @@ import { useThemeMode } from '@state/config/hooks';
 import isUndefined from 'lodash/isUndefined';
 
 const StyledBackgroundPaper = styled(BackgroundPaper)`
-  ${({ theme: { spacing } }) => `
+  ${({ theme: { space } }) => `
     display: flex;
     align-items: flex-start;
     justify-content: space-evenly;
-    padding: ${spacing(5)};
+    padding: ${space.s05};
   `}
 `;
 
@@ -77,7 +77,7 @@ const TokenSelector = ({ startSelectingCoin, fromBalance, isLoadingFromBalance }
     dispatch(setFrom(to));
 
     if (to) {
-      replaceHistory(`/create/${selectedNetwork.chainId}/${to.address || ''}/${from?.address || ''}`);
+      replaceHistory(`/invest/create/${selectedNetwork.chainId}/${to.address || ''}/${from?.address || ''}`);
     }
     trackEvent('DCA - Toggle from/to', { fromAddress: from?.address, toAddress: to?.address });
   };
@@ -96,8 +96,8 @@ const TokenSelector = ({ startSelectingCoin, fromBalance, isLoadingFromBalance }
     undefined;
   return (
     <StyledBackgroundPaper variant="outlined">
-      <ContainerBox flexDirection="column" gap={2} alignItems="flex-start">
-        <Typography variant="bodySmallLabel">
+      <ContainerBox flexDirection="column" gap={2} alignItems="flex-start" alignSelf="flex-start">
+        <Typography variant="labelRegular">
           <FormattedMessage description="sell" defaultMessage="You sell" />
         </Typography>
         <TokenPickerButton
@@ -128,8 +128,8 @@ const TokenSelector = ({ startSelectingCoin, fromBalance, isLoadingFromBalance }
           <ToggleHorizontalArrowIcon color="inherit" />
         </StyledToggleTokenButton>
       </ContainerBox>
-      <ContainerBox flexDirection="column" gap={2} alignItems="flex-start">
-        <Typography variant="bodySmallLabel">
+      <ContainerBox flexDirection="column" gap={2} alignItems="flex-start" alignSelf="flex-start">
+        <Typography variant="labelRegular">
           <FormattedMessage description="receive" defaultMessage="You receive" />
         </Typography>
         <TokenPickerButton

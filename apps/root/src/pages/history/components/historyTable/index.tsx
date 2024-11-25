@@ -17,11 +17,12 @@ import {
   CircleIcon,
   ArrowRightIcon,
   BackgroundPaper,
-  YawningFaceEmoji,
   VirtualizedTableContext,
   Grid,
   CircularProgressWithBrackground,
   SPACING,
+  HiddenNumber,
+  ClockIcon,
 } from 'ui-library';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
@@ -37,7 +38,7 @@ import {
   TransactionEventTypes,
   TransactionStatus,
 } from '@types';
-import { useThemeMode } from '@state/config/hooks';
+import { useShowBalances, useThemeMode } from '@state/config/hooks';
 import Address from '@common/components/address';
 import { findHubAddressVersion, totalSupplyThreshold } from '@common/utils/parsing';
 import useWallets from '@hooks/useWallets';
@@ -72,9 +73,10 @@ const StyledCellContainer = styled.div<{ gap?: number; direction?: 'column' | 'r
   `}
 `;
 
-const StyledBackgroundPaper = styled(BackgroundPaper)`
-  ${({ theme: { spacing } }) => `
-    padding: 0px ${spacing(4)} ${spacing(4)} ${spacing(4)};
+const StyledBackgroundPaper = styled(BackgroundPaper)<{ $solid?: boolean }>`
+  ${({ theme: { space, palette }, $solid }) => `
+    padding: 0px ${space.s04} ${space.s04};
+    ${$solid ? `background: ${colors[palette.mode].background.quartery};backdrop-filter: blur(30px);` : ''}
   `}
   flex: 1;
   display: flex;
@@ -90,7 +92,7 @@ const StyledBackgroundNonIndexedPaper = styled(BackgroundPaper)`
 `;
 
 const StyledViewReceiptButton = styled(Button).attrs({ variant: 'text' })`
-  padding: 0;
+  padding: 0 !important;
   min-width: 0;
   :hover {
     background: inherit;
@@ -156,7 +158,7 @@ const HistoryTableBodySkeleton = () => (
           </StyledBodySmallRegularTypo2>
         </TableCell>
         <TableCell>
-          <StyledCellContainer align="center" direction="column" gap={1}>
+          <StyledCellContainer align="center" direction="column" gap={0.5}>
             <Skeleton variant="rounded" width={20} height={20} animation="wave" />
             <StyledBodySmallLabelTypography alignSelf="stretch">
               <Skeleton variant="text" animation="wave" />
@@ -201,6 +203,72 @@ const formatTokenElement = (txEvent: TransactionEvent): React.ReactElement => {
             <StyledBodySmallLabelTypography noWrap maxWidth={'12ch'}>
               {txEvent.data.token.name || '-'}
             </StyledBodySmallLabelTypography>
+          </StyledCellContainer>
+        </>
+      );
+    case TransactionEventTypes.EARN_CREATED:
+    case TransactionEventTypes.EARN_INCREASE:
+      return (
+        <>
+          {txEvent.data.depositToken.icon}
+          <StyledCellContainer direction="column">
+            <StyledBodySmallRegularTypo2 noWrap maxWidth={'6ch'}>
+              {txEvent.data.depositToken.symbol || '-'}
+            </StyledBodySmallRegularTypo2>
+            <StyledBodySmallLabelTypography noWrap maxWidth={'12ch'}>
+              {txEvent.data.depositToken.name || '-'}
+            </StyledBodySmallLabelTypography>
+          </StyledCellContainer>
+        </>
+      );
+    case TransactionEventTypes.EARN_WITHDRAW:
+      const withdrawnAsset = txEvent.data.withdrawn[0];
+      const isWithdrawingAsset = withdrawnAsset.amount.amount > 0n;
+      const isWithdrawingRewards = txEvent.data.withdrawn.some(
+        (withdraw) => withdraw.token.address !== withdrawnAsset.token.address && withdraw.amount.amount > 0n
+      );
+
+      const tokens = txEvent.data.withdrawn
+        .filter((withdrawn) => withdrawn.amount.amount > 0n)
+        .map((withdrawn) => withdrawn.token);
+
+      return (
+        <>
+          <ComposedTokenIcon tokens={tokens} size={8} />
+          <StyledCellContainer direction="column">
+            <StyledBodySmallRegularTypo2 noWrap maxWidth={'13ch'} display="flex" alignItems="center">
+              {isWithdrawingAsset && withdrawnAsset.token.symbol}
+              {isWithdrawingRewards && isWithdrawingAsset && ' + '}
+              {isWithdrawingRewards && (
+                <FormattedMessage defaultMessage="Rewards" description="history-table.token.earn.withdraw" />
+              )}
+            </StyledBodySmallRegularTypo2>
+          </StyledCellContainer>
+        </>
+      );
+    case TransactionEventTypes.EARN_SPECIAL_WITHDRAW:
+      const specialWithdrawToken = txEvent.data.tokens[0].token;
+      return (
+        <>
+          {specialWithdrawToken.icon}
+          <StyledCellContainer direction="column">
+            <StyledBodySmallRegularTypo2 noWrap maxWidth={'6ch'}>
+              {specialWithdrawToken.symbol}
+            </StyledBodySmallRegularTypo2>
+            <StyledBodySmallLabelTypography noWrap maxWidth={'12ch'}>
+              {specialWithdrawToken.name}
+            </StyledBodySmallLabelTypography>
+          </StyledCellContainer>
+        </>
+      );
+    case TransactionEventTypes.EARN_CLAIM_DELAYED_WITHDRAW:
+      return (
+        <>
+          {txEvent.data.token.icon}
+          <StyledCellContainer direction="column">
+            <StyledBodySmallRegularTypo2 noWrap maxWidth={'13ch'} display="flex" alignItems="center">
+              {txEvent.data.token.symbol}
+            </StyledBodySmallRegularTypo2>
           </StyledCellContainer>
         </>
       );
@@ -255,7 +323,7 @@ const getTxEventRowData = (txEvent: TransactionEvent, intl: ReturnType<typeof us
   } else {
     dateTime = {
       date: <FormattedMessage defaultMessage="Just now" description="just-now" />,
-      time: DateTime.fromSeconds(Date.now() / 1000).toLocaleString({
+      time: DateTime.fromMillis(Date.now()).toLocaleString({
         ...DateTime.TIME_24_SIMPLE,
       }),
     };
@@ -290,6 +358,7 @@ interface TableContext extends VirtualizedTableContext {
   setShowReceipt: SetStateCallback<TransactionEvent>;
   themeMode: 'light' | 'dark';
   intl: ReturnType<typeof useIntl>;
+  showBalances: boolean;
 }
 
 const VirtuosoTableComponents = buildVirtuosoTableComponents<TransactionEvent, TableContext>();
@@ -297,7 +366,7 @@ const VirtuosoTableComponents = buildVirtuosoTableComponents<TransactionEvent, T
 const HistoryTableRow: ItemContent<TransactionEvent, TableContext> = (
   index: number,
   txEvent: TransactionEvent,
-  { setShowReceipt, intl }
+  { setShowReceipt, intl, showBalances }
 ) => {
   const { dateTime, operation, sourceWallet, ...transaction } = getTxEventRowData(txEvent, intl);
   return (
@@ -333,8 +402,16 @@ const HistoryTableRow: ItemContent<TransactionEvent, TableContext> = (
       </TableCell>
       <TableCell>
         <StyledCellContainer direction="column">
-          {formatAmountElement(transaction, intl)}
-          <StyledBodySmallLabelTypography>${getTransactionUsdValue(transaction, intl)}</StyledBodySmallLabelTypography>
+          {showBalances ? (
+            formatAmountElement(transaction, intl)
+          ) : (
+            <HiddenNumber size="medium" justifyContent="flex-start" />
+          )}
+          {showBalances ? (
+            <StyledBodySmallLabelTypography>
+              ${getTransactionUsdValue(transaction, intl)}
+            </StyledBodySmallLabelTypography>
+          ) : null}
         </StyledCellContainer>
       </TableCell>
       <TableCell>
@@ -346,9 +423,9 @@ const HistoryTableRow: ItemContent<TransactionEvent, TableContext> = (
       </TableCell>
       <TableCell>
         <StyledViewReceiptButton onClick={() => setShowReceipt(transaction)}>
-          <StyledCellContainer direction="column" align="center">
-            <ReceiptIcon />
-            <Typography variant="bodyExtraSmall" noWrap>
+          <StyledCellContainer direction="column" align="center" gap={0.5}>
+            <ReceiptIcon sx={({ palette: { mode } }) => ({ color: colors[mode].accent.primary })} />
+            <Typography variant="bodyExtraExtraSmallBold" color="inherit">
               <FormattedMessage description="viewMore" defaultMessage="View more" />
             </Typography>
           </StyledCellContainer>
@@ -398,20 +475,44 @@ const HistoryTableHeader = () => (
   </TableRow>
 );
 
-const NoHistoryYet = () => {
+const StyledNoWalletIconContainer = styled(ContainerBox)`
+  ${({
+    theme: {
+      spacing,
+      palette: { mode },
+    },
+  }) => `
+    border-radius: 50%;
+    border: 1px solid ${colors[mode].border.border1};
+    backdrop-filter: blur(15.294119834899902px);
+    padding: ${spacing(5)};
+    box-shadow: 0px 20px 25px rgba(150, 140, 242, 0.25);
+  `}
+`;
+
+const NoHistoryYet = ({ height }: { height?: React.CSSProperties['height'] }) => {
   const themeMode = useThemeMode();
   return (
-    <StyledCellContainer direction="column" align="center" gap={2}>
-      <YawningFaceEmoji />
-      <Typography variant="h5" fontWeight="bold" color={colors[themeMode].typography.typo3}>
-        <FormattedMessage description="noActivityTitle" defaultMessage="No Activity Yet" />
-      </Typography>
-      <Typography variant="bodyRegular" textAlign="center" color={colors[themeMode].typography.typo3}>
-        <FormattedMessage
-          description="noActivityParagraph"
-          defaultMessage="Once you start making transactions, you'll see all your activity here"
-        />
-      </Typography>
+    <StyledCellContainer
+      direction="column"
+      align="center"
+      gap={6}
+      style={{ minHeight: height || '500px', justifyContent: 'center' }}
+    >
+      <StyledNoWalletIconContainer>
+        <ClockIcon fontSize="large" />
+      </StyledNoWalletIconContainer>
+      <ContainerBox flexDirection="column" gap={2} justifyContent="center" alignItems="center">
+        <Typography variant="h5Bold" color={colors[themeMode].typography.typo3}>
+          <FormattedMessage description="noActivityTitle" defaultMessage="No Activity Yet" />
+        </Typography>
+        <Typography variant="bodyRegular" textAlign="center" color={colors[themeMode].typography.typo3}>
+          <FormattedMessage
+            description="noActivityParagraph"
+            defaultMessage="Once you start making transactions, you'll see all your activity here"
+          />
+        </Typography>
+      </ContainerBox>
     </StyledCellContainer>
   );
 };
@@ -420,6 +521,7 @@ interface HistoryTableProps {
   search?: string;
   tokens?: TokenListId[];
   height?: React.CSSProperties['height'];
+  solid?: boolean;
 }
 
 const UNIT_TYPE_STRING_MAP: Record<IncludedIndexerUnits, React.ReactNode> = {
@@ -435,12 +537,13 @@ const UNIT_TYPE_STRING_MAP: Record<IncludedIndexerUnits, React.ReactNode> = {
   [IndexerUnits.DCA]: (
     <FormattedMessage description="history-table.not-indexed.unit.dca" defaultMessage="Recurring investments" />
   ),
+  [IndexerUnits.EARN]: <FormattedMessage description="history-table.not-indexed.unit.earn" defaultMessage="Earn" />,
   [IndexerUnits.NATIVE_TRANSFERS]: (
     <FormattedMessage description="history-table.not-indexed.unit.nativeTransfers" defaultMessage="Native transfers" />
   ),
 };
 
-const HistoryTable = ({ search, tokens, height }: HistoryTableProps) => {
+const HistoryTable = ({ search, tokens, height, solid }: HistoryTableProps) => {
   const { events, isLoading, fetchMore } = useTransactionsHistory(tokens);
   const wallets = useWallets().map((wallet) => wallet.address);
   const [showReceipt, setShowReceipt] = React.useState<TransactionEvent | undefined>();
@@ -452,6 +555,7 @@ const HistoryTable = ({ search, tokens, height }: HistoryTableProps) => {
   const pushToHistory = usePushToHistory();
   const initialFetchedRef = React.useRef(false);
   const { history: globalHistory } = useStoredTransactionHistory();
+  const showBalances = useShowBalances();
 
   const parsedReceipt = React.useMemo(() => parseTransactionEventToTransactionReceipt(showReceipt), [showReceipt]);
 
@@ -475,9 +579,18 @@ const HistoryTable = ({ search, tokens, height }: HistoryTableProps) => {
   const onGoToPosition = React.useCallback(
     ({ chainId, positionId, hub }: { chainId: number; hub: string; positionId: number }) => {
       const version = findHubAddressVersion(hub);
-      pushToHistory(`/${chainId}/positions/${version}/${positionId}`);
+      pushToHistory(`/invest/positions/${chainId}/${version}/${positionId}`);
+      trackEvent('History - Tx Receipt - View position');
     },
-    [pushToHistory]
+    [pushToHistory, trackEvent]
+  );
+
+  const onGoToEarnPosition = React.useCallback(
+    ({ chainId, strategyId }: { chainId: number; strategyId: string }) => {
+      pushToHistory(`/earn/vaults/${chainId}/${strategyId}`);
+      trackEvent('History - Tx Receipt - View earn position');
+    },
+    [pushToHistory, trackEvent]
   );
 
   React.useEffect(() => {
@@ -550,7 +663,7 @@ const HistoryTable = ({ search, tokens, height }: HistoryTableProps) => {
     <ContainerBox flexDirection="column" flex={1} gap={6}>
       {!isSomeWalletIndexed && !!wallets.length && hasLoadedEvents && (
         <StyledBackgroundNonIndexedPaper variant="outlined">
-          <Typography variant="h6Bold" color={({ palette }) => colors[palette.mode].typography.typo2}>
+          <Typography variant="bodyBold">
             <FormattedMessage
               defaultMessage="Indexing Your Transaction History"
               description="history.not-indexed.title"
@@ -583,7 +696,7 @@ const HistoryTable = ({ search, tokens, height }: HistoryTableProps) => {
                           value={percentage * 100}
                           thickness={6}
                         />
-                        <Typography variant="bodySmallLabel" display="flex" alignItems="center">
+                        <Typography variant="labelRegular" display="flex" alignItems="center">
                           {(percentage * 100).toFixed(0)}%
                         </Typography>
                       </ContainerBox>
@@ -595,9 +708,9 @@ const HistoryTable = ({ search, tokens, height }: HistoryTableProps) => {
           </Grid>
         </StyledBackgroundNonIndexedPaper>
       )}
-      <StyledBackgroundPaper variant="outlined">
+      <StyledBackgroundPaper variant="outlined" $solid={solid}>
         {!isLoading && !wallets.length ? (
-          <NoHistoryYet />
+          <NoHistoryYet height={height} />
         ) : (
           <VirtualizedTable
             data={filteredEvents}
@@ -609,6 +722,7 @@ const HistoryTable = ({ search, tokens, height }: HistoryTableProps) => {
               setShowReceipt: onOpenReceipt,
               themeMode,
               intl,
+              showBalances,
             }}
             height={height}
           />
@@ -618,6 +732,8 @@ const HistoryTable = ({ search, tokens, height }: HistoryTableProps) => {
           open={!isUndefined(showReceipt)}
           onClose={() => setShowReceipt(undefined)}
           onClickPositionId={onGoToPosition}
+          onClickEarnPositionId={onGoToEarnPosition}
+          showBalances={showBalances}
         />
       </StyledBackgroundPaper>
     </ContainerBox>

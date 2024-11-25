@@ -1,7 +1,15 @@
 import { useCallback, useMemo } from 'react';
 import reduce from 'lodash/reduce';
 import find from 'lodash/find';
-import { TransactionDetails, TransactionTypes, Token, TransactionAdderCustomData, SubmittedTransaction } from '@types';
+import {
+  TransactionDetails,
+  TransactionTypes,
+  Token,
+  TransactionAdderCustomData,
+  SubmittedTransaction,
+  isDcaType,
+  isEarnType,
+} from '@types';
 import { useAppDispatch, useAppSelector } from '@hooks/state';
 import useCurrentNetwork from '@hooks/useCurrentNetwork';
 
@@ -9,6 +17,8 @@ import { COMPANION_ADDRESS, HUB_ADDRESS, LATEST_VERSION } from '@constants';
 import usePositionService from '@hooks/usePositionService';
 import { addTransaction } from './actions';
 import useWallets from '@hooks/useWallets';
+import useEarnService from '@hooks/earn/useEarnService';
+import { Hash } from 'viem';
 
 // helper that can take a ethers library transaction response and add it to the list of transactions
 export function useTransactionAdder(): (
@@ -16,6 +26,7 @@ export function useTransactionAdder(): (
   customData: TransactionAdderCustomData
 ) => void {
   const positionService = usePositionService();
+  const earnService = useEarnService();
   const dispatch = useAppDispatch();
   const currentNetwork = useCurrentNetwork();
 
@@ -34,8 +45,8 @@ export function useTransactionAdder(): (
           position: customData.position && { ...customData.position },
         })
       );
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      positionService.setPendingTransaction({
+
+      const pendingTransaction = {
         hash,
         from,
         chainId: response.chainId,
@@ -44,21 +55,29 @@ export function useTransactionAdder(): (
         checking: false,
         ...customData,
         position: customData.position && { ...customData.position },
-      });
+      };
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+
+      if (isDcaType(pendingTransaction)) {
+        positionService.setPendingTransaction(pendingTransaction);
+      }
+
+      if (isEarnType(pendingTransaction)) {
+        earnService.setPendingTransaction(pendingTransaction);
+      }
     },
     [dispatch, currentNetwork]
   );
 }
 
-export function useTransaction(txHash?: string) {
+export function useTransaction(transaction?: { hash: Hash; chainId: number }) {
   const state = useAppSelector((appState) => appState.transactions);
-  const currentNetwork = useCurrentNetwork();
 
-  if (!txHash || !state[currentNetwork.chainId]) {
+  if (!transaction || !state[transaction.chainId]) {
     return null;
   }
 
-  return state[currentNetwork.chainId][txHash];
+  return state[transaction.chainId][transaction.hash];
 }
 
 // returns all the transactions
@@ -174,17 +193,9 @@ export function usePositionHasPendingTransaction(position: string, chainId: numb
 
   return useMemo(() => {
     const foundTransaction = find(allTransactions, (transaction) => {
-      if (
-        transaction.type === TransactionTypes.newPair ||
-        transaction.type === TransactionTypes.approveToken ||
-        transaction.type === TransactionTypes.approveTokenExact ||
-        transaction.type === TransactionTypes.swap ||
-        transaction.type === TransactionTypes.wrap ||
-        transaction.type === TransactionTypes.unwrap ||
-        transaction.type === TransactionTypes.wrapEther ||
-        transaction.type === TransactionTypes.transferToken
-      )
+      if (!isDcaType(transaction)) {
         return false;
+      }
       if (transaction.receipt) {
         return false;
       }

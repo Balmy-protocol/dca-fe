@@ -84,7 +84,7 @@ export type CampaignWithoutToken<T extends CampaignTypeDataOptions = CampaignTyp
 
 export type CampaignsWithoutToken = CampaignWithoutToken[];
 
-export type Campaign<T extends CampaignTypeDataOptions = CampaignTypeDataOptions> = Omit<
+export type Campaign<T extends CampaignTypeDataOptions = CampaignTypeDataOptions> = DistributiveOmit<
   CampaignWithoutToken<T>,
   'tokens'
 > & {

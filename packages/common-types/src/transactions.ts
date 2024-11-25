@@ -1,3 +1,4 @@
+import { SdkEarnPositionId, StrategyId, WithdrawType } from './earn';
 import { Position, PositionPermission, PositionVersions, PositionYieldOption } from './positions';
 import { Token } from './tokens';
 import { DCAPermission } from '@balmy/sdk';
@@ -30,10 +31,6 @@ export type SubmittedTransaction = {
 };
 
 export enum TransactionTypes {
-  // Common
-  approveToken = 'APPROVE_TOKEN',
-  approveTokenExact = 'APPROVE_TOKEN_EXACT',
-  transferToken = 'TRANSFER_TOKEN',
   // DCA
   newPosition = 'NEW_POSITION',
   newPair = 'NEW_PAIR',
@@ -52,17 +49,94 @@ export enum TransactionTypes {
   migratePositionYield = 'MIGRATE_POSITION_YIELD',
   withdrawFunds = 'WITHDRAW_FUNDS',
   resetPosition = 'RESET_POSITION',
-  // AGGREGATOR
-  swap = 'SWAP',
-  wrap = 'WRAP',
-  unwrap = 'UNWRAP',
   // EULER CLAIM
   eulerClaimTerminateMany = 'EULER_CLAIM_TERMINATE_MANY',
   eulerClaimPermitMany = 'EULER_CLAIM_PERMIT_MANY',
   eulerClaimApproveMigrator = 'EULER_CLAIM_APPROVE_MIGRATOR',
   eulerClaimClaimFromMigrator = 'EULER_CLAIM_CLAIM_FROM_MIGRATOR',
+  // Common
+  approveToken = 'APPROVE_TOKEN',
+  approveTokenExact = 'APPROVE_TOKEN_EXACT',
+  transferToken = 'TRANSFER_TOKEN',
+  // AGGREGATOR
+  swap = 'SWAP',
   // CAMPAIGNS
   claimCampaign = 'CLAIM_CAMPAIGN',
+  // EARN
+  earnCreate = 'EARN_CREATE',
+  earnIncrease = 'EARN_INCREASE',
+  earnWithdraw = 'EARN_WITHDRAW',
+  earnSpecialWithdraw = 'EARN_SPECIAL_WITHDRAW',
+  earnClaimDelayedWithdraw = 'EARN_CLAIM_DELAYED_WITHDRAW',
+}
+
+export const DcaTransactionArrayTypes = [
+  TransactionTypes.newPosition,
+  TransactionTypes.terminatePosition,
+  TransactionTypes.withdrawPosition,
+  TransactionTypes.addFundsPosition,
+  TransactionTypes.removeFunds,
+  TransactionTypes.modifySwapsPosition,
+  TransactionTypes.modifyRateAndSwapsPosition,
+  TransactionTypes.transferPosition,
+  TransactionTypes.approveCompanion,
+  TransactionTypes.modifyPermissions,
+  TransactionTypes.migratePosition,
+  TransactionTypes.migratePositionYield,
+  TransactionTypes.withdrawFunds,
+  TransactionTypes.resetPosition,
+  TransactionTypes.eulerClaimTerminateMany,
+  TransactionTypes.eulerClaimPermitMany,
+  TransactionTypes.eulerClaimApproveMigrator,
+  TransactionTypes.eulerClaimClaimFromMigrator,
+] as const;
+
+export type DcaTransactionTypes = (typeof DcaTransactionArrayTypes)[number];
+
+export function isDcaType(
+  transactionType: TransactionDetails
+): transactionType is TransactionDetails & { type: DcaTransactionTypes } {
+  return DcaTransactionArrayTypes.includes(transactionType.type as unknown as DcaTransactionTypes);
+}
+
+export const CommonTransactionArrayTypes = [
+  TransactionTypes.approveToken,
+  TransactionTypes.approveTokenExact,
+  TransactionTypes.transferToken,
+] as const;
+
+export type CommonTransactionTypes = (typeof CommonTransactionArrayTypes)[number];
+
+export function isCommonType(
+  transactionType: TransactionDetails
+): transactionType is TransactionDetails & { type: CommonTransactionTypes } {
+  return CommonTransactionArrayTypes.includes(transactionType.type as unknown as CommonTransactionTypes);
+}
+
+export const EarnTransactionArrayTypes = [
+  TransactionTypes.earnCreate,
+  TransactionTypes.earnIncrease,
+  TransactionTypes.earnWithdraw,
+  TransactionTypes.earnSpecialWithdraw,
+  TransactionTypes.earnClaimDelayedWithdraw,
+] as const;
+
+export type EarnTransactionTypes = (typeof EarnTransactionArrayTypes)[number];
+
+export function isEarnType(
+  transactionType: TransactionDetails
+): transactionType is TransactionDetails & { type: EarnTransactionTypes } {
+  return EarnTransactionArrayTypes.includes(transactionType.type as unknown as EarnTransactionTypes);
+}
+
+export const CampaignTransactionArrayTypes = [TransactionTypes.claimCampaign] as const;
+
+export type CampaignTransactionTypes = (typeof CampaignTransactionArrayTypes)[number];
+
+export function isCampaignType(
+  transactionType: TransactionDetails
+): transactionType is TransactionDetails & { type: CampaignTransactionTypes } {
+  return CampaignTransactionArrayTypes.includes(transactionType.type as unknown as CampaignTransactionTypes);
 }
 
 export type TransactionTypesConstant = Record<TransactionTypes, TransactionTypes>;
@@ -77,27 +151,65 @@ export interface SwapTypeData {
     balanceBefore: string | null;
     transferTo?: string | null;
     swapContract: string;
-    type: 'buy' | 'sell';
+    orderType: 'buy' | 'sell';
   };
 }
 
-export interface WrapTypeData {
-  type: TransactionTypes.wrap;
+export interface EarnCreateTypeData {
+  type: TransactionTypes.earnCreate;
   typeData: {
-    from: Token;
-    to: Token;
-    amountFrom: bigint;
-    amountTo: bigint;
+    asset: Token;
+    assetAmount: string;
+    positionId?: bigint;
+    strategyId: StrategyId;
   };
 }
 
-export interface UnwrapTypeData {
-  type: TransactionTypes.unwrap;
+export interface EarnIncreaseTypeData {
+  type: TransactionTypes.earnIncrease;
   typeData: {
-    from: Token;
-    to: Token;
-    amountFrom: bigint;
-    amountTo: bigint;
+    asset: Token;
+    assetAmount: string;
+    positionId: SdkEarnPositionId;
+    strategyId: StrategyId;
+    signedPermit: boolean;
+  };
+}
+
+export interface EarnWithdrawTypeData {
+  type: TransactionTypes.earnWithdraw;
+  typeData: {
+    positionId: SdkEarnPositionId;
+    strategyId: StrategyId;
+    signedPermit: boolean;
+    withdrawn: {
+      token: Token;
+      amount: string;
+      withdrawType: WithdrawType;
+    }[];
+  };
+}
+
+export interface EarnSpecialWithdrawTypeData {
+  type: TransactionTypes.earnSpecialWithdraw;
+  typeData: {
+    positionId: SdkEarnPositionId;
+    strategyId: StrategyId;
+    tokens: {
+      token: Token;
+      amount: string;
+      withdrawType: WithdrawType;
+    };
+  };
+}
+
+export interface EarnClaimDelayedWithdrawTypeData {
+  type: TransactionTypes.earnClaimDelayedWithdraw;
+  typeData: {
+    positionId: SdkEarnPositionId;
+    strategyId: StrategyId;
+    claim: Token;
+    withdrawn: string;
   };
 }
 
@@ -303,7 +415,12 @@ export interface ClaimCampaignTypeData {
   };
 }
 
-export type TransactionAggregatorTypeDataOptions = SwapTypeData;
+export type TransactionEarnTypeDataOptions =
+  | EarnCreateTypeData
+  | EarnIncreaseTypeData
+  | EarnWithdrawTypeData
+  | EarnSpecialWithdrawTypeData
+  | EarnClaimDelayedWithdrawTypeData;
 
 export type TransactionPositionTypeDataOptions =
   | WithdrawTypeData
@@ -338,13 +455,16 @@ export type TransactionTypeDataOptions =
   | MigratePositionTypeData
   | MigratePositionYieldTypeData
   | TransferTypeData
-  | TransactionAggregatorTypeDataOptions
+  | SwapTypeData
   | EulerClaimTerminateManyTypeData
   | EulerClaimPermitManyTypeData
   | EulerClaimClaimFromMigratorTypeData
-  | WrapTypeData
-  | UnwrapTypeData
   | ClaimCampaignTypeData
+  | EarnCreateTypeData
+  | EarnIncreaseTypeData
+  | EarnWithdrawTypeData
+  | EarnSpecialWithdrawTypeData
+  | EarnClaimDelayedWithdrawTypeData
   | NoOpTypeData;
 
 export type TransactionDetailsBase = {
@@ -395,4 +515,7 @@ export enum TransactionApplicationIdentifier {
   TRANSFER = 'TRANSFER',
   SWAP = 'SWAP',
   DCA = 'DCA',
+  EARN_CREATE = 'EARN_CREATE',
+  EARN_INCREASE = 'EARN_INCREASE',
+  EARN_WITHDRAW = 'EARN_WITHDRAW',
 }

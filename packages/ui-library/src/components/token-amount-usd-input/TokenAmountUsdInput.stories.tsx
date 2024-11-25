@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 
-import { TokenAmounUsdInput } from '.';
+import { PROTOCOL_TOKEN_ADDRESS, TokenAmounUsdInput } from '.';
 import type { TokenAmounUsdInputProps } from '.';
 import { TokenType } from 'common-types';
 
@@ -45,6 +45,26 @@ const meta: Meta<typeof StoryTokenAmountUsdInput> = {
   },
 };
 type Story = StoryObj<typeof StoryTokenAmountUsdInput>;
+
+export const Protocol: Story = {
+  args: {},
+  render: (args: TokenAmounUsdInputProps) => (
+    <StoryTokenAmountUsdInput
+      {...args}
+      token={{
+        name: 'Polygon Ecosystem Token',
+        symbol: 'POL',
+        address: PROTOCOL_TOKEN_ADDRESS,
+        chainId: 137,
+        decimals: 18,
+        type: TokenType.BASE,
+        underlyingTokens: [],
+        chainAddresses: [],
+      }}
+      value={undefined}
+    />
+  ),
+};
 
 export const Empty: Story = {
   args: {},

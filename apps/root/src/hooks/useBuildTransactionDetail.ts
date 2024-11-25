@@ -22,23 +22,11 @@ function useBuildTransactionDetail() {
       let message = intl.formatMessage(
         defineMessage({
           description: 'transactionDetailsConfirmed',
-          defaultMessage: 'Transaction confirmed!',
+          defaultMessage: 'Transaction Confirmed',
         })
       );
       try {
         switch (tx.type) {
-          case TransactionTypes.wrap: {
-            const swapTypeData = tx.typeData;
-
-            message = `Wrap ${swapTypeData.amountFrom} ${swapTypeData.from.symbol} for ${swapTypeData.amountTo} ${swapTypeData.to.symbol}`;
-            break;
-          }
-          case TransactionTypes.unwrap: {
-            const swapTypeData = tx.typeData;
-
-            message = `Unwrap ${swapTypeData.amountFrom} ${swapTypeData.from.symbol} for ${swapTypeData.amountTo} ${swapTypeData.to.symbol}`;
-            break;
-          }
           case TransactionTypes.swap: {
             const swapTypeData = tx.typeData;
 
@@ -323,6 +311,36 @@ function useBuildTransactionDetail() {
                 amount,
                 symbol: token.symbol,
                 to,
+              }
+            );
+            break;
+          }
+          case TransactionTypes.earnCreate: {
+            const { asset, assetAmount } = tx.typeData;
+
+            message = intl.formatMessage(
+              defineMessage({
+                description: 'transactionDetailMessages.earn.create',
+                defaultMessage: 'Started investing {amount} {symbol}',
+              }),
+              {
+                amount: formatCurrencyAmount({ amount: BigInt(assetAmount), token: asset, sigFigs: 4, intl }),
+                symbol: asset.symbol,
+              }
+            );
+            break;
+          }
+          case TransactionTypes.earnIncrease: {
+            const { asset, assetAmount } = tx.typeData;
+
+            message = intl.formatMessage(
+              defineMessage({
+                description: 'transactionDetailMessages.earn.increase',
+                defaultMessage: 'Increased your {symbol} investment by {amount} {symbol}',
+              }),
+              {
+                amount: formatCurrencyAmount({ amount: BigInt(assetAmount), token: asset, sigFigs: 4, intl }),
+                symbol: asset.symbol,
               }
             );
             break;

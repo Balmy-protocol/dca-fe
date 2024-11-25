@@ -10,8 +10,8 @@ import { formatUsdAmount } from '../../common/utils/currency';
 import { useIntl } from 'react-intl';
 
 const StyledBackgroundPaper = styled(BackgroundPaper)`
-  ${({ theme: { spacing, palette } }) => `
-    padding: ${spacing(5)};
+  ${({ theme: { space, palette } }) => `
+    padding: ${space.s05};
     border-color: ${colors[palette.mode].border.border2};
   `}
   display: flex;
@@ -177,7 +177,7 @@ const Dashboard = ({
                   <Label
                     value={showBalances ? valueFormatter(pieValue) : '-'}
                     position="center"
-                    fontSize="0.875rem"
+                    fontSize="1rem"
                     fontWeight={700}
                     fontFamily="Inter"
                     color={colors[mode].typography.typo2}
@@ -210,8 +210,10 @@ const Dashboard = ({
               <Grid item xs={1}>
                 <StyledBullet fill={dataPoint.fill} />
               </Grid>
-              <Grid item xs={3}>
-                <Typography variant="bodySmallRegular">{dataPoint.name}</Typography>
+              <Grid item xs={3} textOverflow="ellipsis" overflow="hidden">
+                <Typography variant="bodySmallSemibold" color={({ palette }) => colors[palette.mode].typography.typo2}>
+                  {dataPoint.name}
+                </Typography>
               </Grid>
               <Grid item flex={1}>
                 {'isOther' in dataPoint && (
@@ -222,7 +224,7 @@ const Dashboard = ({
                 <BorderLinearProgress variant="determinate" value={dataPoint.relativeValue} fill={dataPoint.fill} />
               </Grid>
               <Grid item xs={3} sx={{ textAlign: 'right' }}>
-                <Typography variant="bodySmallRegular">
+                <Typography variant="bodySmallSemibold">
                   {showBalances ? valueFormatter(dataPoint.value) : <HiddenNumber size="small" />}
                 </Typography>
               </Grid>

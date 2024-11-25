@@ -1,7 +1,7 @@
 import { Wallet, WalletStatus, WalletType } from '@types';
 import { Address } from 'viem';
 
-type ToWalletParameter = Partial<Omit<Wallet, 'status'>> & { status: WalletStatus };
+type ToWalletParameter = Partial<DistributiveOmit<Wallet, 'status'>> & { status: WalletStatus };
 
 export const toWallet = (wallet: ToWalletParameter): Wallet => {
   let baseWallet: Wallet = {

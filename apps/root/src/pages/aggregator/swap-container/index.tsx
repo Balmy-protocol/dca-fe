@@ -1,11 +1,11 @@
 import * as React from 'react';
-import { ContainerBox } from 'ui-library';
+import { colors, ContainerBox, Typography } from 'ui-library';
 import { getProtocolToken } from '@common/mocks/tokens';
 import useSelectedNetwork from '@hooks/useSelectedNetwork';
 import { NETWORKS } from '@constants';
 import { useAggregatorState } from '@state/aggregator/hooks';
 import { useAppDispatch } from '@state/hooks';
-import { setFrom, setTo, setSelectedRoute, setAggregatorChainId } from '@state/aggregator/actions';
+import { setFrom, setTo, setSelectedRoute, setAggregatorChainId, setCleared } from '@state/aggregator/actions';
 import useSwapOptions from '@hooks/useSwapOptions';
 import { useParams } from 'react-router-dom';
 import useToken from '@hooks/useToken';
@@ -16,15 +16,15 @@ import useAggSupportedChains from '@hooks/useAggSupportedChains';
 import Swap from './components/swap';
 import AggregatorLanding from './components/landing';
 import { identifyNetwork } from '@common/utils/parsing';
-import NetWorth from '@common/components/net-worth';
 import AggregatorFAQ from './components/faq';
 import useAddCustomTokenToList from '@hooks/useAddCustomTokenToList';
 import { isAddress } from 'viem';
 import { useIsLoadingAllTokenLists } from '@state/token-lists/hooks';
 import usePrevious from '@hooks/usePrevious';
+import { FormattedMessage } from 'react-intl';
 
 const SwapContainer = () => {
-  const { fromValue, from, to, toValue, isBuyOrder, selectedRoute, transferTo } = useAggregatorState();
+  const { fromValue, from, to, toValue, isBuyOrder, selectedRoute, transferTo, cleared } = useAggregatorState();
   const { slippage, gasSpeed, disabledDexes, sorting, sourceTimeout } = useAggregatorSettingsState();
   const dispatch = useAppDispatch();
   const currentNetwork = useSelectedNetwork();
@@ -118,18 +118,34 @@ const SwapContainer = () => {
   ]);
 
   React.useEffect(() => {
-    if (!isLoadingSwapOptions && swapOptions && swapOptions.results?.length) {
+    dispatch(setCleared(false));
+  }, [isLoadingSwapOptions]);
+
+  React.useEffect(() => {
+    if (!isLoadingSwapOptions && swapOptions && swapOptions.results?.length && !cleared) {
       dispatch(setSelectedRoute(swapOptions.results[0]));
+    } else if (isLoadingSwapOptions && selectedRoute) {
+      dispatch(setSelectedRoute(null));
     }
-  }, [isLoadingSwapOptions, swapOptions?.results]);
+  }, [isLoadingSwapOptions, swapOptions?.results, cleared]);
 
   const quotes = React.useMemo(() => (selectedRoute && swapOptions?.results) || [], [selectedRoute, swapOptions]);
   const missingQuotes = React.useMemo(() => Object.keys(swapOptions?.resultsPromise || {}), [swapOptions]);
 
   return (
-    <ContainerBox flexDirection="column" gap={32} flex="0">
-      <ContainerBox flexDirection="column" gap={6}>
-        <NetWorth walletSelector={{ options: { setSelectionAsActive: true } }} />
+    <ContainerBox flexDirection="column" gap={20} flex="0">
+      <ContainerBox flexDirection="column" gap={8}>
+        <ContainerBox flexDirection="column" gap={2}>
+          <Typography variant="h1Bold">
+            <FormattedMessage defaultMessage="Swap" description="swap.title" />
+          </Typography>
+          <Typography variant="bodyLargeRegular" color={({ palette }) => colors[palette.mode].typography.typo1}>
+            <FormattedMessage
+              defaultMessage="Swap your assets with the best prices"
+              description="swap.title-description"
+            />
+          </Typography>
+        </ContainerBox>
         <Swap
           isLoadingRoute={isLoadingSwapOptions || isLoadingCustomFromToken || isLoadingCustomToToken}
           quotes={quotes}

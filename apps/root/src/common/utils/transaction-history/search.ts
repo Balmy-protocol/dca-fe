@@ -2,7 +2,7 @@ import { AccountLabels, Token, TransactionEvent, TransactionEventTypes } from 'c
 import intersection from 'lodash/intersection';
 import some from 'lodash/some';
 import { IntlShape } from 'react-intl';
-import { TRANSACTION_TYPE_TITLE_MAP } from 'ui-library';
+import { getTransactionTypeTitle, TransactionReceiptProp } from 'ui-library';
 
 const searchByTxData = (event: TransactionEvent, search: string) => {
   const {
@@ -19,7 +19,10 @@ const searchByTxData = (event: TransactionEvent, search: string) => {
 };
 
 const searchByType = (event: TransactionEvent, search: string, intl: IntlShape) =>
-  intl.formatMessage(TRANSACTION_TYPE_TITLE_MAP[event.type]).toLowerCase().includes(search);
+  intl
+    .formatMessage(getTransactionTypeTitle(event as unknown as TransactionReceiptProp))
+    .toLowerCase()
+    .includes(search);
 
 const getTokenSearchParameters = ({ name, symbol, address }: Token) => [name, symbol, address];
 
@@ -38,6 +41,11 @@ const getTransactionEventSearchTerms = (event: TransactionEvent) => {
     case TransactionEventTypes.DCA_TRANSFER:
       const { fromToken, toToken } = event.data;
       termsToSearch = [...getTokenSearchParameters(fromToken), ...getTokenSearchParameters(toToken)];
+      break;
+    case TransactionEventTypes.EARN_CREATED:
+    case TransactionEventTypes.EARN_INCREASE:
+      const { depositToken, user } = event.data;
+      termsToSearch = [...getTokenSearchParameters(depositToken), user];
       break;
     case TransactionEventTypes.SWAP:
       const { tokenIn, tokenOut, recipient } = event.data;

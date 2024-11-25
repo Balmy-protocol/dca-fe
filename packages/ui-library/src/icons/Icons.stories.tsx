@@ -16,6 +16,8 @@ function StoryCustomIconInput({ ...args }: IconProps) {
       {pairs.map(([name, Icon]) => (
         <ContainerBox key={name} gap={2} flexDirection="column" justifyContent="center" alignItems="center">
           {name}
+          {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
+          {/* @ts-expect-error */}
           <Icon {...args} />
         </ContainerBox>
       ))}

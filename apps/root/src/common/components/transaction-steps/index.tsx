@@ -1,7 +1,7 @@
 import React, { memo } from 'react';
 import styled from 'styled-components';
 import findIndex from 'lodash/findIndex';
-import { useHasPendingApproval, useIsTransactionPending } from '@state/transactions/hooks';
+import { useIsTransactionPending } from '@state/transactions/hooks';
 import useSelectedNetwork from '@hooks/useSelectedNetwork';
 import { buildEtherscanTransaction } from '@common/utils/etherscan';
 import {
@@ -23,6 +23,18 @@ import {
   SetStateCallback,
   TransactionApplicationIdentifier,
   TransactionEventTypes,
+  TransactionActionApproveTokenSignEarnData,
+  TransactionActionApproveTokenSignEarnType,
+  TransactionActionEarnDepositData,
+  TransactionActionEarnDepositType,
+  TransactionActionApproveCompanionSignEarnType,
+  TransactionActionApproveCompanionSignEarnData,
+  TransactionActionEarnWithdrawType,
+  TransactionActionEarnWithdrawData,
+  TransactionActionEarnSignToSType,
+  TransactionActionSignToSEarnData,
+  EarnPermission,
+  WithdrawType,
 } from '@types';
 import {
   TRANSACTION_ACTION_SWAP,
@@ -31,6 +43,11 @@ import {
   TRANSACTION_ACTION_CREATE_POSITION,
   TRANSACTION_ACTION_APPROVE_TOKEN_SIGN_DCA,
   TRANSACTION_ACTION_APPROVE_TOKEN_SIGN_SWAP,
+  TRANSACTION_ACTION_APPROVE_TOKEN_SIGN_EARN,
+  TRANSACTION_ACTION_EARN_DEPOSIT,
+  TRANSACTION_ACTION_APPROVE_COMPANION_SIGN_EARN,
+  TRANSACTION_ACTION_EARN_WITHDRAW,
+  TRANSACTION_ACTION_SIGN_TOS_EARN,
 } from '@constants';
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
 import {
@@ -46,25 +63,24 @@ import {
   TransactionReceipt,
   TickCircleIcon,
   WalletCheckIcon,
-  useTheme,
   DollarSquareIcon,
 } from 'ui-library';
 import TokenIcon from '@common/components/token-icon';
-import Address from '@common/components/address';
 import { emptyTokenWithAddress, formatCurrencyAmount } from '@common/utils/currency';
 import TransactionSimulation from '@common/components/transaction-simulation';
-import useActiveWallet from '@hooks/useActiveWallet';
 import useTransactionReceipt from '@hooks/useTransactionReceipt';
-import DcaRecapData from '@pages/dca/create-position/components/dca-recap-data';
-import SwapRecapData from '@pages/aggregator/swap-container/components/swap-recap-data';
 import QuoteStatusNotification, {
   QuoteStatus,
 } from '@pages/aggregator/swap-container/components/quote-status-notification';
-import { SuccessTickIcon } from 'ui-library/src/icons';
 import { totalSupplyThreshold } from '@common/utils/parsing';
+import RecapData, { RecapDataProps } from './recap-data';
+import { useUseUnlimitedApproval } from '@state/config/hooks';
+import CommonTransactionStepItem, { CommonTransactionStepItemProps } from './common-transaction-step';
+import { Hash } from 'viem';
 
 interface TransactionActionBase {
   hash: string;
+  chainId: number;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onAction: (transactions: any) => void;
   onActionConfirmed?: (hash: string) => void;
@@ -76,13 +92,14 @@ interface TransactionActionBase {
   explanation?: string;
 }
 
-interface ItemProps {
-  onGoToEtherscan: (hash: string) => void;
-  isLast: boolean;
-  isCurrentStep: boolean;
-  done?: boolean;
-  explanation?: string;
+interface TransactionActionEarnSignToS extends TransactionActionBase {
+  type: TransactionActionEarnSignToSType;
+  extraData: TransactionActionSignToSEarnData;
+  onAction: () => void;
+  onActionConfirmed?: (hash: string) => void;
 }
+
+interface TransactionActionEarnSignToSProps extends TransactionActionEarnSignToS, CommonTransactionStepItemProps {}
 
 interface TransactionActionApproveToken extends TransactionActionBase {
   type: TransactionActionApproveTokenType;
@@ -92,7 +109,7 @@ interface TransactionActionApproveToken extends TransactionActionBase {
   onActionConfirmed?: (hash: string) => void;
 }
 
-interface TransactionActionApproveTokenProps extends TransactionActionApproveToken, ItemProps {}
+interface TransactionActionApproveTokenProps extends TransactionActionApproveToken, CommonTransactionStepItemProps {}
 
 interface TransactionActionApproveTokenSignDCA extends TransactionActionBase {
   type: TransactionActionApproveTokenSignDCAType;
@@ -101,7 +118,20 @@ interface TransactionActionApproveTokenSignDCA extends TransactionActionBase {
   onAction: (amount?: bigint) => void;
 }
 
-interface TransactionActionApproveTokenSignDCAProps extends TransactionActionApproveTokenSignDCA, ItemProps {}
+interface TransactionActionApproveTokenSignDCAProps
+  extends TransactionActionApproveTokenSignDCA,
+    CommonTransactionStepItemProps {}
+
+interface TransactionActionApproveTokenSignEarn extends TransactionActionBase {
+  type: TransactionActionApproveTokenSignEarnType;
+  extraData: TransactionActionApproveTokenSignEarnData;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  onAction: (amount?: bigint) => void;
+}
+
+interface TransactionActionApproveTokenSignEarnProps
+  extends TransactionActionApproveTokenSignEarn,
+    CommonTransactionStepItemProps {}
 
 interface TransactionActionApproveTokenSignSwap extends TransactionActionBase {
   type: TransactionActionApproveTokenSignSwapType;
@@ -110,35 +140,74 @@ interface TransactionActionApproveTokenSignSwap extends TransactionActionBase {
   onAction: (amount?: bigint) => void;
 }
 
-interface TransactionActionApproveTokenSignSwapProps extends TransactionActionApproveTokenSignSwap, ItemProps {}
+interface TransactionActionApproveTokenSignSwapProps
+  extends TransactionActionApproveTokenSignSwap,
+    CommonTransactionStepItemProps {}
 
-interface TransactionActionWaitForSimulation extends Omit<TransactionActionBase, 'onAction'> {
+interface TransactionActionWaitForSimulation extends DistributiveOmit<TransactionActionBase, 'onAction'> {
   type: TransactionActionWaitForSimulationType;
   extraData: TransactionActionWaitForSimulationData;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onAction: (transactions: any, response: BlowfishResponse) => void;
 }
 
-interface TransactionActionWaitForSimulationProps extends TransactionActionWaitForSimulation, ItemProps {}
+interface TransactionActionWaitForSimulationProps
+  extends TransactionActionWaitForSimulation,
+    CommonTransactionStepItemProps {}
 
 interface TransactionActionSwap extends TransactionActionBase {
   type: TransactionActionSwapType;
   extraData: TransactionActionSwapData;
 }
 
-interface TransactionActionSwapProps extends TransactionActionSwap, ItemProps {}
+interface TransactionActionSwapProps extends TransactionActionSwap, CommonTransactionStepItemProps {}
+
+interface TransactionActionEarnDeposit extends TransactionActionBase {
+  type: TransactionActionEarnDepositType;
+  extraData: TransactionActionEarnDepositData;
+}
+
+interface TransactionActionEarnDepositProps extends TransactionActionEarnDeposit, CommonTransactionStepItemProps {}
 
 interface TransactionActionCreatePosition extends TransactionActionBase {
   type: TransactionActionCreatePositionType;
   extraData: TransactionActionCreatePositionData;
 }
 
-interface TransactionActionCreatePositionProps extends TransactionActionCreatePosition, ItemProps {}
+interface TransactionActionCreatePositionProps
+  extends TransactionActionCreatePosition,
+    CommonTransactionStepItemProps {}
 
-type TransactionActionApproveTokenSign = TransactionActionApproveTokenSignDCA | TransactionActionApproveTokenSignSwap;
+interface TransactionActionApproveCompanionSignEarn extends DistributiveOmit<TransactionActionBase, 'onAction'> {
+  type: TransactionActionApproveCompanionSignEarnType;
+  extraData: TransactionActionApproveCompanionSignEarnData;
+  onAction: () => void;
+}
+
+interface TransactionActionApproveCompanionSignEarnProps
+  extends TransactionActionApproveCompanionSignEarn,
+    CommonTransactionStepItemProps {}
+
+interface TransactionActionEarnWithdraw extends TransactionActionBase {
+  type: TransactionActionEarnWithdrawType;
+  extraData: TransactionActionEarnWithdrawData;
+  onAction: (assetWithdrawType: WithdrawType) => void;
+}
+
+interface TransactionActionEarnWithdrawProps extends TransactionActionEarnWithdraw, CommonTransactionStepItemProps {}
+
+type TransactionActionTypeApproveCompanionSign = TransactionActionApproveCompanionSignEarn;
+
+type TransactionActionApproveCompanionSignProps = TransactionActionApproveCompanionSignEarnProps;
+
+type TransactionActionApproveTokenSign =
+  | TransactionActionApproveTokenSignDCA
+  | TransactionActionApproveTokenSignSwap
+  | TransactionActionApproveTokenSignEarn;
 
 type TransactionActionApproveTokenSignProps =
   | TransactionActionApproveTokenSignDCAProps
+  | TransactionActionApproveTokenSignEarnProps
   | TransactionActionApproveTokenSignSwapProps;
 
 export type TransactionAction =
@@ -146,7 +215,12 @@ export type TransactionAction =
   | TransactionActionApproveTokenSign
   | TransactionActionWaitForSimulation
   | TransactionActionSwap
-  | TransactionActionCreatePosition;
+  | TransactionActionEarnDeposit
+  | TransactionActionCreatePosition
+  | TransactionActionTypeApproveCompanionSign
+  | TransactionActionEarnWithdraw
+  | TransactionActionEarnSignToS;
+
 type TransactionActions = TransactionAction[];
 
 type TransactionActionProps =
@@ -154,14 +228,11 @@ type TransactionActionProps =
   | TransactionActionApproveTokenSignProps
   | TransactionActionWaitForSimulationProps
   | TransactionActionSwapProps
-  | TransactionActionCreatePositionProps;
-
-type CommonTransactionActionProps = Omit<ItemProps, 'onGoToEtherscan'> & {
-  title: React.ReactElement;
-  icon: React.ReactElement;
-  isLoading?: boolean;
-  hideWalletLabel?: boolean;
-};
+  | TransactionActionEarnDepositProps
+  | TransactionActionCreatePositionProps
+  | TransactionActionApproveCompanionSignProps
+  | TransactionActionEarnWithdrawProps
+  | TransactionActionEarnSignToSProps;
 
 interface TransactionConfirmationProps {
   shouldShow: boolean;
@@ -172,139 +243,16 @@ interface TransactionConfirmationProps {
   setShouldShowFirstStep: SetStateCallback<boolean>;
   swapQuoteStatus?: QuoteStatus;
   applicationIdentifier: TransactionApplicationIdentifier;
+  setHeight?: (a?: number) => void;
+  recapDataProps?: RecapDataProps;
+  backControlLabel?: string;
 }
-
-const StyledTransactionStepIcon = styled.div<{ isLast: boolean; isCurrentStep: boolean }>`
-  ${({ theme: { palette, spacing }, isLast, isCurrentStep }) => `
-  position: relative;
-  ${
-    !isLast &&
-    `&:after {
-    content: '';
-    position: absolute;
-    width: ${spacing(1.25)};
-    left: calc(50% - ${spacing(0.625)});
-    top: ${spacing(15)};
-    right: 0;
-    bottom: 0;
-    background: ${isCurrentStep ? palette.gradient.main : colors[palette.mode].background.secondary};
-  }`
-  }
-`}
-`;
-
-const iconContentBorderColor = (mode: 'light' | 'dark', isCurrentStep: boolean, done?: boolean) => {
-  if (done) {
-    return colors[mode].border.border1;
-  }
-  return isCurrentStep ? colors[mode].violet.violet500 : colors[mode].background.secondary;
-};
-
-const iconContentBackgroundColor = (mode: 'light' | 'dark', isCurrentStep: boolean, done?: boolean) => {
-  if (done) {
-    return colors[mode].background.quartery;
-  }
-  return colors[mode].background.tertiary;
-};
-
-const iconContentColor = (mode: 'light' | 'dark', isCurrentStep: boolean, done?: boolean) => {
-  if (done) {
-    return colors[mode].semantic.success.primary;
-  }
-  return colors[mode].violet.violet600;
-};
-
-const StyledTransactionStepIconContent = styled.div<{ isCurrentStep: boolean; done?: boolean }>`
-  ${({ theme: { palette, spacing }, isCurrentStep, done }) => `
-  display: flex;
-  padding: ${spacing(4)};
-  background-color: ${iconContentBackgroundColor(palette.mode, isCurrentStep, done)};
-  border-radius: 50%;
-  border: ${spacing(0.875)} solid;
-  border-color: ${iconContentBorderColor(palette.mode, isCurrentStep, done)};
-  ${isCurrentStep ? `box-shadow: ${colors[palette.mode].dropShadow.dropShadow100}` : ''};
-  z-index: 99;
-  & .MuiSvgIcon-root {
-    color: ${iconContentColor(palette.mode, isCurrentStep, done)};
-  }
-`}
-`;
-
-const StyledTransactionStepContent = styled(ContainerBox).attrs({
-  flexDirection: 'column',
-  justifyContent: 'center',
-  fullWidth: true,
-  gap: 6,
-})<{ isLast: boolean }>`
-  ${({ theme: { spacing }, isLast }) => `
-  padding-bottom: ${isLast ? '0' : spacing(12)};
-`}
-`;
 
 const StyledTransactionStepButtonContainer = styled.div`
   display: flex;
   flex: 1;
   padding-top: 15px;
 `;
-
-const StyledTransactionStepTitle = styled(Typography).attrs({ variant: 'h6Bold' })<{
-  $isCurrentStep: boolean;
-}>`
-  ${({ theme: { palette }, $isCurrentStep }) => `
-  color: ${$isCurrentStep ? colors[palette.mode].typography.typo1 : colors[palette.mode].typography.typo3};
-  `}
-`;
-
-const StyledTransactionStepWallet = styled(Typography).attrs({ variant: 'bodySmallSemibold' })`
-  ${({ theme: { palette } }) => `
-  color: ${colors[palette.mode].typography.typo3};
-  `}
-`;
-
-const CommonTransactionStepItem = ({
-  isLast,
-  isCurrentStep,
-  done,
-  title,
-  icon,
-  explanation,
-  children,
-  isLoading,
-  hideWalletLabel,
-}: React.PropsWithChildren<CommonTransactionActionProps>) => {
-  const activeWallet = useActiveWallet();
-  const account = activeWallet?.address;
-  const { spacing } = useTheme();
-
-  return (
-    <>
-      <StyledTransactionStepIcon isLast={isLast} isCurrentStep={isCurrentStep}>
-        <StyledTransactionStepIconContent isCurrentStep={isCurrentStep} done={done}>
-          {isLoading ? <CircularProgress size={spacing(6)} thickness={5} /> : done ? <SuccessTickIcon /> : icon}
-        </StyledTransactionStepIconContent>
-      </StyledTransactionStepIcon>
-      <StyledTransactionStepContent isLast={isLast}>
-        <ContainerBox flexDirection="column" gap={1}>
-          <StyledTransactionStepTitle $isCurrentStep={isCurrentStep}>{title}</StyledTransactionStepTitle>
-          {!hideWalletLabel && (
-            <StyledTransactionStepWallet>
-              <Address trimAddress address={account || ''} />
-            </StyledTransactionStepWallet>
-          )}
-        </ContainerBox>
-        {children}
-        {explanation && isCurrentStep && (
-          <ContainerBox flexDirection="column" gap={1}>
-            <Typography variant="bodySmallBold">
-              <FormattedMessage description="transactionStepsWhy" defaultMessage="Why do I need to do this?" />
-            </Typography>
-            <Typography variant="bodySmallRegular">{explanation}</Typography>
-          </ContainerBox>
-        )}
-      </StyledTransactionStepContent>
-    </>
-  );
-};
 
 const TransactionStepSuccessLabel = ({ label }: { label: React.ReactElement }) => (
   <ContainerBox gap={2} alignItems="center">
@@ -319,27 +267,27 @@ const buildApproveTokenItem = ({
   extraData,
   onGoToEtherscan,
   hash,
+  chainId,
   isLast,
   isCurrentStep,
   explanation,
   done,
 }: TransactionActionApproveTokenProps) => ({
   content: () => {
-    const activeWallet = useActiveWallet();
     const { token, amount, isPermit2Enabled, swapper } = extraData;
     const [showReceipt, setShowReceipt] = React.useState(false);
-    const receipt = useTransactionReceipt(hash);
+    const receipt = useTransactionReceipt({ transaction: { hash: hash as Hash, chainId } });
     const isPendingTransaction = useIsTransactionPending(hash);
     const hasConfirmedRef = React.useRef(false);
-    const hasPendingApproval = useHasPendingApproval(token, activeWallet?.address);
     const intl = useIntl();
+    const useUnlimitedApproval = useUseUnlimitedApproval();
 
     React.useEffect(() => {
       if (hash && !isPendingTransaction && receipt && !hasConfirmedRef.current && onActionConfirmed) {
         hasConfirmedRef.current = true;
         onActionConfirmed(hash);
       }
-    }, [hash, isPendingTransaction, receipt]);
+    }, [hash, isPendingTransaction, receipt, onActionConfirmed]);
 
     const infiniteBtnText = (
       <FormattedMessage
@@ -348,14 +296,6 @@ const buildApproveTokenItem = ({
         values={{
           symbol: token.symbol,
         }}
-      />
-    );
-
-    const specificBtnTextAsSecondary = (
-      <FormattedMessage
-        description="Allow us to use your coin (home exact secondary)"
-        defaultMessage="{amount} {symbol}"
-        values={{ symbol: token.symbol, amount: formatCurrencyAmount({ amount, token, sigFigs: 4, intl }) }}
       />
     );
 
@@ -410,27 +350,30 @@ const buildApproveTokenItem = ({
           isLoading={isPendingTransaction}
         >
           {!hash ? (
-            <ContainerBox gap={3}>
-              <Button
-                onClick={isPermit2Enabled ? () => onAction() : () => onAction(amount)}
-                size="large"
-                variant="contained"
-                sx={{ flex: 1 }}
-                disabled={hasPendingApproval}
-              >
-                {hasPendingApproval ? waitingForAppvText : isPermit2Enabled ? infiniteBtnText : specificBtnText}
-              </Button>
-              {isPermit2Enabled && (
-                <Button onClick={() => onAction(amount)} size="large" variant="outlined" disabled={hasPendingApproval}>
-                  {specificBtnTextAsSecondary}
-                </Button>
+            <>
+              {isCurrentStep && (
+                <ContainerBox gap={3}>
+                  <Button
+                    onClick={isPermit2Enabled && useUnlimitedApproval ? () => onAction() : () => onAction(amount)}
+                    variant="contained"
+                    sx={{ flex: 1 }}
+                    size="large"
+                    disabled={isPendingTransaction}
+                  >
+                    {isPendingTransaction
+                      ? waitingForAppvText
+                      : isPermit2Enabled && useUnlimitedApproval
+                        ? infiniteBtnText
+                        : specificBtnText}
+                  </Button>
+                </ContainerBox>
               )}
-            </ContainerBox>
+            </>
           ) : (
             <ContainerBox gap={4} alignItems="center">
               <Button
                 variant="outlined"
-                size="large"
+                size="small"
                 onClick={() => (hasLoadReceipt ? setShowReceipt(true) : onGoToEtherscan(hash))}
               >
                 {hasLoadReceipt ? (
@@ -491,6 +434,12 @@ const buildApproveTokenSignItem = ({
       }
     }, [extraData.signStatus]);
 
+    let stepTitle = (
+      <FormattedMessage
+        description="transationStepApproveSign"
+        defaultMessage="Sign token authorization with your wallet"
+      />
+    );
     let stepSuccessLabels = <></>;
     let isLoadingQuoteSimulations = false;
 
@@ -498,6 +447,21 @@ const buildApproveTokenSignItem = ({
       stepSuccessLabels = (
         <TransactionStepSuccessLabel
           label={<FormattedMessage description="signTransactionStep" defaultMessage="Token authorization signed" />}
+        />
+      );
+    } else if (type === TRANSACTION_ACTION_APPROVE_TOKEN_SIGN_EARN) {
+      stepTitle = (
+        <FormattedMessage description="earn.tx-steps.sign-approve-token.title" defaultMessage="Authorize investment" />
+      );
+
+      stepSuccessLabels = (
+        <TransactionStepSuccessLabel
+          label={
+            <FormattedMessage
+              description="earn.tx-steps.sign-approve-token.success"
+              defaultMessage="Token authorization signed"
+            />
+          }
         />
       );
     } else if (type === TRANSACTION_ACTION_APPROVE_TOKEN_SIGN_SWAP) {
@@ -553,12 +517,7 @@ const buildApproveTokenSignItem = ({
           isCurrentStep={isCurrentStep}
           done={done}
           icon={<WalletCheckIcon />}
-          title={
-            <FormattedMessage
-              description="transationStepApproveSign"
-              defaultMessage="Sign token authorization with your wallet"
-            />
-          }
+          title={stepTitle}
           isLoading={isSigning || isLoadingQuoteSimulations}
           explanation={explanation}
         >
@@ -578,6 +537,176 @@ const buildApproveTokenSignItem = ({
       </>
     );
   },
+});
+
+const buildApproveCompanionSignItem = ({
+  onAction,
+  extraData,
+  isLast,
+  isCurrentStep,
+  explanation,
+  done,
+  failed,
+}: TransactionActionApproveCompanionSignProps) => ({
+  content: () => {
+    const [isSigning, setIsSigning] = React.useState(false);
+
+    React.useEffect(() => {
+      if (isSigning) {
+        setIsSigning(false);
+      }
+    }, [extraData.signStatus]);
+
+    const stepSuccessLabels = (
+      <TransactionStepSuccessLabel
+        label={
+          extraData.type === EarnPermission.INCREASE ? (
+            <FormattedMessage
+              description="tx-steps.earn.approve-companion-sign.increase.title"
+              defaultMessage="Contract authorization signed"
+            />
+          ) : (
+            <FormattedMessage
+              description="tx-steps.earn.approve-companion-sign.withdraw.title"
+              defaultMessage="Contract authorization signed"
+            />
+          )
+        }
+      />
+    );
+
+    const handleSign = () => {
+      setIsSigning(true);
+      onAction();
+    };
+
+    return (
+      <>
+        <CommonTransactionStepItem
+          isLast={isLast}
+          isCurrentStep={isCurrentStep}
+          done={done}
+          icon={<WalletCheckIcon />}
+          title={
+            extraData.type === EarnPermission.INCREASE ? (
+              <FormattedMessage
+                description="tx-steps.earn.approve-companion-sign.increase.title"
+                defaultMessage="Authorize us to deposit your assets"
+              />
+            ) : (
+              <FormattedMessage
+                description="tx-steps.earn.approve-companion-sign.withdraw.title"
+                defaultMessage="Authorize us to withdraw your assets"
+              />
+            )
+          }
+          isLoading={isSigning}
+          explanation={explanation}
+        >
+          {isCurrentStep && (
+            <Button variant="contained" fullWidth size="large" onClick={handleSign} disabled={failed}>
+              {isSigning ? (
+                <FormattedMessage description="signing" defaultMessage="Signing..." />
+              ) : (
+                <FormattedMessage description="signWithWallet" defaultMessage="Sign with your wallet" />
+              )}
+            </Button>
+          )}
+          {done && stepSuccessLabels}
+        </CommonTransactionStepItem>
+      </>
+    );
+  },
+});
+
+const buildSignEarnItem = ({
+  onAction,
+  extraData,
+  isLast,
+  isCurrentStep,
+  explanation,
+  done,
+  failed,
+}: TransactionActionEarnSignToSProps) => ({
+  content: () => {
+    const [isSigning, setIsSigning] = React.useState(false);
+
+    React.useEffect(() => {
+      if (isSigning) {
+        setIsSigning(false);
+      }
+    }, [extraData.signStatus]);
+
+    const handleSign = () => {
+      setIsSigning(true);
+      onAction();
+    };
+
+    return (
+      <>
+        <CommonTransactionStepItem
+          isLast={isLast}
+          isCurrentStep={isCurrentStep}
+          done={done}
+          icon={<WalletCheckIcon />}
+          title={
+            <FormattedMessage
+              description="transationStep.sign-earn-tos"
+              defaultMessage="Sign the vault terms of service"
+            />
+          }
+          isLoading={isSigning}
+          explanation={explanation}
+        >
+          {isCurrentStep && (
+            <Button variant="contained" fullWidth size="large" onClick={handleSign} disabled={failed}>
+              {isSigning ? (
+                <FormattedMessage description="signing" defaultMessage="Signing..." />
+              ) : (
+                <FormattedMessage description="signWithWallet" defaultMessage="Sign with your wallet" />
+              )}
+            </Button>
+          )}
+          {done && (
+            <TransactionStepSuccessLabel
+              label={
+                <FormattedMessage
+                  description="earn.transaction-steps.sign-tos.signed"
+                  defaultMessage="Strategy Terms of Service signed"
+                />
+              }
+            />
+          )}
+        </CommonTransactionStepItem>
+      </>
+    );
+  },
+});
+
+const buildEarnWithdrawItem = ({
+  onAction,
+  isLast,
+  isCurrentStep,
+  done,
+  extraData,
+}: TransactionActionEarnWithdrawProps) => ({
+  content: () => (
+    <CommonTransactionStepItem
+      isLast={isLast}
+      isCurrentStep={isCurrentStep}
+      done={done}
+      icon={<WalletMoneyIcon />}
+      title={<FormattedMessage description="tx-step.title.earn.withdraw" defaultMessage="Withdraw from Vault" />}
+    >
+      {isCurrentStep && (
+        <StyledTransactionStepButtonContainer>
+          <Button variant="contained" fullWidth size="large" onClick={() => onAction(extraData.assetWithdrawType)}>
+            <FormattedMessage description="tx-step.button.earn.withdraw" defaultMessage="Withdraw" />
+          </Button>
+        </StyledTransactionStepButtonContainer>
+      )}
+    </CommonTransactionStepItem>
+  ),
 });
 
 const WaitIcons = {
@@ -677,6 +806,32 @@ const buildSwapItem = ({ onAction, isLast, isCurrentStep, transactions, done }: 
   ),
 });
 
+const buildEarnDepositItem = ({
+  onAction,
+  isLast,
+  isCurrentStep,
+  transactions,
+  done,
+}: TransactionActionEarnDepositProps) => ({
+  content: () => (
+    <CommonTransactionStepItem
+      isLast={isLast}
+      isCurrentStep={isCurrentStep}
+      done={done}
+      icon={<DollarSquareIcon />}
+      title={<FormattedMessage description="transationStepEarnDeposit" defaultMessage="Deposit and Start Earning" />}
+    >
+      {isCurrentStep && (
+        <StyledTransactionStepButtonContainer>
+          <Button variant="contained" fullWidth size="large" onClick={() => onAction(transactions)}>
+            <FormattedMessage description="transationStepEarnDeposit.deposit" defaultMessage="Deposit" />
+          </Button>
+        </StyledTransactionStepButtonContainer>
+      )}
+    </CommonTransactionStepItem>
+  ),
+});
+
 const buildCreatePositionItem = ({
   onAction,
   isLast,
@@ -701,31 +856,56 @@ const buildCreatePositionItem = ({
   ),
 });
 
-const RECAP_DATA_MAP: Record<TransactionApplicationIdentifier, (() => JSX.Element | null) | undefined> = {
-  [TransactionApplicationIdentifier.DCA]: DcaRecapData,
-  [TransactionApplicationIdentifier.SWAP]: SwapRecapData,
-  [TransactionApplicationIdentifier.TRANSFER]: undefined,
-};
-
 const ITEMS_MAP: Record<TransactionActionType, (props: TransactionActionProps) => { content: () => JSX.Element }> = {
+  [TRANSACTION_ACTION_SIGN_TOS_EARN]: buildSignEarnItem,
   [TRANSACTION_ACTION_APPROVE_TOKEN]: buildApproveTokenItem,
   [TRANSACTION_ACTION_APPROVE_TOKEN_SIGN_SWAP]: buildApproveTokenSignItem,
   [TRANSACTION_ACTION_APPROVE_TOKEN_SIGN_DCA]: buildApproveTokenSignItem,
+  [TRANSACTION_ACTION_APPROVE_TOKEN_SIGN_EARN]: buildApproveTokenSignItem,
   [TRANSACTION_ACTION_WAIT_FOR_SIMULATION]: buildWaitForSimulationItem,
   [TRANSACTION_ACTION_SWAP]: buildSwapItem,
+  [TRANSACTION_ACTION_EARN_DEPOSIT]: buildEarnDepositItem,
   [TRANSACTION_ACTION_CREATE_POSITION]: buildCreatePositionItem,
+  [TRANSACTION_ACTION_APPROVE_COMPANION_SIGN_EARN]: buildApproveCompanionSignItem,
+  [TRANSACTION_ACTION_EARN_WITHDRAW]: buildEarnWithdrawItem,
 };
+
+const StyledContainer = styled(ContainerBox).attrs({ fullWidth: true, alignItems: 'flex-start' })<{
+  $isAbsolute: boolean;
+}>`
+  ${({
+    $isAbsolute,
+    theme: {
+      palette: { mode },
+      spacing,
+    },
+  }) =>
+    $isAbsolute &&
+    `position: absolute; top: 0; bottom: 0; left: 0;background-color: ${
+      colors[mode].background.quartery
+    };border-radius: ${spacing(4)}; backdrop-filter: blur(30px);`}
+`;
+
+const StyledPositioner = styled(ContainerBox).attrs({ gap: 5, fullWidth: true, flexDirection: 'column', flex: 1 })<{
+  $isAbsolute: boolean;
+}>`
+  ${({ $isAbsolute, theme: { spacing } }) => $isAbsolute && `padding: ${spacing(6)};`}
+`;
 
 const TransactionSteps = ({
   shouldShow,
-  handleClose,
+  handleClose: onHandleClose,
   transactions,
   onAction,
   onActionConfirmed,
   applicationIdentifier,
   setShouldShowFirstStep,
   swapQuoteStatus,
+  setHeight,
+  recapDataProps,
+  backControlLabel,
 }: TransactionConfirmationProps) => {
+  const innerRef = React.useRef<HTMLDivElement>(null);
   const currentNetwork = useSelectedNetwork();
   const intl = useIntl();
 
@@ -736,46 +916,75 @@ const TransactionSteps = ({
 
   const currentStep = findIndex(transactions, { done: false });
 
-  const RecapData = RECAP_DATA_MAP[applicationIdentifier];
+  const handleClose = () => {
+    if (setHeight) setHeight(undefined);
+    onHandleClose();
+  };
+
+  React.useEffect(() => {
+    if (setHeight && shouldShow) {
+      setHeight(shouldShow ? innerRef.current?.offsetHeight : undefined);
+    }
+  });
+
+  const handleResize = React.useCallback(() => {
+    if (setHeight) setHeight(innerRef.current?.offsetHeight);
+  }, [setHeight]);
+
+  const handleEnter = React.useCallback(() => {
+    setShouldShowFirstStep(false);
+    handleResize();
+  }, [setShouldShowFirstStep, handleResize]);
+
+  const handleExit = React.useCallback(() => {
+    if (setHeight) setHeight(undefined);
+  }, [setHeight]);
 
   return (
-    <Slide direction="up" in={shouldShow} mountOnEnter unmountOnExit onEnter={() => setShouldShowFirstStep(false)}>
-      <ContainerBox flexDirection="column" gap={10} fullWidth>
-        <ContainerBox justifyContent="space-between" gap={8}>
-          <BackControl
-            onClick={handleClose}
-            label={intl.formatMessage(defineMessage({ defaultMessage: 'Back', description: 'back' }))}
-          />
-          {applicationIdentifier === TransactionApplicationIdentifier.SWAP && swapQuoteStatus && (
-            <QuoteStatusNotification quoteStatus={swapQuoteStatus} />
-          )}
-        </ContainerBox>
-        {RecapData && <RecapData />}
-        <DividerBorder1 />
-        <ContainerBox flexDirection="column">
-          {transactions.map((transaction, index) => {
-            const { type, hash } = transaction;
-            const step = index + 1;
-            const isLast = step === transactions.length;
-            const isCurrentStep = currentStep === index;
+    <Slide direction="up" in={shouldShow} mountOnEnter unmountOnExit onExit={handleExit} onEnter={handleEnter}>
+      <StyledContainer $isAbsolute={!!setHeight} fullWidth>
+        <StyledPositioner $isAbsolute={!!setHeight} ref={innerRef}>
+          <ContainerBox flexDirection="column" gap={3}>
+            <ContainerBox justifyContent="space-between" gap={8}>
+              <BackControl
+                onClick={handleClose}
+                label={
+                  backControlLabel || intl.formatMessage(defineMessage({ defaultMessage: 'Back', description: 'back' }))
+                }
+                variant="text"
+              />
+              {applicationIdentifier === TransactionApplicationIdentifier.SWAP && swapQuoteStatus && (
+                <QuoteStatusNotification quoteStatus={swapQuoteStatus} />
+              )}
+            </ContainerBox>
+            <RecapData {...(recapDataProps || {})} applicationIdentifier={applicationIdentifier} />
+          </ContainerBox>
+          <DividerBorder1 />
+          <ContainerBox flexDirection="column">
+            {transactions.map((transaction, index) => {
+              const { type, hash } = transaction;
+              const step = index + 1;
+              const isLast = step === transactions.length;
+              const isCurrentStep = currentStep === index;
 
-            const item = ITEMS_MAP[transaction.type]({
-              ...transaction,
-              transactions,
-              onGoToEtherscan,
-              isLast,
-              isCurrentStep,
-              onAction,
-              onActionConfirmed,
-            });
-            return (
-              <ContainerBox gap={8} key={`${type}-${hash}-${step}`}>
-                <item.content />
-              </ContainerBox>
-            );
-          })}
-        </ContainerBox>
-      </ContainerBox>
+              const item = ITEMS_MAP[transaction.type]({
+                ...transaction,
+                transactions,
+                onGoToEtherscan,
+                isLast,
+                isCurrentStep,
+                onAction,
+                onActionConfirmed,
+              });
+              return (
+                <ContainerBox gap={8} key={`${type}-${hash}-${step}`}>
+                  <item.content />
+                </ContainerBox>
+              );
+            })}
+          </ContainerBox>
+        </StyledPositioner>
+      </StyledContainer>
     </Slide>
   );
 };

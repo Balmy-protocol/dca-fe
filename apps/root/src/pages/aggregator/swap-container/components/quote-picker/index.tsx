@@ -82,7 +82,7 @@ const QuoteItem = ({ quote, bestQuote, sorting, isBuyOrder, selectedRoute, onCli
             isBestQuote
           )}
         </Typography>
-        <Typography variant="bodySmallLabel">
+        <Typography variant="labelRegular">
           {isBestQuote
             ? intl.formatMessage(getBetterByLabel(sorting, isBuyOrder))
             : intl.formatMessage(getWorseByLabel(sorting, isBuyOrder))}
@@ -135,7 +135,6 @@ const QuotePicker = ({ quotes, isLoading, bestQuote, isBuyOrder }: QuotePickerPr
   const trackEvent = useTrackEvent();
   const intl = useIntl();
   const { selectedRoute } = useAggregatorState();
-  const mode = useThemeMode();
 
   const handleClose = () => {
     setAnchorEl(null);
@@ -185,28 +184,7 @@ const QuotePicker = ({ quotes, isLoading, bestQuote, isBuyOrder }: QuotePickerPr
         )}
         isLoading={isLoading}
       />
-      <Popover
-        anchorOrigin={{
-          vertical: 'center',
-          horizontal: 'right',
-        }}
-        transformOrigin={{
-          vertical: 'center',
-          horizontal: 'left',
-        }}
-        anchorEl={anchorEl}
-        id={id}
-        open={!isLoading && open}
-        onClose={handleClose}
-        disableAutoFocus
-        slotProps={{
-          paper: {
-            style: {
-              boxShadow: colors[mode].dropShadow.dropShadow300,
-            },
-          },
-        }}
-      >
+      <Popover anchorEl={anchorEl} id={id} open={!isLoading && open} onClose={handleClose}>
         <QuoteList
           quotes={quotes}
           bestQuote={bestQuote}

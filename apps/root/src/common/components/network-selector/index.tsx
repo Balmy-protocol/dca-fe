@@ -54,8 +54,8 @@ const NetworkItem = ({ item: network }: { item: OptionWithKey }) => {
   return (
     <ContainerBox alignItems="center" justifyContent="space-between" key={network.key} flex={1} gap={3}>
       <ContainerBox alignItems="center" flex={1} gap={3}>
-        <TokenIcon size={6} token={emptyTokenWithLogoURI(getGhTokenListLogoUrl(network.chainId, 'logo'))} />
-        <Typography variant="bodySmallSemibold" color={colors[mode].typography.typo2}>
+        <TokenIcon withShadow size={8} token={emptyTokenWithLogoURI(getGhTokenListLogoUrl(network.chainId, 'logo'))} />
+        <Typography variant="bodySmallBold" color={colors[mode].typography.typo2}>
           {network.name}
         </Typography>
         {network.testnet && (
@@ -69,7 +69,40 @@ const NetworkItem = ({ item: network }: { item: OptionWithKey }) => {
       {!!network.balance && (
         <Chip
           size="small"
-          label={<Typography variant="bodySemibold">${formatUsdAmount({ amount: network.balance, intl })}</Typography>}
+          color="primary"
+          variant="outlined"
+          label={<Typography variant="bodyBold">${formatUsdAmount({ amount: network.balance, intl })}</Typography>}
+        />
+      )}
+    </ContainerBox>
+  );
+};
+
+const SelectedNetworkItem = ({ item: network }: { item: OptionWithKey }) => {
+  const mode = useThemeMode();
+  const intl = useIntl();
+
+  return (
+    <ContainerBox alignItems="center" justifyContent="space-between" key={network.key} flex={1} gap={3}>
+      <ContainerBox alignItems="center" flex={1} gap={3}>
+        <TokenIcon size={6} token={emptyTokenWithLogoURI(getGhTokenListLogoUrl(network.chainId, 'logo'))} />
+        <Typography variant="bodySemibold" color={colors[mode].typography.typo1}>
+          {network.name}
+        </Typography>
+        {network.testnet && (
+          <Chip
+            label={<FormattedMessage description="testnet" defaultMessage="Testnet" />}
+            size="small"
+            color="warning"
+          />
+        )}
+      </ContainerBox>
+      {!!network.balance && (
+        <Chip
+          size="small"
+          color="primary"
+          variant="outlined"
+          label={<Typography variant="bodyBold">${formatUsdAmount({ amount: network.balance, intl })}</Typography>}
         />
       )}
     </ContainerBox>
@@ -167,11 +200,13 @@ const NetworkSelector = ({
           id="choose-network"
           options={renderNetworks}
           RenderItem={NetworkItem}
+          RenderSelectedValue={SelectedNetworkItem}
           selectedItem={selectedItem}
           onChange={handleChangeNetwork}
           disabledSearch={!!disableSearch}
           searchFunction={searchFunction}
           limitHeight
+          size="medium"
         />
       </StyledNetworkButtonsContainer>
     </StyledNetworkContainer>

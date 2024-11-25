@@ -1,8 +1,10 @@
 import React from 'react';
-import { QuoteTransaction, AmountsOfToken as SdkAmountOfToken } from '@balmy/sdk';
+import { PermitData, QuoteTransaction, AmountsOfToken as SdkAmountOfToken } from '@balmy/sdk';
 
 import { Token } from './tokens';
 import { BlowfishResponse } from './responses';
+import { Hex, SignMessageReturnType } from 'viem';
+import { EarnPermission, EarnPermissionData, WithdrawType } from '@balmy/sdk/dist/services/earn/types';
 
 export * from './tokens';
 export * from './positions';
@@ -19,6 +21,7 @@ export * from './contactList';
 export * from './accountLabels';
 export * from './accountHistory';
 export * from './providerInfo';
+export * from './earn';
 
 export type SetStateCallback<T> = React.Dispatch<React.SetStateAction<T>>;
 
@@ -61,9 +64,14 @@ export type Timestamp = number;
 export type TransactionActionApproveTokenType = 'APPROVE_TOKEN';
 export type TransactionActionApproveTokenSignSwapType = 'APPROVE_TOKEN_SIGN_SWAP';
 export type TransactionActionApproveTokenSignDCAType = 'APPROVE_TOKEN_SIGN_DCA';
+export type TransactionActionApproveTokenSignEarnType = 'APPROVE_TOKEN_SIGN_EARN';
 export type TransactionActionWaitForSimulationType = 'WAIT_FOR_SIMULATION';
 export type TransactionActionSwapType = 'SWAP';
+export type TransactionActionEarnDepositType = 'EARN_DEPOSIT';
 export type TransactionActionCreatePositionType = 'CREATE_POSITION';
+export type TransactionActionApproveCompanionSignEarnType = 'APPROVE_COMPANION_SIGN_EARN';
+export type TransactionActionEarnWithdrawType = 'EARN_WITHDRAW';
+export type TransactionActionEarnSignToSType = 'SIGN_TOS_EARN';
 
 export type TransactionActionType =
   // Common
@@ -72,7 +80,12 @@ export type TransactionActionType =
   | TransactionActionApproveTokenSignDCAType
   | TransactionActionWaitForSimulationType
   | TransactionActionSwapType
-  | TransactionActionCreatePositionType;
+  | TransactionActionEarnDepositType
+  | TransactionActionEarnSignToSType
+  | TransactionActionApproveTokenSignEarnType
+  | TransactionActionCreatePositionType
+  | TransactionActionApproveCompanionSignEarnType
+  | TransactionActionEarnWithdrawType;
 
 export enum AllowanceType {
   specific = 'specific',
@@ -106,6 +119,15 @@ export interface TransactionActionApproveTokenSignSwapData extends TransactionAc
   simulation?: BlowfishResponse;
 }
 
+export interface TransactionActionApproveTokenSignEarnData extends TransactionActionApproveTokenSignDCAData {
+  asset: Token;
+  assetAmount: bigint;
+}
+
+export interface TransactionActionSignToSEarnData extends TransactionActionApproveTokenSignDCAData {
+  tos: string;
+}
+
 export interface TransactionActionWaitForSimulationData {
   tx: QuoteTransaction;
   chainId: number;
@@ -120,6 +142,14 @@ export interface TransactionActionSwapData {
   signature?: { deadline: number; nonce: bigint; rawSignature: string };
 }
 
+export interface TransactionActionEarnDepositData {
+  asset: Token;
+  assetAmount: bigint;
+  permitSignature?: PermitData['permitData'] & { signature: Hex };
+  permissionSignature?: EarnPermissionData['permitData'] & { signature: Hex };
+  tosSignature?: SignMessageReturnType;
+}
+
 export interface TransactionActionCreatePositionData {
   from: Token;
   to: Token;
@@ -129,6 +159,21 @@ export interface TransactionActionCreatePositionData {
   signature?: { deadline: number; nonce: bigint; rawSignature: string };
 }
 
-export interface AmountsOfToken extends Omit<SdkAmountOfToken, 'amount'> {
+export interface TransactionActionApproveCompanionSignEarnData {
+  type: EarnPermission;
+  signStatus: SignStatus;
+}
+
+export interface TransactionActionEarnWithdrawData {
+  asset: Token;
+  withdraw: {
+    token: Token;
+    amount: bigint;
+  }[];
+  signature?: EarnPermissionData['permitData'] & { signature: Hex };
+  assetWithdrawType: WithdrawType;
+}
+
+export interface AmountsOfToken extends DistributiveOmit<SdkAmountOfToken, 'amount'> {
   amount: bigint;
 }

@@ -2,7 +2,7 @@ import { QuoteResponse } from '@balmy/sdk';
 import { AmountsOfToken } from '.';
 
 export interface MappedQuoteResponse
-  extends Omit<QuoteResponse, 'gas' | 'sellAmount' | 'buyAmount' | 'maxSellAmount' | 'minBuyAmount'> {
+  extends DistributiveOmit<QuoteResponse, 'gas' | 'sellAmount' | 'buyAmount' | 'maxSellAmount' | 'minBuyAmount'> {
   sellAmount: AmountsOfToken;
   buyAmount: AmountsOfToken;
   maxSellAmount: AmountsOfToken;

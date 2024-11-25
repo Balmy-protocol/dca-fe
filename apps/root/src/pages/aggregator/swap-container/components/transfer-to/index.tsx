@@ -1,6 +1,6 @@
 import * as React from 'react';
 import styled from 'styled-components';
-import { Typography, IconButton, EditIcon, ForegroundPaper, ContainerBox, CloseIcon } from 'ui-library';
+import { Typography, IconButton, EditIcon, ForegroundPaper, ContainerBox, CloseIcon, colors } from 'ui-library';
 import { FormattedMessage } from 'react-intl';
 import { useAppDispatch } from '@hooks/state';
 import { setTransferTo } from '@state/aggregator/actions';
@@ -8,9 +8,9 @@ import useTrackEvent from '@hooks/useTrackEvent';
 import Address from '@common/components/address';
 
 const StyledTransferToContainer = styled(ForegroundPaper).attrs({ variant: 'outlined' })`
-  ${({ theme: { spacing } }) => `
+  ${({ theme: { spacing, space } }) => `
   border-radius: ${spacing(2)};
-  padding: ${spacing(5)};
+  padding: ${space.s05};
   position: relative;
   display: flex;
   flex-direction: column;
@@ -49,14 +49,14 @@ const TransferTo = ({ transferTo, onOpenTransferTo, showControls }: TransferToPr
         </Typography>
         {showControls && onOpenTransferTo && (
           <IconButton aria-label="edit" onClick={onOpenTransferTo}>
-            <EditIcon color="info" fontSize="small" />
+            <EditIcon fontSize="small" sx={({ palette }) => ({ color: colors[palette.mode].typography.typo3 })} />
           </IconButton>
         )}
       </ContainerBox>
       {showControls && (
         <StyledCloseContainer>
           <IconButton aria-label="close" onClick={onRemoveAddress}>
-            <CloseIcon color="info" fontSize="small" />
+            <CloseIcon fontSize="small" sx={({ palette }) => ({ color: colors[palette.mode].typography.typo3 })} />
           </IconButton>
         </StyledCloseContainer>
       )}

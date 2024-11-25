@@ -8,139 +8,39 @@ import React from 'react';
 import { createStyles } from '../../common';
 import { IconButton } from '../iconbutton';
 import { withStyles } from 'tss-react/mui';
-import {
-  TransactionEventTypes,
-  ERC20ApprovalDataDoneEvent,
-  NativeTransferDataDoneEvent,
-  ERC20TransferDataDoneEvent,
-  DCAWithdrawDataDoneEvent,
-  ERC20ApprovalEvent,
-  ERC20TransferEvent,
-  NativeTransferEvent,
-  DCAWithdrawnEvent,
-  DCAModifiedDataDoneEvent,
-  DCAModifiedEvent,
-  DCACreatedEvent,
-  DCACreatedDataDoneEvent,
-  DCAPermissionsModifiedDataDoneEvent,
-  DCAPermissionsModifiedEvent,
-  Address,
-  DCATransferDataDoneEvent,
-  DCATransferEvent,
-  DCATerminatedEvent,
-  DCATerminatedDataDoneEvent,
-  SwapEvent,
-  SwapDataDoneEvent,
-} from 'common-types';
-import { Typography } from '../typography';
+import { AmountsOfToken, StrategyId, TokenWithIcon, TransactionEventTypes } from 'common-types';
+import { Typography, TypographyProps } from '../typography';
 import { useTheme } from '@mui/material';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { FormattedMessage, IntlShape, useIntl } from 'react-intl';
 import BalmyLogoSmallLight from '../../assets/balmy-logo-small-light';
 import { baseColors, colors } from '../../theme';
 import styled from 'styled-components';
-import { TRANSACTION_TYPE_TITLE_MAP } from './transaction-types-map';
+import { getIsDelayedWithdraw, getTransactionTypeTitle } from './transaction-types-map';
 import { DateTime } from 'luxon';
 import { maxUint256 } from 'viem';
 import { ContainerBox } from '../container-box';
 import { formatCurrencyAmount, formatUsdAmount } from '../../common/utils/currency';
-import isUndefined from 'lodash/isUndefined';
-
-interface ERC20ApprovaDataReceipt extends Omit<ERC20ApprovalDataDoneEvent, 'owner' | 'spender'> {
-  owner: React.ReactNode;
-  spender: React.ReactNode;
-}
-interface ERC20ApprovalReceipt extends Omit<ERC20ApprovalEvent, 'data'> {
-  data: ERC20ApprovaDataReceipt;
-}
-
-interface ERC20TransferDataReceipt extends Omit<ERC20TransferDataDoneEvent, 'from' | 'to'> {
-  from: React.ReactNode;
-  to: React.ReactNode;
-}
-interface ERC20TransferReceipt extends Omit<ERC20TransferEvent, 'data'> {
-  data: ERC20TransferDataReceipt;
-}
-
-interface SwapDataReceipt extends Omit<SwapDataDoneEvent, 'recipient' | 'from'> {
-  recipient?: React.ReactNode;
-  from: React.ReactNode;
-}
-interface SwapReceipt extends Omit<SwapEvent, 'data'> {
-  data: SwapDataReceipt;
-}
-
-interface NativeTransferDataReceipt extends Omit<NativeTransferDataDoneEvent, 'from' | 'to'> {
-  from: React.ReactNode;
-  to: React.ReactNode;
-}
-interface NativeTransferReceipt extends Omit<NativeTransferEvent, 'data'> {
-  data: NativeTransferDataReceipt;
-}
-
-interface DCAWithdrawDataReceipt extends Omit<DCAWithdrawDataDoneEvent, 'from' | 'to'> {
-  from: React.ReactNode;
-  to: React.ReactNode;
-}
-interface DCAWithdrawReceipt extends Omit<DCAWithdrawnEvent, 'data'> {
-  data: DCAWithdrawDataReceipt;
-}
-
-interface DCATerminatedDataReceipt extends Omit<DCATerminatedDataDoneEvent, 'from' | 'to'> {
-  from: React.ReactNode;
-}
-interface DCATerminatedReceipt extends Omit<DCATerminatedEvent, 'data'> {
-  data: DCATerminatedDataReceipt;
-}
-
-interface DCAModifyDataReceipt extends Omit<DCAModifiedDataDoneEvent, 'from' | 'to'> {
-  from: React.ReactNode;
-  to: React.ReactNode;
-}
-interface DCAModifyReceipt extends Omit<DCAModifiedEvent, 'data'> {
-  data: DCAModifyDataReceipt;
-}
-
-interface DCACreatedDataReceipt extends Omit<DCACreatedDataDoneEvent, 'from' | 'to' | 'owner'> {
-  from: React.ReactNode;
-  owner: React.ReactNode;
-}
-interface DCACreatedReceipt extends Omit<DCACreatedEvent, 'data'> {
-  data: DCACreatedDataReceipt;
-}
-
-interface DCATransferDataReceipt extends Omit<DCATransferDataDoneEvent, 'from' | 'to'> {
-  from: React.ReactNode;
-  to: React.ReactNode;
-}
-interface DCATransferReceipt extends Omit<DCATransferEvent, 'data'> {
-  data: DCATransferDataReceipt;
-}
-
-interface DCAPermissionsModifiedDataReceipt extends Omit<DCAPermissionsModifiedDataDoneEvent, 'permissions'> {
-  permissions: {
-    permissions: DCAPermissionsModifiedDataDoneEvent['permissions'][Address]['permissions'];
-    label: React.ReactNode;
-  }[];
-  to: React.ReactNode;
-}
-interface DCAPermissionsModifiedReceipt extends Omit<DCAPermissionsModifiedEvent, 'data'> {
-  data: DCAPermissionsModifiedDataReceipt;
-}
-
-type DcaTransactionReceiptProp =
-  | DCAWithdrawReceipt
-  | DCAModifyReceipt
-  | DCACreatedReceipt
-  | DCAPermissionsModifiedReceipt
-  | DCATransferReceipt
-  | DCATerminatedReceipt;
-
-type TransactionReceiptProp =
-  | ERC20ApprovalReceipt
-  | ERC20TransferReceipt
-  | SwapReceipt
-  | NativeTransferReceipt
-  | DcaTransactionReceiptProp;
+import {
+  ERC20ApprovalReceipt,
+  ERC20TransferReceipt,
+  NativeTransferReceipt,
+  DCAWithdrawReceipt,
+  SwapReceipt,
+  DCATerminatedReceipt,
+  DCAModifyReceipt,
+  DCACreatedReceipt,
+  EarnDepositReceipt,
+  EarnIncreaseReceipt,
+  EarnWithdrawReceipt,
+  DCAPermissionsModifiedReceipt,
+  DCATransferReceipt,
+  DcaTransactionReceiptProp,
+  TransactionReceiptProp,
+  EarnClaimDelayedWithdrawReceipt,
+  EarnSpecialWithdrawReceipt,
+  EarnTransactionReceiptProp,
+} from './types';
+import { HiddenNumber } from '../hidden-number';
 
 const StyledDialog = withStyles(Dialog, ({ palette: { mode } }) =>
   createStyles({
@@ -154,12 +54,9 @@ const StyledDialog = withStyles(Dialog, ({ palette: { mode } }) =>
         borderLeft: `2px solid ${colors[mode].violet.violet500}`,
         borderRight: `2px solid ${colors[mode].violet.violet500}`,
         borderBottom: 0,
-        backgroundImage: `url(\'data:image/svg+xml;utf8, <svg viewBox="0 0 200 110" xmlns="http://www.w3.org/2000/svg"><path d="M -15 110 L100 10 L215 110" fill="${colors[
+        backgroundImage: `url(\'data:image/svg+xml;utf8, <svg viewBox="0 0 200 110" xmlns="http://www.w3.org/2000/svg"><path d="M -15 110 L100 10 L215 110" fill="${baseColors.violet.violet800.replace('#', '%23')}" stroke="${colors[
           mode
-        ].background.tertiary.replace('#', '%23')}" stroke="${colors[mode].violet.violet500.replace(
-          '#',
-          '%23'
-        )}" stroke-width="2" vector-effect="non-scaling-stroke"/></svg>\')`,
+        ].violet.violet500.replace('#', '%23')}" stroke-width="2" vector-effect="non-scaling-stroke"/></svg>\')`,
         backgroundSize: '5% 13px',
         height: '10px',
         transform: 'rotate(180deg)',
@@ -203,11 +100,11 @@ const StyledDialogTitle = withStyles(DialogTitle, ({ palette: { mode }, spacing 
   })
 );
 
-const StyledDialogContent = withStyles(DialogContent, ({ spacing }) =>
+const StyledDialogContent = withStyles(DialogContent, ({ space }) =>
   createStyles({
     root: {
-      padding: `${spacing(6)} ${spacing(6)} ${spacing(14)} ${spacing(6)} !important`,
-      gap: spacing(5),
+      padding: `${space.s05} ${space.s05} ${space.s07} !important`,
+      gap: space.s05,
       display: 'flex',
       flexDirection: 'column',
     },
@@ -263,42 +160,86 @@ const StyledPositionId = styled(ContainerBox).attrs({
 `}
 `;
 
+const HiddenNumberWithToken = ({ token }: { token: TokenWithIcon }) => {
+  return (
+    <ContainerBox alignItems="center" gap={2}>
+      {token.icon}
+      <HiddenNumber size="medium" justifyContent="flex-start" />
+    </ContainerBox>
+  );
+};
+
+const NumberWithToken = ({
+  token,
+  amount,
+  intl,
+  customRenderer,
+  color,
+  showBalances = true,
+}: {
+  token: TokenWithIcon;
+  amount: AmountsOfToken;
+  intl: IntlShape;
+  customRenderer?: React.ReactNode;
+  color?: TypographyProps['color'];
+  showBalances?: boolean;
+}) => {
+  const { spacing } = useTheme();
+
+  if (!showBalances) {
+    return <HiddenNumberWithToken token={token} />;
+  }
+
+  return (
+    <StyledBodySmallBold sx={{ display: 'flex', alignItems: 'center', gap: spacing(2) }} color={color}>
+      {token.icon}
+      {customRenderer || (
+        <>
+          {formatCurrencyAmount({ amount: amount.amount, token, intl })}
+          {amount.amountInUSD && ` ($${formatUsdAmount({ amount: amount.amountInUSD, intl })})`}
+        </>
+      )}
+    </StyledBodySmallBold>
+  );
+};
+
 interface TransactionReceiptProps {
   transaction?: TransactionReceiptProp;
   open: boolean;
   onClose: () => void;
   onClickPositionId?: ({ chainId, positionId, hub }: { chainId: number; hub: string; positionId: number }) => void;
+  onClickEarnPositionId?: ({ chainId, strategyId }: { chainId: number; strategyId: StrategyId }) => void;
+  showBalances?: boolean;
 }
 
 const ERC20ApprovalTransactionReceipt = ({ transaction }: { transaction: ERC20ApprovalReceipt }) => {
-  const { spacing } = useTheme();
   const intl = useIntl();
   return (
     <>
       <StyledSectionContent>
-        <Typography variant="bodySmallLabel">
+        <Typography variant="labelRegular">
           <FormattedMessage description="TransactionReceipt-transactionAmountSent" defaultMessage="Amount approved" />
         </Typography>
-        <Typography variant="bodySmallBold" sx={{ display: 'flex', alignItems: 'center', gap: spacing(2) }}>
-          {transaction.data.token.icon}
-          {transaction.data.amount.amount === maxUint256 &&
-          transaction.type === TransactionEventTypes.ERC20_APPROVAL ? (
-            <FormattedMessage description="unlimited" defaultMessage="Unlimited" />
-          ) : (
-            formatCurrencyAmount({ amount: transaction.data.amount.amount, token: transaction.data.token, intl })
-          )}{' '}
-          {transaction.data.amount.amountInUSD &&
-            `($${formatUsdAmount({ amount: transaction.data.amount.amountInUSD, intl })})`}
-        </Typography>
+        <NumberWithToken
+          token={transaction.data.token}
+          amount={transaction.data.amount}
+          intl={intl}
+          customRenderer={
+            transaction.data.amount.amount === maxUint256 &&
+            transaction.type === TransactionEventTypes.ERC20_APPROVAL ? (
+              <FormattedMessage description="unlimited" defaultMessage="Unlimited" />
+            ) : undefined
+          }
+        />
       </StyledSectionContent>
       <StyledSectionContent>
-        <Typography variant="bodySmallLabel">
+        <Typography variant="labelRegular">
           <FormattedMessage description="TransactionReceipt-transactionAmountSent" defaultMessage="From address" />
         </Typography>
         <StyledBodySmallBold>{transaction.data.owner}</StyledBodySmallBold>
       </StyledSectionContent>
       <StyledSectionContent>
-        <Typography variant="bodySmallLabel">
+        <Typography variant="labelRegular">
           <FormattedMessage description="TransactionReceipt-transactionAmountSent" defaultMessage="Spender" />
         </Typography>
         <StyledBodySmallBold>{transaction.data.spender}</StyledBodySmallBold>
@@ -307,30 +248,35 @@ const ERC20ApprovalTransactionReceipt = ({ transaction }: { transaction: ERC20Ap
   );
 };
 
-const ERC20TransferTransactionReceipt = ({ transaction }: { transaction: ERC20TransferReceipt }) => {
-  const { spacing } = useTheme();
+const ERC20TransferTransactionReceipt = ({
+  transaction,
+  showBalances,
+}: {
+  transaction: ERC20TransferReceipt;
+  showBalances: boolean;
+}) => {
   const intl = useIntl();
   return (
     <>
       <StyledSectionContent>
-        <Typography variant="bodySmallLabel">
+        <Typography variant="labelRegular">
           <FormattedMessage description="TransactionReceipt-transactionAmountSent" defaultMessage="Amount sent" />
         </Typography>
-        <StyledBodySmallBold sx={{ display: 'flex', alignItems: 'center', gap: spacing(2) }}>
-          {transaction.data.token.icon}
-          {formatCurrencyAmount({ amount: transaction.data.amount.amount, token: transaction.data.token, intl })}{' '}
-          {transaction.data.amount.amountInUSD &&
-            `($${formatUsdAmount({ amount: transaction.data.amount.amountInUSD, intl })})`}
-        </StyledBodySmallBold>
+        <NumberWithToken
+          showBalances={showBalances}
+          token={transaction.data.token}
+          amount={transaction.data.amount}
+          intl={intl}
+        />
       </StyledSectionContent>
       <StyledSectionContent>
-        <Typography variant="bodySmallLabel">
+        <Typography variant="labelRegular">
           <FormattedMessage description="TransactionReceipt-transactionAmountSent" defaultMessage="From address" />
         </Typography>
         <StyledBodySmallBold>{transaction.data.from}</StyledBodySmallBold>
       </StyledSectionContent>
       <StyledSectionContent>
-        <Typography variant="bodySmallLabel">
+        <Typography variant="labelRegular">
           <FormattedMessage description="TransactionReceipt-transactionAmountSent" defaultMessage="To address" />
         </Typography>
         <StyledBodySmallBold>{transaction.data.to}</StyledBodySmallBold>
@@ -339,34 +285,35 @@ const ERC20TransferTransactionReceipt = ({ transaction }: { transaction: ERC20Tr
   );
 };
 
-const NativeTransferTransactionReceipt = ({ transaction }: { transaction: NativeTransferReceipt }) => {
-  const { spacing } = useTheme();
+const NativeTransferTransactionReceipt = ({
+  transaction,
+  showBalances,
+}: {
+  transaction: NativeTransferReceipt;
+  showBalances: boolean;
+}) => {
   const intl = useIntl();
   return (
     <>
       <StyledSectionContent>
-        <Typography variant="bodySmallLabel">
+        <Typography variant="labelRegular">
           <FormattedMessage description="TransactionReceipt-transactionAmountSent" defaultMessage="Amount sent" />
         </Typography>
-        <StyledBodySmallBold sx={{ display: 'flex', alignItems: 'center', gap: spacing(2) }}>
-          {transaction.tx.network.nativeCurrency.icon}
-          {formatCurrencyAmount({
-            amount: transaction.data.amount.amount,
-            token: transaction.tx.network.nativeCurrency,
-            intl,
-          })}{' '}
-          {transaction.data.amount.amountInUSD &&
-            `($${formatUsdAmount({ intl, amount: transaction.data.amount.amountInUSD })})`}
-        </StyledBodySmallBold>
+        <NumberWithToken
+          showBalances={showBalances}
+          token={transaction.tx.network.nativeCurrency}
+          amount={transaction.data.amount}
+          intl={intl}
+        />
       </StyledSectionContent>
       <StyledSectionContent>
-        <Typography variant="bodySmallLabel">
+        <Typography variant="labelRegular">
           <FormattedMessage description="TransactionReceipt-transactionAmountSent" defaultMessage="From address" />
         </Typography>
         <StyledBodySmallBold>{transaction.data.from}</StyledBodySmallBold>
       </StyledSectionContent>
       <StyledSectionContent>
-        <Typography variant="bodySmallLabel">
+        <Typography variant="labelRegular">
           <FormattedMessage description="TransactionReceipt-transactionAmountSent" defaultMessage="To address" />
         </Typography>
         <StyledBodySmallBold>{transaction.data.to}</StyledBodySmallBold>
@@ -375,28 +322,29 @@ const NativeTransferTransactionReceipt = ({ transaction }: { transaction: Native
   );
 };
 
-const DCAWithdrawTransactionReceipt = ({ transaction }: { transaction: DCAWithdrawReceipt }) => {
-  const { spacing } = useTheme();
+const DCAWithdrawTransactionReceipt = ({
+  transaction,
+  showBalances,
+}: {
+  transaction: DCAWithdrawReceipt;
+  showBalances: boolean;
+}) => {
   const intl = useIntl();
   return (
     <>
       <StyledSectionContent>
-        <Typography variant="bodySmallLabel">
+        <Typography variant="labelRegular">
           <FormattedMessage description="TransactionReceipt-transactionDCAWithdrawn" defaultMessage="Withdrawn" />
         </Typography>
-        <StyledBodySmallBold sx={{ display: 'flex', alignItems: 'center', gap: spacing(2) }}>
-          {transaction.data.toToken.icon}
-          {formatCurrencyAmount({
-            amount: transaction.data.withdrawn.amount,
-            token: transaction.data.toToken,
-            intl,
-          })}{' '}
-          {transaction.data.withdrawn.amountInUSD &&
-            `($${formatUsdAmount({ intl, amount: transaction.data.withdrawn.amountInUSD })})`}
-        </StyledBodySmallBold>
+        <NumberWithToken
+          showBalances={showBalances}
+          token={transaction.data.toToken}
+          amount={transaction.data.withdrawn}
+          intl={intl}
+        />
       </StyledSectionContent>
       <StyledSectionContent>
-        <Typography variant="bodySmallLabel">
+        <Typography variant="labelRegular">
           <FormattedMessage description="TransactionReceipt-transactionDCAWithdrawnBy" defaultMessage="Withdrawn by" />
         </Typography>
         <StyledBodySmallBold>{transaction.data.from}</StyledBodySmallBold>
@@ -405,50 +353,41 @@ const DCAWithdrawTransactionReceipt = ({ transaction }: { transaction: DCAWithdr
   );
 };
 
-const SwapTransactionReceipt = ({ transaction }: { transaction: SwapReceipt }) => {
-  const { spacing } = useTheme();
+const SwapTransactionReceipt = ({ transaction, showBalances }: { transaction: SwapReceipt; showBalances: boolean }) => {
   const intl = useIntl();
   return (
     <>
       <StyledSectionContent>
-        <Typography variant="bodySmallLabel">
+        <Typography variant="labelRegular">
           <FormattedMessage description="TransactionReceipt-transactionSwapSoldToken" defaultMessage="Sold token" />
         </Typography>
-        <StyledBodySmallBold sx={{ display: 'flex', alignItems: 'center', gap: spacing(2) }}>
-          {transaction.data.tokenIn.icon}
-          {formatCurrencyAmount({
-            amount: transaction.data.amountIn.amount,
-            token: transaction.data.tokenIn,
-            intl,
-          })}{' '}
-          {transaction.data.amountIn.amountInUSD &&
-            `($${formatUsdAmount({ intl, amount: transaction.data.amountIn.amountInUSD })})`}
-        </StyledBodySmallBold>
+        <NumberWithToken
+          showBalances={showBalances}
+          token={transaction.data.tokenIn}
+          amount={transaction.data.amountIn}
+          intl={intl}
+        />
       </StyledSectionContent>
       <StyledSectionContent>
-        <Typography variant="bodySmallLabel">
+        <Typography variant="labelRegular">
           <FormattedMessage description="TransactionReceipt-transactionSwapBoughtToken" defaultMessage="Bought token" />
         </Typography>
-        <StyledBodySmallBold sx={{ display: 'flex', alignItems: 'center', gap: spacing(2) }}>
-          {transaction.data.tokenOut.icon}
-          {formatCurrencyAmount({
-            amount: transaction.data.amountOut.amount,
-            token: transaction.data.tokenOut,
-            intl,
-          })}{' '}
-          {transaction.data.amountOut.amountInUSD &&
-            `($${formatUsdAmount({ intl, amount: transaction.data.amountOut.amountInUSD })})`}
-        </StyledBodySmallBold>
+        <NumberWithToken
+          showBalances={showBalances}
+          token={transaction.data.tokenOut}
+          amount={transaction.data.amountOut}
+          intl={intl}
+        />
       </StyledSectionContent>
       <StyledSectionContent>
-        <Typography variant="bodySmallLabel">
+        <Typography variant="labelRegular">
           <FormattedMessage description="TransactionReceipt-transactionSwapSwappedBy" defaultMessage="Swapped by" />
         </Typography>
         <StyledBodySmallBold>{transaction.data.from}</StyledBodySmallBold>
       </StyledSectionContent>
       {transaction.data.recipient && (
         <StyledSectionContent>
-          <Typography variant="bodySmallLabel">
+          <Typography variant="labelRegular">
             <FormattedMessage
               description="TransactionReceipt-transactionSwapTransferedTo"
               defaultMessage="Transfered to"
@@ -461,46 +400,43 @@ const SwapTransactionReceipt = ({ transaction }: { transaction: SwapReceipt }) =
   );
 };
 
-const DCATerminatedTransactionReceipt = ({ transaction }: { transaction: DCATerminatedReceipt }) => {
-  const { spacing } = useTheme();
+const DCATerminatedTransactionReceipt = ({
+  transaction,
+  showBalances,
+}: {
+  transaction: DCATerminatedReceipt;
+  showBalances: boolean;
+}) => {
   const intl = useIntl();
   return (
     <>
       <StyledSectionContent>
-        <Typography variant="bodySmallLabel">
+        <Typography variant="labelRegular">
           <FormattedMessage
             description="TransactionReceipt-transactionDCAWithdrawn"
             defaultMessage="Withdrawn swapped"
           />
         </Typography>
-        <StyledBodySmallBold sx={{ display: 'flex', alignItems: 'center', gap: spacing(2) }}>
-          {transaction.data.toToken.icon}
-          {formatCurrencyAmount({
-            amount: transaction.data.withdrawnSwapped.amount,
-            token: transaction.data.toToken,
-            intl,
-          })}{' '}
-          {transaction.data.withdrawnSwapped.amountInUSD &&
-            `($${formatUsdAmount({ intl, amount: transaction.data.withdrawnSwapped.amountInUSD })})`}
-        </StyledBodySmallBold>
+        <NumberWithToken
+          showBalances={showBalances}
+          token={transaction.data.toToken}
+          amount={transaction.data.withdrawnSwapped}
+          intl={intl}
+        />
       </StyledSectionContent>
       <StyledSectionContent>
-        <Typography variant="bodySmallLabel">
+        <Typography variant="labelRegular">
           <FormattedMessage description="TransactionReceipt-transactionDCAWithdrawn" defaultMessage="Withdrawn funds" />
         </Typography>
-        <StyledBodySmallBold sx={{ display: 'flex', alignItems: 'center', gap: spacing(2) }}>
-          {transaction.data.fromToken.icon}
-          {formatCurrencyAmount({
-            amount: transaction.data.withdrawnRemaining.amount,
-            token: transaction.data.fromToken,
-            intl,
-          })}{' '}
-          {transaction.data.withdrawnRemaining.amountInUSD &&
-            `($${formatUsdAmount({ intl, amount: transaction.data.withdrawnRemaining.amountInUSD })})`}
-        </StyledBodySmallBold>
+        <NumberWithToken
+          showBalances={showBalances}
+          token={transaction.data.fromToken}
+          amount={transaction.data.withdrawnRemaining}
+          intl={intl}
+        />
       </StyledSectionContent>
       <StyledSectionContent>
-        <Typography variant="bodySmallLabel">
+        <Typography variant="labelRegular">
           <FormattedMessage description="TransactionReceipt-transactionDCAWithdrawnBy" defaultMessage="Withdrawn by" />
         </Typography>
         <StyledBodySmallBold>{transaction.data.from}</StyledBodySmallBold>
@@ -509,8 +445,13 @@ const DCATerminatedTransactionReceipt = ({ transaction }: { transaction: DCATerm
   );
 };
 
-const DCAModifyTransactionReceipt = ({ transaction }: { transaction: DCAModifyReceipt }) => {
-  const { spacing } = useTheme();
+const DCAModifyTransactionReceipt = ({
+  transaction,
+  showBalances,
+}: {
+  transaction: DCAModifyReceipt;
+  showBalances: boolean;
+}) => {
   const intl = useIntl();
 
   const {
@@ -528,36 +469,31 @@ const DCAModifyTransactionReceipt = ({ transaction }: { transaction: DCAModifyRe
   return (
     <>
       <StyledSectionContent>
-        <Typography variant="bodySmallLabel">
+        <Typography variant="labelRegular">
           <FormattedMessage description="totalInvested" defaultMessage="Total Invested" />
         </Typography>
         <ContainerBox gap={0.5} alignItems="center">
-          <StyledBodySmallBold sx={{ display: 'flex', alignItems: 'center', gap: spacing(2) }}>
-            {fromToken.icon}
-            {formatCurrencyAmount({ amount: oldRemainingLiquidity.amount, token: fromToken, sigFigs: 2, intl })}
-            {!isUndefined(oldRemainingLiquidity.amountInUSD) && ` ($${oldRemainingLiquidity.amountInUSD})`}
-          </StyledBodySmallBold>
+          <NumberWithToken showBalances={showBalances} token={fromToken} amount={oldRemainingLiquidity} intl={intl} />
           <ArrowRightIcon />
           {oldRemainingLiquidity.amount === remainingLiquidity.amount ? (
             <StyledBodySmallBold>=</StyledBodySmallBold>
           ) : (
-            <StyledBodySmallBold color="success.dark">
-              {formatCurrencyAmount({ amount: remainingLiquidity.amount, token: fromToken, sigFigs: 2, intl })}
-              {!isUndefined(remainingLiquidity.amountInUSD) && ` ($${remainingLiquidity.amountInUSD})`}
-            </StyledBodySmallBold>
+            <NumberWithToken
+              showBalances={showBalances}
+              token={fromToken}
+              amount={remainingLiquidity}
+              intl={intl}
+              color="success.dark"
+            />
           )}
         </ContainerBox>
       </StyledSectionContent>
       <StyledSectionContent>
-        <Typography variant="bodySmallLabel">
+        <Typography variant="labelRegular">
           <FormattedMessage description="rate" defaultMessage="Rate" />
         </Typography>
         <ContainerBox gap={0.5} alignItems="center">
-          <StyledBodySmallBold sx={{ display: 'flex', alignItems: 'center', gap: spacing(2) }}>
-            {fromToken.icon}
-            {formatCurrencyAmount({ amount: oldRate.amount, token: fromToken, sigFigs: 2, intl })}
-            {!isUndefined(oldRate.amountInUSD) && ` ($${oldRate.amountInUSD})`}
-          </StyledBodySmallBold>
+          <NumberWithToken showBalances={showBalances} token={fromToken} amount={oldRate} intl={intl} />
           {fromIsYield && Number(oldRate.amount) > 0 && (
             <StyledBodySmallBold>
               <FormattedMessage description="plusYield" defaultMessage="+ yield" />
@@ -568,10 +504,13 @@ const DCAModifyTransactionReceipt = ({ transaction }: { transaction: DCAModifyRe
             <StyledBodySmallBold>=</StyledBodySmallBold>
           ) : (
             <>
-              <StyledBodySmallBold color="success.dark">
-                {formatCurrencyAmount({ amount: rate.amount, token: fromToken, sigFigs: 2, intl })}
-                {!isUndefined(rate.amountInUSD) && ` ($${rate.amountInUSD})`}
-              </StyledBodySmallBold>
+              <NumberWithToken
+                showBalances={showBalances}
+                token={fromToken}
+                amount={rate}
+                intl={intl}
+                color="success.dark"
+              />
               {fromIsYield && Number(rate.amount) > 0 && (
                 <StyledBodySmallBold color="success.dark">
                   <FormattedMessage description="plusYield" defaultMessage="+ yield" />
@@ -582,7 +521,7 @@ const DCAModifyTransactionReceipt = ({ transaction }: { transaction: DCAModifyRe
         </ContainerBox>
       </StyledSectionContent>
       <StyledSectionContent>
-        <Typography variant="bodySmallLabel">
+        <Typography variant="labelRegular">
           <FormattedMessage description="swapsLeft" defaultMessage="Swaps left" />
         </Typography>
         <ContainerBox gap={0.5} alignItems="center">
@@ -626,7 +565,7 @@ const DCAModifyTransactionReceipt = ({ transaction }: { transaction: DCAModifyRe
         </ContainerBox>
       </StyledSectionContent>
       <StyledSectionContent>
-        <Typography variant="bodySmallLabel">
+        <Typography variant="labelRegular">
           <FormattedMessage description="TransactionReceipt-transactionDCAModifiedBy" defaultMessage="Modified by" />
         </Typography>
         <StyledBodySmallBold>{from}</StyledBodySmallBold>
@@ -635,31 +574,36 @@ const DCAModifyTransactionReceipt = ({ transaction }: { transaction: DCAModifyRe
   );
 };
 
-const DCACreateTransactionReceipt = ({ transaction }: { transaction: DCACreatedReceipt }) => {
-  const { spacing } = useTheme();
+const DCACreateTransactionReceipt = ({
+  transaction,
+  showBalances,
+}: {
+  transaction: DCACreatedReceipt;
+  showBalances: boolean;
+}) => {
   const intl = useIntl();
 
   return (
     <>
       <StyledSectionContent>
-        <Typography variant="bodySmallLabel">
+        <Typography variant="labelRegular">
           <FormattedMessage description="TransactionReceipt-transactionDCACreate" defaultMessage="Rate" />
         </Typography>
-        <StyledBodySmallBold sx={{ display: 'flex', alignItems: 'center', gap: spacing(2) }}>
-          {transaction.data.fromToken.icon}
-          {formatCurrencyAmount({ amount: transaction.data.rate.amount, token: transaction.data.fromToken, intl })}{' '}
-          {transaction.data.rate.amountInUSD &&
-            `($${formatUsdAmount({ intl, amount: transaction.data.rate.amountInUSD })})`}
-        </StyledBodySmallBold>
+        <NumberWithToken
+          showBalances={showBalances}
+          token={transaction.data.fromToken}
+          amount={transaction.data.rate}
+          intl={intl}
+        />
       </StyledSectionContent>
       <StyledSectionContent>
-        <Typography variant="bodySmallLabel">
+        <Typography variant="labelRegular">
           <FormattedMessage description="TransactionReceipt-transactionDCAModifiedBy" defaultMessage="Created by" />
         </Typography>
         <StyledBodySmallBold>{transaction.data.from}</StyledBodySmallBold>
       </StyledSectionContent>
       <StyledSectionContent>
-        <Typography variant="bodySmallLabel">
+        <Typography variant="labelRegular">
           <FormattedMessage description="TransactionReceipt-transactionDCAModifiedBy" defaultMessage="Owned by" />
         </Typography>
         <StyledBodySmallBold>{transaction.data.owner}</StyledBodySmallBold>
@@ -668,11 +612,160 @@ const DCACreateTransactionReceipt = ({ transaction }: { transaction: DCACreatedR
   );
 };
 
+const EarnDepositTransactionReceipt = ({
+  transaction,
+  showBalances,
+}: {
+  transaction: EarnDepositReceipt;
+  showBalances: boolean;
+}) => {
+  const intl = useIntl();
+
+  return (
+    <>
+      <StyledSectionContent>
+        <Typography variant="labelRegular">
+          <FormattedMessage description="TransactionReceipt-transactionEarnDeposit-Asset" defaultMessage="Deposited" />
+        </Typography>
+        <NumberWithToken
+          showBalances={showBalances}
+          token={transaction.data.depositToken}
+          amount={transaction.data.depositAmount}
+          intl={intl}
+        />
+      </StyledSectionContent>
+    </>
+  );
+};
+
+const EarnIncreaseTransactionReceipt = ({
+  transaction,
+  showBalances,
+}: {
+  transaction: EarnIncreaseReceipt;
+  showBalances: boolean;
+}) => {
+  const intl = useIntl();
+
+  return (
+    <>
+      <StyledSectionContent>
+        <Typography variant="labelRegular">
+          <FormattedMessage description="TransactionReceipt-transactionEarnIncrease-Asset" defaultMessage="Deposited" />
+        </Typography>
+        <NumberWithToken
+          showBalances={showBalances}
+          token={transaction.data.depositToken}
+          amount={transaction.data.depositAmount}
+          intl={intl}
+        />
+      </StyledSectionContent>
+    </>
+  );
+};
+
+const EarnWithdrawTransactionReceipt = ({
+  transaction,
+  showBalances,
+}: {
+  transaction: EarnWithdrawReceipt;
+  showBalances: boolean;
+}) => {
+  const intl = useIntl();
+
+  const isDelayed = getIsDelayedWithdraw(transaction.data.withdrawn);
+
+  return (
+    <StyledSectionContent>
+      {isDelayed ? (
+        <Typography variant="labelRegular">
+          <FormattedMessage
+            description="TransactionReceipt-transactionEarnWithdrawDelayed"
+            defaultMessage="Delayed withdrawal"
+          />
+        </Typography>
+      ) : (
+        <Typography variant="labelRegular">
+          <FormattedMessage description="TransactionReceipt-transactionEarnWithdraw" defaultMessage="Withdrew" />
+        </Typography>
+      )}
+      <ContainerBox gap={2} alignItems="center" flexWrap="wrap">
+        {transaction.data.withdrawn.map((withdrawn) => (
+          <NumberWithToken
+            showBalances={showBalances}
+            key={withdrawn.token.address}
+            token={withdrawn.token}
+            amount={withdrawn.amount}
+            intl={intl}
+          />
+        ))}
+      </ContainerBox>
+    </StyledSectionContent>
+  );
+};
+
+const EarnSpecialWithdrawTransactionReceipt = ({
+  transaction,
+  showBalances,
+}: {
+  transaction: EarnSpecialWithdrawReceipt;
+  showBalances: boolean;
+}) => {
+  const intl = useIntl();
+
+  return (
+    <StyledSectionContent>
+      <Typography variant="labelRegular">
+        <FormattedMessage description="TransactionReceipt-transactionEarnMarketWithdraw" defaultMessage="Withdrew" />
+      </Typography>
+
+      <ContainerBox gap={2} alignItems="center" flexWrap="wrap">
+        {transaction.data.tokens.map((withdrawnToken) => (
+          <NumberWithToken
+            showBalances={showBalances}
+            key={withdrawnToken.token.address}
+            token={withdrawnToken.token}
+            amount={withdrawnToken.amount}
+            intl={intl}
+          />
+        ))}
+      </ContainerBox>
+    </StyledSectionContent>
+  );
+};
+
+const EarnClaimDelayedWithdrawTransactionReceipt = ({
+  transaction,
+  showBalances,
+}: {
+  transaction: EarnClaimDelayedWithdrawReceipt;
+  showBalances: boolean;
+}) => {
+  const intl = useIntl();
+
+  return (
+    <StyledSectionContent>
+      <Typography variant="labelRegular">
+        <FormattedMessage
+          description="TransactionReceipt-transactionEarnClaimDelayedWithdraw"
+          defaultMessage="Claimed"
+        />
+      </Typography>
+      <NumberWithToken
+        showBalances={showBalances}
+        token={transaction.data.token}
+        amount={transaction.data.withdrawn}
+        intl={intl}
+      />
+    </StyledSectionContent>
+  );
+};
+
 const DCAPermissionsModifiedTransactionReceipt = ({ transaction }: { transaction: DCAPermissionsModifiedReceipt }) => {
   const { spacing } = useTheme();
   return (
     <StyledSectionContent>
-      <Typography variant="bodySmallLabel">
+      <Typography variant="labelRegular">
         <FormattedMessage
           description="TransactionReceipt-transactionDCAPermissionsModified-rate"
           defaultMessage="New permissions set:"
@@ -690,13 +783,13 @@ const DCAPermissionsModifiedTransactionReceipt = ({ transaction }: { transaction
 const DcaTransferTransactionReceipt = ({ transaction }: { transaction: DCATransferReceipt }) => (
   <>
     <StyledSectionContent>
-      <Typography variant="bodySmallLabel">
+      <Typography variant="labelRegular">
         <FormattedMessage description="TransactionReceipt-transactionAmountSent" defaultMessage="From address" />
       </Typography>
       <StyledBodySmallBold>{transaction.data.from}</StyledBodySmallBold>
     </StyledSectionContent>
     <StyledSectionContent>
-      <Typography variant="bodySmallLabel">
+      <Typography variant="labelRegular">
         <FormattedMessage description="TransactionReceipt-transactionAmountSent" defaultMessage="To address" />
       </Typography>
       <StyledBodySmallBold>{transaction.data.to}</StyledBodySmallBold>
@@ -706,18 +799,19 @@ const DcaTransferTransactionReceipt = ({ transaction }: { transaction: DCATransf
 
 const buildDcaTransactionReceiptForEvent = (
   dcaTransaction: DcaTransactionReceiptProp,
-  onClickPositionId?: TransactionReceiptProps['onClickPositionId']
+  onClickPositionId?: TransactionReceiptProps['onClickPositionId'],
+  showBalances = true
 ) => {
   let dcaReceipt: React.ReactElement;
   switch (dcaTransaction.type) {
     case TransactionEventTypes.DCA_WITHDRAW:
-      dcaReceipt = <DCAWithdrawTransactionReceipt transaction={dcaTransaction} />;
+      dcaReceipt = <DCAWithdrawTransactionReceipt transaction={dcaTransaction} showBalances={showBalances} />;
       break;
     case TransactionEventTypes.DCA_MODIFIED:
-      dcaReceipt = <DCAModifyTransactionReceipt transaction={dcaTransaction} />;
+      dcaReceipt = <DCAModifyTransactionReceipt transaction={dcaTransaction} showBalances={showBalances} />;
       break;
     case TransactionEventTypes.DCA_CREATED:
-      dcaReceipt = <DCACreateTransactionReceipt transaction={dcaTransaction} />;
+      dcaReceipt = <DCACreateTransactionReceipt transaction={dcaTransaction} showBalances={showBalances} />;
       break;
     case TransactionEventTypes.DCA_PERMISSIONS_MODIFIED:
       dcaReceipt = <DCAPermissionsModifiedTransactionReceipt transaction={dcaTransaction} />;
@@ -726,14 +820,14 @@ const buildDcaTransactionReceiptForEvent = (
       dcaReceipt = <DcaTransferTransactionReceipt transaction={dcaTransaction} />;
       break;
     case TransactionEventTypes.DCA_TERMINATED:
-      dcaReceipt = <DCATerminatedTransactionReceipt transaction={dcaTransaction} />;
+      dcaReceipt = <DCATerminatedTransactionReceipt transaction={dcaTransaction} showBalances={showBalances} />;
       break;
   }
   return (
     <>
       {dcaReceipt}
       <StyledSectionContent>
-        <Typography variant="bodySmallLabel">
+        <Typography variant="labelRegular">
           <FormattedMessage
             description="TransactionReceipt-transactionDCAWithdrawnPosition"
             defaultMessage="Position"
@@ -762,31 +856,100 @@ const buildDcaTransactionReceiptForEvent = (
   );
 };
 
+const buildEarnTransactionReceiptForEvent = (
+  earnTransaction: EarnTransactionReceiptProp,
+  onClickEarnPositionId?: TransactionReceiptProps['onClickEarnPositionId'],
+  showBalances = true
+) => {
+  let earnReceipt: React.ReactElement;
+  switch (earnTransaction.type) {
+    case TransactionEventTypes.EARN_CREATED:
+      earnReceipt = <EarnDepositTransactionReceipt transaction={earnTransaction} showBalances={showBalances} />;
+      break;
+    case TransactionEventTypes.EARN_INCREASE:
+      earnReceipt = <EarnIncreaseTransactionReceipt transaction={earnTransaction} showBalances={showBalances} />;
+      break;
+    case TransactionEventTypes.EARN_WITHDRAW:
+      earnReceipt = <EarnWithdrawTransactionReceipt transaction={earnTransaction} showBalances={showBalances} />;
+      break;
+    case TransactionEventTypes.EARN_SPECIAL_WITHDRAW:
+      earnReceipt = <EarnSpecialWithdrawTransactionReceipt transaction={earnTransaction} showBalances={showBalances} />;
+      break;
+    case TransactionEventTypes.EARN_CLAIM_DELAYED_WITHDRAW:
+      earnReceipt = (
+        <EarnClaimDelayedWithdrawTransactionReceipt transaction={earnTransaction} showBalances={showBalances} />
+      );
+      break;
+  }
+
+  const positionIdNumber = earnTransaction.data.positionId.split('-')[2];
+
+  return (
+    <>
+      {earnReceipt}
+      {positionIdNumber && (
+        <StyledSectionContent>
+          <Typography variant="labelRegular">
+            <FormattedMessage description="TransactionReceipt-transactionEarnPosition-Link" defaultMessage="Position" />
+          </Typography>
+          <StyledPositionId
+            onClick={() =>
+              onClickEarnPositionId &&
+              onClickEarnPositionId({
+                chainId: earnTransaction.tx.chainId,
+                strategyId: earnTransaction.data.strategyId,
+              })
+            }
+            $allowClick={!!onClickEarnPositionId}
+          >
+            <StyledBodySmallBold>#{positionIdNumber}</StyledBodySmallBold>
+          </StyledPositionId>
+        </StyledSectionContent>
+      )}
+    </>
+  );
+};
+
 const buildTransactionReceiptForEvent = (
   transaction: TransactionReceiptProp,
-  onClickPositionId?: TransactionReceiptProps['onClickPositionId']
+  onClickPositionId?: TransactionReceiptProps['onClickPositionId'],
+  onClickEarnPositionId?: TransactionReceiptProps['onClickEarnPositionId'],
+  showBalances = true
 ) => {
   switch (transaction.type) {
     case TransactionEventTypes.ERC20_APPROVAL:
       return <ERC20ApprovalTransactionReceipt transaction={transaction} />;
     case TransactionEventTypes.ERC20_TRANSFER:
-      return <ERC20TransferTransactionReceipt transaction={transaction} />;
+      return <ERC20TransferTransactionReceipt transaction={transaction} showBalances={showBalances} />;
     case TransactionEventTypes.SWAP:
-      return <SwapTransactionReceipt transaction={transaction} />;
+      return <SwapTransactionReceipt transaction={transaction} showBalances={showBalances} />;
     case TransactionEventTypes.NATIVE_TRANSFER:
-      return <NativeTransferTransactionReceipt transaction={transaction} />;
+      return <NativeTransferTransactionReceipt transaction={transaction} showBalances={showBalances} />;
+    case TransactionEventTypes.EARN_CREATED:
+    case TransactionEventTypes.EARN_INCREASE:
+    case TransactionEventTypes.EARN_WITHDRAW:
+    case TransactionEventTypes.EARN_SPECIAL_WITHDRAW:
+    case TransactionEventTypes.EARN_CLAIM_DELAYED_WITHDRAW:
+      return buildEarnTransactionReceiptForEvent(transaction, onClickEarnPositionId, showBalances);
     case TransactionEventTypes.DCA_WITHDRAW:
     case TransactionEventTypes.DCA_MODIFIED:
     case TransactionEventTypes.DCA_CREATED:
     case TransactionEventTypes.DCA_PERMISSIONS_MODIFIED:
     case TransactionEventTypes.DCA_TRANSFER:
     case TransactionEventTypes.DCA_TERMINATED:
-      return buildDcaTransactionReceiptForEvent(transaction, onClickPositionId);
+      return buildDcaTransactionReceiptForEvent(transaction, onClickPositionId, showBalances);
   }
   return null;
 };
 
-const TransactionReceipt = ({ transaction, open, onClose, onClickPositionId }: TransactionReceiptProps) => {
+const TransactionReceipt = ({
+  transaction,
+  open,
+  onClose,
+  onClickPositionId,
+  onClickEarnPositionId,
+  showBalances = true,
+}: TransactionReceiptProps) => {
   const { spacing } = useTheme();
 
   const intl = useIntl();
@@ -798,8 +961,8 @@ const TransactionReceipt = ({ transaction, open, onClose, onClickPositionId }: T
   return (
     <StyledDialog open={open} scroll="paper" maxWidth="xs" fullWidth PaperProps={{ id: 'paper-id' }} onClose={onClose}>
       <StyledDialogTitle>
-        <BalmyLogoSmallLight size={spacing(8)} />
-        <Typography variant="h4Bold" color={baseColors.violet.violet100}>
+        <BalmyLogoSmallLight size={spacing(10)} />
+        <Typography variant="h3Bold" color={baseColors.violet.violet100}>
           <FormattedMessage description="receipt" defaultMessage="Receipt" />
         </Typography>
         <IconButton
@@ -813,13 +976,13 @@ const TransactionReceipt = ({ transaction, open, onClose, onClickPositionId }: T
       </StyledDialogTitle>
       <StyledDialogContent>
         <StyledSectionContent>
-          <Typography variant="bodySmallLabel">
+          <Typography variant="labelRegular">
             <FormattedMessage description="TransactionReceipt-transactionType" defaultMessage="Transaction Type" />
           </Typography>
-          <StyledBodySmallBold>{intl.formatMessage(TRANSACTION_TYPE_TITLE_MAP[transaction.type])}</StyledBodySmallBold>
+          <StyledBodySmallBold>{intl.formatMessage(getTransactionTypeTitle(transaction))}</StyledBodySmallBold>
         </StyledSectionContent>
         <StyledSectionContent>
-          <Typography variant="bodySmallLabel">
+          <Typography variant="labelRegular">
             <FormattedMessage description="TransactionReceipt-transactionDateTime" defaultMessage="Date & Time" />
           </Typography>
           <StyledBodySmallBold>
@@ -829,10 +992,10 @@ const TransactionReceipt = ({ transaction, open, onClose, onClickPositionId }: T
             })}
           </StyledBodySmallBold>
         </StyledSectionContent>
-        {buildTransactionReceiptForEvent(transaction, onClickPositionId)}
+        {buildTransactionReceiptForEvent(transaction, onClickPositionId, onClickEarnPositionId, showBalances)}
         <StyledDoubleSectionContent>
           <StyledSectionContent>
-            <Typography variant="bodySmallLabel">
+            <Typography variant="labelRegular">
               <FormattedMessage description="TransactionReceipt-transactionNetwork" defaultMessage="Network" />
             </Typography>
             <StyledBodySmallBold sx={{ display: 'flex', alignItems: 'center', gap: spacing(2) }}>
@@ -841,24 +1004,20 @@ const TransactionReceipt = ({ transaction, open, onClose, onClickPositionId }: T
             </StyledBodySmallBold>
           </StyledSectionContent>
           <StyledSectionContent>
-            <Typography variant="bodySmallLabel">
+            <Typography variant="labelRegular">
               <FormattedMessage description="TransactionReceipt-transactionFee" defaultMessage="Network Fee" />
             </Typography>
-            <StyledBodySmallBold sx={{ display: 'flex', alignItems: 'center', gap: spacing(2) }}>
-              {transaction.tx.network.nativeCurrency.icon}
-              {formatCurrencyAmount({
-                amount: transaction.tx.spentInGas.amount,
-                token: transaction.tx.network.nativeCurrency,
-                intl,
-              })}{' '}
-              {transaction.tx.network.nativeCurrency.symbol}
-            </StyledBodySmallBold>
+            <NumberWithToken
+              token={transaction.tx.network.nativeCurrency}
+              amount={transaction.tx.spentInGas}
+              intl={intl}
+            />
           </StyledSectionContent>
         </StyledDoubleSectionContent>
         <DividerBorder2 />
         <StyledDoubleSectionContent>
           <StyledSectionContent>
-            <Typography variant="bodySmallLabel">
+            <Typography variant="labelRegular">
               <FormattedMessage description="TransactionReceipt-transactionId" defaultMessage="Transaction ID" />
             </Typography>
             <Link variant="bodySmallBold" href={transaction.tx.explorerLink} target="_blank">
@@ -871,4 +1030,10 @@ const TransactionReceipt = ({ transaction, open, onClose, onClickPositionId }: T
   );
 };
 
-export { TransactionReceipt, TransactionReceiptProps, TransactionReceiptProp, TRANSACTION_TYPE_TITLE_MAP };
+export {
+  TransactionReceipt,
+  type TransactionReceiptProps,
+  type TransactionReceiptProp,
+  getTransactionTypeTitle,
+  getIsDelayedWithdraw,
+};

@@ -37,7 +37,7 @@ export default function CoinStar({ width = '40px', height = '40px', ...style }: 
       />
       <div
         style={{
-          backgroundColor: '#9389EF',
+          backgroundColor: colors[mode].earnWizard.mask,
           mask: `${CoinStarUrl} center / contain no-repeat`,
           maskPosition: 'center',
           width,

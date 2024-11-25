@@ -1312,7 +1312,9 @@ describe('Position Service', () => {
   });
 
   describe('companionHasPermission', () => {
-    let permissionManagerInstanceMock: jest.Mocked<ReturnType<ContractService['getPermissionManagerInstance']>>;
+    let permissionManagerInstanceMock: jest.Mocked<
+      ReturnType<NonNullable<ContractService['getPermissionManagerInstance']>>
+    >;
     beforeEach(() => {
       permissionManagerInstanceMock = {
         read: {
@@ -1447,14 +1449,14 @@ describe('Position Service', () => {
 
   describe('getTokenNFT', () => {
     let permissionManagerInstanceMock: jest.Mocked<
-      Awaited<ReturnType<ContractService['getPermissionManagerInstance']>>
+      NonNullable<Awaited<ReturnType<ContractService['getPermissionManagerInstance']>>>
     >;
     beforeEach(() => {
       permissionManagerInstanceMock = {
         read: {
           tokenURI: jest.fn().mockResolvedValue('url'),
         },
-      } as unknown as jest.Mocked<Awaited<ReturnType<ContractService['getPermissionManagerInstance']>>>;
+      } as unknown as jest.Mocked<NonNullable<Awaited<ReturnType<ContractService['getPermissionManagerInstance']>>>>;
 
       meanApiService.getNFTData.mockResolvedValue({
         data: { name: 'tokenUri', image: 'image', description: 'description' },
@@ -1592,6 +1594,7 @@ describe('Position Service', () => {
 
   describe('buildDepositTx', () => {
     beforeEach(() => {
+      contractService.getHUBCompanionAddress.mockReturnValue('0xcompanionAddress');
       sdkService.buildCreatePositionTx.mockResolvedValue({
         to: '0xcompanion',
         data: '0xdata',
@@ -1699,6 +1702,7 @@ describe('Position Service', () => {
 
   describe('approveAndDepositSafe', () => {
     beforeEach(() => {
+      contractService.getHUBCompanionAddress.mockReturnValue('0xcompanionAddress');
       walletService.buildApproveSpecificTokenTx.mockResolvedValue({
         to: '0xcompanion',
         from: '0xsafe',
@@ -2610,7 +2614,7 @@ describe('Position Service', () => {
 
   describe('givePermissionToMultiplePositions', () => {
     let permissionManagerInstanceMock: jest.Mocked<
-      Awaited<ReturnType<ContractService['getPermissionManagerInstance']>>
+      NonNullable<Awaited<ReturnType<ContractService['getPermissionManagerInstance']>>>
     >;
     beforeEach(() => {
       permissionManagerInstanceMock = {
@@ -2620,7 +2624,7 @@ describe('Position Service', () => {
         write: {
           modifyMany: jest.fn().mockResolvedValue('0xhash'),
         },
-      } as unknown as jest.Mocked<Awaited<ReturnType<ContractService['getPermissionManagerInstance']>>>;
+      } as unknown as jest.Mocked<NonNullable<Awaited<ReturnType<ContractService['getPermissionManagerInstance']>>>>;
 
       contractService.getPermissionManagerInstance.mockResolvedValue(permissionManagerInstanceMock);
     });
@@ -3396,6 +3400,7 @@ describe('Position Service', () => {
 
   describe('approveAndModifyRateAndSwapsSafe', () => {
     beforeEach(() => {
+      contractService.getHUBCompanionAddress.mockReturnValue('0xcompanionAddress');
       positionService.buildModifyRateAndSwapsParams = jest
         .fn()
         .mockReturnValue({ amount: 10n, tokenFrom: 'tokenfrom', isIncrease: true });
@@ -3531,9 +3536,7 @@ describe('Position Service', () => {
       { type: TransactionTypes.approveToken },
       { type: TransactionTypes.approveTokenExact },
       { type: TransactionTypes.swap },
-      { type: TransactionTypes.wrap },
       { type: TransactionTypes.claimCampaign },
-      { type: TransactionTypes.unwrap },
       { type: TransactionTypes.wrapEther },
     ].forEach((tx) => {
       test(`it should do nothing for ${tx.type} transactions`, () => {
@@ -3699,6 +3702,7 @@ describe('Position Service', () => {
 
       positionService.setPendingTransaction({
         hash: 'hash',
+        type: TransactionTypes.withdrawFunds,
         typeData: { id: 'position-2' },
         position: createPositionMock({ id: 'position-2' }),
       } as unknown as TransactionDetails);
@@ -3717,6 +3721,7 @@ describe('Position Service', () => {
       positionService.setPendingTransaction({
         hash: 'hash',
         typeData: { id: 'position-1' },
+        type: TransactionTypes.withdrawFunds,
       } as unknown as TransactionDetails);
 
       expect(positionService.currentPositions).toEqual({
@@ -3742,9 +3747,7 @@ describe('Position Service', () => {
       { type: TransactionTypes.approveToken },
       { type: TransactionTypes.approveTokenExact },
       { type: TransactionTypes.swap },
-      { type: TransactionTypes.wrap },
       { type: TransactionTypes.claimCampaign },
-      { type: TransactionTypes.unwrap },
       { type: TransactionTypes.wrapEther },
     ].forEach((tx) => {
       beforeEach(() => positionService.setPendingTransaction(tx as TransactionDetails));
@@ -3889,9 +3892,7 @@ describe('Position Service', () => {
         { type: TransactionTypes.approveToken },
         { type: TransactionTypes.approveTokenExact },
         { type: TransactionTypes.swap },
-        { type: TransactionTypes.wrap },
         { type: TransactionTypes.claimCampaign },
-        { type: TransactionTypes.unwrap },
         { type: TransactionTypes.wrapEther },
       ].forEach((tx) => {
         beforeEach(() => {

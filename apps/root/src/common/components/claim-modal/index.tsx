@@ -17,14 +17,6 @@ const StyledContent = styled.div`
   gap: 5px;
 `;
 
-const StyledClaimContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  text-align: left;
-  flex: 1;
-`;
-
 interface ClaimModalProps {
   onCancel: () => void;
   open: boolean;
@@ -97,11 +89,9 @@ const ClaimModal = ({ open, onCancel, campaigns, isLoadingCampaigns }: ClaimModa
       title={<FormattedMessage description="claimModal title" defaultMessage="Claim campaigns" />}
       actions={[]}
     >
-      <StyledClaimContainer>
-        <Grid container alignItems="stretch" rowSpacing={2}>
-          {renderCampaigns()}
-        </Grid>
-      </StyledClaimContainer>
+      <Grid container alignItems="stretch" rowSpacing={2}>
+        {renderCampaigns()}
+      </Grid>
     </Modal>
   );
 };

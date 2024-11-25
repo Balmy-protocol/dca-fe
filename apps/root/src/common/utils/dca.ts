@@ -148,6 +148,6 @@ export const getDcaTweetContent = ({
 
   return {
     text: twitterShareText,
-    shareUrl: `https://app.balmy.xyz/${position.chainId}/positions/${position.version}/${position.positionId}?utm_source=twitter&utm_medium=social&utm_campaign=recurring_investment_shared`,
+    shareUrl: `https://app.balmy.xyz/invest/positions/${position.chainId}/${position.version}/${position.positionId}?utm_source=twitter&utm_medium=social&utm_campaign=recurring_investment_shared`,
   };
 };

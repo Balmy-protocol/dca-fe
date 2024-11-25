@@ -187,6 +187,7 @@ const TerminateModal = ({ position, open, onCancel }: TerminateModalProps) => {
       onClose={handleCancel}
       showCloseIcon
       maxWidth="sm"
+      actionsAlignment="horizontal"
       title={
         <FormattedMessage
           description="terminate title"

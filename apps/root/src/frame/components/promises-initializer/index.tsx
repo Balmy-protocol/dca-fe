@@ -14,7 +14,8 @@ import useUser from '@hooks/useUser';
 import { UserStatus } from 'common-types';
 import useTrackEvent from '@hooks/useTrackEvent';
 import usePositionService from '@hooks/usePositionService';
-import { processConfirmedTransactions } from '@state/transactions/actions';
+import { processConfirmedTransactionsForDca, processConfirmedTransactionsForEarn } from '@state/transactions/actions';
+import useEarnService from '@hooks/earn/useEarnService';
 import useLabelService from '@hooks/useLabelService';
 
 const PromisesInitializer = () => {
@@ -24,6 +25,7 @@ const PromisesInitializer = () => {
   const contactListService = useContactListService();
   const transactionService = useTransactionService();
   const positionService = usePositionService();
+  const earnService = useEarnService();
   const labelService = useLabelService();
   const intl = useIntl();
   const fetchRef = React.useRef(true);
@@ -88,7 +90,7 @@ const PromisesInitializer = () => {
       void timeoutPromise(labelService.initializeWalletsEnsNames(), TimeoutPromises.COMMON, {
         description: ApiErrorKeys.ENS,
       }).catch(() => {});
-      timeoutPromise(transactionService.fetchDcaIndexingBlocks(), TimeoutPromises.COMMON, {
+      timeoutPromise(transactionService.fetchIndexingBlocks(), TimeoutPromises.COMMON, {
         description: ApiErrorKeys.DCA_INDEXING_BLOCKS,
       }).catch(handleError);
       timeoutPromise(transactionService.fetchTransactionsHistory({ isFetchMore: false }), TimeoutPromises.COMMON, {
@@ -97,10 +99,17 @@ const PromisesInitializer = () => {
       timeoutPromise(positionService.fetchUserHasPositions(), TimeoutPromises.COMMON, {
         description: ApiErrorKeys.HISTORY,
       }).catch(handleError);
+      if (process.env.EARN_ENABLED === 'true') {
+        timeoutPromise(earnService.fetchUserStrategies(), TimeoutPromises.COMMON, {
+          description: ApiErrorKeys.EARN,
+        })
+          .then(() => void dispatch(processConfirmedTransactionsForEarn()))
+          .catch(handleError);
+      }
       timeoutPromise(positionService.fetchCurrentPositions(), TimeoutPromises.COMMON, {
         description: ApiErrorKeys.DCA_POSITIONS,
       })
-        .then(() => void dispatch(processConfirmedTransactions()))
+        .then(() => void dispatch(processConfirmedTransactionsForDca()))
         .catch(handleError);
 
       // Awaited Promises

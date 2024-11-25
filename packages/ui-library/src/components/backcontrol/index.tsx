@@ -1,8 +1,9 @@
 import { Typography } from '../typography';
 import React from 'react';
-import { KeyboardBackspaceIcon } from '../../icons';
 import { colors } from '../../theme';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
+import { ArrowRightLightIcon } from '../../icons';
+import { ButtonProps } from '@mui/material';
 
 const StyledArrowCircle = styled.div`
   ${({ theme: { palette, spacing } }) => `
@@ -19,12 +20,12 @@ const StyledArrowCircle = styled.div`
   `}
 `;
 
-const ControlContainer = styled.div`
-  ${({ theme: { palette, spacing } }) => `
+const ControlContainer = styled.div<{ variant: ButtonProps['variant'] }>`
+  ${({ theme: { palette, spacing }, variant }) => `
   display: flex;
   align-items: center;
   color: ${colors[palette.mode].accentPrimary};
-  gap: ${spacing(3)};
+  gap: ${variant === 'text' ? spacing(1) : spacing(3)};
   cursor: pointer;
   :hover {
     ${StyledArrowCircle} {
@@ -35,26 +36,32 @@ const ControlContainer = styled.div`
   `}
 `;
 
-const StyledBackIcon = styled(KeyboardBackspaceIcon)`
+const StyledBackIcon = styled(ArrowRightLightIcon)`
   ${({ theme: { palette, spacing } }) => `
-color: ${colors[palette.mode].accentPrimary};
-gap: ${spacing(3)};
+  color: ${colors[palette.mode].accentPrimary};
+  gap: ${spacing(3)};
+  transform: rotate(180deg);
 `}
 `;
 
 interface Props {
   onClick: () => void;
   label?: string;
+  variant?: ButtonProps['variant'];
 }
 
-export const BackControl = ({ onClick, label }: Props) => {
+export const BackControl = ({ onClick, label, variant }: Props) => {
+  const { spacing } = useTheme();
   return (
-    <ControlContainer onClick={onClick}>
-      <StyledArrowCircle>
-        <StyledBackIcon />
-      </StyledArrowCircle>
+    <ControlContainer onClick={onClick} variant={variant}>
+      {variant === 'text' && <StyledBackIcon size={spacing(6)} />}
+      {variant !== 'text' && (
+        <StyledArrowCircle>
+          <StyledBackIcon size={spacing(5)} />
+        </StyledArrowCircle>
+      )}
       {label && (
-        <Typography variant="bodyRegular" color={({ palette: { mode } }) => colors[mode].accentPrimary}>
+        <Typography variant="bodySmallBold" color={({ palette: { mode } }) => colors[mode].accentPrimary}>
           {label}
         </Typography>
       )}

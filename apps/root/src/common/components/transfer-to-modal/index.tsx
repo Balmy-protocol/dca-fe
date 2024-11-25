@@ -9,14 +9,6 @@ import useCurrentNetwork from '@hooks/useCurrentNetwork';
 import useTrackEvent from '@hooks/useTrackEvent';
 import useValidateAddress from '@hooks/useValidateAddress';
 
-const StyledTransferContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  text-align: left;
-  flex: 1;
-`;
-
 const StyledWalletContainer = styled.div`
   display: flex;
   justify-content: space-between;
@@ -81,74 +73,71 @@ const TransferToModal = ({ transferTo, open, onCancel }: TransferToModalProps) =
       actions={[
         {
           label: <FormattedMessage description="transfer to selectAddress" defaultMessage="Confirm address" />,
-          color: 'secondary',
           variant: 'contained',
           disabled: !isValidRecipient || !validateCheckbox,
           onClick: handleTransfer,
         },
       ]}
     >
-      <StyledTransferContainer>
-        <StyledWalletContainer>
-          <Typography variant="bodyRegular">
-            <FormattedMessage description="wallet" defaultMessage="Wallet:" />
-          </Typography>
-          <Button variant="text" onClick={onPasteAddress}>
-            <FormattedMessage description="paste" defaultMessage="Paste" />
-          </Button>
-        </StyledWalletContainer>
-        <TextField
-          id="toAddress"
-          value={toAddress}
-          placeholder={intl.formatMessage(
-            defineMessage({
-              defaultMessage: 'Set the address to transfer to',
-              description: 'transferToSwapModalPlaceholder',
-            })
-          )}
-          autoComplete="off"
-          autoCorrect="off"
-          error={!isValidRecipient && !!errorMessage}
-          helperText={errorMessage}
-          fullWidth
-          type="text"
-          margin="normal"
-          spellCheck="false"
-          onChange={(evt) => onRecipientChange(evt.target.value)}
-          // eslint-disable-next-line react/jsx-no-duplicate-props
-          inputProps={{
-            pattern: '^0x[A-Fa-f0-9]*$',
-            minLength: 1,
-            maxLength: 79,
-          }}
-        />
-        <Typography variant="bodySmallRegular">
-          <Button variant="text" onClick={onGoToEtherscan} disabled={!isValidRecipient}>
-            <Typography variant="bodySmallRegular" component="span">
-              <FormattedMessage description="view on chain explorer" defaultMessage="View on chain explorer" />
-            </Typography>
-            <OpenInNewIcon style={{ fontSize: '1rem' }} />
-          </Button>
+      <StyledWalletContainer>
+        <Typography variant="bodyRegular">
+          <FormattedMessage description="wallet" defaultMessage="Wallet:" />
         </Typography>
-        <FormGroup row>
-          <FormControlLabel
-            control={
-              <Checkbox
-                color="primary"
-                checked={validateCheckbox}
-                onChange={(evt) => setValidateCheckbox(evt.target.checked)}
-                name="validateCheckbox"
-              />
-            }
-            label={
-              <FormattedMessage
-                description="transferToValidateCheckboxLabel"
-                defaultMessage="I confirm that the address above is correct"
-              />
-            }
-          />
-        </FormGroup>
-      </StyledTransferContainer>
+        <Button variant="text" onClick={onPasteAddress}>
+          <FormattedMessage description="paste" defaultMessage="Paste" />
+        </Button>
+      </StyledWalletContainer>
+      <TextField
+        id="toAddress"
+        value={toAddress}
+        placeholder={intl.formatMessage(
+          defineMessage({
+            defaultMessage: 'Set the address to transfer to',
+            description: 'transferToSwapModalPlaceholder',
+          })
+        )}
+        autoComplete="off"
+        autoCorrect="off"
+        error={!isValidRecipient && !!errorMessage}
+        helperText={errorMessage}
+        fullWidth
+        type="text"
+        margin="normal"
+        spellCheck="false"
+        onChange={(evt) => onRecipientChange(evt.target.value)}
+        // eslint-disable-next-line react/jsx-no-duplicate-props
+        inputProps={{
+          pattern: '^0x[A-Fa-f0-9]*$',
+          minLength: 1,
+          maxLength: 79,
+        }}
+      />
+      <Typography variant="bodySmallRegular">
+        <Button variant="text" onClick={onGoToEtherscan} disabled={!isValidRecipient}>
+          <Typography variant="bodySmallRegular" component="span">
+            <FormattedMessage description="view on chain explorer" defaultMessage="View on chain explorer" />
+          </Typography>
+          <OpenInNewIcon style={{ fontSize: '1rem' }} />
+        </Button>
+      </Typography>
+      <FormGroup row>
+        <FormControlLabel
+          control={
+            <Checkbox
+              color="primary"
+              checked={validateCheckbox}
+              onChange={(evt) => setValidateCheckbox(evt.target.checked)}
+              name="validateCheckbox"
+            />
+          }
+          label={
+            <FormattedMessage
+              description="transferToValidateCheckboxLabel"
+              defaultMessage="I confirm that the address above is correct"
+            />
+          }
+        />
+      </FormGroup>
     </Modal>
   );
 };

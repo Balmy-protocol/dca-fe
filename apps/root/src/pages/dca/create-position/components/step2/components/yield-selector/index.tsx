@@ -23,11 +23,11 @@ import useSelectedNetwork from '@hooks/useSelectedNetwork';
 import { StyledDcaInputLabel } from '../../../step1';
 
 const StyledYieldContainer = styled(BackgroundPaper).attrs({ variant: 'outlined' })`
-  ${({ theme: { spacing } }) => `
-  padding: ${spacing(5)};
+  ${({ theme: { space } }) => `
+  padding: ${space.s05};
   display: flex;
   flex-direction: column;
-  gap: ${spacing(4)};
+  gap: ${space.s04};
 `}
 `;
 
@@ -42,8 +42,8 @@ const StyledYieldHelpContainer = styled(ContainerBox).attrs({ gap: 1, alignItems
 `;
 
 const StyledYieldHelpDescriptionContainer = styled(ForegroundPaper).attrs({ variant: 'outlined' })`
-  ${({ theme: { spacing } }) => `
-  padding: ${spacing(5)};
+  ${({ theme: { space } }) => `
+  padding: ${space.s05};
   display: flex;
 `}
 `;
@@ -110,11 +110,11 @@ const YieldSelector = ({
   return (
     <StyledYieldContainer>
       <ContainerBox flexDirection="column" gap={1}>
-        <Typography variant="h6" fontWeight={700}>
+        <Typography variant="bodySmallBold">
           <FormattedMessage description="yieldTitle" defaultMessage="Generate yield" />
         </Typography>
         {!fromCanHaveYield && !toCanHaveYield ? (
-          <Typography variant="bodyRegular">
+          <Typography variant="bodySmallRegular">
             <FormattedMessage
               description="disabledByNoOption"
               defaultMessage="None of the tokens you have selected support yield platforms."

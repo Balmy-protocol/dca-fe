@@ -2,7 +2,6 @@ import React, { useCallback, useMemo, useState } from 'react';
 import {
   Chip,
   ContainerBox,
-  DividerBorder2,
   ForegroundPaper,
   Grid,
   IconButton,
@@ -82,6 +81,8 @@ const StyledForegroundPaper = styled(ForegroundPaper)`
     gap: ${spacing(1)};
     padding: ${spacing(3)};
     border-radius: ${spacing(2)};
+    border: 1px solid ${colors[mode].border.border2};
+    backgroundColor: ${colors[mode].background.secondary};
     :hover {
       background-color: ${colors[mode].background.emphasis};
     }
@@ -90,6 +91,7 @@ const StyledForegroundPaper = styled(ForegroundPaper)`
 
 const StyledCopyIcon = styled(ContentCopyIcon)`
   cursor: pointer;
+  color: ${({ theme: { palette } }) => colors[palette.mode].typography.typo5};
 `;
 
 const validAddressRegex = RegExp(/^0x[A-Fa-f0-9]{40}$/);
@@ -176,8 +178,8 @@ const Row: ItemContent<TokenWithBalance, RowData> = (
     <StyledForegroundPaper key={`${token.chainId}-${token.address}`} onClick={() => onClick(tokenWithBalance)}>
       <ContainerBox flex="1" alignItems="center" gap={3}>
         {token.icon}
-        <ContainerBox flexDirection="column" flex="1" alignItems="flex-start">
-          <Typography variant="bodyBold" color={colors[themeMode].typography.typo2}>
+        <ContainerBox flexDirection="column" flex="1" alignItems="flex-start" gap={0.5}>
+          <Typography variant="bodyBold" color={colors[themeMode].typography.typo2} lineHeight={1}>
             {token.name}
           </Typography>
           {!isLoadingTokenBalances && !balanceUnits && (
@@ -199,7 +201,17 @@ const Row: ItemContent<TokenWithBalance, RowData> = (
             </Typography>
           )}
         </ContainerBox>
-        <ContainerBox flexDirection="column" alignItems="flex-end" gap={1}>
+        <ContainerBox gap={2} alignItems="center">
+          {allowsYield && (
+            <Typography variant="bodyExtraSmall" color="success.dark">
+              {intl.formatMessage(
+                defineMessage({
+                  defaultMessage: 'Supports yield',
+                  description: 'supportsYield',
+                })
+              )}
+            </Typography>
+          )}
           {(isLoadingTokenPrices || balanceUsd) && (
             <Typography variant="bodyBold" color={baseColors.disabledText}>
               {isLoadingTokenPrices && !balanceUsd ? (
@@ -209,22 +221,8 @@ const Row: ItemContent<TokenWithBalance, RowData> = (
               )}
             </Typography>
           )}
-          {allowsYield && (
-            <Typography variant="bodyBold" color={baseColors.disabledText}>
-              <Chip
-                size="medium"
-                color="success"
-                label={intl.formatMessage(
-                  defineMessage({
-                    defaultMessage: 'Supports yield',
-                    description: 'supportsYield',
-                  })
-                )}
-              />
-            </Typography>
-          )}
         </ContainerBox>
-        <Typography variant="h5" component="span" sx={{ display: 'flex' }}>
+        <Typography variant="h5Bold" component="span" sx={{ display: 'flex' }}>
           <Tooltip title={token.address} arrow placement="top">
             <StyledCopyIcon fontSize="inherit" onClick={onCopyAddress} />
           </Tooltip>
@@ -273,7 +271,6 @@ const TokenSearch = ({ search, onChange }: TokenSearchProps) => {
       fullWidth
       value={search}
       onChange={(evt: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => onChange(evt.currentTarget.value)}
-      autoFocus
       InputProps={{
         startAdornment: (
           <InputAdornment position="start">
@@ -281,18 +278,15 @@ const TokenSearch = ({ search, onChange }: TokenSearchProps) => {
           </InputAdornment>
         ),
         endAdornment: (
-          <ContainerBox gap={1} alignItems="center">
-            <Tooltip
-              title={
-                <FormattedMessage description="tokenPickerPasteAddress" defaultMessage="Paste address from clipboard" />
-              }
-              arrow
-              placement="top"
-            >
-              <ContentPasteIcon onClick={() => void onPasteAddress()} />
-            </Tooltip>
-            <SearchIcon />
-          </ContainerBox>
+          <Tooltip
+            title={
+              <FormattedMessage description="tokenPickerPasteAddress" defaultMessage="Paste address from clipboard" />
+            }
+            arrow
+            placement="top"
+          >
+            <ContentPasteIcon onClick={() => void onPasteAddress()} />
+          </Tooltip>
         ),
       }}
       onKeyDown={(e) => {
@@ -465,19 +459,16 @@ const TokenPicker = ({
           onClick={handleOnClose}
           style={{ position: 'absolute', top: spacing(6), right: spacing(8) }}
         >
-          <CloseIcon fontSize="inherit" color="info" />
+          <CloseIcon fontSize="inherit" />
         </IconButton>
-        <Grid container rowSpacing={5} direction="column" style={{ flexWrap: 'nowrap' }}>
+        <Grid container rowSpacing={6} direction="column" style={{ flexWrap: 'nowrap' }}>
           <Grid item xs={12} style={{ flexBasis: 'auto', alignSelf: 'flex-start' }}>
-            <Typography variant="h6" fontWeight={700}>
+            <Typography variant="h5Bold" color={({ palette }) => colors[palette.mode].typography.typo1}>
               {modalTitle}
             </Typography>
           </Grid>
           <Grid item xs={12} style={{ flexBasis: 'auto' }}>
             <TokenSearch search={search} onChange={onSearchChange} />
-          </Grid>
-          <Grid item xs={12} style={{ flexBasis: 'auto' }}>
-            <DividerBorder2 />
           </Grid>
           {otherSelected && filterByPair && (
             <Grid
@@ -508,7 +499,7 @@ const TokenPicker = ({
             {!isLoading && search && filteredTokens.length === 0 && !validAddressRegex.test(search) && (
               <EmptyRow message={emptySearchMessage} intl={intl} />
             )}
-            <VirtualizedList context={itemData} data={dataToRender} itemContent={itemContentToRender} />
+            <VirtualizedList gap={1} context={itemData} data={dataToRender} itemContent={itemContentToRender} />
           </Grid>
         </Grid>
       </ContainerBox>

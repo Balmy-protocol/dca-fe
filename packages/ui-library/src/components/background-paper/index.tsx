@@ -8,11 +8,13 @@ const StyledBackgroundPaper = styled(Paper)`
     theme: {
       palette: { mode },
       spacing,
+      space,
     },
   }) => `
     background-color: ${colors[mode].background.quartery};
+    backdrop-filter: blur(30px);
     border-radius: ${spacing(4)};
-    padding: ${spacing(8)} ${spacing(6)};
+    padding: ${space.s06};
   `}
 `;
 const BackgroundPaper = ({ children, ...otherProps }: PaperProps) => (

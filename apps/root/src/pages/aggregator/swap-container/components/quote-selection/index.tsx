@@ -27,8 +27,8 @@ import QuotePicker from '../quote-picker';
 const StyledQuoteSelectionContainer = styled(ContainerBox).attrs({ flexDirection: 'column', gap: 6, fullWidth: true })<{
   $isSelected?: boolean;
 }>`
-  ${({ theme: { palette, spacing }, $isSelected }) => `
-  padding: ${spacing(5)};
+  ${({ theme: { palette, spacing, space }, $isSelected }) => `
+  padding: ${space.s05};
   border-radius: ${spacing(4)};
   border: 1px solid ${colors[palette.mode].border.border1};
   transition: background 300ms;
@@ -67,7 +67,7 @@ const QuoteSelection = ({
   missingQuotes,
   totalQuotes,
 }: SwapQuotesProps) => {
-  const { isBuyOrder, selectedRoute, from } = useAggregatorState();
+  const { isBuyOrder, selectedRoute, from, to } = useAggregatorState();
   const { sorting } = useAggregatorSettingsState();
   const currentNetwork = useSelectedNetwork();
   const isPermit2Enabled = useIsPermit2Enabled(currentNetwork.chainId);
@@ -77,7 +77,7 @@ const QuoteSelection = ({
   if (!quotes.length && !isLoading && !!swapOptionsError) {
     return (
       <StyledQuoteSelectionContainer>
-        <Typography variant="h6" textAlign="left" fontWeight={700}>
+        <Typography variant="h5Bold" textAlign="left">
           <FormattedMessage description="All routes failed" defaultMessage="We could not fetch a route for your swap" />
         </Typography>
         <ContainerBox flexDirection="column" alignItems="center" gap={3}>
@@ -142,7 +142,7 @@ const QuoteSelection = ({
       amount: selectedRoute.buyAmount.amount,
       token: selectedRoute.buyToken,
       intl,
-    })} ${selectedRoute.buyToken.symbol}`;
+    })} ${to?.symbol || selectedRoute.buyToken.symbol}`;
 
     diffCaption = intl.formatMessage(
       defineMessage({
@@ -176,8 +176,8 @@ const QuoteSelection = ({
   return (
     <StyledQuoteSelectionContainer $isSelected={!!selectedRoute && !isLoading}>
       <Typography
-        variant="bodySmallBold"
-        color={!!selectedRoute && !isLoading ? colors[mode].typography.typo2 : colors[mode].typography.typo3}
+        variant="h5Bold"
+        color={colors[mode].typography.typo1}
         sx={{ display: 'inline-flex', alignItems: 'center', gap: ({ spacing }) => spacing(1) }}
       >
         {isLoading ? (
@@ -223,7 +223,7 @@ const QuoteSelection = ({
               {isLoading ? <Skeleton variant="text" animation="wave" /> : diffLabel}
             </Typography>
           </StyledDiffCaptionContainer>
-          <Typography variant="bodySmallLabel">{diffCaption}</Typography>
+          <Typography variant="labelRegular">{diffCaption}</Typography>
         </ContainerBox>
       </ContainerBox>
     </StyledQuoteSelectionContainer>

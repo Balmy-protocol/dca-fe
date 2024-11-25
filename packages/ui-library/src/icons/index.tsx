@@ -3,7 +3,6 @@ import HelpOutlineOutlined from '@mui/icons-material/HelpOutlineOutlined';
 import CheckCircleOutline from '@mui/icons-material/CheckCircleOutline';
 import CheckCircleOutlineOutlined from '@mui/icons-material/CheckCircleOutlineOutlined';
 import Sick from '@mui/icons-material/Sick';
-import Close from '@mui/icons-material/Close';
 import ArrowDropDown from '@mui/icons-material/ArrowDropDown';
 import Cancel from '@mui/icons-material/Cancel';
 import ContentPaste from '@mui/icons-material/ContentPaste';
@@ -21,7 +20,6 @@ import CurrencyExchange from '@mui/icons-material/CurrencyExchange';
 import ViewList from '@mui/icons-material/ViewList';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
-import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import KeyboardArrowDown from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight';
 import KeyboardBackspace from '@mui/icons-material/KeyboardBackspace';
@@ -35,6 +33,7 @@ import Settings from '@mui/icons-material/Settings';
 import DeleteOutline from '@mui/icons-material/DeleteOutline';
 import SwapHoriz from '@mui/icons-material/SwapHoriz';
 import ArrowBack from '@mui/icons-material/ArrowBack';
+import ArrowForward from '@mui/icons-material/ArrowForward';
 import ArrowDropUp from '@mui/icons-material/ArrowDropUp';
 import ArrowRightAlt from '@mui/icons-material/ArrowRightAlt';
 import Timeline from '@mui/icons-material/Timeline';
@@ -81,6 +80,7 @@ import MoreVertIcon from './moreVert';
 import SuccessCircleIcon from './successCircle';
 import ErrorCircleIcon from './errorCircle';
 import ArrowRightIcon from './arrowRight';
+import ArrowRightLightIcon from './arrowRightLight';
 import WalletMoneyIcon from './walletMoney';
 import ProfileAddIcon from './profile-add';
 import DollarSquareIcon from './dollarSquare';
@@ -103,17 +103,37 @@ import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import LightingIcon from './lighting';
 import HomeIcon from './home';
 import InfoCircleIcon from './infoCircle';
+import MoneyAddIcon from './moneyAdd';
+import SafetyIcon from './safety';
 import EyeIcon from './eye';
 import EyeSlashIcon from './eyeSlash';
 import GCalendarIcon from './gCalendar';
 import OutlookIcon from './outlook';
 import SuccessTickIcon from './successTick';
+import Money4Icon from './money-4';
 import AnimatedChevronRightIcon from './animated-chevron-right';
+import GlobalIcon from './global';
+import ShieldSearchIcon from './shieldSearch';
 import GraphIcon from './graphIcon';
 import StarIcon from './star';
-import GlobalIcon from './global';
 import MovingStarIcon from './movingStar';
-import MoneyAddIcon from './moneyAdd';
+import MoneyReceiveIcon from './money-receive';
+import CloseIcon from './close-icon';
+import ModalSuccessCheckIcon from './modal-success-check';
+import ModalErrorCrossIcon from './modal-error-cross';
+import ChevronDownIcon from './chevron-down';
+import ChevronRightIcon from './chevron-right';
+import ChevronUpIcon from './chevron-up';
+import TimerIcon from './timer';
+import Wallet3Icon from './wallet-3';
+import ExportIcon from './export';
+import DiagramIcon from './diagram';
+import ChevronRightSmallIcon from './chevron-right-small';
+import Money2Icon from './money-2';
+import Wallet2Icon from './wallet-2';
+import UnlockIcon from './unlock';
+import ChartIcon from './chart';
+import ClockIcon from './clock';
 
 export {
   HelpOutline as HelpOutlineIcon,
@@ -121,7 +141,6 @@ export {
   CheckCircleOutline as CheckCircleOutlineIcon,
   CheckCircleOutlineOutlined as CheckCircleOutlineOutlinedIcon,
   Sick as SickIcon,
-  Close as CloseIcon,
   ArrowDropDown as ArrowDropDownIcon,
   Cancel as CancelIcon,
   ContentPaste as ContentPasteIcon,
@@ -152,6 +171,7 @@ export {
   DeleteOutline as DeleteOutlineIcon,
   SwapHoriz as SwapHorizIcon,
   ArrowBack as ArrowBackIcon,
+  ArrowForward as ArrowForwardIcon,
   ArrowDropUp as ArrowDropUpIcon,
   ArrowRightAlt as ArrowRightAltIcon,
   Timeline as TimelineIcon,
@@ -196,6 +216,7 @@ export {
   SuccessCircleIcon,
   ErrorCircleIcon,
   ArrowRightIcon,
+  ArrowRightLightIcon,
   WalletMoneyIcon,
   ProfileAddIcon,
   DollarSquareIcon,
@@ -219,6 +240,8 @@ export {
   LightingIcon,
   HomeIcon,
   InfoCircleIcon,
+  MoneyAddIcon,
+  SafetyIcon,
   EyeIcon,
   SuccessTickIcon,
   EyeSlashIcon,
@@ -226,10 +249,27 @@ export {
   OutlookIcon,
   CalendarMonthIcon,
   ChevronRightIcon,
+  ChevronDownIcon,
+  ChevronUpIcon,
+  Money4Icon,
   AnimatedChevronRightIcon,
+  GlobalIcon,
+  ShieldSearchIcon,
   GraphIcon,
   MovingStarIcon,
-  GlobalIcon,
   StarIcon,
-  MoneyAddIcon,
+  MoneyReceiveIcon,
+  CloseIcon,
+  ModalSuccessCheckIcon,
+  ModalErrorCrossIcon,
+  TimerIcon,
+  Wallet3Icon,
+  ExportIcon,
+  DiagramIcon,
+  ChevronRightSmallIcon,
+  Money2Icon,
+  Wallet2Icon,
+  UnlockIcon,
+  ChartIcon,
+  ClockIcon,
 };

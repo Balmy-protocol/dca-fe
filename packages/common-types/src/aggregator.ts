@@ -9,27 +9,27 @@ export type SwapOption = {
   buyToken: QuoteResponse['buyToken'] & Token;
   transferTo?: Address | null;
   chainId: number;
-  sellAmount: Omit<QuoteResponse['sellAmount'], 'amount' | 'amountInUnits' | 'amountInUSD'> & {
+  sellAmount: DistributiveOmit<QuoteResponse['sellAmount'], 'amount' | 'amountInUnits' | 'amountInUSD'> & {
     amount: bigint;
     amountInUnits: string;
     amountInUSD?: number;
   };
-  buyAmount: Omit<QuoteResponse['buyAmount'], 'amount' | 'amountInUnits' | 'amountInUSD'> & {
+  buyAmount: DistributiveOmit<QuoteResponse['buyAmount'], 'amount' | 'amountInUnits' | 'amountInUSD'> & {
     amount: bigint;
     amountInUnits: string;
     amountInUSD?: number;
   };
-  maxSellAmount: Omit<QuoteResponse['maxSellAmount'], 'amount' | 'amountInUnits' | 'amountInUSD'> & {
+  maxSellAmount: DistributiveOmit<QuoteResponse['maxSellAmount'], 'amount' | 'amountInUnits' | 'amountInUSD'> & {
     amount: bigint;
     amountInUnits: string;
     amountInUSD?: number;
   };
-  minBuyAmount: Omit<QuoteResponse['minBuyAmount'], 'amount' | 'amountInUnits' | 'amountInUSD'> & {
+  minBuyAmount: DistributiveOmit<QuoteResponse['minBuyAmount'], 'amount' | 'amountInUnits' | 'amountInUSD'> & {
     amount: bigint;
     amountInUnits: string;
     amountInUSD?: number;
   };
-  gas?: Omit<
+  gas?: DistributiveOmit<
     QuoteResponse['gas'],
     | 'estimatedGas'
     | 'estimatedCost'

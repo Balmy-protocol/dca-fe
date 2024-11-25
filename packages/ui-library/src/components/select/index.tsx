@@ -1,20 +1,22 @@
 import React, { useCallback, useMemo, useRef, useState } from 'react';
 import {
   MuiSelect,
+  MuiSelectProps,
   ListSubheader,
   TextField,
   MenuItem,
   MuiSelectChangeEvent,
   InputAdornment,
-  DividerBorder2,
   ContainerBox,
   Typography,
+  TypographyProps,
 } from '..';
 import { KeyboardArrowDownIcon, SearchIcon } from '../../icons';
 import { defineMessage, useIntl } from 'react-intl';
 import styled, { useTheme } from 'styled-components';
 import { colors } from '../../theme';
 import isUndefined from 'lodash/isUndefined';
+import { SPACING } from '../../theme/constants';
 
 interface DisabledSearchProps {
   disabledSearch: true;
@@ -28,12 +30,14 @@ interface EnabledSearchProps<T> {
 
 type SearchProps<T> = DisabledSearchProps | EnabledSearchProps<T>;
 
-interface BaseSelectProps<T extends { key: string | number }> {
+interface BaseSelectProps<T extends { key: string | number }, H = object> {
   disabledSearch?: boolean;
   placeholder?: string;
+  placeholderProps?: TypographyProps;
   options: T[];
   onChange: (selectedOption: T) => void;
   RenderItem: React.ComponentType<{ item: T }>;
+  RenderSelectedValue?: React.ComponentType<{ item: T }>;
   SkeletonItem?: React.ComponentType;
   selectedItem?: T;
   id?: string;
@@ -42,18 +46,26 @@ interface BaseSelectProps<T extends { key: string | number }> {
   onSearchChange?: (searchTerm: string) => void;
   isLoading?: boolean;
   limitHeight?: boolean;
+  variant?: MuiSelectProps['variant'];
+  size?: MuiSelectProps['size'];
+  Header?: {
+    component: React.ComponentType<{ props: H }>;
+    props: H;
+  };
 }
 
-type SelectProps<T extends { key: string | number }> = BaseSelectProps<T> & SearchProps<T>;
+type SelectProps<T extends { key: string | number }, H = object> = BaseSelectProps<T, H> & SearchProps<T>;
 
 const StyledKeyboardArrowDown = styled(KeyboardArrowDownIcon)`
   color: ${({ theme: { palette } }) => `${colors[palette.mode].typography.typo2} !important;`};
 `;
 
-function Select<T extends { key: string | number }>({
+function Select<T extends { key: string | number }, H = object>({
   id,
   placeholder,
+  placeholderProps,
   RenderItem,
+  RenderSelectedValue,
   options,
   onChange,
   selectedItem,
@@ -64,7 +76,10 @@ function Select<T extends { key: string | number }>({
   SkeletonItem,
   isLoading,
   limitHeight = false,
-}: SelectProps<T>) {
+  variant,
+  size = 'small',
+  Header,
+}: SelectProps<T, H>) {
   const [search, setSearch] = useState('');
   const searchRef = useRef<HTMLDivElement>();
   const [open, setOpen] = useState(false);
@@ -100,12 +115,16 @@ function Select<T extends { key: string | number }>({
     const optionFound = options.find((option) => option.key === value);
     if (value === '' || isUndefined(value) || !optionFound) {
       return (
-        <Typography variant="bodyBold" color={colors[mode].typography.typo5}>
+        <Typography variant="bodyBold" color={colors[mode].typography.typo5} {...placeholderProps}>
           {placeholder}
         </Typography>
       );
     } else {
-      return <RenderItem item={optionFound} key={value} />;
+      return RenderSelectedValue ? (
+        <RenderSelectedValue item={optionFound} key={value} />
+      ) : (
+        <RenderItem item={optionFound} key={value} />
+      );
     }
   };
 
@@ -133,16 +152,15 @@ function Select<T extends { key: string | number }>({
       IconComponent={StyledKeyboardArrowDown}
       renderValue={onRenderValue}
       displayEmpty
-      size="small"
+      variant={variant}
+      size={size}
       SelectDisplayProps={{ style: { display: 'flex', alignItems: 'center', gap: '5px' } }}
       MenuProps={{
         autoFocus: false,
-        TransitionProps: { onEntered: () => searchRef.current?.focus() },
         transformOrigin: {
           horizontal: 'center',
           vertical: 'top',
         },
-
         className: 'MuiSelect-MuiMenu',
         ...(!limitHeight
           ? {}
@@ -158,7 +176,7 @@ function Select<T extends { key: string | number }>({
       }}
     >
       {!disabledSearch && (
-        <ListSubheader disableGutters>
+        <ListSubheader disableGutters sx={{ marginBottom: SPACING(2.5) }}>
           <TextField
             size="small"
             // Autofocus on textfield
@@ -186,7 +204,20 @@ function Select<T extends { key: string | number }>({
           />
         </ListSubheader>
       )}
-      {!disabledSearch && <DividerBorder2 />}
+      {Header && (
+        <ListSubheader
+          disableGutters
+          sx={{
+            border: `1px solid ${colors[mode].accentPrimary}`,
+            background: colors[mode].background.secondary,
+            padding: `${SPACING(3.75)} ${SPACING(3)}`,
+            marginBottom: SPACING(1),
+            borderRadius: SPACING(2),
+          }}
+        >
+          {<Header.component props={Header.props} />}
+        </ListSubheader>
+      )}
       {renderedItems.length === 0 && (!isLoading || !SkeletonItem) && (
         <ContainerBox alignItems="center" justifyContent="center">
           {emptyOption}

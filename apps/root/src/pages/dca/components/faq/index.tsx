@@ -12,11 +12,15 @@ import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 import useTrackEvent from '@hooks/useTrackEvent';
 
-const StyledQuestion = styled(Typography).attrs({ variant: 'bodySemibold' })``;
+const StyledQuestion = styled(Typography).attrs({ variant: 'h4Bold' })`
+  ${({ theme: { palette } }) => `
+  color: ${colors[palette.mode].typography.typo2};
+  `}
+`;
 
 const StyledAnswer = styled(Typography).attrs({ variant: 'bodyRegular' })`
   ${({ theme: { palette } }) => `
-  color: ${colors[palette.mode].typography.typo3};
+  color: ${colors[palette.mode].typography.typo2};
 `}
 `;
 
@@ -33,10 +37,10 @@ const DcaFAQ = () => {
 
   return (
     <StyledContainer flexDirection="column" gap={8} alignSelf="center">
-      <Typography variant="h4" fontWeight={700} textAlign="center">
+      <Typography variant="h4Bold" textAlign="center">
         <FormattedMessage description="dcaFaqTitle" defaultMessage="Balmy’s DCA Frequently Asked Questions" />
       </Typography>
-      <ContainerBox flexDirection="column" gap={1}>
+      <ContainerBox flexDirection="column" gap={4}>
         <Accordion disableGutters>
           <AccordionSummary>
             <StyledQuestion>

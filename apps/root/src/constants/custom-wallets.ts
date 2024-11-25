@@ -133,7 +133,7 @@ export interface MyWalletOptions {
   walletConnectParameters?: RainbowKitWalletConnectParameters;
 }
 
-export type RainbowKitDetails = Omit<Wallet, 'createConnector' | 'hidden'> & {
+export type RainbowKitDetails = DistributiveOmit<Wallet, 'createConnector' | 'hidden'> & {
   index: number;
   groupIndex: number;
   groupName: string;

@@ -3,34 +3,47 @@ import styled from 'styled-components';
 import useCountingAnimation from '@hooks/useCountingAnimation';
 import { ContainerBox, HiddenNumber, Skeleton, Typography, TypographyProps, colors, ButtonProps } from 'ui-library';
 import { useIntl } from 'react-intl';
-import { formatUsdAmount, getDecimalSeparator } from '@common/utils/currency';
+import { emptyTokenWithDecimals, formatCurrencyAmount, getDecimalSeparator } from '@common/utils/currency';
 import { useShowBalances } from '@state/config/hooks';
 import isUndefined from 'lodash/isUndefined';
 
-const StyledNetWorth = styled(Typography).attrs({ fontWeight: 700 })`
-  ${({ theme: { palette } }) => `
-    color: ${colors[palette.mode].typography.typo2};
+type ColorVariant = keyof (typeof colors)[keyof typeof colors]['typography'];
+
+const StyledNetWorth = styled(Typography).attrs({ fontWeight: 700 })<{ $colorVariant?: ColorVariant }>`
+  ${({ theme: { palette }, $colorVariant }) => `
+    color: ${colors[palette.mode].typography[$colorVariant || 'typo2']};
   `}
 `;
 
-const StyledNetWorthDecimals = styled.div<{ $lightDecimals?: boolean }>`
-  ${({ theme: { palette }, $lightDecimals }) =>
-    $lightDecimals &&
+const StyledNetWorthDecimals = styled.div<{ $colorVariant?: ColorVariant }>`
+  ${({ theme: { palette }, $colorVariant }) =>
+    $colorVariant &&
     `
-    color: ${colors[palette.mode].typography.typo4};
+    color: ${colors[palette.mode].typography[$colorVariant]};
   `}
 `;
 
-interface NetWorthNumberProps {
+export interface NetWorthNumberProps {
   value: number;
   withAnimation?: boolean;
   isLoading?: boolean;
   variant: TypographyProps['variant'];
   size?: ButtonProps['size'];
   isFiat?: boolean;
+  colorVariant?: ColorVariant;
+  disableHiddenNumber?: boolean;
 }
 
-const NetWorthNumber = ({ value, withAnimation, isLoading, variant, size, isFiat = true }: NetWorthNumberProps) => {
+const NetWorthNumber = ({
+  value,
+  withAnimation,
+  isLoading,
+  variant,
+  size,
+  isFiat = true,
+  colorVariant, // Overrides all colors
+  disableHiddenNumber = false,
+}: NetWorthNumberProps) => {
   const animatedNetWorth = useCountingAnimation(value);
   const networthToUse = withAnimation ? animatedNetWorth : value;
   const intl = useIntl();
@@ -41,17 +54,17 @@ const NetWorthNumber = ({ value, withAnimation, isLoading, variant, size, isFiat
   const [totalInteger, totalDecimal] = fixedWorth.split('.');
 
   return (
-    <StyledNetWorth variant={variant}>
+    <StyledNetWorth variant={variant} $colorVariant={colorVariant}>
       {isLoading ? (
-        <Skeleton variant="text" animation="wave" />
+        <Skeleton variant="text" animation="wave" width="6ch" />
       ) : (
         <ContainerBox>
-          {showBalance ? (
+          {showBalance || disableHiddenNumber ? (
             <>
               {isFiat && '$'}
-              {formatUsdAmount({ amount: totalInteger || 0, intl })}
+              {formatCurrencyAmount({ amount: BigInt(totalInteger || 0), token: emptyTokenWithDecimals(0), intl })}
               {totalDecimal !== '' && !isUndefined(totalDecimal) && (
-                <StyledNetWorthDecimals $lightDecimals={isFiat}>
+                <StyledNetWorthDecimals $colorVariant={colorVariant || (isFiat ? 'typo4' : undefined)}>
                   {getDecimalSeparator(intl)}
                   {totalDecimal}
                 </StyledNetWorthDecimals>

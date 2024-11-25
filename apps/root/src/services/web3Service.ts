@@ -24,6 +24,7 @@ import AccountService, { WalletActionType } from './accountService';
 import LabelService from './labelService';
 import ContactListService from './conctactListService';
 import getWagmiConfig from './wagmiConfig';
+import { EarnService } from './earnService';
 import WalletClientsService from './walletClientsService';
 import { reconnect } from '@wagmi/core';
 
@@ -159,6 +160,8 @@ export default class Web3Service {
 
   contactListService: ContactListService;
 
+  earnService: EarnService;
+
   walletClientsService: WalletClientsService;
 
   constructor() {
@@ -174,6 +177,12 @@ export default class Web3Service {
     this.sdkService = new SdkService(this.axiosClient);
     this.providerService = new ProviderService(this.accountService, this.sdkService, this.walletClientsService);
     this.contractService = new ContractService(this.providerService);
+    this.earnService = new EarnService(
+      this.sdkService,
+      this.accountService,
+      this.providerService,
+      this.contractService
+    );
     this.labelService = new LabelService(
       this.meanApiService,
       this.accountService,
@@ -333,6 +342,10 @@ export default class Web3Service {
     return this.permit2Service;
   }
 
+  getEarnService() {
+    return this.earnService;
+  }
+
   getLoadedAsSafeApp() {
     return this.loadedAsSafeApp;
   }
@@ -390,6 +403,7 @@ export default class Web3Service {
 
   logOutUser() {
     this.positionService.logOutUser();
+    this.earnService.logOutUser();
     this.contactListService.logOutUser();
     this.labelService.logOutUser();
     this.transactionService.logOutUser();

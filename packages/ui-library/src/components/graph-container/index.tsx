@@ -22,6 +22,9 @@ const StyledContainerBoxWithHeight = styled.div<{ height?: number; minHeight?: n
   min-height: ${({ minHeight, height }) => minHeight || height}px;
   ${({ height }) => (height ? ` height: ${height}px;` : 'flex: 1;')}
   color: black;
+  .recharts-surface {
+    overflow: visible;
+  }
 `;
 
 interface GraphContainerProps<T extends DataItem> {
@@ -38,6 +41,7 @@ interface GraphContainerProps<T extends DataItem> {
   defaultPeriod?: AvailableDatePeriods;
   defaultEnabledPeriods?: AvailableDatePeriods[];
   updatePeriodCallback?: (period: AvailableDatePeriods) => void;
+  customDaysBackMap?: Partial<typeof DAYS_BACK_MAP>;
 }
 
 export const GraphNoDataAvailable = () => {
@@ -46,10 +50,10 @@ export const GraphNoDataAvailable = () => {
   } = useTheme();
   return (
     <ContainerBox flexDirection="column" gap={2} fullWidth alignItems="center" justifyContent="center">
-      <Typography variant="h4">
+      <Typography variant="h4Bold">
         <ChartEmoji />
       </Typography>
-      <Typography variant="h5" fontWeight={700} color={colors[mode].typography.typo3}>
+      <Typography variant="h5Bold" color={colors[mode].typography.typo3}>
         <FormattedMessage
           description="graph-container.no-data-available"
           defaultMessage="We could not retrieve the data for this graph"
@@ -58,20 +62,6 @@ export const GraphNoDataAvailable = () => {
     </ContainerBox>
   );
 };
-
-const MinimalButton = styled(Button)<{ active?: boolean }>`
-  ${({
-    theme: {
-      spacing,
-      palette: { mode },
-    },
-    active,
-  }) => `
-    padding: ${spacing(1)} ${spacing(2)} !important;
-    border-radius: ${spacing(1)};
-    ${active && `background-color: ${colors[mode].accentPrimary};color: ${colors[mode].accent.accent100};`}
-  `}
-`;
 
 const LegendItem = ({ legend: { color, label } }: { legend: Legend }) => (
   <ContainerBox gap={2} alignItems="center" justifyContent="center">
@@ -91,14 +81,10 @@ function getMaxAndMin<T extends DataItem>(data: T[]) {
 }
 
 function getAmountOfDaysBetweenDates(startDate: number, endDate: number) {
-  if (startDate > endDate) {
-    return DateTime.fromSeconds(startDate).diff(DateTime.fromSeconds(endDate), 'days').days;
-  }
-
   return DateTime.fromSeconds(endDate).diff(DateTime.fromSeconds(startDate), 'days').days;
 }
 
-enum AvailableDatePeriods {
+export enum AvailableDatePeriods {
   day = '1d',
   week = '1w',
   month = '1m',
@@ -107,7 +93,7 @@ enum AvailableDatePeriods {
 }
 
 const DAYS_BACK_MAP: Record<AvailableDatePeriods, number> = {
-  [AvailableDatePeriods.day]: 1,
+  [AvailableDatePeriods.day]: 3,
   [AvailableDatePeriods.week]: 7,
   [AvailableDatePeriods.month]: 30,
   [AvailableDatePeriods.year]: 365,
@@ -206,9 +192,9 @@ const GraphContainer = <T extends DataItem>({
   defaultPeriod,
   defaultEnabledPeriods,
   updatePeriodCallback,
+  customDaysBackMap,
 }: GraphContainerProps<T>) => {
   const intl = useIntl();
-  const [today] = useState(Math.floor(Date.now() / 1000));
   const [periodSetByUser, setPeriodSetByUser] = useState(false);
   const [activePeriod, setActivePeriod] = useState<AvailableDatePeriods>(defaultPeriod || AvailableDatePeriods.all);
   const enabledPeriods = useMemo(() => defaultEnabledPeriods || getEnabledDates(data), [data, defaultEnabledPeriods]);
@@ -232,18 +218,36 @@ const GraphContainer = <T extends DataItem>({
   }, [enabledPeriods, periodSetByUser]);
 
   const filteredData = useMemo(() => {
-    let parsedData = orderBy(
-      data.filter((d) => getAmountOfDaysBetweenDates(d.timestamp, today) < DAYS_BACK_MAP[activePeriod]),
-      'timestamp',
-      'asc'
-    );
+    const today = Math.floor(Date.now() / 1000);
+
+    const daysBackMapValue = customDaysBackMap?.[activePeriod] || DAYS_BACK_MAP[activePeriod];
+    const filteredCurrentData = data.filter((d) => {
+      const daysBetween = getAmountOfDaysBetweenDates(d.timestamp, today);
+
+      // We only want the actual data first
+      return daysBetween < daysBackMapValue && daysBetween >= 0;
+    });
+
+    // Now we only want 1/4th of the graph to be future data
+    const amountOfDataToAdd = Math.ceil(filteredCurrentData.length / 4);
+    // Now we get the future data and cutoff the rest
+
+    const filteredFutureData = data
+      .filter((d) => {
+        // this would always be negative for the future ones
+        const daysBetween = getAmountOfDaysBetweenDates(d.timestamp, today);
+        return daysBetween <= 0 && daysBetween * -1 <= daysBackMapValue;
+      })
+      .slice(0, amountOfDataToAdd);
+
+    let parsedData = orderBy([...filteredCurrentData, ...filteredFutureData], 'timestamp', 'asc');
 
     if (addOrganicGrowthTo) {
       parsedData = addOrganicVariation(parsedData, addOrganicGrowthTo, variationFactor);
     }
 
     return parsedData;
-  }, [data, activePeriod]);
+  }, [data, activePeriod, customDaysBackMap]);
 
   if (isLoading && LoadingSkeleton) {
     return <LoadingSkeleton />;
@@ -258,7 +262,7 @@ const GraphContainer = <T extends DataItem>({
       {(title || !!legend?.length) && (
         <ContainerBox justifyContent="space-between">
           {title && (
-            <Typography variant="h6Bold" color={({ palette: { mode } }) => colors[mode].typography.typo1}>
+            <Typography variant="h5Bold" color={({ palette: { mode } }) => colors[mode].typography.typo1}>
               {title}
             </Typography>
           )}
@@ -277,16 +281,16 @@ const GraphContainer = <T extends DataItem>({
         </StyledContainerBoxWithHeight>
         <ContainerBox justifyContent="flex-end" gap={1} alignItems="center">
           {enabledPeriods.map((period) => (
-            <MinimalButton
-              active={period === activePeriod}
+            <Button
               key={period}
               variant="contained"
+              color={period === activePeriod ? 'primary' : 'secondary'}
               size="small"
-              color="secondary"
+              sx={({ spacing }) => ({ padding: `${spacing(1)} ${spacing(2)}` })}
               onClick={() => handlePeriodChange(period)}
             >
               {intl.formatMessage(AVAILABLE_DATE_PERIODS_STRING_MAP[period])}
-            </MinimalButton>
+            </Button>
           ))}
         </ContainerBox>
       </ContainerBox>

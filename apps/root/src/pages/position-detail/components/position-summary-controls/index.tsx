@@ -2,10 +2,8 @@ import React from 'react';
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
 import { NFTData, Position, TokenListId, TransactionTypes } from '@types';
 import {
-  IconButton,
   Menu,
   MenuItem,
-  MoreVertIcon,
   createStyles,
   Button,
   Typography,
@@ -16,6 +14,7 @@ import {
   Link,
   DividerBorder1,
   TwitterShareLinkButton,
+  MoreVertButtonIcon,
 } from 'ui-library';
 import { withStyles } from 'tss-react/mui';
 import {
@@ -58,13 +57,20 @@ const StyledDivider = styled(DividerBorder1).attrs({ orientation: 'vertical', fl
   margin: ${({ theme }) => theme.spacing(1)} 0;
 `;
 
+const StyledPositionSummaryControlsContainer = styled(ContainerBox).attrs({ gap: 3, alignSelf: 'flex-end' })<{
+  show: boolean;
+}>`
+  ${({ show }) => (show ? '' : 'opacity: 0;')}
+`;
+
 interface PositionSummaryControlsProps {
   pendingTransaction: string | null;
   position: Position;
-  ownerWallet: DisplayWallet;
+  show: boolean;
+  ownerWallet?: DisplayWallet;
 }
 
-const PositionSummaryControls = ({ pendingTransaction, position, ownerWallet }: PositionSummaryControlsProps) => {
+const PositionSummaryControls = ({ show, pendingTransaction, position, ownerWallet }: PositionSummaryControlsProps) => {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const [anchorWithdrawButton, setAnchorWithdrawButton] = React.useState<null | HTMLElement>(null);
@@ -99,7 +105,7 @@ const PositionSummaryControls = ({ pendingTransaction, position, ownerWallet }: 
   const isOnNetwork = connectedNetwork?.chainId === position.chainId;
 
   const showSwitchAction =
-    !isOnNetwork && CHAIN_CHANGING_WALLETS_WITH_REFRESH.includes(ownerWallet.providerInfo?.name || '');
+    !isOnNetwork && CHAIN_CHANGING_WALLETS_WITH_REFRESH.includes(ownerWallet?.providerInfo?.name || '');
 
   const disabled = showSwitchAction;
 
@@ -432,117 +438,113 @@ const PositionSummaryControls = ({ pendingTransaction, position, ownerWallet }: 
   };
 
   return (
-    ownerWallet && (
-      <>
-        <TerminateModal open={showTerminateModal} position={position} onCancel={() => setShowTerminateModal(false)} />
-        <TransferPositionModal
-          open={showTransferModal}
-          position={position}
-          onCancel={() => setShowTransferModal(false)}
-        />
-        <NFTModal open={showNFTModal} nftData={nftData} onCancel={() => setShowNFTModal(false)} />
-        <ContainerBox gap={3} alignSelf="end">
-          {position.remainingSwaps > 0 && <AddPositionToCalendarButton position={position} />}
+    <>
+      <TerminateModal open={showTerminateModal} position={position} onCancel={() => setShowTerminateModal(false)} />
+      <TransferPositionModal
+        open={showTransferModal}
+        position={position}
+        onCancel={() => setShowTransferModal(false)}
+      />
+      <NFTModal open={showNFTModal} nftData={nftData} onCancel={() => setShowNFTModal(false)} />
+      <StyledPositionSummaryControlsContainer show={show}>
+        {position.remainingSwaps > 0 && <AddPositionToCalendarButton position={position} />}
 
-          {shouldDisableArrow && (
+        {shouldDisableArrow && (
+          <Button
+            variant="outlined"
+            disabled={disabledWithdraw || isPending || disabled || position.toWithdraw.amount <= 0n}
+            onClick={() => onWithdraw(!!hasSignSupport && position.to.address === PROTOCOL_TOKEN_ADDRESS)}
+          >
+            <FormattedMessage
+              description="withdrawToken"
+              defaultMessage="Withdraw {token}"
+              values={{
+                token:
+                  hasSignSupport || position.to.address !== PROTOCOL_TOKEN_ADDRESS
+                    ? position.to.symbol
+                    : wrappedProtocolToken.symbol,
+              }}
+            />
+          </Button>
+        )}
+
+        {!shouldDisableArrow && (
+          <>
             <Button
               variant="outlined"
               disabled={disabledWithdraw || isPending || disabled || position.toWithdraw.amount <= 0n}
-              onClick={() => onWithdraw(!!hasSignSupport && position.to.address === PROTOCOL_TOKEN_ADDRESS)}
+              onClick={(e) => setAnchorWithdrawButton(e.currentTarget)}
+              endIcon={<KeyboardArrowDownIcon />}
             >
-              <FormattedMessage
-                description="withdrawToken"
-                defaultMessage="Withdraw {token}"
-                values={{
-                  token:
-                    hasSignSupport || position.to.address !== PROTOCOL_TOKEN_ADDRESS
-                      ? position.to.symbol
-                      : wrappedProtocolToken.symbol,
-                }}
-              />
+              <FormattedMessage defaultMessage="Withdraw" description="withdraw" />
             </Button>
-          )}
-
-          {!shouldDisableArrow && (
-            <>
-              <Button
-                variant="outlined"
-                disabled={disabledWithdraw || isPending || disabled || position.toWithdraw.amount <= 0n}
-                onClick={(e) => setAnchorWithdrawButton(e.currentTarget)}
-                endIcon={<KeyboardArrowDownIcon />}
-              >
-                <FormattedMessage defaultMessage="Withdraw" description="withdraw" />
-              </Button>
-              <OptionsMenuItems
-                options={options}
-                anchorEl={anchorWithdrawButton}
-                handleClose={() => setAnchorWithdrawButton(null)}
-              />
-            </>
-          )}
-          <StyledDivider />
-          <TwitterShareLinkButton text={tweetContent.text} url={tweetContent.shareUrl} onClick={onClickShare} />
-          <ContainerBox alignSelf="center">
-            <IconButton onClick={handleClick} disabled={isPending}>
-              <MoreVertIcon color="info" />
-            </IconButton>
-            <StyledMenu
-              anchorEl={anchorEl}
-              open={open}
-              onClose={handleClose}
-              anchorOrigin={{
-                vertical: 'bottom',
-                horizontal: 'right',
+            <OptionsMenuItems
+              options={options}
+              anchorEl={anchorWithdrawButton}
+              handleClose={() => setAnchorWithdrawButton(null)}
+            />
+          </>
+        )}
+        <StyledDivider />
+        <TwitterShareLinkButton text={tweetContent.text} url={tweetContent.shareUrl} onClick={onClickShare} />
+        <ContainerBox alignSelf="center">
+          <MoreVertButtonIcon onClick={handleClick} disabled={isPending} />
+          <StyledMenu
+            anchorEl={anchorEl}
+            open={open}
+            onClose={handleClose}
+            anchorOrigin={{
+              vertical: 'bottom',
+              horizontal: 'right',
+            }}
+            transformOrigin={{
+              vertical: 'top',
+              horizontal: 'right',
+            }}
+          >
+            <MenuItem
+              onClick={() => {
+                handleClose();
+                void onViewNFT();
               }}
-              transformOrigin={{
-                vertical: 'top',
-                horizontal: 'right',
-              }}
+              disabled={disabled}
             >
+              <FormattedMessage description="view nft" defaultMessage="View NFT" />
+            </MenuItem>
+            <MenuItem
+              onClick={() => {
+                handleClose();
+                onTransfer();
+              }}
+              disabled={isPending || disabled}
+            >
+              <FormattedMessage description="transferPosition" defaultMessage="Transfer position" />
+            </MenuItem>
+            <MenuItem
+              onClick={() => {
+                handleClose();
+                onTerminate();
+              }}
+              disabled={isPending || disabled || disabledWithdraw || !showExtendedFunctions}
+            >
+              <FormattedMessage description="terminate position" defaultMessage="Withdraw and close position" />
+            </MenuItem>
+            {csvUrl && (
               <MenuItem
-                onClick={() => {
-                  handleClose();
-                  void onViewNFT();
-                }}
-                disabled={disabled}
+                onClick={handleClose}
+                component={Link}
+                download={`position_${position.chainId}_${position.positionId}.csv`}
+                ref={downloadCsvLinkRef}
+                href={csvUrl}
+                sx={{ textDecoration: 'none !important' }}
               >
-                <FormattedMessage description="view nft" defaultMessage="View NFT" />
+                <FormattedMessage description="exportPositionCSV" defaultMessage="Export as CSV" />
               </MenuItem>
-              <MenuItem
-                onClick={() => {
-                  handleClose();
-                  onTransfer();
-                }}
-                disabled={isPending || disabled}
-              >
-                <FormattedMessage description="transferPosition" defaultMessage="Transfer position" />
-              </MenuItem>
-              <MenuItem
-                onClick={() => {
-                  handleClose();
-                  onTerminate();
-                }}
-                disabled={isPending || disabled || disabledWithdraw || !showExtendedFunctions}
-              >
-                <FormattedMessage description="terminate position" defaultMessage="Withdraw and close position" />
-              </MenuItem>
-              {csvUrl && (
-                <MenuItem
-                  onClick={handleClose}
-                  component={Link}
-                  download={`position_${position.chainId}_${position.positionId}.csv`}
-                  ref={downloadCsvLinkRef}
-                  href={csvUrl}
-                  sx={{ textDecoration: 'none !important' }}
-                >
-                  <FormattedMessage description="exportPositionCSV" defaultMessage="Export as CSV" />
-                </MenuItem>
-              )}
-            </StyledMenu>
-          </ContainerBox>
+            )}
+          </StyledMenu>
         </ContainerBox>
-      </>
-    )
+      </StyledPositionSummaryControlsContainer>
+    </>
   );
 };
 

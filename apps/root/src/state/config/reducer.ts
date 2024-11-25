@@ -8,6 +8,7 @@ import {
   toggleShowBalances,
   hydrateConfig,
   setSwitchActiveWalletOnConnection,
+  setUseUnlimitedApproval,
 } from './actions';
 import { isUndefined } from 'lodash';
 
@@ -18,6 +19,7 @@ export interface ApplicationState {
   showSmallBalances: boolean;
   showBalances: boolean;
   switchActiveWalletOnConnection: boolean;
+  useUnlimitedApproval: boolean;
 }
 
 export const initialState: ApplicationState = {
@@ -27,6 +29,7 @@ export const initialState: ApplicationState = {
   showSmallBalances: true,
   showBalances: true,
   switchActiveWalletOnConnection: true,
+  useUnlimitedApproval: true,
 };
 
 export default createReducer(initialState, (builder) => {
@@ -39,6 +42,9 @@ export default createReducer(initialState, (builder) => {
     })
     .addCase(setSelectedLocale, (state, { payload }) => {
       state.selectedLocale = payload;
+    })
+    .addCase(setUseUnlimitedApproval, (state, { payload }) => {
+      state.useUnlimitedApproval = payload;
     })
     .addCase(toggleShowSmallBalances, (state) => {
       state.showSmallBalances = !state.showSmallBalances;
@@ -64,6 +70,9 @@ export default createReducer(initialState, (builder) => {
       }
       if (!isUndefined(payload.switchActiveWalletOnConnection)) {
         state.switchActiveWalletOnConnection = payload.switchActiveWalletOnConnection;
+      }
+      if (!isUndefined(payload.useUnlimitedApproval)) {
+        state.useUnlimitedApproval = payload.useUnlimitedApproval;
       }
     });
 });

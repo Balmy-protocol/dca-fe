@@ -1,5 +1,5 @@
 import React from 'react';
-import { Address, formatUnits, parseUnits } from 'viem';
+import { Address, formatUnits, Hash, parseUnits } from 'viem';
 import find from 'lodash/find';
 import styled from 'styled-components';
 import {
@@ -16,8 +16,6 @@ import {
   TransactionActionSwapData,
   TransactionApplicationIdentifier,
   TransactionTypes,
-  UnwrapTypeData,
-  WrapTypeData,
 } from '@types';
 import { Typography, BackgroundPaper } from 'ui-library';
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
@@ -69,9 +67,13 @@ import TransferToModal from '../transfer-to-modal';
 import { setSwapOptionMaxSellAmount } from '@common/utils/quotes';
 import { compact } from 'lodash';
 
-const StyledBackgroundPaper = styled(BackgroundPaper)`
+const StyledBackgroundPaper = styled(BackgroundPaper)<{ $showsCog: boolean }>`
   position: relative;
   overflow: hidden;
+  ${({ theme: { space }, $showsCog }) => `
+  padding: ${space.s07} ${space.s05} ${space.s06};
+  ${!$showsCog && `padding-top: ${space.s06};`}
+  `}
 `;
 
 const sellMessage = <FormattedMessage description="You sell" defaultMessage="You sell" />;
@@ -111,7 +113,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError, missingQ
   const [currentQuoteStatus, setCurrentQuoteStatus] = React.useState(QuoteStatus.None);
   const protocolToken = getProtocolToken(currentNetwork.chainId);
   const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
-  const [currentTransaction, setCurrentTransaction] = React.useState('');
+  const [currentTransaction, setCurrentTransaction] = React.useState<{ hash: Hash; chainId: number } | undefined>();
   const [transactionsToExecute, setTransactionsToExecute] = React.useState<TransactionStep[]>([]);
   const simulationService = useSimulationService();
   const actualCurrentNetwork = useCurrentNetwork();
@@ -272,6 +274,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError, missingQ
             newSteps[approveIndex] = {
               ...newSteps[approveIndex],
               hash: result.hash,
+              chainId: result.chainId,
             };
           }
           setTransactionsToExecute(newSteps);
@@ -351,19 +354,12 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError, missingQ
       intl,
     });
     try {
-      const isWrap = from?.address === PROTOCOL_TOKEN_ADDRESS && to?.address === wrappedProtocolToken.address;
-      const isUnwrap = from?.address === wrappedProtocolToken.address && to?.address === PROTOCOL_TOKEN_ADDRESS;
       setRefreshQuotes(false);
 
       setModalLoading({
         content: (
           <Typography variant="bodyRegular">
-            {isWrap && <FormattedMessage description="wrap agg loading" defaultMessage="Wrapping" />}
-            {isUnwrap && <FormattedMessage description="unwrap agg loading" defaultMessage="Unwrapping" />}
-            {((from?.address !== PROTOCOL_TOKEN_ADDRESS && from?.address !== wrappedProtocolToken.address) ||
-              (to?.address !== PROTOCOL_TOKEN_ADDRESS && to?.address !== wrappedProtocolToken.address)) && (
-              <FormattedMessage description="swap agg loading" defaultMessage="Swapping" />
-            )}
+            <FormattedMessage description="swap agg loading" defaultMessage="Swapping" />
             {` `}
             <FormattedMessage
               description="swap aggregator loading title"
@@ -448,32 +444,24 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError, missingQ
         amountTo: selectedRoute.buyAmount.amount,
         balanceBefore: (balanceBefore && balanceBefore?.toString()) || null,
         transferTo,
-        type: selectedRoute.type,
+        orderType: selectedRoute.type,
         swapContract: selectedRoute.tx.to,
       };
 
-      let transactionTypeData: SwapTypeData | WrapTypeData | UnwrapTypeData = {
+      const transactionTypeData: SwapTypeData = {
         type: TransactionTypes.swap,
         typeData: baseTransactionData,
       };
-      if (isWrap) {
-        transactionTypeData = {
-          type: TransactionTypes.wrap,
-          typeData: baseTransactionData,
-        };
-      } else if (isUnwrap) {
-        transactionTypeData = {
-          type: TransactionTypes.unwrap,
-          typeData: baseTransactionData,
-        };
-      }
 
       addTransaction(result, transactionTypeData);
 
       setShouldShowFirstStep(false);
       setShouldShowSteps(false);
       setModalClosed({ content: '' });
-      setCurrentTransaction(result.hash);
+      setCurrentTransaction({
+        hash: result.hash,
+        chainId: result.chainId,
+      });
       setShouldShowConfirmation(true);
 
       // Scroll to top of page
@@ -488,6 +476,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError, missingQ
           newSteps[index] = {
             ...newSteps[index],
             hash: result.hash,
+            chainId: result.chainId,
             done: true,
           };
 
@@ -589,19 +578,12 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError, missingQ
       intl,
     });
     try {
-      const isWrap = from?.address === PROTOCOL_TOKEN_ADDRESS && to?.address === wrappedProtocolToken.address;
-      const isUnwrap = from?.address === wrappedProtocolToken.address && to?.address === PROTOCOL_TOKEN_ADDRESS;
       setRefreshQuotes(false);
 
       setModalLoading({
         content: (
           <Typography variant="bodyRegular">
-            {isWrap && <FormattedMessage description="wrap agg loading" defaultMessage="Wrapping" />}
-            {isUnwrap && <FormattedMessage description="unwrap agg loading" defaultMessage="Unwrapping" />}
-            {((from?.address !== PROTOCOL_TOKEN_ADDRESS && from?.address !== wrappedProtocolToken.address) ||
-              (to?.address !== PROTOCOL_TOKEN_ADDRESS && to?.address !== wrappedProtocolToken.address)) && (
-              <FormattedMessage description="swap agg loading" defaultMessage="Swapping" />
-            )}
+            <FormattedMessage description="swap agg loading" defaultMessage="Swapping" />
             {` `}
             <FormattedMessage
               description="swap aggregator loading title"
@@ -680,26 +662,14 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError, missingQ
         amountTo: selectedRoute.buyAmount.amount,
         balanceBefore: (balanceBefore && balanceBefore?.toString()) || null,
         transferTo,
-        type: selectedRoute.type,
+        orderType: selectedRoute.type,
         swapContract: selectedRoute.tx.to,
       };
 
-      let transactionTypeData: SwapTypeData | WrapTypeData | UnwrapTypeData = {
+      const transactionTypeData: SwapTypeData = {
         type: TransactionTypes.swap,
         typeData: baseTransactionData,
       };
-
-      if (isWrap) {
-        transactionTypeData = {
-          type: TransactionTypes.wrap,
-          typeData: baseTransactionData,
-        };
-      } else if (isUnwrap) {
-        transactionTypeData = {
-          type: TransactionTypes.unwrap,
-          typeData: baseTransactionData,
-        };
-      }
 
       addTransaction(
         {
@@ -713,7 +683,10 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError, missingQ
       setShouldShowFirstStep(false);
       setShouldShowSteps(false);
       setModalClosed({ content: '' });
-      setCurrentTransaction(result.safeTxHash);
+      setCurrentTransaction({
+        hash: result.safeTxHash as Hash,
+        chainId: selectedRoute.chainId,
+      });
       setShouldShowConfirmation(true);
 
       if (transactionsToExecute?.length) {
@@ -1091,6 +1064,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError, missingQ
     if (!isApproved) {
       newSteps.push({
         hash: '',
+        chainId: currentNetwork.chainId,
         onAction: (amount) => handleApproveToken(amount),
         onActionConfirmed: (hash) => handleApproveTransactionConfirmed(hash),
         checkForPending: false,
@@ -1131,6 +1105,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError, missingQ
     if (isPermit2Enabled) {
       newSteps.push({
         hash: '',
+        chainId: currentNetwork.chainId,
         onAction: (amount) => handleSignPermit2Approval(amount),
         checkForPending: false,
         done: false,
@@ -1154,6 +1129,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError, missingQ
     } else if (BLOWFISH_ENABLED_CHAINS.includes(currentNetwork.chainId) && selectedRoute.tx) {
       newSteps.push({
         hash: '',
+        chainId: currentNetwork.chainId,
         onAction: (steps: TransactionAction[]) => handleTransactionSimulationWait(steps),
         checkForPending: true,
         done: false,
@@ -1167,6 +1143,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError, missingQ
 
     newSteps.push({
       hash: '',
+      chainId: currentNetwork.chainId,
       onAction: () => handleSwap(),
       checkForPending: true,
       done: false,
@@ -1285,6 +1262,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError, missingQ
 
   const handleNewTrade = () => {
     trackEvent('Aggregator - New trade');
+    dispatch(resetForm());
     handleTransactionConfirmationClose();
     setShouldShowFirstStep(true);
   };
@@ -1292,7 +1270,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError, missingQ
   return (
     <>
       <TransferToModal activeContactModal={activeContactModal} setActiveContactModal={setActiveContactModal} />
-      <StyledBackgroundPaper variant="outlined">
+      <StyledBackgroundPaper variant="outlined" $showsCog={!shouldShowConfirmation && !shouldShowSteps}>
         <SwapSettings
           shouldShow={shouldShowSettings}
           onClose={() => setShouldShowSettings(false)}
@@ -1303,7 +1281,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError, missingQ
           from={from}
           shouldShow={shouldShowConfirmation}
           transaction={currentTransaction}
-          showBalanceChanges
+          showWalletBalanceChanges
           successTitle={intl.formatMessage(
             defineMessage({ description: 'transactionConfirmationBalanceChanges', defaultMessage: 'Trade confirmed' })
           )}
@@ -1329,7 +1307,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError, missingQ
                       intl,
                     })
                   : '',
-              from: selectedRoute?.sellToken.symbol || '',
+              from: from?.symbol || selectedRoute?.sellToken.symbol || '',
               valueTo:
                 selectedRoute && to
                   ? formatCurrencyAmount({
@@ -1340,7 +1318,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError, missingQ
                       intl,
                     })
                   : '',
-              to: selectedRoute?.buyToken.symbol || '',
+              to: to?.symbol || selectedRoute?.buyToken.symbol || '',
             }
           )}
           actions={[

@@ -5,12 +5,14 @@ import { FormattedMessage } from 'react-intl';
 import {
   Typography,
   Link,
-  CancelIcon,
   Modal,
   Button,
   copyTextToClipboard,
-  SuccessCircleIcon,
   ModalProps,
+  colors,
+  ModalSuccessCheckIcon,
+  ModalErrorCrossIcon,
+  ContainerBox,
 } from 'ui-library';
 import { buildEtherscanTransaction } from '@common/utils/etherscan';
 import { TRANSACTION_ERRORS, getTransactionErrorCode, shouldTrackError } from '@common/utils/errors';
@@ -18,11 +20,12 @@ import useCurrentNetwork from '@hooks/useCurrentNetwork';
 import useActiveWallet from '@hooks/useActiveWallet';
 import { BaseError } from 'viem';
 
-const StyledContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+const StyledContainer = styled(ContainerBox).attrs({
+  flexDirection: 'column',
+  alignItems: 'center',
+  justifyContent: 'center',
+  gap: 2,
+})`
   text-align: center;
 `;
 
@@ -126,9 +129,9 @@ export const TransactionModal = ({
   const LoadingContent = (
     <>
       <StyledLoadingIndicatorWrapper withMargin>
-        <LoadingIndicator size={70} />
+        <LoadingIndicator size={80} />
       </StyledLoadingIndicatorWrapper>
-      <Typography variant="h6">
+      <Typography variant="h5Bold" color={({ palette }) => colors[palette.mode].typography.typo1}>
         <FormattedMessage description="Waiting confirmation" defaultMessage="Waiting for confirmation" />
       </Typography>
       {loadingConfig.content}
@@ -144,9 +147,7 @@ export const TransactionModal = ({
   const SuccessContent = (
     <>
       <StyledLoadingIndicatorWrapper>
-        <Typography variant="bodyRegular">
-          <SuccessCircleIcon size="64px" />
-        </Typography>
+        <ModalSuccessCheckIcon size="80px" />
       </StyledLoadingIndicatorWrapper>
       <Typography variant="h5Bold">
         <FormattedMessage description="Operation successfull" defaultMessage="Transaction sent!" />
@@ -167,13 +168,11 @@ export const TransactionModal = ({
   const ErrorContent = (
     <>
       <StyledLoadingIndicatorWrapper>
-        <Typography variant="h1">
-          <CancelIcon color="error" fontSize="inherit" />
-        </Typography>
+        <ModalErrorCrossIcon size="80px" />
       </StyledLoadingIndicatorWrapper>
       {!TRANSACTION_ERRORS[getTransactionErrorCode(errorConfig.error)] && (
-        <Typography variant="h6">
-          <FormattedMessage description="Operation erro" defaultMessage="Error encountered" />
+        <Typography variant="h5Bold">
+          <FormattedMessage description="Operation error" defaultMessage="Error encountered" />
         </Typography>
       )}
       {errorConfig.content}
@@ -192,6 +191,7 @@ export const TransactionModal = ({
         <Button
           variant="contained"
           sx={{ marginTop: '10px' }}
+          size="large"
           onClick={() =>
             copyTextToClipboard(
               `\`\`\`${JSON.stringify({

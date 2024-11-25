@@ -6,7 +6,10 @@ import {
   HOME_ROUTES,
   DCA_CREATE_ROUTE,
   EARN_ROUTE,
+  EARN_PORTFOLIO,
+  EARN_GROUP,
   NON_NAVIGABLE_ROUTES,
+  EARN_SUBSCRIBE_ROUTE,
 } from '@constants/routes';
 import { useAppDispatch } from '@hooks/state';
 import usePushToHistory from '@hooks/usePushToHistory';
@@ -32,15 +35,19 @@ import {
   useSnackbar,
   TrashIcon,
   MovingStarIcon,
+  DollarSquareIcon,
+  LinkSection,
 } from 'ui-library';
 // import { setSwitchActiveWalletOnConnectionThunk, toggleTheme } from '@state/config/actions';
 // import { useSwitchActiveWalletOnConnection, useThemeMode } from '@state/config/hooks';
-import { toggleTheme } from '@state/config/actions';
-import { useThemeMode } from '@state/config/hooks';
+import { setUseUnlimitedApproval, toggleTheme } from '@state/config/actions';
+import { useThemeMode, useUseUnlimitedApproval } from '@state/config/hooks';
 import useSelectedLanguage from '@hooks/useSelectedLanguage';
 import { SUPPORTED_LANGUAGES_STRING, SupportedLanguages } from '@constants/lang';
 import useChangeLanguage from '@hooks/useChangeLanguage';
 import useTrackEvent from '@hooks/useTrackEvent';
+import NetWorth, { NetWorthVariants } from '@common/components/net-worth';
+import { WalletOptionValues, ALL_WALLETS, WalletSelectorVariants } from '@common/components/wallet-selector/types';
 import GuardianListSubscribeModal from '../guardian-list-subscribe-modal';
 
 const helpOptions = [
@@ -109,6 +116,8 @@ const Navigation = ({ children }: React.PropsWithChildren) => {
   const selectedLanguage = useSelectedLanguage();
   const changeLanguage = useChangeLanguage();
   const trackEvent = useTrackEvent();
+  const useUnlimitedApproval = useUseUnlimitedApproval();
+  const [selectedWalletOption, setSelectedWalletOption] = React.useState<WalletOptionValues>(ALL_WALLETS);
   const [showGuardianListSubscribeModal, setShowGuardianListSubscribeModal] = React.useState(false);
   // const switchActiveWalletOnConnection = useSwitchActiveWalletOnConnection();
 
@@ -117,14 +126,16 @@ const Navigation = ({ children }: React.PropsWithChildren) => {
       dispatch(changeRoute('home'));
     } else if (location.pathname.startsWith('/history')) {
       dispatch(changeRoute('history'));
-    } else if (location.pathname.startsWith('/create')) {
-      dispatch(changeRoute('create'));
-    } else if (location.pathname.startsWith('/positions')) {
-      dispatch(changeRoute('positions'));
+    } else if (location.pathname.startsWith('/invest/create')) {
+      dispatch(changeRoute('invest/create'));
+    } else if (location.pathname.startsWith('/invest/positions')) {
+      dispatch(changeRoute('invest/positions'));
     } else if (location.pathname.startsWith('/swap')) {
       dispatch(changeRoute('swap'));
     } else if (location.pathname.startsWith('/transfer')) {
       dispatch(changeRoute('transfer'));
+    } else if (location.pathname.startsWith('/earn')) {
+      dispatch(changeRoute('earn'));
     } else if (location.pathname.startsWith('/settings')) {
       dispatch(changeRoute('settings'));
     } else if (location.pathname.startsWith('/token')) {
@@ -134,12 +145,14 @@ const Navigation = ({ children }: React.PropsWithChildren) => {
 
   const onSectionClick = useCallback(
     (section: Section, openInNewTab?: boolean) => {
-      if (section.type !== SectionType.divider && section.key === EARN_ROUTE.key) {
-        setShowGuardianListSubscribeModal(true);
-      }
+      // TODO: Re-enable for release
+      // if (section.type !== SectionType.divider && section.key === EARN_ROUTE.key) {
+      //   setShowGuardianListSubscribeModal(true);
+      // }
 
       if (
         section.type === SectionType.divider ||
+        section.type === SectionType.group ||
         section.key === currentRoute ||
         NON_NAVIGABLE_ROUTES.includes(section.key)
       ) {
@@ -220,6 +233,11 @@ const Navigation = ({ children }: React.PropsWithChildren) => {
     trackEvent('Main - Click brand logo');
   };
 
+  const onToggleUseUnlimitedApproval = () => {
+    trackEvent('Main - Click use unlimited approval', { oldValue: useUnlimitedApproval });
+    dispatch(setUseUnlimitedApproval(!useUnlimitedApproval));
+  };
+
   const secretMenuOptions: OptionsMenuOption[] =
     SECRET_MENU_CLICKS === secretMenuClicks
       ? [
@@ -265,25 +283,86 @@ const Navigation = ({ children }: React.PropsWithChildren) => {
         onClose={() => setShowGuardianListSubscribeModal(false)}
       />
       <NavigationUI
+        headerContent={
+          <NetWorth
+            variant={NetWorthVariants.nav}
+            walletSelector={{
+              variant: WalletSelectorVariants.main,
+              options: {
+                allowAllWalletsOption: true,
+                onSelectWalletOption: setSelectedWalletOption,
+                selectedWalletOption,
+              },
+            }}
+          />
+        }
         sections={[
           {
-            ...DASHBOARD_ROUTE,
-            label: intl.formatMessage(DASHBOARD_ROUTE.label),
-            type: SectionType.link,
+            type: SectionType.group,
+            label: intl.formatMessage(
+              defineMessage({ description: 'navigation.section.dashboard.title', defaultMessage: 'Dashboard' })
+            ),
+            sections: [
+              {
+                ...DASHBOARD_ROUTE,
+                label: intl.formatMessage(DASHBOARD_ROUTE.label),
+                type: SectionType.link,
+              },
+            ],
           },
           {
-            ...EARN_ROUTE,
-            label: intl.formatMessage(EARN_ROUTE.label),
-            type: SectionType.link,
+            type: SectionType.group,
+            label: intl.formatMessage(
+              defineMessage({
+                description: 'navigation.section.investment.title',
+                defaultMessage: 'Investments & Operations',
+              })
+            ),
+            sections: [
+              // TODO: Re-enable for relase
+              // {
+              //   ...EARN_ROUTE,
+              //   label: intl.formatMessage(EARN_ROUTE.label),
+              //   type: SectionType.link,
+              // },
+              ...((process.env.EARN_ENABLED === 'true'
+                ? [
+                    {
+                      ...EARN_GROUP,
+                      label: intl.formatMessage(EARN_GROUP.label),
+                      type: SectionType.link,
+                      activeKeys: [EARN_ROUTE.key, EARN_PORTFOLIO.key],
+                      options: [
+                        {
+                          ...EARN_ROUTE,
+                          label: intl.formatMessage(EARN_ROUTE.label),
+                          type: SectionType.link,
+                        },
+                        {
+                          ...EARN_PORTFOLIO,
+                          label: intl.formatMessage(EARN_PORTFOLIO.label),
+                          type: SectionType.link,
+                        },
+                      ],
+                    },
+                  ]
+                : [
+                    {
+                      ...EARN_SUBSCRIBE_ROUTE,
+                      label: intl.formatMessage(EARN_SUBSCRIBE_ROUTE.label),
+                      type: SectionType.link,
+                    },
+                  ]) satisfies LinkSection[]),
+              {
+                ...DCA_ROUTE,
+                label: intl.formatMessage(DCA_ROUTE.label),
+                type: SectionType.link,
+                activeKeys: [DCA_ROUTE.key, DCA_CREATE_ROUTE.key],
+              },
+              { ...SWAP_ROUTE, label: intl.formatMessage(SWAP_ROUTE.label), type: SectionType.link },
+              { ...TRANSFER_ROUTE, label: intl.formatMessage(TRANSFER_ROUTE.label), type: SectionType.link },
+            ],
           },
-          {
-            ...DCA_ROUTE,
-            label: intl.formatMessage(DCA_ROUTE.label),
-            type: SectionType.link,
-            activeKeys: [DCA_ROUTE.key, DCA_CREATE_ROUTE.key],
-          },
-          { ...SWAP_ROUTE, label: intl.formatMessage(SWAP_ROUTE.label), type: SectionType.link },
-          { ...TRANSFER_ROUTE, label: intl.formatMessage(TRANSFER_ROUTE.label), type: SectionType.link },
         ]}
         selectedSection={currentRoute}
         onSectionClick={onSectionClick}
@@ -297,6 +376,16 @@ const Navigation = ({ children }: React.PropsWithChildren) => {
             type: OptionsMenuOptionType.option,
           },
           ...languageOptions,
+          {
+            label: intl.formatMessage(
+              defineMessage({ description: 'useUnlimitedApproval', defaultMessage: 'Unlimited Approval' })
+            ),
+            Icon: DollarSquareIcon,
+            onClick: onToggleUseUnlimitedApproval,
+            control: <Switch checked={useUnlimitedApproval} />,
+            closeOnClick: false,
+            type: OptionsMenuOptionType.option,
+          },
           // {
           //   label: intl.formatMessage(
           //     defineMessage({ description: 'showSmallBalances', defaultMessage: 'Show balances < 1 USD' })

@@ -139,7 +139,7 @@ const PositionPermissionsContainer = ({ position, pendingTransaction }: Position
       />
       <Grid container spacing={2} alignItems="stretch">
         <Grid item xs={12}>
-          <Typography variant="h5">
+          <Typography variant="h5Bold">
             <FormattedMessage description="AddressessPermissions" defaultMessage="Permissions on your position:" />
           </Typography>
           <Typography variant="bodyRegular">

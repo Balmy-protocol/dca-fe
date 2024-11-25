@@ -1,7 +1,7 @@
 import React from 'react';
 import { Grid, Typography, colors, StyledNonFormContainer, ContainerBox, InfoCircleIcon, SPACING } from 'ui-library';
 import Portfolio from '../components/portfolio';
-import { ALL_WALLETS, WalletOptionValues } from '@common/components/wallet-selector';
+import { ALL_WALLETS, WalletOptionValues, WalletSelectorVariants } from '@common/components/wallet-selector/types';
 import Activity from '../components/activity';
 import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
@@ -11,15 +11,18 @@ import { changeRoute } from '@state/tabs/actions';
 import { DASHBOARD_ROUTE } from '@constants/routes';
 import NetWorth from '@common/components/net-worth';
 import DcaDashboard from '../components/dca-dashboard';
+import useReplaceHistory from '@hooks/useReplaceHistory';
+import EarnPositionsDashboard from '../components/earn-positions-dashboard';
+import useUserHasPositions from '@hooks/useUserHasPositions';
+import useUserHasEarnPositions from '@hooks/useUserHasEarnPositions';
 import useIsSomeWalletIndexed from '@hooks/useIsSomeWalletIndexed';
 import EarnBanner from '@common/components/news-banners/earn-banner';
 
 const StyledFeatureTitle = styled(Typography).attrs({
-  variant: 'h5Bold',
+  variant: 'h3Bold',
 })`
   ${({ theme: { palette } }) => `
     color: ${colors[palette.mode].typography.typo2};
-    font-weight: bold
   `}
 `;
 
@@ -37,6 +40,19 @@ const StyledContent = styled.div`
   flex: 1;
 `;
 
+const StyledViewportContainer = styled(Grid).attrs({
+  item: true,
+  xs: 12,
+  display: 'flex',
+})`
+  ${({ theme }) => `
+    min-height: 60vh;
+    [${theme.breakpoints.up('md')}] {
+      min-height: 50vh;
+    }
+  `}
+`;
+
 const StyledNonIndexedContainer = styled(ContainerBox).attrs({ gap: 2, alignItems: 'center' })`
   ${({ theme }) => `
     background-color: ${colors[theme.palette.mode].background.secondary};
@@ -50,21 +66,27 @@ const HomeFrame = () => {
   const [selectedWalletOption, setSelectedWalletOption] = React.useState<WalletOptionValues>(ALL_WALLETS);
   const dispatch = useAppDispatch();
   const trackEvent = useTrackEvent();
+  const replaceHistory = useReplaceHistory();
+  const { userHasPositions } = useUserHasPositions();
+  const userHasEarnPositions = useUserHasEarnPositions();
+
   const { isSomeWalletIndexed, hasLoadedEvents } = useIsSomeWalletIndexed(
     selectedWalletOption !== ALL_WALLETS ? selectedWalletOption : undefined
   );
   React.useEffect(() => {
     dispatch(changeRoute(DASHBOARD_ROUTE.key));
+    replaceHistory(`/${DASHBOARD_ROUTE.key}`);
     trackEvent('Home - Visit Dashboard Page');
   }, []);
 
   return (
     <StyledNonFormContainer>
-      <Grid container flexDirection={'column'} gap={10}>
-        <Grid container spacing={8} flexWrap="wrap">
+      <Grid container flexDirection={'column'} gap={8}>
+        <Grid container spacing={6} flexWrap="wrap">
           <Grid item xs={12} md={8} display="flex">
             <NetWorth
               walletSelector={{
+                variant: WalletSelectorVariants.main,
                 options: {
                   allowAllWalletsOption: true,
                   onSelectWalletOption: setSelectedWalletOption,
@@ -77,10 +99,10 @@ const HomeFrame = () => {
             <EarnBanner />
           </Grid>
         </Grid>
-        <Grid container sx={{ flex: 1 }} spacing={8} flexWrap="wrap">
+        <Grid container sx={{ flex: 1 }} spacing={6} flexWrap="wrap">
           <Grid item xs={12} md={8}>
-            <Grid container spacing={8}>
-              <Grid item xs={12} display="flex" sx={{ minHeight: '60vh' }}>
+            <Grid container spacing={6}>
+              <StyledViewportContainer>
                 <StyledContainer>
                   <StyledFeatureTitle>
                     <FormattedMessage description="assets" defaultMessage="Assets" />
@@ -89,17 +111,26 @@ const HomeFrame = () => {
                     <Portfolio selectedWalletOption={selectedWalletOption} />
                   </StyledContent>
                 </StyledContainer>
-              </Grid>
-              <Grid item xs={12} display="flex">
-                <StyledContent>
-                  <DcaDashboard selectedWalletOption={selectedWalletOption} />
-                </StyledContent>
-              </Grid>
+              </StyledViewportContainer>
+              {userHasEarnPositions && (
+                <Grid item xs={12} display="flex">
+                  <StyledContent>
+                    <EarnPositionsDashboard selectedWalletOption={selectedWalletOption} />
+                  </StyledContent>
+                </Grid>
+              )}
+              {userHasPositions && (
+                <Grid item xs={12} display="flex">
+                  <StyledContent>
+                    <DcaDashboard selectedWalletOption={selectedWalletOption} />
+                  </StyledContent>
+                </Grid>
+              )}
             </Grid>
           </Grid>
           <Grid item xs={12} md={4} display="flex">
-            <Grid container rowSpacing={8} alignContent="flex-start">
-              <Grid item xs={12} display="flex" sx={{ height: '60vh' }}>
+            <Grid container rowSpacing={6} alignContent="flex-start">
+              <StyledViewportContainer>
                 <StyledContainer>
                   <StyledFeatureTitle>
                     <FormattedMessage description="activity" defaultMessage="Activity" />
@@ -108,7 +139,7 @@ const HomeFrame = () => {
                     <Activity selectedWalletOption={selectedWalletOption} />
                   </StyledContent>
                 </StyledContainer>
-              </Grid>
+              </StyledViewportContainer>
               {hasLoadedEvents && !isSomeWalletIndexed && (
                 <Grid item xs={12} display="flex">
                   <StyledNonIndexedContainer>
@@ -117,10 +148,7 @@ const HomeFrame = () => {
                       sx={({ palette }) => ({ color: colors[palette.mode].semantic.informative.primary })}
                     />
                     <ContainerBox flexDirection="column" gap={1}>
-                      <Typography
-                        variant="bodySmallRegular"
-                        color={({ palette }) => colors[palette.mode].typography.typo2}
-                      >
+                      <Typography variant="h6Bold" color={({ palette }) => colors[palette.mode].typography.typo3}>
                         <FormattedMessage
                           defaultMessage="Indexing Your Transaction History"
                           description="home.activity.not-indexed.title"
@@ -128,7 +156,7 @@ const HomeFrame = () => {
                       </Typography>
                       <Typography
                         variant="bodySmallRegular"
-                        color={({ palette }) => colors[palette.mode].typography.typo2}
+                        color={({ palette }) => colors[palette.mode].typography.typo3}
                       >
                         <FormattedMessage
                           defaultMessage="We are currently retrieving and organizing your transaction history. This process may take some time."

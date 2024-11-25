@@ -20,3 +20,7 @@ export function useShowBalances() {
 export function useSwitchActiveWalletOnConnection() {
   return useAppSelector((state: RootState) => state.config.switchActiveWalletOnConnection);
 }
+
+export function useUseUnlimitedApproval() {
+  return useAppSelector((state: RootState) => state.config.useUnlimitedApproval);
+}

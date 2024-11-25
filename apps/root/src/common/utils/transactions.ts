@@ -1,9 +1,24 @@
 import { getProtocolToken, getWrappedProtocolToken } from '@common/mocks/tokens';
-import { NewPositionTypeData, Position, Positions, Token, TransactionDetails, TransactionTypes } from '@types';
+import {
+  AmountsOfToken,
+  EarnCreateTypeData,
+  EarnPermission,
+  EarnPositionActionType,
+  NewPositionTypeData,
+  Position,
+  Positions,
+  SavedSdkEarnPosition,
+  SdkEarnPositionId,
+  SdkStrategyToken,
+  Token,
+  TransactionDetails,
+  TransactionTypes,
+} from '@types';
 import { emptyTokenWithAddress, parseNumberUsdPriceToBigInt, parseUsdPrice } from './currency';
 import { sortTokens } from './parsing';
 import { Address, formatUnits, parseUnits } from 'viem';
 import { LATEST_VERSION } from '@constants';
+import { nowInSeconds } from './time';
 
 export const getImpactedTokensByTxType = (tx: TransactionDetails, positions: Positions): Token[] => {
   switch (tx.type) {
@@ -12,6 +27,12 @@ export const getImpactedTokensByTxType = (tx: TransactionDetails, positions: Pos
 
     case TransactionTypes.newPosition:
       return [tx.typeData.from];
+
+    case TransactionTypes.earnCreate:
+    case TransactionTypes.earnIncrease:
+      return [tx.typeData.asset];
+    case TransactionTypes.earnWithdraw:
+      return tx.typeData.withdrawn.map((withdrawn) => withdrawn.token);
 
     case TransactionTypes.wrapEther:
       return [getProtocolToken(tx.chainId), getWrappedProtocolToken(tx.chainId)];
@@ -36,8 +57,6 @@ export const getImpactedTokensByTxType = (tx: TransactionDetails, positions: Pos
       return withdrawnPosition ? [withdrawnPosition.from] : [];
 
     case TransactionTypes.swap:
-    case TransactionTypes.wrap:
-    case TransactionTypes.unwrap:
       const { from, to } = tx.typeData;
       return [from, to];
 
@@ -183,5 +202,97 @@ export const getNewPositionFromTxTypeData = ({
     nextSwapAvailableAt: newPositionTypeData.startedAt,
     permissions: [],
     yields: newPositionTypeData.yields,
+  };
+};
+
+const tokenToSdkStrategyToken = ({ address, decimals, name, symbol, price }: Token): SdkStrategyToken => ({
+  address,
+  decimals,
+  name,
+  symbol,
+  price,
+});
+export const getNewEarnPositionFromTxTypeData = ({
+  newEarnPositionTypeData,
+  depositFee,
+  user,
+  id,
+  transaction,
+  companionAddress,
+}: {
+  newEarnPositionTypeData: EarnCreateTypeData['typeData'];
+  user: Address;
+  id: SdkEarnPositionId;
+  transaction: string;
+  depositFee?: number;
+  companionAddress?: Address;
+}): SavedSdkEarnPosition => {
+  const { asset, assetAmount: assetAmountString, strategyId } = newEarnPositionTypeData;
+  const assetAmount = BigInt(assetAmountString);
+  const depositedAmount = {
+    amount: assetAmount,
+    amountInUnits: formatUnits(assetAmount, asset.decimals),
+    amountInUSD: parseUsdPrice(asset, assetAmount, parseNumberUsdPriceToBigInt(asset.price)).toString(),
+  };
+
+  let depositedAmountWithoutFee: AmountsOfToken | undefined;
+  if (depositFee) {
+    const feeAmount = (depositedAmount.amount * BigInt(depositFee * 100)) / 100000n;
+
+    depositedAmountWithoutFee = {
+      amount: assetAmount - feeAmount,
+      amountInUnits: formatUnits(assetAmount - feeAmount, asset.decimals),
+      amountInUSD: parseUsdPrice(asset, assetAmount - feeAmount, parseNumberUsdPriceToBigInt(asset.price)).toFixed(2),
+    };
+  }
+
+  return {
+    id,
+    createdAt: nowInSeconds(),
+    owner: user,
+    lastUpdatedAt: nowInSeconds(),
+    strategy: strategyId,
+    hasFetchedHistory: false,
+    permissions: companionAddress ? { [companionAddress]: [EarnPermission.INCREASE] } : {},
+    balances: [
+      {
+        token: tokenToSdkStrategyToken(asset),
+        amount: depositedAmountWithoutFee || depositedAmount,
+        profit: {
+          amount: 0n,
+          amountInUnits: '0',
+          amountInUSD: '0',
+        },
+      },
+    ],
+    historicalBalances: [
+      {
+        timestamp: nowInSeconds(),
+        balances: [
+          {
+            token: tokenToSdkStrategyToken(asset),
+            amount: depositedAmountWithoutFee || depositedAmount,
+            profit: {
+              amount: 0n,
+              amountInUnits: '0',
+              amountInUSD: '0',
+            },
+          },
+        ],
+      },
+    ],
+    history: [
+      {
+        action: EarnPositionActionType.CREATED,
+        owner: user,
+        deposited: depositedAmount,
+        assetPrice: asset.price,
+        permissions: {},
+        tx: {
+          hash: transaction,
+          timestamp: nowInSeconds(),
+        },
+      },
+    ],
   };
 };

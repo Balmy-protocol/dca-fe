@@ -63,7 +63,7 @@ const ExplorerItem = ({ network, tokenAddress }: { network: Chain; tokenAddress:
           logoURI: getGhTokenListLogoUrl(network.chainId, 'logo'),
         })}
       />
-      <Typography variant="bodySmallBold" noWrap>
+      <Typography variant="bodySmallSemibold" noWrap>
         {network.name}
       </Typography>
     </StyledExplorerItem>
@@ -98,8 +98,8 @@ const Explorers = ({ token }: { token: Token }) => {
       <Accordion disableGutters defaultExpanded>
         <AccordionSummary>
           <ContainerBox gap={2} alignItems="center">
-            <GlobalIcon fontSize="small" />
-            <Typography variant="bodySemibold">
+            <GlobalIcon sx={({ palette: { mode } }) => ({ color: colors[mode].typography.typo2 })} />
+            <Typography variant="h5Bold">
               <FormattedMessage defaultMessage="Explorers" description="token-profile.explorers" />
             </Typography>
           </ContainerBox>
@@ -122,7 +122,7 @@ const Explorers = ({ token }: { token: Token }) => {
                 <Grid item xs="auto">
                   <Typography
                     variant="bodySmallBold"
-                    color="primary"
+                    color={({ palette }) => ({ color: colors[palette.mode].accentPrimary })}
                     noWrap
                     sx={{ cursor: 'pointer' }}
                     onClick={() => setShowMore(true)}

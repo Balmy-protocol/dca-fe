@@ -72,6 +72,7 @@ export function formatCurrencyAmount({
   maxDecimals = 3,
   intl,
   localize = true,
+  minFractionDigits = 0,
 }: {
   amount: bigint | undefined;
   localize?: boolean;
@@ -79,6 +80,7 @@ export function formatCurrencyAmount({
   sigFigs?: number;
   maxDecimals?: number;
   intl?: ReturnType<typeof useIntl>;
+  minFractionDigits?: number;
 }) {
   if (!amount && amount !== 0n) {
     return '-';
@@ -100,6 +102,7 @@ export function formatCurrencyAmount({
   }
 
   const [int, decimal] = significant.split('.');
+  const paddedDecimal = (decimal || '').padEnd(minFractionDigits, '0');
 
   const formattedInt = intl.formatNumber(BigInt(int), {
     style: 'decimal',
@@ -107,7 +110,7 @@ export function formatCurrencyAmount({
     maximumFractionDigits: 0,
   });
 
-  return `${formattedInt}${decimal ? `${getDecimalSeparator(intl)}${decimal}` : ''}`;
+  return `${formattedInt}${paddedDecimal ? `${getDecimalSeparator(intl)}${paddedDecimal}` : ''}`;
 }
 
 export function formatUsdAmount({ amount, intl }: { amount?: number | string; intl: ReturnType<typeof useIntl> }) {
@@ -115,6 +118,7 @@ export function formatUsdAmount({ amount, intl }: { amount?: number | string; in
     amount: !isUndefined(amount) ? parseUnits((Number(amount) || 0).toFixed(2), 2) : amount,
     token: emptyTokenWithDecimals(2),
     intl,
+    minFractionDigits: 2,
   });
 }
 
@@ -327,11 +331,44 @@ export const amountValidator = ({
   }
 };
 
+export const isSameToken = (tokenA: Token, tokenB: Token) =>
+  tokenA.address === tokenB.address && tokenA.chainId === tokenB.chainId;
+
+export const findEquivalentTokenById = (tokens: Token[], tokenId: string) =>
+  tokens.find((token) =>
+    token.chainAddresses.some((chainToken) => `${chainToken.chainId}-${chainToken.address}` === tokenId)
+  );
+
 export const getIsSameOrTokenEquivalent = (tokenA: Token, tokenB: Token) =>
   (tokenA.address === tokenB.address && tokenA.chainId === tokenB.chainId) ||
   tokenA.chainAddresses.some(
     (chainAddress) => chainAddress.address === tokenB.address && chainAddress.chainId === tokenB.chainId
   );
+
+export const removeEquivalentFromTokensArray = (tokens: Token[]) =>
+  tokens.reduce<Token[]>((acc, token) => {
+    const isSameOrEquivalent = acc.some((addedToken) => getIsSameOrTokenEquivalent(addedToken, token));
+    if (!isSameOrEquivalent) {
+      acc.push(token);
+    }
+    return acc;
+  }, []);
+
+export const findTokenAnyMatch = (list: Token[], tokenString?: string) => {
+  if (!tokenString) return;
+  return (
+    // By tokenId
+    findEquivalentTokenById(list, tokenString.toLowerCase()) ||
+    // By address
+    list.find(
+      (asset) =>
+        asset.address.toLowerCase() === tokenString.toLowerCase() ||
+        asset.chainAddresses.some(({ address }) => address === tokenString.toLowerCase())
+    ) ||
+    // By symbol
+    list.find((asset) => asset.symbol.toLowerCase() === tokenString.toLowerCase())
+  );
+};
 
 export const calculatePercentageChange = (currentPrice?: number, pastPrice?: number) => {
   return currentPrice && pastPrice ? (((currentPrice - pastPrice) / currentPrice) * 100).toFixed(2) : undefined;

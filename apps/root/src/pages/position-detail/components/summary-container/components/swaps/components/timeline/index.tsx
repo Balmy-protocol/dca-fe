@@ -40,6 +40,7 @@ import { ActionTypeAction } from '@balmy/sdk';
 import { usePositionPrices } from '@state/position-details/hooks';
 import { compact } from 'lodash';
 import TokenIcon from '@common/components/token-icon';
+import { StyledTimelineIcon } from '@common/components/timeline-controls/timeline';
 
 const StyledLink = styled(Link)<{ $isFirst?: boolean }>`
   margin: ${({ $isFirst }) => ($isFirst ? '0px 5px 0px 0px' : '0px 5px')};
@@ -80,46 +81,6 @@ const StyledTitleEnd = styled.div`
   justify-content: flex-end;
 `;
 
-const StyledTimelineIcon = styled.div`
-  ${({
-    theme: {
-      palette: { mode },
-      spacing,
-    },
-  }) => `
-    position: absolute;
-    color: ${colors[mode].accent.accent600};
-    left: -${spacing(7.5)};
-    top: 0px;
-    width: ${spacing(15)};
-    height: ${spacing(15)};
-    border-radius: 50%;
-    text-align: center;
-    border: 1px solid ${colors[mode].border.border1};
-    background: ${colors[mode].background.secondary};
-
-    i, .MuiSkeleton-root {
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, -50%);
-    }
-
-    svg {
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, -50%);
-    }
-
-    img {
-      width: 100%;
-      height: 100%;
-      border-radius: 50%;
-    }
-  `}
-`;
-
 const StyledTimelineContent = styled.div`
   ${({ theme: { spacing } }) => `
     padding: 0px 0px 0px ${spacing(13)};
@@ -136,7 +97,7 @@ const StyledTimelineContentTitle = styled(Grid)`
   align-items: center;
 `;
 
-const StyledTitleDate = styled(Typography).attrs(() => ({ variant: 'bodySmallLabel' }))``;
+const StyledTitleDate = styled(Typography).attrs(() => ({ variant: 'labelRegular' }))``;
 
 const ItemAmount = styled(Typography).attrs(() => ({ variant: 'bodyBold' }))``;
 const ItemAmountText = styled(Typography).attrs(() => ({ variant: 'bodyRegular' }))``;
@@ -159,7 +120,7 @@ const ItemTitle = styled(Typography).attrs(
     theme: {
       palette: { mode },
     },
-  }) => ({ variant: 'bodySmallLabel', color: colors[mode].typography.typo2 })
+  }) => ({ variant: 'labelRegular', color: colors[mode].typography.typo2 })
 )``;
 const ItemSubTitle = styled(Typography).attrs(
   ({

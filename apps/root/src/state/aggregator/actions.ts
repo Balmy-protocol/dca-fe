@@ -3,6 +3,8 @@ import { SwapOptionWithFailure, Token } from '@types';
 
 export const setFromValue = createAction<{ value: string; updateMode?: boolean }>('aggregator/setFromValue');
 
+export const setCleared = createAction<boolean>('aggregator/setCleared');
+
 export const setToValue = createAction<{ value: string; updateMode?: boolean }>('aggregator/setToValue');
 
 export const setFrom = createAction<Token | null>('aggregator/setFrom');

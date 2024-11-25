@@ -6,7 +6,7 @@ import TokenIcon from '@common/components/token-icon';
 import { ContainerBox, Skeleton, Tooltip, Typography } from 'ui-library';
 import ComposedTokenIcon from '@common/components/composed-token-icon';
 import { useIntl } from 'react-intl';
-import { BalanceToken } from '../portfolio';
+import { BalanceToken } from '@hooks/useMergedTokensBalances';
 
 const StyledAssetLogosContainer = styled(ContainerBox).attrs({ flexDirection: 'column' })<{ $center: boolean }>`
   ${({ $center }) => `
@@ -26,15 +26,29 @@ const StyledNetworkLogosContainer = styled.div`
   bottom: -4px;
 `;
 
-const TokenNetworksTooltipTitle = ({ balanceTokens }: { balanceTokens: BalanceToken[] }) => {
+export const TokenNetworksTooltipTitle = ({
+  balanceTokens,
+  isTokenBreakdown,
+}: {
+  balanceTokens: BalanceToken[];
+  isTokenBreakdown?: boolean;
+}) => {
   const intl = useIntl();
 
   return (
     <ContainerBox flexDirection="column" gap={1}>
       {balanceTokens.map((chainData, index) => (
         <ContainerBox key={index} gap={1} alignItems="center" justifyContent="start">
-          <TokenIcon token={toToken({ logoURI: getGhTokenListLogoUrl(chainData.token.chainId, 'logo') })} size={3.5} />
-          <Typography variant="bodySmallLabel">
+          <TokenIcon
+            border
+            token={
+              isTokenBreakdown
+                ? chainData.token
+                : toToken({ logoURI: getGhTokenListLogoUrl(chainData.token.chainId, 'logo') })
+            }
+            size={3.5}
+          />
+          <Typography variant="labelRegular">
             {`${formatCurrencyAmount({
               amount: chainData.balance,
               token: chainData.token,
@@ -42,7 +56,7 @@ const TokenNetworksTooltipTitle = ({ balanceTokens }: { balanceTokens: BalanceTo
               intl,
             })}`}
           </Typography>
-          <Typography variant="bodySmallLabel">
+          <Typography variant="labelRegular">
             {chainData.isLoadingPrice ? (
               <Skeleton width="3ch" />
             ) : (
@@ -55,7 +69,13 @@ const TokenNetworksTooltipTitle = ({ balanceTokens }: { balanceTokens: BalanceTo
   );
 };
 
-const TokenIconMultichain = ({ balanceTokens }: { balanceTokens: BalanceToken[] }) => {
+const TokenIconMultichain = ({
+  balanceTokens,
+  withShadow,
+}: {
+  balanceTokens: BalanceToken[];
+  withShadow?: boolean;
+}) => {
   const orderedBalanceTokens = balanceTokens.sort((a, b) => Number((b.balanceUsd ?? 0) - (a.balanceUsd ?? 0)));
 
   const itemWithTokenIcon = orderedBalanceTokens.find((chainData) => chainData.token.logoURI) || balanceTokens[0];
@@ -68,9 +88,9 @@ const TokenIconMultichain = ({ balanceTokens }: { balanceTokens: BalanceToken[] 
   return (
     <Tooltip title={<TokenNetworksTooltipTitle balanceTokens={balanceTokens} />}>
       <StyledAssetLogosContainer $center={networkTokens.length === 2}>
-        <TokenIcon token={itemWithTokenIcon?.token} size={8} />
+        <TokenIcon token={itemWithTokenIcon?.token} size={8} withShadow={withShadow} />
         <StyledNetworkLogosContainer>
-          <ComposedTokenIcon size={3.5} tokens={networkTokens} overlapRatio={0.6} marginRight={1.75} withShadow />
+          <ComposedTokenIcon size={3.5} tokens={networkTokens} overlapRatio={0.75} marginRight={1.75} withShadow />
         </StyledNetworkLogosContainer>
       </StyledAssetLogosContainer>
     </Tooltip>

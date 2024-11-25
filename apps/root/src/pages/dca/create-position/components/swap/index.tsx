@@ -1,5 +1,5 @@
 import React from 'react';
-import { parseUnits, formatUnits, Address } from 'viem';
+import { parseUnits, formatUnits, Address, Hash } from 'viem';
 import styled from 'styled-components';
 import {
   Token,
@@ -13,7 +13,7 @@ import {
   TransactionActionApproveTokenSignDCAData,
   TransactionApplicationIdentifier,
 } from '@types';
-import { Typography, Grid, BackgroundPaper, ContainerBox, colors, CalendarMonthIcon } from 'ui-library';
+import { Typography, BackgroundPaper, ContainerBox, colors, CalendarMonthIcon } from 'ui-library';
 import TokenPicker from '../token-picker';
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
 import find from 'lodash/find';
@@ -79,23 +79,9 @@ const StyledFrequentRecipient = styled(ContainerBox).attrs({ gap: 6, justifyCont
   margin-top: ${({ theme: { spacing } }) => spacing(6)};
 `;
 
-export const StyledContentContainer = styled.div`
-  padding: 16px;
-  border-radius: 8px;
-`;
-
 const StyledPaper = styled(BackgroundPaper)`
   position: relative;
   backdrop-filter: blur(2px);
-`;
-
-export const StyledGrid = styled(Grid)<{ $show: boolean; $zIndex: number }>`
-  ${({ $show }) => !$show && 'position: absolute;width: auto;'};
-  ${({ $zIndex }) => `z-index: ${$zIndex};`}
-  top: 16px;
-  left: 16px;
-  right: 16px;
-  z-index: 90;
 `;
 
 const sellMessage = <FormattedMessage description="You sell" defaultMessage="You sell" />;
@@ -128,7 +114,7 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
   const [shouldShowSteps, setShouldShowSteps] = React.useState(false);
   const [transactionsToExecute, setTransactionsToExecute] = React.useState<TransactionStep[]>([]);
   const [shouldShowConfirmation, setShouldShowConfirmation] = React.useState(false);
-  const [currentTransaction, setCurrentTransaction] = React.useState('');
+  const [currentTransaction, setCurrentTransaction] = React.useState<{ hash: Hash; chainId: number } | undefined>();
   const currentFullTransaction = useTransaction(currentTransaction);
   const intl = useIntl();
   const canUsePermit2 = useSupportsSigning();
@@ -229,7 +215,7 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
       dispatch(setFrequencyType(ONE_DAY));
     }
 
-    replaceHistory(`/create/${currentNetwork.chainId}/${newFrom.address}/${to?.address || ''}`);
+    replaceHistory(`/invest/create/${currentNetwork.chainId}/${newFrom.address}/${to?.address || ''}`);
     trackEvent('DCA - Set from', { fromAddress: newFrom?.address, toAddress: to?.address });
   };
   const onSetTo = (newTo: Token) => {
@@ -238,7 +224,7 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
       dispatch(setFrequencyType(ONE_DAY));
     }
     if (from) {
-      replaceHistory(`/create/${currentNetwork.chainId}/${from.address || ''}/${newTo.address}`);
+      replaceHistory(`/invest/create/${currentNetwork.chainId}/${from.address || ''}/${newTo.address}`);
     }
     trackEvent('DCA - Set to', { fromAddress: from?.address, toAddress: newTo?.address });
   };
@@ -300,6 +286,7 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
             ...newSteps[approveIndex],
             done: true,
             hash: result.hash,
+            chainId: result.chainId,
           };
         }
 
@@ -334,6 +321,11 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
 
   const handleSwap = async () => {
     if (!from || !to || !activeWallet?.address) return;
+
+    const hubAddress = contractService.getHUBAddress(currentNetwork.chainId);
+    const companionAddress = contractService.getHUBCompanionAddress(currentNetwork.chainId);
+    if (!hubAddress || !companionAddress) return;
+
     const fromSymbol = from.symbol;
 
     try {
@@ -385,9 +377,6 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
         });
       } catch {}
 
-      const hubAddress = contractService.getHUBAddress(currentNetwork.chainId);
-      const companionAddress = contractService.getHUBCompanionAddress(currentNetwork.chainId);
-
       addTransaction(result, {
         type: TransactionTypes.newPosition,
         typeData: {
@@ -424,6 +413,7 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
           newSteps[index] = {
             ...newSteps[index],
             hash: result.hash,
+            chainId: result.chainId,
             done: true,
           };
 
@@ -434,7 +424,10 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
       setShowFirstStep(false);
       setShouldShowConfirmation(true);
       setShouldShowSteps(false);
-      setCurrentTransaction(result.hash);
+      setCurrentTransaction({
+        hash: result.hash,
+        chainId: result.chainId,
+      });
       dispatch(setFromValue(''));
       dispatch(setRate('0'));
       dispatch(setToYield({ option: null, manualUpdate: false }));
@@ -489,6 +482,11 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
 
   const handleSafeApproveAndSwap = async () => {
     if (!from || !to || !loadedAsSafeApp || !activeWallet?.address) return;
+
+    const hubAddress = contractService.getHUBAddress(currentNetwork.chainId);
+    const companionAddress = contractService.getHUBCompanionAddress(currentNetwork.chainId);
+    if (!hubAddress || !companionAddress) return;
+
     const fromSymbol = from.symbol;
 
     try {
@@ -516,8 +514,6 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
         shouldEnableYield ? toYield?.tokenAddress : undefined
       );
       trackEvent('DCA - Safe approve and create position submitted');
-      const hubAddress = contractService.getHUBAddress(currentNetwork.chainId);
-      const companionAddress = contractService.getHUBCompanionAddress(currentNetwork.chainId);
 
       addTransaction(
         {
@@ -555,7 +551,10 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
       setShowFirstStep(false);
       setShouldShowConfirmation(true);
       setShouldShowSteps(false);
-      setCurrentTransaction(result.safeTxHash);
+      setCurrentTransaction({
+        hash: result.safeTxHash as Hash,
+        chainId: currentNetwork.chainId,
+      });
       dispatch(setFromValue(''));
       dispatch(setRate('0'));
       dispatch(setToYield({ option: null, manualUpdate: false }));
@@ -786,6 +785,7 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
     if (!isApproved) {
       newSteps.push({
         hash: '',
+        chainId: currentNetwork.chainId,
         onAction: (amount) => handleApproveToken(amount),
         checkForPending: false,
         done: false,
@@ -821,6 +821,7 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
 
     newSteps.push({
       hash: '',
+      chainId: currentNetwork.chainId,
       onAction: handleSignPermit2Approval,
       checkForPending: false,
       done: false,
@@ -840,6 +841,7 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
 
     newSteps.push({
       hash: '',
+      chainId: currentNetwork.chainId,
       onAction: handleSwap,
       checkForPending: true,
       done: false,
@@ -945,7 +947,7 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
         <TransactionConfirmation
           shouldShow={shouldShowConfirmation}
           transaction={currentTransaction}
-          showBalanceChanges={false}
+          showWalletBalanceChanges={false}
           successSubtitle={
             <FormattedMessage
               description="positionCreationSuccessfulDescription"

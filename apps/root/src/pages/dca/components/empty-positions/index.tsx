@@ -44,7 +44,7 @@ const EmptyPositions = () => {
     <StyledCard variant="outlined">
       <ContainerBox flexGrow={1} justifyContent="center" alignItems="center" flexDirection="column" gap={6}>
         <ContainerBox flexDirection="column" gap={2} alignItems="center" justifyContent="center">
-          <Typography variant="h5" fontWeight={500}>
+          <Typography variant="h5Bold">
             <FormattedMessage description="createPositionPositionListTitle" defaultMessage="Balmy’s DCA" />
           </Typography>
           <Typography variant="bodyRegular">

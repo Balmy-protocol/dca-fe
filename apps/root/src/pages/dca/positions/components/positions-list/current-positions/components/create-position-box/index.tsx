@@ -13,12 +13,13 @@ const StyledContainer = styled(ContainerBox)`
     theme: {
       palette: { mode },
       spacing,
+      space,
     },
   }) => `
     border-radius: ${spacing(4)};
-    gap: ${spacing(4)};
+    gap: ${space.s05};
     border: ${spacing(0.625)} dashed ${colors[mode].border.border1};
-    padding: ${spacing(5)};
+    padding: ${space.s05};
   `}
 `;
 
@@ -36,10 +37,10 @@ const CreatePositionBox = () => {
   return (
     <StyledContainer flexGrow={1} justifyContent="center" alignItems="center" flexDirection="column">
       <ContainerBox flexDirection="column" gap={2} alignItems="center" justifyContent="center">
-        <Typography variant="h5" fontWeight={500}>
+        <Typography variant="h4Bold">
           <FormattedMessage description="createPositionPositionListTitle" defaultMessage="Balmy’s DCA" />
         </Typography>
-        <Typography variant="bodyBold">
+        <Typography variant="bodyRegular">
           <FormattedMessage
             description="createPositionPositionListSubtitle"
             defaultMessage="Spread your investment and earn yields."

@@ -3,18 +3,17 @@ import { buildTypographyVariant } from './typography';
 import { darkModePallete, lightModePallete } from './pallete';
 import { lightModeComponents, darkModeComponents } from './components';
 export { colors, baseColors } from './colors';
-import { DEFAULT_SPACING, DEFAULT_BORDER_RADIUS } from './constants';
 export { SPACING } from './constants';
+import { DEFAULT_SPACING, DEFAULT_BORDER_RADIUS, baseSpacingScale } from './constants';
 
 const baseThemeDefinition = {
   palette: darkModePallete,
   spacing: DEFAULT_SPACING,
+  space: baseSpacingScale,
   shape: {
     borderRadius: DEFAULT_BORDER_RADIUS,
   },
 };
-
-export const baseTheme = createTheme(baseThemeDefinition);
 
 export const darkTheme = createTheme({
   ...baseThemeDefinition,

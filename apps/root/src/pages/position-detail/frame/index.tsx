@@ -16,6 +16,7 @@ import PositionSummaryContainer from '../components/summary-container';
 import { DCA_ROUTE } from '@constants/routes';
 import PositionWarning from '@pages/dca/positions/components/positions-list/position-card/components/position-warning';
 import useWallets from '@hooks/useWallets';
+import { EmptyPosition } from '@common/mocks/currentPositions';
 
 const PositionDetailFrame = () => {
   const { positionId, chainId, positionVersion } = useParams<{
@@ -53,28 +54,30 @@ const PositionDetailFrame = () => {
 
   const onBackToPositions = () => {
     dispatch(changeRoute(DCA_ROUTE.key));
-    pushToHistory('/positions');
+    pushToHistory('/invest/positions');
     trackEvent('DCA - Go back to positions');
   };
 
   return (
-    <Grid container rowSpacing={6}>
+    <Grid container rowSpacing={8}>
       <Grid item xs={12}>
-        <ContainerBox justifyContent="space-between">
-          <ContainerBox flexDirection="column" gap={4}>
-            <BackControl
-              onClick={onBackToPositions}
-              label={intl.formatMessage(defineMessage({ defaultMessage: 'Back', description: 'back' }))}
+        <ContainerBox flexDirection="column" gap={4}>
+          <BackControl
+            onClick={onBackToPositions}
+            label={intl.formatMessage(defineMessage({ defaultMessage: 'Back', description: 'back' }))}
+          />
+          {/* This is to make sure the controls are aligned with the title since the buttons make the container grow to 44px, but without them it would be 38.4px */}
+          <ContainerBox gap={2} justifyContent="space-between" alignItems="flex-end" style={{ minHeight: '44px' }}>
+            <Typography variant="h2Bold">
+              <FormattedMessage description="positionPerformance" defaultMessage="Position Performance" />
+            </Typography>
+            <PositionControls
+              show={!!position && position.status !== 'TERMINATED' && ownerWallet?.status === WalletStatus.connected}
+              position={position || EmptyPosition}
+              pendingTransaction={pendingTransaction}
+              ownerWallet={ownerWallet}
             />
-            <ContainerBox gap={2}>
-              <Typography variant="h3">
-                <FormattedMessage description="positionPerformance" defaultMessage="Position Performance" />
-              </Typography>
-            </ContainerBox>
           </ContainerBox>
-          {position && position.status !== 'TERMINATED' && ownerWallet?.status === WalletStatus.connected && (
-            <PositionControls position={position} pendingTransaction={pendingTransaction} ownerWallet={ownerWallet} />
-          )}
         </ContainerBox>
       </Grid>
       <Grid item xs={12}>
