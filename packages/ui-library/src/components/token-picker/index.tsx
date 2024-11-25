@@ -81,6 +81,8 @@ const StyledForegroundPaper = styled(ForegroundPaper)`
     gap: ${spacing(1)};
     padding: ${spacing(3)};
     border-radius: ${spacing(2)};
+    border: 1px solid ${colors[mode].border.border2};
+    backgroundColor: ${colors[mode].background.secondary};
     :hover {
       background-color: ${colors[mode].background.emphasis};
     }

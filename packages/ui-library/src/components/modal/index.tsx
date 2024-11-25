@@ -56,7 +56,7 @@ const StyledDialog = styled(Dialog)``;
 
 const StyledPaperModal = styled(ForegroundPaper)`
   ${({ theme: { palette, space } }) => `
-    background-color: ${colors[palette.mode].background.tertiary};
+    background-color: ${colors[palette.mode].background.modals};
     padding: ${space.s07};
     gap: ${space.s05};
     margin: 0;

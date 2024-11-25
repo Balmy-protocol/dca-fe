@@ -123,6 +123,7 @@ export const colors = {
       tertiary: '#2b1e3e',
       quartery: 'rgba(24, 17, 34, 0.3000)',
       emphasis: '#2B1E3E',
+      modals: '#1F162D',
     },
     aqua: {
       aqua100: baseColors.aqua.aqua900,
@@ -224,6 +225,7 @@ export const colors = {
       tertiary: '#f9f7fc',
       quartery: 'rgba(244, 242, 247, 0.4000)',
       emphasis: '#edebf0',
+      modals: '#F9F7FC',
     },
     aqua: {
       aqua100: baseColors.aqua.aqua100,
