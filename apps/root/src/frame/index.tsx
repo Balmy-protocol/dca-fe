@@ -134,13 +134,17 @@ const AppFrame = ({ config: { wagmiClient } }: AppFrameProps) => {
                                 <Route path={path} key={i} element={<Home />} />
                               ))}
                               <Route path="/history" element={<History />} />
-                              <Route path="/earn" element={<EarnHome />} />
-                              <Route path="/earn/:assetTokenId?/:rewardTokenId?" element={<EarnHome />} />
-                              <Route path={`/${EARN_PORTFOLIO.key}`} element={<EarnPortfolio />} />
-                              <Route
-                                path="/earn/vaults/:chainId/:strategyGuardianId"
-                                element={<StrategyGuardianDetail />}
-                              />
+                              {process.env.EARN_ENABLED === 'true' && (
+                                <>
+                                  <Route path="/earn" element={<EarnHome />} />
+                                  <Route path="/earn/:assetTokenId?/:rewardTokenId?" element={<EarnHome />} />
+                                  <Route path={`/${EARN_PORTFOLIO.key}`} element={<EarnPortfolio />} />
+                                  <Route
+                                    path="/earn/vaults/:chainId/:strategyGuardianId"
+                                    element={<StrategyGuardianDetail />}
+                                  />
+                                </>
+                              )}
                               <Route path="/invest/positions/:positionId" element={<PositionDetail />} />
                               {/* // TODO: Remove this route below it's no longer used (@mixpanel) */}
                               <Route

@@ -9,6 +9,7 @@ import {
   EARN_PORTFOLIO,
   EARN_GROUP,
   NON_NAVIGABLE_ROUTES,
+  EARN_SUBSCRIBE_ROUTE,
 } from '@constants/routes';
 import { useAppDispatch } from '@hooks/state';
 import usePushToHistory from '@hooks/usePushToHistory';
@@ -35,6 +36,7 @@ import {
   TrashIcon,
   MovingStarIcon,
   DollarSquareIcon,
+  LinkSection,
 } from 'ui-library';
 // import { setSwitchActiveWalletOnConnectionThunk, toggleTheme } from '@state/config/actions';
 // import { useSwitchActiveWalletOnConnection, useThemeMode } from '@state/config/hooks';
@@ -323,24 +325,34 @@ const Navigation = ({ children }: React.PropsWithChildren) => {
               //   label: intl.formatMessage(EARN_ROUTE.label),
               //   type: SectionType.link,
               // },
-              {
-                ...EARN_GROUP,
-                label: intl.formatMessage(EARN_GROUP.label),
-                type: SectionType.link,
-                activeKeys: [EARN_ROUTE.key, EARN_PORTFOLIO.key],
-                options: [
-                  {
-                    ...EARN_ROUTE,
-                    label: intl.formatMessage(EARN_ROUTE.label),
-                    type: SectionType.link,
-                  },
-                  {
-                    ...EARN_PORTFOLIO,
-                    label: intl.formatMessage(EARN_PORTFOLIO.label),
-                    type: SectionType.link,
-                  },
-                ],
-              },
+              ...((process.env.EARN_ENABLED === 'true'
+                ? [
+                    {
+                      ...EARN_GROUP,
+                      label: intl.formatMessage(EARN_GROUP.label),
+                      type: SectionType.link,
+                      activeKeys: [EARN_ROUTE.key, EARN_PORTFOLIO.key],
+                      options: [
+                        {
+                          ...EARN_ROUTE,
+                          label: intl.formatMessage(EARN_ROUTE.label),
+                          type: SectionType.link,
+                        },
+                        {
+                          ...EARN_PORTFOLIO,
+                          label: intl.formatMessage(EARN_PORTFOLIO.label),
+                          type: SectionType.link,
+                        },
+                      ],
+                    },
+                  ]
+                : [
+                    {
+                      ...EARN_SUBSCRIBE_ROUTE,
+                      label: intl.formatMessage(EARN_SUBSCRIBE_ROUTE.label),
+                      type: SectionType.link,
+                    },
+                  ]) satisfies LinkSection[]),
               {
                 ...DCA_ROUTE,
                 label: intl.formatMessage(DCA_ROUTE.label),

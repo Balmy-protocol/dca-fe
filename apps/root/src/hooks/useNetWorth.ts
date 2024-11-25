@@ -174,8 +174,9 @@ const useNetWorth = ({ walletSelector, chainId, tokens }: NetWorthProps) => {
     return depositedTokensValue + delayedTokensValue;
   }, [tokens, userStrategies, walletSelector, chainId, walletAddressToEvaluate]);
 
+  const isEarnEnabled = process.env.EARN_ENABLED === 'true';
   const isLoadingSomePrices =
-    (activeWallet && (!hasFetchedCurrentPositions || !hasFetchedUserStrategies)) ||
+    (activeWallet && (!hasFetchedCurrentPositions || (isEarnEnabled && !hasFetchedUserStrategies))) ||
     isLoadingAllBalances ||
     Object.values(allBalances).some(
       (balances) =>
