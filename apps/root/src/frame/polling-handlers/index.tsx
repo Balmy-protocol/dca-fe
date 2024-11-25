@@ -10,7 +10,7 @@ const PollingHandlers = () => (
     <TransactionUpdater />
     <BalancesUpdater />
     <NetworkUpdater />
-    {(process.env.EARN_ENABLED === 'true' && <EarnPositionsUpdater />) ?? null}
+    {(process.env.EARN_ENABLED === 'true' && <EarnPositionsUpdater />) || null}
   </>
 );
 

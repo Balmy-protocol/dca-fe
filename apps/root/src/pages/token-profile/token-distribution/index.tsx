@@ -168,6 +168,7 @@ const TokenDistributionLabelsSkeleton = () => (
   </>
 );
 
+const DATA_KEYS_TO_SHOW = ['wallet', 'dca', ...(process.env.EARN_ENABLED === 'true' ? ['earn'] : [])].filter(Boolean);
 const TokenDistribution = ({ token }: TokenDistributionProps) => {
   const { assetsTotalValue, totalAssetValue, isLoadingAllBalances, isLoadingSomePrices } = useNetWorth({
     walletSelector: 'allWallets',
@@ -192,7 +193,7 @@ const TokenDistribution = ({ token }: TokenDistributionProps) => {
         },
       ]
     : Object.entries(assetsTotalValue)
-        .filter(([, balance]) => balance > 0)
+        .filter(([entryKey, balance]) => balance > 0 && DATA_KEYS_TO_SHOW.includes(entryKey))
         .map(([entryKey, balance], index) => ({
           name: entryKey,
           value: balance,
