@@ -6,7 +6,14 @@ import useTrackEvent from '@hooks/useTrackEvent';
 import useTransactionsHistory from '@hooks/useTransactionsHistory';
 import { useAppDispatch } from '@state/hooks';
 import { changeRoute } from '@state/tabs/actions';
-import { SetStateCallback, TransactionEvent, TransactionEventTypes, TransactionStatus, UserStatus } from 'common-types';
+import {
+  SetStateCallback,
+  StrategyId,
+  TransactionEvent,
+  TransactionEventTypes,
+  TransactionStatus,
+  UserStatus,
+} from 'common-types';
 import { FormattedMessage, useIntl } from 'react-intl';
 import {
   Button,
@@ -314,8 +321,17 @@ const Activity = ({ selectedWalletOption }: ActivityProps) => {
     ({ chainId, positionId, hub }: { chainId: number; hub: string; positionId: number }) => {
       const version = findHubAddressVersion(hub);
       pushToHistory(`/invest/positions/${chainId}/${version}/${positionId}`);
+      trackEvent('Home - Tx Receipt - View position');
     },
-    [pushToHistory]
+    [pushToHistory, trackEvent]
+  );
+
+  const onGoToEarnPosition = React.useCallback(
+    ({ chainId, strategyId }: { chainId: number; strategyId: StrategyId }) => {
+      pushToHistory(`/earn/vaults/${chainId}/${strategyId}`);
+      trackEvent('Home - Tx Receipt - View earn position');
+    },
+    [pushToHistory, trackEvent]
   );
 
   const context = React.useMemo(
@@ -330,6 +346,7 @@ const Activity = ({ selectedWalletOption }: ActivityProps) => {
         open={!isUndefined(showReceipt)}
         onClose={() => setShowReceipt(undefined)}
         onClickPositionId={onGoToPosition}
+        onClickEarnPositionId={onGoToEarnPosition}
         showBalances={showBalances}
       />
       <StyledPaper variant="outlined">

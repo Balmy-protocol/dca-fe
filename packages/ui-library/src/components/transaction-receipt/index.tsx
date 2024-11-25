@@ -8,7 +8,7 @@ import React from 'react';
 import { createStyles } from '../../common';
 import { IconButton } from '../iconbutton';
 import { withStyles } from 'tss-react/mui';
-import { AmountsOfToken, TokenWithIcon, TransactionEventTypes } from 'common-types';
+import { AmountsOfToken, StrategyId, TokenWithIcon, TransactionEventTypes } from 'common-types';
 import { Typography, TypographyProps } from '../typography';
 import { useTheme } from '@mui/material';
 import { FormattedMessage, IntlShape, useIntl } from 'react-intl';
@@ -38,6 +38,7 @@ import {
   TransactionReceiptProp,
   EarnClaimDelayedWithdrawReceipt,
   EarnSpecialWithdrawReceipt,
+  EarnTransactionReceiptProp,
 } from './types';
 import { HiddenNumber } from '../hidden-number';
 
@@ -210,6 +211,7 @@ interface TransactionReceiptProps {
   open: boolean;
   onClose: () => void;
   onClickPositionId?: ({ chainId, positionId, hub }: { chainId: number; hub: string; positionId: number }) => void;
+  onClickEarnPositionId?: ({ chainId, strategyId }: { chainId: number; strategyId: StrategyId }) => void;
   showBalances?: boolean;
 }
 
@@ -857,9 +859,64 @@ const buildDcaTransactionReceiptForEvent = (
   );
 };
 
+const buildEarnTransactionReceiptForEvent = (
+  earnTransaction: EarnTransactionReceiptProp,
+  onClickEarnPositionId?: TransactionReceiptProps['onClickEarnPositionId'],
+  showBalances = true
+) => {
+  let earnReceipt: React.ReactElement;
+  switch (earnTransaction.type) {
+    case TransactionEventTypes.EARN_CREATED:
+      earnReceipt = <EarnDepositTransactionReceipt transaction={earnTransaction} showBalances={showBalances} />;
+      break;
+    case TransactionEventTypes.EARN_INCREASE:
+      earnReceipt = <EarnIncreaseTransactionReceipt transaction={earnTransaction} showBalances={showBalances} />;
+      break;
+    case TransactionEventTypes.EARN_WITHDRAW:
+      earnReceipt = <EarnWithdrawTransactionReceipt transaction={earnTransaction} showBalances={showBalances} />;
+      break;
+    case TransactionEventTypes.EARN_SPECIAL_WITHDRAW:
+      earnReceipt = <EarnSpecialWithdrawTransactionReceipt transaction={earnTransaction} showBalances={showBalances} />;
+      break;
+    case TransactionEventTypes.EARN_CLAIM_DELAYED_WITHDRAW:
+      earnReceipt = (
+        <EarnClaimDelayedWithdrawTransactionReceipt transaction={earnTransaction} showBalances={showBalances} />
+      );
+      break;
+  }
+
+  const positionIdNumber = earnTransaction.data.positionId.split('-')[2];
+
+  return (
+    <>
+      {earnReceipt}
+      {positionIdNumber && (
+        <StyledSectionContent>
+          <Typography variant="labelRegular">
+            <FormattedMessage description="TransactionReceipt-transactionEarnPosition-Link" defaultMessage="Position" />
+          </Typography>
+          <StyledPositionId
+            onClick={() =>
+              onClickEarnPositionId &&
+              onClickEarnPositionId({
+                chainId: earnTransaction.tx.chainId,
+                strategyId: earnTransaction.data.strategyId,
+              })
+            }
+            $allowClick={!!onClickEarnPositionId}
+          >
+            <StyledBodySmallBold>#{positionIdNumber}</StyledBodySmallBold>
+          </StyledPositionId>
+        </StyledSectionContent>
+      )}
+    </>
+  );
+};
+
 const buildTransactionReceiptForEvent = (
   transaction: TransactionReceiptProp,
   onClickPositionId?: TransactionReceiptProps['onClickPositionId'],
+  onClickEarnPositionId?: TransactionReceiptProps['onClickEarnPositionId'],
   showBalances = true
 ) => {
   switch (transaction.type) {
@@ -869,18 +926,14 @@ const buildTransactionReceiptForEvent = (
       return <ERC20TransferTransactionReceipt transaction={transaction} showBalances={showBalances} />;
     case TransactionEventTypes.SWAP:
       return <SwapTransactionReceipt transaction={transaction} showBalances={showBalances} />;
-    case TransactionEventTypes.EARN_CREATED:
-      return <EarnDepositTransactionReceipt transaction={transaction} showBalances={showBalances} />;
-    case TransactionEventTypes.EARN_INCREASE:
-      return <EarnIncreaseTransactionReceipt transaction={transaction} showBalances={showBalances} />;
     case TransactionEventTypes.NATIVE_TRANSFER:
       return <NativeTransferTransactionReceipt transaction={transaction} showBalances={showBalances} />;
+    case TransactionEventTypes.EARN_CREATED:
+    case TransactionEventTypes.EARN_INCREASE:
     case TransactionEventTypes.EARN_WITHDRAW:
-      return <EarnWithdrawTransactionReceipt transaction={transaction} showBalances={showBalances} />;
     case TransactionEventTypes.EARN_SPECIAL_WITHDRAW:
-      return <EarnSpecialWithdrawTransactionReceipt transaction={transaction} showBalances={showBalances} />;
     case TransactionEventTypes.EARN_CLAIM_DELAYED_WITHDRAW:
-      return <EarnClaimDelayedWithdrawTransactionReceipt transaction={transaction} showBalances={showBalances} />;
+      return buildEarnTransactionReceiptForEvent(transaction, onClickEarnPositionId, showBalances);
     case TransactionEventTypes.DCA_WITHDRAW:
     case TransactionEventTypes.DCA_MODIFIED:
     case TransactionEventTypes.DCA_CREATED:
@@ -897,6 +950,7 @@ const TransactionReceipt = ({
   open,
   onClose,
   onClickPositionId,
+  onClickEarnPositionId,
   showBalances = true,
 }: TransactionReceiptProps) => {
   const { spacing } = useTheme();
@@ -941,7 +995,7 @@ const TransactionReceipt = ({
             })}
           </StyledBodySmallBold>
         </StyledSectionContent>
-        {buildTransactionReceiptForEvent(transaction, onClickPositionId, showBalances)}
+        {buildTransactionReceiptForEvent(transaction, onClickPositionId, onClickEarnPositionId, showBalances)}
         <StyledDoubleSectionContent>
           <StyledSectionContent>
             <Typography variant="labelRegular">
