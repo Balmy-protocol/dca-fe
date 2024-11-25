@@ -31,6 +31,7 @@ import {
   formatUsdAmount,
   getIsSameOrTokenEquivalent,
   parseExponentialNumberToString,
+  toToken,
 } from '@common/utils/currency';
 import { isUndefined, map, orderBy } from 'lodash';
 import { useAllBalances } from '@state/balances/hooks';
@@ -44,7 +45,9 @@ import useIsLoggingUser from '@hooks/useIsLoggingUser';
 import { useShowSmallBalances, useShowBalances } from '@state/config/hooks';
 import WidgetFrame from '@pages/home/components/widget-frame';
 import { getAllChains } from '@balmy/sdk';
+import TokenIcon from '@common/components/token-icon';
 import { WalletActionType } from '@services/accountService';
+import { getGhTokenListLogoUrl } from '@constants/addresses';
 
 const StyledNoWallet = styled(ContainerBox).attrs({
   flexDirection: 'column',
@@ -179,6 +182,18 @@ const StyledWalletIconContainer = styled.div<{ $size: number }>`
   `};
 `;
 
+const StyledNetworkLogoContainer = styled.div`
+  position: absolute;
+  bottom: -4px;
+  right: -4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 30px;
+  width: 16px;
+  height: 16px;
+`;
+
 const BalanceTableBodyItem: ItemContent<BalanceItem, Context> = (
   index: number,
   { balanceInUnits, balanceUsd, walletAddress, token, isLoadingPrice, price, relativeBalance }: BalanceItem,
@@ -191,6 +206,16 @@ const BalanceTableBodyItem: ItemContent<BalanceItem, Context> = (
       <TableCell>
         <Grid container flexDirection={'row'} alignItems={'center'} gap={3}>
           <StyledAssetLogosContainer>
+            <StyledNetworkLogoContainer>
+              <TokenIcon
+                size={3.5}
+                token={toToken({
+                  logoURI: getGhTokenListLogoUrl(token.chainId, 'logo'),
+                })}
+                withShadow
+                shadowType="dropShadow200"
+              />
+            </StyledNetworkLogoContainer>
             <StyledWalletIconContainer $size={8}>
               <Wallet3Icon fontSize="small" />
             </StyledWalletIconContainer>
@@ -353,7 +378,6 @@ const BalanceTable = ({ token }: BalanceTableProps) => {
         sigFigs: 3,
         intl,
       })} ${token.symbol}`}
-      solid
     >
       {isLoggedIn ? (
         <VirtualizedTable

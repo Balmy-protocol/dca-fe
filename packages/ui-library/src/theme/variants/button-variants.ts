@@ -49,7 +49,8 @@ export const buildButtonVariant = (mode: 'light' | 'dark'): Components => ({
         padding: `${SPACING(1)} ${SPACING(3)} !important`,
         border: `1.5px solid ${colors[mode].border.border2}`,
         color: colors[mode].typography.typo3,
-        backgroundColor: colors[mode].background.quarteryNoAlpha,
+        backgroundColor: colors[mode].background.quartery,
+        backdropFilter: 'blur(30px)',
         borderRadius: `${SPACING(25)} !important`,
         '&:hover': {
           backgroundColor: colors[mode].background.secondary,

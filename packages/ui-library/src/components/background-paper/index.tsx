@@ -12,6 +12,7 @@ const StyledBackgroundPaper = styled(Paper)`
     },
   }) => `
     background-color: ${colors[mode].background.quartery};
+    backdrop-filter: blur(30px);
     border-radius: ${spacing(4)};
     padding: ${space.s06};
   `}

@@ -108,7 +108,7 @@ export const darkModePallete: PaletteOptions = {
   },
   gradient: {
     main: `linear-gradient(0deg, ${colors.dark.background.emphasis} -1.99%, ${baseColors.violet.violet500} 100%)`,
-    earnWizard: `linear-gradient(90deg, #270A50 0%, #16062D 100%)`,
+    earnWizard: `linear-gradient(180deg, #1D132A 25.13%, rgba(52, 32, 81, 0.80) 100%);`,
     newsBanner: `linear-gradient(286deg, #7A1BFF 1.4%, #0EECC1 113.11%)`,
   },
 };

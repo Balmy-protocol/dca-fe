@@ -26,6 +26,7 @@ import RedirectOldRoute from '@common/components/redirect-old-route';
 import useWeb3Service from '@hooks/useWeb3Service';
 import { SavedCustomConfig } from '@state/base-types';
 import PollingHandlers from './polling-handlers';
+import DarkBackgroundGrid from './components/background-grid/dark';
 
 const Home = lazy(() => import('@pages/home'));
 const DCA = lazy(() => import('@pages/dca'));
@@ -115,6 +116,11 @@ const AppFrame = ({ config: { wagmiClient } }: AppFrameProps) => {
                   {themeMode === 'light' && (
                     <StyledGridBg>
                       <LightBackgroundGrid />
+                    </StyledGridBg>
+                  )}
+                  {themeMode === 'dark' && (
+                    <StyledGridBg>
+                      <DarkBackgroundGrid />
                     </StyledGridBg>
                   )}
                   <PromisesInitializer />

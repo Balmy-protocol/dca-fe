@@ -1,5 +1,5 @@
 import React from 'react';
-import { Grid, Alert, Button, ContainerBox } from 'ui-library';
+import { Grid, Alert, Button, ContainerBox, Typography, colors } from 'ui-library';
 import isUndefined from 'lodash/isUndefined';
 import { AmountsOfToken, SetStateCallback, SwapOption, Token } from '@types';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
@@ -191,8 +191,18 @@ const SwapFirstStep = ({
       )}
       <Grid item xs={12}>
         <ContainerBox flexDirection="column" gap={3}>
-          <FormWalletSelector />
-          <SwapNetworkSelector />
+          <ContainerBox gap={1} flexDirection="column">
+            <Typography variant="bodySmallSemibold" color={({ palette: { mode } }) => colors[mode].typography.typo4}>
+              <FormattedMessage description="aggregator.form.wallet-selector.title" defaultMessage="Wallet" />
+            </Typography>
+            <FormWalletSelector />
+          </ContainerBox>
+          <ContainerBox gap={1} flexDirection="column">
+            <Typography variant="bodySmallSemibold" color={({ palette: { mode } }) => colors[mode].typography.typo4}>
+              <FormattedMessage description="aggregator.form.network-selector.title" defaultMessage="Network" />
+            </Typography>
+            <SwapNetworkSelector />
+          </ContainerBox>
         </ContainerBox>
       </Grid>
       <Grid item xs={12}>

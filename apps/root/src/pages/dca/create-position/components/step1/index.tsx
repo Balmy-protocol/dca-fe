@@ -129,8 +129,18 @@ const SwapFirstStep = ({
     <Grid container rowSpacing={6}>
       <Grid item xs={12}>
         <ContainerBox flexDirection="column" gap={3}>
-          <FormWalletSelector />
-          <NetworkSelector disableSearch handleChangeCallback={onChangeNetwork} networkList={networkList} />
+          <ContainerBox gap={1} flexDirection="column">
+            <Typography variant="bodySmallSemibold" color={({ palette: { mode } }) => colors[mode].typography.typo4}>
+              <FormattedMessage description="dca.form.wallet-selector.title" defaultMessage="Wallet" />
+            </Typography>
+            <FormWalletSelector />
+          </ContainerBox>
+          <ContainerBox gap={1} flexDirection="column">
+            <Typography variant="bodySmallSemibold" color={({ palette: { mode } }) => colors[mode].typography.typo4}>
+              <FormattedMessage description="dca.form.network-selector.title" defaultMessage="Network" />
+            </Typography>
+            <NetworkSelector disableSearch handleChangeCallback={onChangeNetwork} networkList={networkList} />
+          </ContainerBox>
         </ContainerBox>
       </Grid>
       <Grid item xs={12}>

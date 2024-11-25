@@ -16,7 +16,7 @@ const StyledEmptyTokenIcon = styled.div<{ $realSize: string }>`
   }) => `
   width: ${$realSize};
   height: ${$realSize};
-  background-color: ${mode === 'light' ? colors[mode].background.primary : colors[mode].background.secondary};
+  background-color: ${colors[mode].background.primary};
   border-radius: 50%;
   `};
 `;
