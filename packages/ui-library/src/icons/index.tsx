@@ -134,6 +134,7 @@ import Wallet2Icon from './wallet-2';
 import UnlockIcon from './unlock';
 import ChartIcon from './chart';
 import ClockIcon from './clock';
+import TrendUpIcon from './trend-up';
 
 export {
   HelpOutline as HelpOutlineIcon,
@@ -272,4 +273,5 @@ export {
   UnlockIcon,
   ChartIcon,
   ClockIcon,
+  TrendUpIcon,
 };

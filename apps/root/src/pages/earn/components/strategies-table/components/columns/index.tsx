@@ -22,8 +22,10 @@ import Address from '@common/components/address';
 import { useThemeMode } from '@state/config/hooks';
 import TokenIconWithNetwork from '@common/components/token-icon-with-network';
 import TokenAmount from '@common/components/token-amount';
+import { PROMOTED_STRATEGIES_IDS } from '@constants/earn';
 
 export enum StrategyColumnKeys {
+  IS_PROMOTED = 'isPromoted',
   VAULT_NAME = 'vaultName',
   TOKEN = 'token',
   REWARDS = 'rewards',
@@ -158,6 +160,15 @@ export const strategyColumnConfigs: StrategyColumnConfig<StrategiesTableVariants
     ),
     renderCell: () => <></>,
     getOrderValue: (data) => (data.walletBalance ? data.walletBalance.amountInUSD || '0' : undefined),
+    hiddenProps: {
+      xsUp: true,
+    },
+  },
+  {
+    key: StrategyColumnKeys.IS_PROMOTED,
+    label: <></>,
+    renderCell: () => <></>,
+    getOrderValue: (data) => (PROMOTED_STRATEGIES_IDS.includes(data.id) ? 1 : 0),
     hiddenProps: {
       xsUp: true,
     },

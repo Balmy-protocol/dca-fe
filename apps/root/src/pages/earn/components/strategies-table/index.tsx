@@ -1,5 +1,5 @@
 import React from 'react';
-import { AmountsOfToken, EarnPosition, SetStateCallback, Strategy } from 'common-types';
+import { AmountsOfToken, EarnPosition, SetStateCallback, Strategy, StrategyId } from 'common-types';
 import {
   BackgroundPaper,
   ContainerBox,
@@ -30,6 +30,8 @@ import { getStrategyFromTableObject, RowClickParamValue } from '@common/utils/ea
 import EmptyPortfolio from './components/empty-portfolio';
 import TotalFooter from './components/total-footer';
 import { FarmWithAvailableDepositTokens } from '@hooks/earn/useAvailableDepositTokens';
+import { PROMOTED_STRATEGIES_IDS } from '@constants/earn';
+import PromotedFlag from './components/promoted-flag';
 
 export type StrategyWithWalletBalance = Strategy & {
   walletBalance?: AmountsOfToken;
@@ -47,16 +49,23 @@ const StyledBackgroundPaper = styled(BackgroundPaper).attrs({ variant: 'outlined
   $isPortfolio?: number;
   $isMigration?: boolean;
 }>`
-  ${({ theme: { palette, spacing }, $isPortfolio, $isMigration }) => `
+  ${({ theme: { spacing }, $isPortfolio, $isMigration }) => `
     padding: ${$isMigration ? '0px' : `0px ${spacing(4)} ${spacing($isPortfolio ? 0 : 4)}`};
-    ${$isPortfolio ? `background: ${colors[palette.mode].background.quarteryNoAlpha};` : ''}
-    max-height: ${spacing(147.25)};
   `}
   flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
   position: relative;
+`;
+
+const StyledTableRow = styled(TableRow)<{ $isPromoted?: boolean }>`
+  ${({ theme: { palette, spacing }, $isPromoted }) =>
+    $isPromoted &&
+    `
+    box-shadow: 0px 0px 0px 1.5px ${colors[palette.mode].semantic.success.darker};
+    border-radius: ${spacing(2)};
+  `}
 `;
 
 const StyledTableEnd = styled(TableCell)`
@@ -73,11 +82,12 @@ const StyledNavContainer = styled(ContainerBox)`
   margin: 0 auto;
 `;
 
-const StyledBodyTableCell = styled(TableCell)`
-  ${({ theme: { spacing } }) => `
+const StyledBodyTableCell = styled(TableCell)<{ $isPromoted?: boolean }>`
+  ${({ theme: { spacing }, $isPromoted }) => `
   height: ${spacing(14.5)};
   padding-top: ${spacing(0.5)};
   padding-bottom: ${spacing(0.5)};
+  ${$isPromoted && `position: relative;`}
 `}
 `;
 
@@ -190,9 +200,10 @@ const Row = <T extends StrategiesTableVariants>({
   const [hovered, setHovered] = React.useState(false);
 
   const strategy = getStrategyFromTableObject(rowData, variant);
-
+  const isPromoted = PROMOTED_STRATEGIES_IDS.includes(strategy.id as StrategyId);
   return (
-    <TableRow
+    <StyledTableRow
+      $isPromoted={isPromoted}
       key={strategy.id}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
@@ -200,9 +211,10 @@ const Row = <T extends StrategiesTableVariants>({
       hover
       onClick={() => onRowClick(strategy)}
     >
-      {columns.map((column) => (
+      {columns.map((column, i) => (
         <Hidden {...column.hiddenProps} key={`${strategy.id}-${column.key}`}>
-          <StyledBodyTableCell key={`${strategy.id}-${column.key}`}>
+          <StyledBodyTableCell key={`${strategy.id}-${column.key}`} $isPromoted={isPromoted && i === 0}>
+            {isPromoted && i === 0 && <PromotedFlag />}
             {renderBodyCell(column.renderCell(rowData, showBalances))}
           </StyledBodyTableCell>
         </Hidden>
@@ -216,7 +228,7 @@ const Row = <T extends StrategiesTableVariants>({
           />
         </StyledNavContainer>
       </StyledTableEnd>
-    </TableRow>
+    </StyledTableRow>
   );
 };
 

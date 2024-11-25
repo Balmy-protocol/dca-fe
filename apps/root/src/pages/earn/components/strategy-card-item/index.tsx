@@ -7,6 +7,8 @@ import TokenIconWithNetwork from '@common/components/token-icon-with-network';
 import { FormattedMessage } from 'react-intl';
 import ComposedTokenIcon from '@common/components/composed-token-icon';
 import { Link } from 'react-router-dom';
+import { PROMOTED_STRATEGIES_IDS } from '@constants/earn';
+import PromotedFlag from '../strategies-table/components/promoted-flag';
 
 interface SugestedStrategyCardProps {
   strategy: Strategy;
@@ -22,46 +24,59 @@ const StyledLink = styled(Link)`
   `}
 `;
 
-const StyledCard = styled(Card).attrs({ variant: 'outlined' })`
-  ${({ theme: { palette, spacing } }) => `
+const StyledCard = styled(Card).attrs({ variant: 'outlined' })<{ $isPromoted?: boolean }>`
+  ${({ theme: { palette, spacing }, $isPromoted }) => `
       padding: ${spacing(6)};
       box-shadow: ${colors[palette.mode].dropShadow.dropShadow300};
       display: flex;
       flex-direction: column;
       gap: ${spacing(4)};
+      ${
+        $isPromoted &&
+        `
+        overflow: visible;
+        position: relative;
+        outline-color: ${colors[palette.mode].semantic.success.darker};
+        outline-width: 1.5px;
+      `
+      }
     `}
 `;
 
-const StrategyCardItem = ({ strategy, variant }: SugestedStrategyCardProps) => (
-  <StyledCard>
-    <ContainerBox justifyContent="space-between" alignItems="center">
-      <ContainerBox gap={2} alignItems="center">
-        <TokenIconWithNetwork token={strategy.asset} />
-        <Typography variant="bodySmallBold" color={({ palette }) => colors[palette.mode].typography.typo2}>
-          {strategy.asset.symbol}
+const StrategyCardItem = ({ strategy, variant }: SugestedStrategyCardProps) => {
+  const isPromoted = PROMOTED_STRATEGIES_IDS.includes(strategy.id);
+  return (
+    <StyledCard $isPromoted={isPromoted}>
+      <ContainerBox justifyContent="space-between" alignItems="center">
+        <ContainerBox gap={2} alignItems="center">
+          <TokenIconWithNetwork token={strategy.asset} />
+          <Typography variant="bodySmallBold" color={({ palette }) => colors[palette.mode].typography.typo2}>
+            {strategy.asset.symbol}
+          </Typography>
+          {strategy.rewards.tokens.length > 0 && (
+            <>
+              {` · `}
+              <Typography variant="bodySmallRegular">
+                <FormattedMessage description="earn.strategy-card.rewards" defaultMessage="Rewards" />
+              </Typography>
+              <ComposedTokenIcon size={8} tokens={strategy.rewards.tokens} />
+            </>
+          )}
+        </ContainerBox>
+        <Typography variant="bodySmallRegular" color={({ palette }) => colors[palette.mode].typography.typo2}>
+          {strategy.farm.name}
         </Typography>
-        {strategy.rewards.tokens.length > 0 && (
-          <>
-            {` · `}
-            <Typography variant="bodySmallRegular">
-              <FormattedMessage description="earn.strategy-card.rewards" defaultMessage="Rewards" />
-            </Typography>
-            <ComposedTokenIcon size={8} tokens={strategy.rewards.tokens} />
-          </>
-        )}
       </ContainerBox>
-      <Typography variant="bodySmallRegular" color={({ palette }) => colors[palette.mode].typography.typo2}>
-        {strategy.farm.name}
-      </Typography>
-    </ContainerBox>
-    <DataCards strategy={strategy} dataCardsGap={2} variant={variant} />
-    <StyledLink to={`/earn/vaults/${strategy.network.chainId}/${strategy.id}`}>
-      <Typography variant="bodyBold" color={({ palette }) => colors[palette.mode].accentPrimary}>
-        <FormattedMessage description="earn.strategy-card.button" defaultMessage="View Vault" />
-      </Typography>
-    </StyledLink>
-  </StyledCard>
-);
+      <DataCards strategy={strategy} dataCardsGap={2} variant={variant} />
+      <StyledLink to={`/earn/vaults/${strategy.network.chainId}/${strategy.id}`}>
+        <Typography variant="bodyBold" color={({ palette }) => colors[palette.mode].accentPrimary}>
+          <FormattedMessage description="earn.strategy-card.button" defaultMessage="View Vault" />
+        </Typography>
+      </StyledLink>
+      {isPromoted && <PromotedFlag isCard />}
+    </StyledCard>
+  );
+};
 
 const SkeletonStrategyCardItem = () => (
   <StyledCard>
