@@ -50,11 +50,12 @@ const StyledDialog = withStyles(Dialog, ({ palette: { mode } }) =>
       borderBottomLeftRadius: '0 !important',
       borderBottomRightRadius: '0 !important',
       overflow: 'visible !important',
+      backgroundColor: colors[mode].background.modals,
       '&:after': {
         borderLeft: `2px solid ${colors[mode].violet.violet500}`,
         borderRight: `2px solid ${colors[mode].violet.violet500}`,
         borderBottom: 0,
-        backgroundImage: `url(\'data:image/svg+xml;utf8, <svg viewBox="0 0 200 110" xmlns="http://www.w3.org/2000/svg"><path d="M -15 110 L100 10 L215 110" fill="${baseColors.violet.violet800.replace('#', '%23')}" stroke="${colors[
+        backgroundImage: `url(\'data:image/svg+xml;utf8, <svg viewBox="0 0 200 110" xmlns="http://www.w3.org/2000/svg"><path d="M -15 110 L100 10 L215 110" fill="${colors[mode].background.modals.replace('#', '%23')}" stroke="${colors[
           mode
         ].violet.violet500.replace('#', '%23')}" stroke-width="2" vector-effect="non-scaling-stroke"/></svg>\')`,
         backgroundSize: '5% 13px',
