@@ -1498,19 +1498,6 @@ export default class PositionService extends EventsManager<PositionServiceData> 
       currentPositions[id].pendingTransaction = transaction.hash;
     }
 
-    if (
-      transaction.type === TransactionTypes.eulerClaimPermitMany ||
-      transaction.type === TransactionTypes.eulerClaimTerminateMany
-    ) {
-      const { positionIds } = transaction.typeData;
-
-      positionIds.forEach((positionId) => {
-        if (currentPositions[positionId]) {
-          currentPositions[positionId].pendingTransaction = transaction.hash;
-        }
-      });
-    }
-
     this.currentPositions = currentPositions;
     if (transaction.type === TransactionTypes.newPosition) {
       this.userHasPositions = true;
@@ -1530,17 +1517,6 @@ export default class PositionService extends EventsManager<PositionServiceData> 
     const { id } = typeData;
     if (transaction.type === TransactionTypes.newPosition) {
       delete currentPositions[`pending-transaction-${transaction.hash}-v${LATEST_VERSION}`];
-    } else if (
-      transaction.type === TransactionTypes.eulerClaimPermitMany ||
-      transaction.type === TransactionTypes.eulerClaimTerminateMany
-    ) {
-      const { positionIds } = transaction.typeData;
-
-      positionIds.forEach((positionId) => {
-        if (currentPositions[positionId]) {
-          currentPositions[positionId].pendingTransaction = '';
-        }
-      });
     } else if (id && currentPositions[id]) {
       currentPositions[id].pendingTransaction = '';
     }
@@ -1564,12 +1540,7 @@ export default class PositionService extends EventsManager<PositionServiceData> 
       ...this.pastPositions,
     };
 
-    if (
-      !currentPositions[transaction.typeData.id] &&
-      transaction.type !== TransactionTypes.newPosition &&
-      transaction.type !== TransactionTypes.eulerClaimPermitMany &&
-      transaction.type !== TransactionTypes.eulerClaimTerminateMany
-    ) {
+    if (!currentPositions[transaction.typeData.id] && transaction.type !== TransactionTypes.newPosition) {
       if (transaction.position) {
         currentPositions[transaction.typeData.id] = {
           ...transaction.position,
@@ -1579,33 +1550,6 @@ export default class PositionService extends EventsManager<PositionServiceData> 
       }
     }
     switch (transaction.type) {
-      case TransactionTypes.newPosition: {
-        const newPositionTypeData = transaction.typeData;
-        const newId = newPositionTypeData.id;
-        if (!currentPositions[`${transaction.chainId}-${newId}-v${newPositionTypeData.version}`]) {
-          const newPosition = getNewPositionFromTxTypeData({
-            chainId: transaction.chainId,
-            id: `${transaction.chainId}-${newId}-v${newPositionTypeData.version}`,
-            positionId: BigInt(newId),
-            newPositionTypeData,
-            user: transaction.from as Address,
-          });
-
-          currentPositions[`${transaction.chainId}-${newId}-v${newPositionTypeData.version}`] = {
-            ...(currentPositions[`pending-transaction-${transaction.hash}-v${newPositionTypeData.version}`] || {}),
-            ...newPosition,
-          };
-        }
-
-        delete currentPositions[`pending-transaction-${transaction.hash}-v${newPositionTypeData.version}`];
-        this.pairService.addNewPair(
-          newPositionTypeData.from,
-          newPositionTypeData.to,
-          BigInt(newPositionTypeData.frequencyType),
-          transaction.chainId
-        );
-        break;
-      }
       case TransactionTypes.terminatePosition: {
         const terminatePositionTypeData = transaction.typeData;
 
@@ -1639,28 +1583,6 @@ export default class PositionService extends EventsManager<PositionServiceData> 
           pendingTransaction: '',
         };
         delete currentPositions[terminatePositionTypeData.id];
-        break;
-      }
-      case TransactionTypes.eulerClaimTerminateMany: {
-        const { positionIds } = transaction.typeData;
-        positionIds.forEach((id) => {
-          pastPositions[id] = {
-            ...currentPositions[id],
-            toWithdraw: {
-              amount: 0n,
-              amountInUnits: '0',
-              amountInUSD: '0',
-            },
-            remainingLiquidity: {
-              amount: 0n,
-              amountInUnits: '0',
-              amountInUSD: '0',
-            },
-            remainingSwaps: 0n,
-            pendingTransaction: '',
-          };
-          delete currentPositions[id];
-        });
         break;
       }
       case TransactionTypes.migratePositionYield: {
@@ -1844,43 +1766,6 @@ export default class PositionService extends EventsManager<PositionServiceData> 
         } else {
           currentPositions[id].permissions = permissions;
         }
-        break;
-      }
-      case TransactionTypes.eulerClaimPermitMany: {
-        const { positionIds, permissions, permittedAddress } = transaction.typeData;
-        positionIds.forEach((id) => {
-          const positionPermissions = currentPositions[id].permissions;
-          if (positionPermissions) {
-            let newPermissions = [...positionPermissions];
-            const permissionIndex = findIndex(positionPermissions, { operator: permittedAddress.toLowerCase() });
-            if (permissionIndex !== -1) {
-              newPermissions[permissionIndex] = {
-                ...positionPermissions[permissionIndex],
-                permissions: [...positionPermissions[permissionIndex].permissions, ...permissions],
-              };
-            } else {
-              newPermissions = [
-                ...newPermissions,
-                {
-                  id: permittedAddress,
-                  operator: permittedAddress,
-                  permissions,
-                },
-              ];
-            }
-            currentPositions[id].permissions = newPermissions;
-          } else {
-            currentPositions[id].permissions = [
-              {
-                id: permittedAddress,
-                operator: permittedAddress,
-                permissions,
-              },
-            ];
-          }
-
-          currentPositions[id].pendingTransaction = '';
-        });
         break;
       }
       default:

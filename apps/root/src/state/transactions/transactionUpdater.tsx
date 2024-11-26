@@ -150,11 +150,6 @@ export default function Updater(): null {
 
     try {
       switch (tx.type) {
-        case TransactionTypes.newPair:
-          extendedTypeData = {
-            id: toHex(tx.receipt.logs[tx.receipt.logs.length - 1].data),
-          };
-          break;
         case TransactionTypes.newPosition:
           const newPositionparsedLogPromise = transactionService.parseLog({
             logs: tx.receipt.logs,

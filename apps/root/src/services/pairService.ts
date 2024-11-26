@@ -276,40 +276,6 @@ export default class PairService extends EventsManager<PairServiceData> {
     this.hasFetchedAvailablePairs = true;
   }
 
-  // PAIR METHODS
-  addNewPair(tokenA: Token, tokenB: Token, frequencyType: bigint, chainId: number) {
-    const [token0, token1] = sortTokens(tokenA, tokenB);
-
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    const swapInfo: SwapInfo = SWAP_INTERVALS_MAP.map(() => false);
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    const lastSwappedAt: LastSwappedAt = SWAP_INTERVALS_MAP.map(() => 0);
-    const freqIndex = findIndex(SWAP_INTERVALS_MAP, { value: frequencyType });
-
-    swapInfo[freqIndex] = true;
-
-    swapInfo[freqIndex] = true;
-    lastSwappedAt[freqIndex] = DateTime.now().toSeconds();
-
-    const availablePairs = this.availablePairs;
-
-    if (!this.availablePairExists(token0, token1, chainId)) {
-      availablePairs[chainId].push({
-        token0: token0.address,
-        token1: token1.address,
-        id: `${token0.address}-${token1.address}`,
-        nextSwapAvailableAt: {
-          [Number(frequencyType)]: 0,
-        },
-        isStale: { [Number(frequencyType)]: false },
-      });
-    }
-
-    this.availablePairs = availablePairs;
-  }
-
   availablePairExists(token0: Token, token1: Token, chainId: number) {
     return !!find(this.availablePairs[chainId], { id: `${token0.address}-${token1.address}` });
   }
