@@ -9,8 +9,17 @@ import {
   EarnPositionSpecialWithdrewAction,
   EarnPositionTransferredAction,
   EarnPositionWithdrewAction,
+  EarnWithdrawDataDoneEvent,
 } from 'common-types';
-import { CardGiftcardIcon, ContainerBox, ExportIcon, MoneyReceiveIcon, ReceiptIcon, Typography } from 'ui-library';
+import {
+  CardGiftcardIcon,
+  ContainerBox,
+  ExportIcon,
+  getIsDelayedWithdraw,
+  MoneyReceiveIcon,
+  ReceiptIcon,
+  Typography,
+} from 'ui-library';
 import { FormattedMessage } from 'react-intl';
 import {
   StyledTimelineLink,
@@ -146,32 +155,42 @@ const BaseWithdrawItem = ({
   );
 
   return (
-    <>
-      <ContainerBox alignItems="center" gap={4}>
-        {withdrawnTokensWithCurrentPrice.map(({ token, currentPrice, amount }) => (
-          <TimelineTokenAmount
-            key={token.address}
-            token={token}
-            amount={amount}
-            currentPrice={currentPrice}
-            tokenPrice={token.price}
-          />
-        ))}
-      </ContainerBox>
-    </>
+    <ContainerBox alignItems="center" gap={4}>
+      {withdrawnTokensWithCurrentPrice.map(({ token, currentPrice, amount }) => (
+        <TimelineTokenAmount
+          key={token.address}
+          token={token}
+          amount={amount}
+          currentPrice={currentPrice}
+          tokenPrice={token.price}
+        />
+      ))}
+    </ContainerBox>
   );
 };
 
 export const buildEarnWithdrawnItem = (positionState: EarnPositionWithdrewAction, position: EarnPosition) => ({
   icon: ReceiptIcon,
-  content: () => (
-    <>
-      <TimelineItemSubTitle>
-        <FormattedMessage description="earn.timeline.title.vault-position-withdrew" defaultMessage="Withdrew" />
-      </TimelineItemSubTitle>
-      <BaseWithdrawItem positionState={positionState} position={position} />
-    </>
-  ),
+  content: () => {
+    const isDelayedWithdraw = getIsDelayedWithdraw(positionState.withdrawn as EarnWithdrawDataDoneEvent['withdrawn']);
+    return (
+      <>
+        {isDelayedWithdraw ? (
+          <TimelineItemSubTitle>
+            <FormattedMessage
+              description="earn.timeline.title.vault-position-delayed-withdrawal-initiated"
+              defaultMessage="Initiated delayed withdrawal"
+            />
+          </TimelineItemSubTitle>
+        ) : (
+          <TimelineItemSubTitle>
+            <FormattedMessage description="earn.timeline.title.vault-position-withdrew" defaultMessage="Withdrew" />
+          </TimelineItemSubTitle>
+        )}
+        <BaseWithdrawItem positionState={positionState} position={position} />
+      </>
+    );
+  },
   transactionData: buildEarnTimelineTransactionData(positionState, position.strategy.farm.chainId, position.owner),
 });
 
