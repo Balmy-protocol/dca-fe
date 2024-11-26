@@ -1550,6 +1550,27 @@ export default class PositionService extends EventsManager<PositionServiceData> 
       }
     }
     switch (transaction.type) {
+      case TransactionTypes.newPosition: {
+        const newPositionTypeData = transaction.typeData;
+        const newId = newPositionTypeData.id;
+        if (!currentPositions[`${transaction.chainId}-${newId}-v${newPositionTypeData.version}`]) {
+          const newPosition = getNewPositionFromTxTypeData({
+            chainId: transaction.chainId,
+            id: `${transaction.chainId}-${newId}-v${newPositionTypeData.version}`,
+            positionId: BigInt(newId),
+            newPositionTypeData,
+            user: transaction.from as Address,
+          });
+
+          currentPositions[`${transaction.chainId}-${newId}-v${newPositionTypeData.version}`] = {
+            ...(currentPositions[`pending-transaction-${transaction.hash}-v${newPositionTypeData.version}`] || {}),
+            ...newPosition,
+          };
+        }
+
+        delete currentPositions[`pending-transaction-${transaction.hash}-v${newPositionTypeData.version}`];
+        break;
+      }
       case TransactionTypes.terminatePosition: {
         const terminatePositionTypeData = transaction.typeData;
 
