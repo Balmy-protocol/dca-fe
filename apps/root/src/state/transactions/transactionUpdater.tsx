@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo } from 'react';
-import { Address, Transaction, toHex } from 'viem';
+import { Address, Transaction } from 'viem';
 import omit from 'lodash/omit';
 import values from 'lodash/values';
 import useBuildTransactionMessage from '@hooks/useBuildTransactionMessage';

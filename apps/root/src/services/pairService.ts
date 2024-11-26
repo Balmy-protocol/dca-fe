@@ -1,11 +1,8 @@
 import find from 'lodash/find';
-import findIndex from 'lodash/findIndex';
 import {
   Token,
   AvailablePairs,
-  SwapInfo,
   AvailablePair,
-  LastSwappedAt,
   NextSwapAvailableAt,
   ChainId,
   TokenList,
@@ -14,12 +11,11 @@ import {
   YieldOptions,
   YieldName,
 } from '@types';
-import { DateTime } from 'luxon';
 import { sortTokens, sortTokensByAddress } from '@common/utils/parsing';
 
 // MOCKS
 import { PROTOCOL_TOKEN_ADDRESS, getProtocolToken, getWrappedProtocolToken } from '@common/mocks/tokens';
-import { PLATFORM_NAMES_FOR_TOKENS, SWAP_INTERVALS_MAP, getGhTokenListLogoUrl } from '@constants';
+import { PLATFORM_NAMES_FOR_TOKENS, getGhTokenListLogoUrl } from '@constants';
 
 import SdkService from './sdkService';
 import { EventsManager } from './eventsManager';
