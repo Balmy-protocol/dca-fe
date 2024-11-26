@@ -183,10 +183,7 @@ export default createReducer(initialState, (builder) => {
 
           const newRemainingSwaps = BigInt(modifyRateAndSwapsPositionTypeData.newSwaps);
 
-          const newRate = parseUnits(
-            modifyRateAndSwapsPositionTypeData.newRate,
-            modifyRateAndSwapsPositionTypeData.decimals
-          );
+          const newRate = BigInt(modifyRateAndSwapsPositionTypeData.newRate);
 
           const modifiedAction: DCAPositionModifiedAction = {
             tx: dcaTx,

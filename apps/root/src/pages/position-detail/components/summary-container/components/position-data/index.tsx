@@ -498,9 +498,11 @@ const Details = ({ position, pendingTransaction }: DetailsProps) => {
             )}
           </ContainerBox>
         </StyledValueContainer>
-        <StyledValueContainer>
-          <PositionDataMainButton position={position} />
-        </StyledValueContainer>
+        {position.status !== 'TERMINATED' && (
+          <StyledValueContainer>
+            <PositionDataMainButton position={position} />
+          </StyledValueContainer>
+        )}
       </ContainerBox>
     </ContainerBox>
   );

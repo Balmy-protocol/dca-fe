@@ -42,7 +42,7 @@ export const buildSelectVariant = (mode: 'light' | 'dark'): Components => ({
               '& .MuiMenuItem-root': {
                 padding: SPACING(3),
                 borderRadius: SPACING(2),
-                border: `1px solid ${colors[mode].border.border2}`,
+                border: `1px solid ${colors[mode].border.border1}`,
                 backgroundColor: colors[mode].background.secondary,
                 '&:hover': {
                   backgroundColor: colors[mode].background.emphasis,
