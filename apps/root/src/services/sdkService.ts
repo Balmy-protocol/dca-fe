@@ -524,6 +524,7 @@ export default class SdkService {
     const positionsByAccount = await this.sdk.earnService.getPositionsByAccount({
       accounts: accounts as ArrayOneOrMore<Address>,
       includeHistoricalBalancesFrom: nowInSeconds() - Number(THREE_MONTHS),
+      includeHistory: true,
     });
 
     return positionsByAccount;
