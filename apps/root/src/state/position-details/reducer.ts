@@ -1,5 +1,5 @@
 import { createReducer } from '@reduxjs/toolkit';
-import { Address, formatUnits, parseUnits } from 'viem';
+import { Address, formatUnits } from 'viem';
 import findIndex from 'lodash/findIndex';
 import {
   DCAPositionModifiedAction,
