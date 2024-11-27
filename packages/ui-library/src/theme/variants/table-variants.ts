@@ -29,10 +29,9 @@ export const buildTableVariant = (mode: 'light' | 'dark'): Components => ({
         },
       },
       head: {
-        backgroundColor: 'transparent !important',
-        backdropFilter: 'blur(30px)',
+        backgroundColor: `${colors[mode].background.quarteryNoAlpha} !important`,
         '&:hover': {
-          backgroundColor: 'transparent !important',
+          backgroundColor: `${colors[mode].background.quarteryNoAlpha} !important`,
         },
       },
     },

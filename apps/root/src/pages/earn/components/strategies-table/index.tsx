@@ -47,8 +47,10 @@ const StyledBackgroundPaper = styled(BackgroundPaper).attrs({ variant: 'outlined
   $isPortfolio?: number;
   $isMigration?: boolean;
 }>`
-  ${({ theme: { spacing }, $isPortfolio, $isMigration }) => `
-    padding: ${$isMigration ? '0px' : `${spacing(4)} ${spacing(4)} ${spacing($isPortfolio ? 0 : 4)}`};
+  ${({ theme: { palette, spacing }, $isPortfolio, $isMigration }) => `
+    padding: ${$isMigration ? '0px' : `0px ${spacing(4)} ${spacing($isPortfolio ? 0 : 4)}`};
+    ${$isPortfolio ? `background: ${colors[palette.mode].background.quarteryNoAlpha};` : ''}
+    max-height: ${spacing(147.25)};
   `}
   flex: 1;
   display: flex;
@@ -79,11 +81,12 @@ const StyledBodyTableCell = styled(TableCell)`
 `}
 `;
 
-const StyledHeaderTableRow = styled(TableRow)`
-  background-color: transparent !important;
-  &:hover {
-    background-color: transparent !important;
-  }
+const StyledHeaderTableRow = styled(TableRow)<{ $isPortfolio?: boolean }>`
+  ${({ theme: { palette }, $isPortfolio }) => `
+    background-color: ${$isPortfolio ? colors[palette.mode].background.quarteryNoAlpha : 'transparent'} !important;
+    &:hover {
+      background-color: ${$isPortfolio ? colors[palette.mode].background.quarteryNoAlpha : 'transparent'} !important;
+  `}
 `;
 
 const StyledHeaderTableCell = styled(TableCell)`
@@ -110,7 +113,7 @@ const StrategiesTableHeader = <T extends StrategiesTableVariants>({
 
   return (
     <TableHead>
-      <StyledHeaderTableRow>
+      <StyledHeaderTableRow $isPortfolio={variant === StrategiesTableVariants.USER_STRATEGIES}>
         {columns.map((column) => (
           <Hidden {...column.hiddenProps} key={column.key}>
             <StyledHeaderTableCell

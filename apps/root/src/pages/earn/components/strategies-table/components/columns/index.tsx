@@ -205,7 +205,7 @@ export const strategyColumnConfigs: StrategyColumnConfig<StrategiesTableVariants
   {
     key: StrategyColumnKeys.APY,
     label: <FormattedMessage description="earn.all-strategies-table.column.apy" defaultMessage="APY" />,
-    renderCell: (data) => `${data.farm.apy}%`,
+    renderCell: (data) => `${data.farm.apy.toFixed(2)}%`,
     getOrderValue: (data) => data.farm.apy,
   },
   {
@@ -297,7 +297,7 @@ export const portfolioColumnConfigs: StrategyColumnConfig<StrategiesTableVariant
   {
     key: StrategyColumnKeys.APY,
     label: <FormattedMessage description="earn.all-strategies-table.column.apy" defaultMessage="APY" />,
-    renderCell: (data) => `${data[0].strategy.farm.apy}%`,
+    renderCell: (data) => `${data[0].strategy.farm.apy.toFixed(2)}%`,
     getOrderValue: (data) => data[0].strategy.farm.apy,
   },
   {
