@@ -378,7 +378,6 @@ const BalanceTable = ({ token }: BalanceTableProps) => {
         sigFigs: 3,
         intl,
       })} ${token.symbol}`}
-      solid
     >
       {isLoggedIn ? (
         <VirtualizedTable

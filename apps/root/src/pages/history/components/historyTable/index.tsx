@@ -76,7 +76,7 @@ const StyledCellContainer = styled.div<{ gap?: number; direction?: 'column' | 'r
 const StyledBackgroundPaper = styled(BackgroundPaper)<{ $solid?: boolean }>`
   ${({ theme: { space, palette }, $solid }) => `
     padding: 0px ${space.s04} ${space.s04};
-    ${$solid || palette.mode === 'dark' ? `background: ${colors[palette.mode].background.quarteryNoAlpha};backdrop-filter: blur(30px);` : ''}
+    ${$solid ? `background: ${colors[palette.mode].background.quartery};backdrop-filter: blur(30px);` : ''}
   `}
   flex: 1;
   display: flex;

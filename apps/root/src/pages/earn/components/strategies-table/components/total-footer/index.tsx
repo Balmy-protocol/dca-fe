@@ -2,7 +2,7 @@ import React from 'react';
 import { StrategiesTableVariants } from '@state/strategies-filters/reducer';
 import { StrategyColumnConfig, StrategyColumnKeys } from '../columns';
 import { TableStrategy } from '../..';
-import { TableFooter, TableRow, ContainerBox, TableCell, Typography, Hidden, DividerBorder1, colors } from 'ui-library';
+import { TableFooter, TableRow, ContainerBox, TableCell, Typography, Hidden, DividerBorder1 } from 'ui-library';
 import styled from 'styled-components';
 import { EarnPosition } from 'common-types';
 import { flatten } from 'lodash';
@@ -27,9 +27,9 @@ const StyledTableFooter = styled(TableFooter)<{ $isPortfolio?: boolean }>`
 `;
 
 const StyledTotalRow = styled(TableRow)`
-  background: ${({ theme: { palette } }) => colors[palette.mode].background.quarteryNoAlpha} !important;
+  background: transparent !important;
   &:hover {
-    background: ${({ theme: { palette } }) => colors[palette.mode].background.quarteryNoAlpha} !important;
+    background: transparent !important;
   }
 `;
 
