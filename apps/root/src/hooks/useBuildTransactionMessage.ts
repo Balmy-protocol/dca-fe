@@ -1,6 +1,6 @@
 import React from 'react';
 import find from 'lodash/find';
-import { TransactionDetails, Position, TransactionTypes } from '@types';
+import { TransactionDetails, Position, TransactionTypes, WithdrawType } from '@types';
 import { STRING_SWAP_INTERVALS } from '@constants';
 import { formatCurrencyAmount } from '@common/utils/currency';
 
@@ -23,38 +23,10 @@ function useBuildTransactionMessages() {
       let message = intl.formatMessage(
         defineMessage({
           description: 'transactionMessagesConfirmed',
-          defaultMessage: 'Transaction confirmed!',
+          defaultMessage: 'Transaction Confirmed',
         })
       );
       switch (tx.type) {
-        case TransactionTypes.wrap: {
-          const swapTypeData = tx.typeData;
-
-          message = `Wrapped ${formatCurrencyAmount({
-            amount: swapTypeData.amountFrom,
-            token: swapTypeData.from,
-            intl,
-          })} ${swapTypeData.from.symbol} for ${formatCurrencyAmount({
-            amount: swapTypeData.amountTo,
-            token: swapTypeData.to,
-            intl,
-          })} ${swapTypeData.to.symbol}`;
-          break;
-        }
-        case TransactionTypes.unwrap: {
-          const swapTypeData = tx.typeData;
-
-          message = `Unwrapped ${formatCurrencyAmount({
-            amount: swapTypeData.amountFrom,
-            token: swapTypeData.from,
-            intl,
-          })} ${swapTypeData.from.symbol} for ${formatCurrencyAmount({
-            amount: swapTypeData.amountTo,
-            token: swapTypeData.to,
-            intl,
-          })} ${swapTypeData.to.symbol}`;
-          break;
-        }
         case TransactionTypes.swap: {
           const swapTypeData = tx.typeData;
 
@@ -350,6 +322,83 @@ function useBuildTransactionMessages() {
               amount: formatCurrencyAmount({ amount: BigInt(amount), token, sigFigs: 4, intl }),
               symbol: token.symbol,
               to: isAddress(to) ? trimAddress(to) : to,
+            }
+          );
+          break;
+        }
+        case TransactionTypes.earnCreate: {
+          const { asset, assetAmount } = tx.typeData;
+
+          message = intl.formatMessage(
+            defineMessage({
+              description: 'transactionMessages.earn.create',
+              defaultMessage: 'You have invested {amount} {symbol}',
+            }),
+            {
+              amount: formatCurrencyAmount({ amount: BigInt(assetAmount), token: asset, sigFigs: 4, intl }),
+              symbol: asset.symbol,
+            }
+          );
+          break;
+        }
+        case TransactionTypes.earnIncrease: {
+          const { asset, assetAmount } = tx.typeData;
+
+          message = intl.formatMessage(
+            defineMessage({
+              description: 'transactionMessages.earn.increase',
+              defaultMessage: 'You have increased your investment by {amount} {symbol}',
+            }),
+            {
+              amount: formatCurrencyAmount({ amount: BigInt(assetAmount), token: asset, sigFigs: 4, intl }),
+              symbol: asset.symbol,
+            }
+          );
+          break;
+        }
+        case TransactionTypes.earnWithdraw: {
+          const withdrawnAsset = tx.typeData.withdrawn[0];
+          const isWithdrawingAsset = BigInt(withdrawnAsset.amount) > 0n;
+          const isDelayedWithdrawal = isWithdrawingAsset && withdrawnAsset.withdrawType === WithdrawType.DELAYED;
+
+          if (isDelayedWithdrawal) {
+            message = intl.formatMessage(
+              defineMessage({
+                description: 'transactionMessages.earn.delayed-withdraw',
+                defaultMessage: 'Your {asset} withdrawal has been initiated',
+              }),
+              { asset: withdrawnAsset.token.symbol }
+            );
+            break;
+          }
+
+          const isWithdrawingRewards = tx.typeData.withdrawn.some(
+            (withdraw) => withdraw.token.address !== withdrawnAsset.token.address && BigInt(withdraw.amount) > 0n
+          );
+
+          const includePlusSign = isWithdrawingRewards && isWithdrawingAsset;
+
+          message = intl.formatMessage(
+            defineMessage({
+              description: 'transactionMessages.earn.withdraw',
+              defaultMessage: 'You have withdrawn {asset}{plusRewards} from your investment',
+            }),
+            {
+              asset: isWithdrawingAsset
+                ? `${formatCurrencyAmount({
+                    amount: BigInt(withdrawnAsset.amount),
+                    token: withdrawnAsset.token,
+                    intl,
+                  })} ${withdrawnAsset.token.symbol}`
+                : '',
+              plusRewards: isWithdrawingRewards
+                ? `${includePlusSign ? '+' : ''} ${intl.formatMessage(
+                    defineMessage({
+                      description: 'transactionMessages.earn.withdraw.plusRewards',
+                      defaultMessage: 'Rewards',
+                    })
+                  )}`
+                : '',
             }
           );
           break;

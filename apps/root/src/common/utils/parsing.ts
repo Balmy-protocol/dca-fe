@@ -14,6 +14,7 @@ import {
   Wallet,
   Position,
   YieldName,
+  Contact,
 } from '@types';
 import {
   HUB_ADDRESS,
@@ -40,6 +41,7 @@ import orderBy from 'lodash/orderBy';
 import toPairs from 'lodash/toPairs';
 import { CURATED_LISTS } from '@state/token-lists/reducer';
 import { isEqual, isUndefined, uniqWith } from 'lodash';
+import { nowInSeconds } from './time';
 
 export const sortTokensByAddress = (tokenA: string, tokenB: string) => {
   let token0 = tokenA;
@@ -105,7 +107,7 @@ export const HEALTHY = 1;
 export const STALE = 2;
 
 export const calculateStaleSwaps = (lastSwapped: number, frequencyType: bigint, createdAt: number) => {
-  const today = BigInt(Math.floor(Date.now() / 1000)) / frequencyType;
+  const today = BigInt(nowInSeconds()) / frequencyType;
 
   if (lastSwapped === 0) {
     return today - (BigInt(createdAt) / frequencyType + 3n);
@@ -302,6 +304,10 @@ export const validateAddress = (address: string) => {
 
 export const trimAddress = (address: string, trimSize?: number) =>
   `${address.slice(0, trimSize || 6)}...${address.slice(-(trimSize || 6))}`;
+
+export const getDisplayContact = (contact: Contact) => {
+  return contact.label?.label || trimAddress(contact.address);
+};
 
 export const getDisplayWallet = (wallet?: Wallet) => {
   if (!wallet) return;

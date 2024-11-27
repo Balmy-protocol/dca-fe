@@ -1,22 +1,22 @@
 import * as React from 'react';
 import styled from 'styled-components';
 import { SwapOption, Token } from '@types';
-import { Typography, Tooltip, HelpOutlineIcon, ContainerBox, DividerBorder1 } from 'ui-library';
+import { Typography, Tooltip, ContainerBox, DividerBorder1, InfoCircleIcon, colors } from 'ui-library';
 import { formatCurrencyAmount, formatUsdAmount } from '@common/utils/currency';
 import { FormattedMessage, useIntl } from 'react-intl';
 import useSelectedNetwork from '@hooks/useSelectedNetwork';
 import { getProtocolToken } from '@common/mocks/tokens';
 
-const StyledQuoteDataItem = styled.div`
-  display: flex;
-  justify-content: space-between;
-`;
+const StyledQuoteDataItem = styled(ContainerBox).attrs({
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  gap: 1,
+})``;
 
-const StyledMinimumContainer = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 5px;
-`;
+const StyledMinimumContainer = styled(ContainerBox).attrs({
+  alignItems: 'center',
+  gap: 1,
+})``;
 
 const StyledContainer = styled(ContainerBox).attrs(() => ({
   flexDirection: 'column',
@@ -74,19 +74,22 @@ const QuoteData = ({ quote, to, isBuyOrder }: QuoteDataProps) => {
                       intl,
                     })} ${quote?.sellToken.symbol}`
                   : '-'}
-                <Tooltip
-                  title={
-                    <FormattedMessage
-                      description="quoteDataMaximumTooltip"
-                      defaultMessage="This is the maximum you will spend based on your slippage settings"
-                    />
-                  }
-                  arrow
-                  placement="top"
-                >
-                  <HelpOutlineIcon color="inherit" fontSize="inherit" />
-                </Tooltip>
               </Typography>
+              <Tooltip
+                title={
+                  <FormattedMessage
+                    description="quoteDataMaximumTooltip"
+                    defaultMessage="This is the maximum you will spend based on your slippage settings"
+                  />
+                }
+              >
+                <ContainerBox>
+                  <InfoCircleIcon
+                    fontSize="small"
+                    sx={({ palette }) => ({ color: colors[palette.mode].typography.typo3 })}
+                  />
+                </ContainerBox>
+              </Tooltip>
             </StyledMinimumContainer>
           </StyledQuoteDataItem>
         )}
@@ -104,21 +107,24 @@ const QuoteData = ({ quote, to, isBuyOrder }: QuoteDataProps) => {
                       sigFigs: 4,
                       maxDecimals: 6,
                       intl,
-                    })} ${quote.buyToken.symbol}`
+                    })} ${to.symbol}`
                   : '-'}
-                <Tooltip
-                  title={
-                    <FormattedMessage
-                      description="quoteDataMinimumTooltip"
-                      defaultMessage="This is the minimum you will receive based on your slippage settings"
-                    />
-                  }
-                  arrow
-                  placement="top"
-                >
-                  <HelpOutlineIcon color="inherit" fontSize="inherit" />
-                </Tooltip>
               </Typography>
+              <Tooltip
+                title={
+                  <FormattedMessage
+                    description="quoteDataMinimumTooltip"
+                    defaultMessage="This is the minimum you will receive based on your slippage settings"
+                  />
+                }
+              >
+                <ContainerBox>
+                  <InfoCircleIcon
+                    fontSize="small"
+                    sx={({ palette }) => ({ color: colors[palette.mode].typography.typo3 })}
+                  />
+                </ContainerBox>
+              </Tooltip>
             </StyledMinimumContainer>
           </StyledQuoteDataItem>
         )}

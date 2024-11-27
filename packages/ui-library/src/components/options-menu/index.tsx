@@ -12,16 +12,27 @@ import { ContainerBox } from '../container-box';
 
 const StyledButton = styled(Button)`
   ${({ theme: { spacing } }) => `
-  padding: ${spacing(1)};
+  padding: ${spacing(1)} !important;
   max-width: none;
   min-width: 0;
   display: flex;
   gap: ${spacing(1)};
+  justify-content: space-between;
 
   &:hover {
     border-radius: ${spacing(3)};
   }
 `}
+`;
+
+const StyledMenuItem = styled(MenuItem)`
+  ${({ theme: { palette, spacing } }) => `
+  transition: background-color 0.2s ease-in-out;
+  border-radius: ${spacing(2)};
+  :hover {
+    background-color: ${colors[palette.mode].background.emphasis};
+  }
+  `}
 `;
 
 enum OptionsMenuOptionType {
@@ -36,7 +47,7 @@ type DividerOption = {
 type MenuOption = {
   type: OptionsMenuOptionType.option;
   label: string | React.ReactElement;
-  secondaryLabel?: string;
+  secondaryLabel?: string | React.ReactElement;
   Icon?: React.ElementType;
   onClick?: () => void;
   control?: React.ReactElement;
@@ -91,7 +102,7 @@ const BaseOptionItem = ({
     if (onRender) onRender();
   }, [onRender]);
   return (
-    <MenuItem onClick={(e) => handleItemClick(e, closeOnClick, onClick)} color={itemColor} disabled={disabled}>
+    <StyledMenuItem onClick={(e) => handleItemClick(e, closeOnClick, onClick)} color={itemColor} disabled={disabled}>
       {ItemIcon && <ItemIcon color={itemColor ?? 'info'} />}
       <ContainerBox flexDirection="column" fullWidth className={customClassname}>
         {typeof label === 'string' ? (
@@ -111,7 +122,7 @@ const BaseOptionItem = ({
         )}
       </ContainerBox>
       {control}
-    </MenuItem>
+    </StyledMenuItem>
   );
 };
 
@@ -255,6 +266,7 @@ type OptionsMenuProps = {
   alwaysUseTypography?: boolean;
   dataAttrs?: Record<string, string>;
   customClassname?: string;
+  fullWidth?: boolean;
 };
 
 const OptionsMenu = ({
@@ -268,6 +280,7 @@ const OptionsMenu = ({
   setIsMenuOpen,
   alwaysUseTypography = false,
   customClassname,
+  fullWidth,
   dataAttrs,
 }: OptionsMenuProps) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -289,14 +302,15 @@ const OptionsMenu = ({
   }, [setAnchorEl]);
 
   return (
-    <div>
+    <ContainerBox flex={fullWidth ? 1 : undefined}>
       <StyledButton
         variant={variant}
         color={color}
         size={size}
         onClick={handleClick}
-        endIcon={showEndIcon && <KeyboardArrowDownIcon />}
+        endIcon={showEndIcon && <KeyboardArrowDownIcon fontSize="large" />}
         className={customClassname}
+        fullWidth={fullWidth}
         {...(dataAttrs || {})}
       >
         {typeof mainDisplay === 'string' || alwaysUseTypography ? (
@@ -308,7 +322,7 @@ const OptionsMenu = ({
         )}
       </StyledButton>
       <OptionsMenuItems options={options} anchorEl={anchorEl} handleClose={handleClose} />
-    </div>
+    </ContainerBox>
   );
 };
 

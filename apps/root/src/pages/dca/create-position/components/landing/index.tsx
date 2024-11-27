@@ -29,7 +29,7 @@ const StyledBackgroundPaper = styled(BackgroundPaper)`
   gap: ${spacing(6)};
   align-items: center;
   padding-top: ${spacing(12)};
-  margin-top: ${spacing(20)};
+  margin-top: ${spacing(14)};
   padding-bottom: ${spacing(12)};
   position: relative;
   overflow: hidden;
@@ -63,7 +63,7 @@ const AggregatorLanding = () => {
   return (
     <StyledBackgroundPaper variant="outlined">
       {logo}
-      <Typography variant="h4" fontWeight={700}>
+      <Typography variant="h4Bold">
         <FormattedMessage description="dcaLandingTitle" defaultMessage="Balmy’s Dollar-Cost Average Strategy" />
       </Typography>
       <Typography variant="bodyRegular" textAlign="center">

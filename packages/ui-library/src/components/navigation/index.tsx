@@ -22,18 +22,19 @@ import { ListItemButton } from '../listitembutton';
 import { ListItemIcon } from '../listitemicon';
 import { ListItemText } from '../listitemtext';
 import { Container } from '../container';
-import { Link, useTheme } from '@mui/material';
+import { Link, Typography, useMediaQuery, useTheme } from '@mui/material';
 import BalmyLogoLight from '../../assets/balmy-logo-light';
 import BalmyLogoDark from '../../assets/balmy-logo-dark';
 import styled from 'styled-components';
 import { OptionsMenu, OptionsMenuOption } from '../options-menu';
-import { SPACING } from '../../theme/constants';
 import { colors } from '../../theme/colors';
 import { ContainerBox } from '../container-box';
+import isUndefined from 'lodash/isUndefined';
 
 enum SectionType {
   divider = 'divider',
   link = 'link',
+  group = 'group',
 }
 
 type BaseLinkSection = {
@@ -49,11 +50,17 @@ type LinkSection = BaseLinkSection & {
   options?: BaseLinkSection[];
 };
 
+type GroupSection = {
+  sections: LinkSection[];
+  type: SectionType.group;
+  label: string;
+};
+
 type DividerSection = {
   type: SectionType.divider;
 };
 
-type Section = LinkSection | DividerSection;
+type Section = LinkSection | DividerSection | GroupSection;
 
 type NavigationProps = React.PropsWithChildren<{
   selectedSection: string;
@@ -63,10 +70,11 @@ type NavigationProps = React.PropsWithChildren<{
   helpOptions: OptionsMenuOption[];
   extraHeaderTools?: React.ReactElement;
   onClickBrandLogo: () => void;
+  headerContent?: React.ReactNode;
 }>;
 
-const drawerWidthMd = 240;
-const drawerWidthSm = 240;
+const drawerWidthLg = 240;
+const drawerWidthSm = 200;
 
 const StyledIconToolbar = styled(Toolbar)`
   ${({ theme: { spacing } }) => `
@@ -76,7 +84,7 @@ const StyledIconToolbar = styled(Toolbar)`
 
 const StyledListItemButton = styled(ListItemButton)`
   ${({ theme: { spacing, palette } }) => `
-    padding: ${spacing(3)} ${spacing(6)};
+    padding: ${spacing(3)} ${spacing(4)};
     color: ${colors[palette.mode].typography.typo3};
     &.Mui-selected {
       background-color: inherit;
@@ -112,14 +120,14 @@ const StyledDrawerContainer = styled.div`
 const StyledDrawerFooterContainer = styled.div`
   ${({
     theme: {
-      spacing,
+      space,
       palette: { mode },
     },
   }) => `
     display: flex;
-    margin-bottom: ${spacing(5)};
+    margin-bottom: ${space.s05};
     justify-content: center;
-    gap: ${spacing(6)};
+    gap: ${space.s05};
     margin-top: auto;
     color: ${colors[mode].typography.typo3}
   `}
@@ -167,27 +175,67 @@ const CollapsableItems = ({
   selectedSection: string;
   onSectionClick: (section: Section, openInNewTab?: boolean) => void;
 }) => {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState<undefined | boolean>();
   const { options, ...sectionWithoutOptions } = section;
 
-  const isOpen = open || !!options?.find((option) => option.key === selectedSection);
+  const isOpen = isUndefined(open) ? !!options?.find((option) => option.key === selectedSection) : open;
 
   return (
     <>
       <BuiltListItem
         section={sectionWithoutOptions}
-        isSelected={false}
+        isSelected={section.key === selectedSection || !!section.activeKeys?.includes(selectedSection)}
         showChevron
         isOpen={isOpen}
         onClick={() => setOpen((oldSetOpen) => !oldSetOpen)}
       />
       <Collapse in={isOpen} timeout="auto" unmountOnExit>
-        <List dense disablePadding sx={{ padding: `0 ${SPACING(3)}` }}>
+        <List dense disablePadding sx={({ spacing }) => ({ padding: `0 ${spacing(3)}` })}>
           {/* eslint-disable-next-line @typescript-eslint/no-use-before-define */}
           {options?.map((subSection) => buildItem(subSection, selectedSection, onSectionClick))}
         </List>
       </Collapse>
     </>
+  );
+};
+
+const StyledGroupContainer = styled(ContainerBox).attrs({ gap: 2, flexDirection: 'column' })``;
+
+const StyledDrawerLinksContainer = styled(ContainerBox).attrs({ gap: 8, flexDirection: 'column' })`
+  ${({ theme: { spacing } }) => `
+    padding: ${spacing(8)} ${spacing(4)};
+  `}
+`;
+
+const StyledGroupTitle = styled(Typography).attrs({ variant: 'labelRegular' })`
+  ${({
+    theme: {
+      palette: { mode },
+    },
+  }) => `
+    color: ${colors[mode].typography.typo4};
+  `}
+`;
+
+const BuiltGroupItem = ({
+  section,
+  selectedSection,
+  onSectionClick,
+}: {
+  section: GroupSection;
+  selectedSection: string;
+  onSectionClick: (section: Section) => void;
+}) => {
+  const { sections } = section;
+
+  return (
+    <StyledGroupContainer>
+      <StyledGroupTitle>{section.label}</StyledGroupTitle>
+      <List dense disablePadding sx={{ padding: 0 }}>
+        {/* eslint-disable-next-line @typescript-eslint/no-use-before-define */}
+        {sections.map((subSection) => buildItem(subSection, selectedSection, onSectionClick))}
+      </List>
+    </StyledGroupContainer>
   );
 };
 
@@ -198,6 +246,10 @@ const buildItem = (
 ) => {
   if (section.type === SectionType.divider) {
     return <DividerBorder2 />;
+  }
+
+  if (section.type === SectionType.group) {
+    return <BuiltGroupItem section={section} selectedSection={selectedSection} onSectionClick={onSectionClick} />;
   }
 
   if (section.options) {
@@ -231,26 +283,39 @@ const buildDrawer = ({
   onSectionClick: (section: Section, openInNewTab?: boolean) => void;
 }) => {
   const items = [];
-  let lastSectionType: SectionType | undefined = undefined;
   let i = 0;
 
   while (i < sections.length) {
     let section = sections[i];
 
-    if (lastSectionType !== SectionType.link && sections[i].type === SectionType.link) {
+    if (section.type === SectionType.group) {
       const links = [];
-      while (i < sections.length && section.type === SectionType.link) {
+      while (i < sections.length && sections[i].type === SectionType.group) {
         links.push(buildItem(section, selectedSection, onSectionClick));
         i++;
         section = sections[i];
       }
-      items.push(<List dense>{links}</List>);
+      items.push(
+        <List dense sx={{ padding: 0 }}>
+          {links}
+        </List>
+      );
+    } else if (sections[i].type === SectionType.link) {
+      const links = [];
+      while (i < sections.length && sections[i].type === SectionType.link) {
+        links.push(buildItem(section, selectedSection, onSectionClick));
+        i++;
+        section = sections[i];
+      }
+      items.push(
+        <List dense sx={{ padding: 0 }}>
+          {links}
+        </List>
+      );
     } else if (section.type === SectionType.divider) {
       items.push(buildItem(section, selectedSection, onSectionClick));
       i++;
     }
-
-    lastSectionType = section && section.type;
   }
 
   return items;
@@ -271,6 +336,7 @@ const Navigation = ({
   helpOptions,
   extraHeaderTools,
   onClickBrandLogo,
+  headerContent,
 }: NavigationProps) => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const {
@@ -278,12 +344,13 @@ const Navigation = ({
     spacing,
     breakpoints,
   } = useTheme();
+  const isDownLg = useMediaQuery(breakpoints.down('lg'));
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
   };
 
-  const drawerWidth = breakpoints.down('md') ? drawerWidthSm : drawerWidthMd;
+  const drawerWidth = isDownLg ? drawerWidthSm : drawerWidthLg;
   const drawerLinks = buildDrawer({ sections, selectedSection, onSectionClick });
 
   const iconProps = { cursor: 'pointer', onClick: onClickBrandLogo, size: '110px' };
@@ -291,35 +358,18 @@ const Navigation = ({
 
   const drawer = (
     <StyledDrawerContainer>
-      <StyledIconToolbar sx={{ padding: `${spacing(4)} ${spacing(6)}`, marginBottom: spacing(10) }}>
-        {icon}
-      </StyledIconToolbar>
-      <DividerBorder2 />
-      {drawerLinks}
+      <StyledIconToolbar sx={{ padding: `${spacing(4)} ${spacing(6)}` }}>{icon}</StyledIconToolbar>
+      {headerContent}
+      <StyledDrawerLinksContainer>{drawerLinks}</StyledDrawerLinksContainer>
       <StyledDrawerFooterContainer>
-        <Link
-          underline="none"
-          target="_blank"
-          href="https://github.com/balmy-protocol"
-          sx={{ color: colors[mode].typography.typo3 }}
-        >
-          <GithubIcon />
+        <Link underline="none" target="_blank" href="https://github.com/balmy-protocol">
+          <GithubIcon sx={{ color: colors[mode].typography.typo3 }} />
         </Link>
-        <Link
-          underline="none"
-          target="_blank"
-          href="https://twitter.com/balmy_xyz"
-          sx={{ color: colors[mode].typography.typo3 }}
-        >
-          <TwitterIcon />
+        <Link underline="none" target="_blank" href="https://twitter.com/balmy_xyz">
+          <TwitterIcon sx={{ color: colors[mode].typography.typo3 }} />
         </Link>
-        <Link
-          underline="none"
-          target="_blank"
-          href="http://discord.balmy.xyz"
-          sx={{ color: colors[mode].typography.typo3 }}
-        >
-          <DiscordIcon />
+        <Link underline="none" target="_blank" href="http://discord.balmy.xyz">
+          <DiscordIcon sx={{ color: colors[mode].typography.typo3 }} />
         </Link>
       </StyledDrawerFooterContainer>
     </StyledDrawerContainer>
@@ -404,7 +454,7 @@ const Navigation = ({
           flexDirection: 'column',
           p: 3,
           width: { md: `calc(100% - ${drawerWidth}px)` },
-          alignSelf: 'flex-end',
+          alignSelf: { md: 'flex-end' },
           padding: 0,
           maxWidth: '100%',
           alignItems: 'center',

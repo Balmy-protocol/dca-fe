@@ -12,14 +12,14 @@ import {
   KeyboardArrowRightIcon,
   Link,
   MoneysIcon,
-  MoreVertIcon,
-  OptionsMenu,
+  MoreVertButtonIcon,
+  OptionsMenuItems,
   OptionsMenuOption,
   OptionsMenuOptionType,
   WalletMoneyIcon,
 } from 'ui-library';
 
-interface PositionProp extends Omit<Position, 'from' | 'to'> {
+interface PositionProp extends DistributiveOmit<Position, 'from' | 'to'> {
   from: Token;
   to: Token;
 }
@@ -49,10 +49,11 @@ const PositionOptions = ({
   const trackEvent = useTrackEvent();
   const intl = useIntl();
   const wrappedProtocolToken = getWrappedProtocolToken(position.chainId);
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
   const onViewDetails = () => {
     dispatch(setPosition(undefined));
-    pushToHistory(`/${chainId}/positions/${position.version}/${position.positionId}`);
+    pushToHistory(`/invest/positions/${chainId}/${position.version}/${position.positionId}`);
     trackEvent('DCA - Position List - View details');
   };
 
@@ -78,7 +79,7 @@ const PositionOptions = ({
     const viewPositionOption: OptionsMenuOption = {
       label: (
         <Link
-          href={`/${chainId}/positions/${position.version}/${position.positionId}`}
+          href={`/invest/positions/${chainId}/${position.version}/${position.positionId}`}
           underline="none"
           color="inherit"
           onClick={(e) => e.preventDefault()}
@@ -155,12 +156,15 @@ const PositionOptions = ({
   }, [showSwitchAction, disabled, position, handleOnWithdraw, handleTerminate, hasSignSupport]);
 
   return (
-    <OptionsMenu
-      mainDisplay={<MoreVertIcon />}
-      options={options}
-      blockMenuOpen={!!pendingTransaction}
-      showEndIcon={false}
-    />
+    <>
+      <MoreVertButtonIcon
+        onClick={(e) => setAnchorEl(e.currentTarget)}
+        $isActive={!!anchorEl}
+        disabled={!!pendingTransaction}
+        fontSize="large"
+      />
+      <OptionsMenuItems options={options} anchorEl={anchorEl} handleClose={() => setAnchorEl(null)} />
+    </>
   );
 };
 

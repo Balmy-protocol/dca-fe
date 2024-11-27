@@ -23,7 +23,7 @@ import { parseUnits } from 'viem';
 import { useTokenBalance } from '@state/balances/hooks';
 import useActiveWallet from '@hooks/useActiveWallet';
 import useAvailableSwapIntervals from '@hooks/useAvailableSwapIntervals';
-import { useThemeMode } from '@state/config/hooks';
+import FormWalletSelector from '@common/components/form-wallet-selector';
 
 const networkList = compact(
   orderBy(
@@ -89,7 +89,6 @@ const SwapFirstStep = ({
 }: SwapFirstStepProps) => {
   const { from, fromValue, to, frequencyValue } = useCreatePositionState();
   const activeWallet = useActiveWallet();
-  const themeMode = useThemeMode();
   const { balance, isLoading: isLoadingBalance } = useTokenBalance({
     token: from,
     walletAddress: activeWallet?.address,
@@ -129,12 +128,20 @@ const SwapFirstStep = ({
   return (
     <Grid container rowSpacing={6}>
       <Grid item xs={12}>
-        <Typography variant="h4Bold" color={colors[themeMode].typography.typo1}>
-          <FormattedMessage description="createADcaPosition" defaultMessage="Create a Recurring Investment" />
-        </Typography>
-      </Grid>
-      <Grid item xs={12}>
-        <NetworkSelector disableSearch handleChangeCallback={onChangeNetwork} networkList={networkList} />
+        <ContainerBox flexDirection="column" gap={3}>
+          <ContainerBox gap={1} flexDirection="column">
+            <Typography variant="bodySmallSemibold" color={({ palette: { mode } }) => colors[mode].typography.typo4}>
+              <FormattedMessage description="dca.form.wallet-selector.title" defaultMessage="Wallet" />
+            </Typography>
+            <FormWalletSelector />
+          </ContainerBox>
+          <ContainerBox gap={1} flexDirection="column">
+            <Typography variant="bodySmallSemibold" color={({ palette: { mode } }) => colors[mode].typography.typo4}>
+              <FormattedMessage description="dca.form.network-selector.title" defaultMessage="Network" />
+            </Typography>
+            <NetworkSelector disableSearch handleChangeCallback={onChangeNetwork} networkList={networkList} />
+          </ContainerBox>
+        </ContainerBox>
       </Grid>
       <Grid item xs={12}>
         <TokenSelector
@@ -145,13 +152,13 @@ const SwapFirstStep = ({
       </Grid>
       <Grid item xs={12}>
         <ContainerBox flexDirection="column" gap={3}>
-          <StyledDcaInputLabel>
+          <Typography variant="bodySmallSemibold" color={({ palette }) => colors[palette.mode].typography.typo4}>
             <FormattedMessage
               description="howMuchToSell"
               defaultMessage="How much <b>{from}</b> are you planning to invest?"
               values={{ from: from?.symbol || '', b: (chunks) => <b>{chunks}</b> }}
             />
-          </StyledDcaInputLabel>
+          </Typography>
           <TokenAmounUsdInput
             value={fromValue}
             token={from}

@@ -6,9 +6,7 @@ import useTrackEvent from '@hooks/useTrackEvent';
 import { Wallet } from 'common-types';
 import useEditLabel from '@hooks/useEditLabel';
 
-const StyledInputsContainer = styled(ContainerBox)`
-  margin: ${({ theme: { spacing } }) => `${spacing(7)} 0`};
-`;
+const StyledInputsContainer = styled(ContainerBox)``;
 
 interface EditWalletLabelModalProps {
   open: boolean;
@@ -93,22 +91,20 @@ const EditWalletLabelModal = ({ open, onCancel, walletToEdit }: EditWalletLabelM
       ]}
       actionsAlignment="horizontal"
     >
-      <ContainerBox flexDirection="column" fullWidth alignItems="center">
-        <StyledInputsContainer flexDirection="column" fullWidth gap={2}>
-          <TextField
-            value={walletLabel}
-            placeholder={intl.formatMessage(
-              defineMessage({
-                defaultMessage: 'Wallet Name',
-                description: 'walletName',
-              })
-            )}
-            onChange={(e) => setWalletLabel(e.target.value)}
-            fullWidth
-          />
-          <TextField id="editWalletAddress" disabled value={walletToEdit?.address} fullWidth type="text" />
-        </StyledInputsContainer>
-      </ContainerBox>
+      <StyledInputsContainer flexDirection="column" fullWidth gap={2}>
+        <TextField
+          value={walletLabel}
+          placeholder={intl.formatMessage(
+            defineMessage({
+              defaultMessage: 'Wallet Name',
+              description: 'walletName',
+            })
+          )}
+          onChange={(e) => setWalletLabel(e.target.value)}
+          fullWidth
+        />
+        <TextField id="editWalletAddress" disabled value={walletToEdit?.address} fullWidth type="text" />
+      </StyledInputsContainer>
     </Modal>
   );
 };

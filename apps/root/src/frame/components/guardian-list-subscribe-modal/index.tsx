@@ -185,7 +185,7 @@ const GuardianListSubscribeModal = ({ isOpen, onClose }: GuardianListSubscribeMo
                   : undefined
               }
             />
-            <Typography variant="bodySmallSmall" color={({ palette: { mode } }) => colors[mode].typography.typo2}>
+            <Typography variant="bodyExtraSmall" color={({ palette: { mode } }) => colors[mode].typography.typo2}>
               <FormattedMessage
                 description="earn.subscribe.modal.disclaimer"
                 defaultMessage="Once you're in, you'll receive access, and we'll notify you as soon as it's ready."

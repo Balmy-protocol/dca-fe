@@ -29,7 +29,7 @@ import { useThemeMode } from '@state/config/hooks';
 import useEstimateTransferFee from '@pages/transfer/hooks/useEstimateTransferFee';
 import ConfirmTransferModal from '../confirm-transfer-modal';
 import useSelectedNetwork from '@hooks/useSelectedNetwork';
-import { parseUnits } from 'viem';
+import { Hash, parseUnits } from 'viem';
 import TransactionConfirmation from '@common/components/transaction-confirmation';
 import useStoredContactList from '@hooks/useStoredContactList';
 import { TransactionApplicationIdentifier } from 'common-types';
@@ -40,6 +40,7 @@ import useWallets from '@hooks/useWallets';
 import useTrackEvent from '@hooks/useTrackEvent';
 import { formatUsdAmount } from '@common/utils/currency';
 import useValidateAddress from '@hooks/useValidateAddress';
+import FormWalletSelector from '@common/components/form-wallet-selector';
 import useCurrentNetwork from '@hooks/useCurrentNetwork';
 
 const StyledTransferForm = styled(BackgroundPaper)`
@@ -55,8 +56,7 @@ const StyledNoWalletsConnected = styled(ContainerBox)`
 
 const StyledRecipientContainer = styled(ContainerBox).attrs({ gap: 3, alignItems: 'start' })`
   ${({ theme: { spacing } }) => `
-  margin-top: ${spacing(6)};
-  margin-bottom: ${spacing(7)};
+  margin-bottom: ${spacing(1.5)};
   `}
 `;
 
@@ -72,8 +72,8 @@ const StyledFrequentRecipient = styled(ContainerBox).attrs({ gap: 6, justifyCont
 
 const noWalletConnected = (
   <StyledNoWalletsConnected flexDirection="column" gap={2} justifyContent="center">
-    <Typography variant="h4">💸</Typography>
-    <Typography variant="h5" fontWeight="bold">
+    <Typography variant="h4Bold">💸</Typography>
+    <Typography variant="h5Bold">
       <FormattedMessage description="noWalletConnected" defaultMessage="No Wallet Connected" />
     </Typography>
     <Typography variant="bodyRegular">
@@ -103,11 +103,12 @@ const TransferForm = () => {
   const selectedNetwork = useSelectedNetwork();
   const [openConfirmTxStep, setOpenConfirmTxStep] = React.useState(false);
   const [shouldShowConfirmation, setShouldShowConfirmation] = React.useState(false);
-  const [currentTxHash, setCurrentTxHash] = React.useState('');
+  const [currentTransaction, setCurrentTransaction] = React.useState<{ hash: Hash; chainId: number } | undefined>();
   const themeMode = useThemeMode();
   const [fee, isLoadingFee] = useEstimateTransferFee();
   const contactList = useStoredContactList();
   const [frequentRecipient, setFrequentRecipient] = React.useState<string | undefined>();
+  const [isContactSelection, setIsContactSelection] = React.useState(false);
   const [activeModal, setActiveModal] = React.useState<ContactListActiveModal>(ContactListActiveModal.NONE);
   const {
     validationResult: { isValidAddress, errorMessage: addressErrorMessage },
@@ -170,6 +171,7 @@ const TransferForm = () => {
     dispatch(resetForm());
     setShouldShowConfirmation(false);
     setFrequentRecipient(undefined);
+    setIsContactSelection(false);
   }, [setShouldShowConfirmation]);
 
   const isRecipientInContactList = React.useMemo(
@@ -187,6 +189,7 @@ const TransferForm = () => {
     setInputAddress(newRecipient);
     dispatch(setRecipient(newRecipient));
     setActiveModal(ContactListActiveModal.NONE);
+    setIsContactSelection(true);
     if (selectedToken) {
       replaceHistory(`/transfer/${selectedNetwork.chainId}/${selectedToken.address}/${newRecipient}`);
     }
@@ -208,8 +211,8 @@ const TransferForm = () => {
       <StyledTransferForm variant="outlined">
         <TransactionConfirmation
           shouldShow={shouldShowConfirmation}
-          transaction={currentTxHash}
-          showBalanceChanges={false}
+          transaction={currentTransaction}
+          showWalletBalanceChanges={false}
           successSubtitle={
             <FormattedMessage
               description="transferSuccessfulDescription"
@@ -259,7 +262,7 @@ const TransferForm = () => {
           fee={fee}
           isLoadingFee={isLoadingFee}
           network={selectedNetwork}
-          setCurrentTxHash={setCurrentTxHash}
+          setCurrentTransaction={setCurrentTransaction}
           setShouldShowConfirmation={setShouldShowConfirmation}
         />
         <ContactModal
@@ -273,18 +276,45 @@ const TransferForm = () => {
           ? noWalletConnected
           : !shouldShowConfirmation && (
               <>
-                <Typography variant="h3" fontWeight="bold" color={colors[themeMode].typography.typo1}>
-                  <FormattedMessage description="transfer" defaultMessage="Transfer" />
-                </Typography>
-                <StyledRecipientContainer>
-                  <RecipientAddress
-                    validationResult={{ isValidAddress, errorMessage: addressErrorMessage }}
-                    setAddress={setInputAddress}
-                  />
-                  <ContactsButton onClick={onOpenContactList} />
-                </StyledRecipientContainer>
                 <ContainerBox flexDirection="column" gap={3}>
-                  <NetworkSelector networkList={networkList} handleChangeCallback={handleChangeNetworkCallback} />
+                  <ContainerBox gap={1} flexDirection="column">
+                    <Typography
+                      variant="bodySmallSemibold"
+                      color={({ palette: { mode } }) => colors[mode].typography.typo4}
+                    >
+                      <FormattedMessage description="transfer.form.wallet-selector.title" defaultMessage="Wallet" />
+                    </Typography>
+                    <FormWalletSelector />
+                  </ContainerBox>
+                  <ContainerBox gap={1} flexDirection="column">
+                    <Typography
+                      variant="bodySmallSemibold"
+                      color={({ palette: { mode } }) => colors[mode].typography.typo4}
+                    >
+                      <FormattedMessage
+                        description="transfer.form.recipient-selector.title"
+                        defaultMessage="Transfer to"
+                      />
+                    </Typography>
+                    <StyledRecipientContainer>
+                      <RecipientAddress
+                        validationResult={{ isValidAddress, errorMessage: addressErrorMessage }}
+                        setAddress={setInputAddress}
+                        isContactSelection={isContactSelection}
+                        setIsContactSelection={(newValue) => setIsContactSelection(newValue)}
+                      />
+                      <ContactsButton onClick={onOpenContactList} />
+                    </StyledRecipientContainer>
+                  </ContainerBox>
+                  <ContainerBox gap={1} flexDirection="column">
+                    <Typography
+                      variant="bodySmallSemibold"
+                      color={({ palette: { mode } }) => colors[mode].typography.typo4}
+                    >
+                      <FormattedMessage description="transfer.form.network-selector.title" defaultMessage="Network" />
+                    </Typography>
+                    <NetworkSelector networkList={networkList} handleChangeCallback={handleChangeNetworkCallback} />
+                  </ContainerBox>
                   <TokenSelector />
                 </ContainerBox>
                 <StyledNetworkFeeContainer flexDirection="column" gap={3}>
@@ -314,13 +344,13 @@ const TransferForm = () => {
       </StyledTransferForm>
       {shouldShowConfirmation && !isRecipientInContactList && (
         <StyledFrequentRecipient>
-          <ContainerBox gap={1} alignItems="center" color={colors[themeMode].typography.typo2}>
+          <ContainerBox gap={1} alignItems="center">
             <ProfileAddIcon />
             <ContainerBox flexDirection="column">
-              <Typography variant="bodySmallBold">
+              <Typography variant="bodySmallBold" color={colors[themeMode].typography.typo2}>
                 <FormattedMessage description="frequientRecipientQuestion" defaultMessage="Frequent Recipient?" />
               </Typography>
-              <Typography variant="bodySmallRegular">
+              <Typography variant="bodySmallRegular" color={colors[themeMode].typography.typo2}>
                 <FormattedMessage description="addThemToYourContacts" defaultMessage="Add them to your contacts." />
               </Typography>
             </ContainerBox>

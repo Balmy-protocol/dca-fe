@@ -10,8 +10,8 @@ const AnimatedChevronRight = styled((props: SvgIconProps) => (
   </ContainerBox>
 ))<{ $hovered?: boolean }>`
   ${({ $hovered, theme: { spacing } }) => `
-  transition: transform 0.15s ease;
-  transform: translateX(${$hovered ? spacing(1) : 0});
+    transition: transform 0.15s ease;
+    transform: translateX(${$hovered ? spacing(1) : 0});
   `}
 `;
 

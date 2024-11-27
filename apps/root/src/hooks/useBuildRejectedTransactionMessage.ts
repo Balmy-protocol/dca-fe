@@ -18,36 +18,8 @@ function useBuildTransactionMessages() {
 
   return React.useCallback(
     (tx: TransactionDetails) => {
-      let message = 'Transaction confirmed!';
+      let message = 'Transaction Confirmed';
       switch (tx.type) {
-        case TransactionTypes.wrap: {
-          const swapTypeData = tx.typeData;
-
-          message = `Wrapping ${formatCurrencyAmount({
-            amount: swapTypeData.amountFrom,
-            token: swapTypeData.from,
-            intl,
-          })} ${swapTypeData.from.symbol} for ${formatCurrencyAmount({
-            amount: swapTypeData.amountTo,
-            token: swapTypeData.to,
-            intl,
-          })} ${swapTypeData.to.symbol}`;
-          break;
-        }
-        case TransactionTypes.unwrap: {
-          const swapTypeData = tx.typeData;
-
-          message = `Unwrapping ${formatCurrencyAmount({
-            amount: swapTypeData.amountFrom,
-            token: swapTypeData.from,
-            intl,
-          })} ${swapTypeData.from.symbol} for ${formatCurrencyAmount({
-            amount: swapTypeData.amountTo,
-            token: swapTypeData.to,
-            intl,
-          })} ${swapTypeData.to.symbol}`;
-          break;
-        }
         case TransactionTypes.swap: {
           const swapTypeData = tx.typeData;
 
@@ -212,6 +184,72 @@ function useBuildTransactionMessages() {
             }),
             {
               campaign: claimCampaignTypeData.name,
+            }
+          );
+          break;
+        }
+        case TransactionTypes.earnCreate: {
+          const { asset, assetAmount } = tx.typeData;
+
+          message = intl.formatMessage(
+            defineMessage({
+              description: 'transactionRejected.earn.create',
+              defaultMessage: 'Investing {amount} {symbol}',
+            }),
+            {
+              symbol: asset.symbol,
+              amount: formatCurrencyAmount({ amount: BigInt(assetAmount), token: asset, intl }),
+            }
+          );
+          break;
+        }
+        case TransactionTypes.earnIncrease: {
+          const { asset, assetAmount } = tx.typeData;
+
+          message = intl.formatMessage(
+            defineMessage({
+              description: 'transactionRejected.earn.increase',
+              defaultMessage: 'Depositing {amount} {symbol}',
+            }),
+            {
+              symbol: asset.symbol,
+              amount: formatCurrencyAmount({ amount: BigInt(assetAmount), token: asset, intl }),
+            }
+          );
+          break;
+        }
+        case TransactionTypes.earnWithdraw: {
+          const withdrawnAsset = tx.typeData.withdrawn[0];
+
+          const isWithdrawingAsset = BigInt(withdrawnAsset.amount) > 0n;
+
+          const isWithdrawingRewards = tx.typeData.withdrawn.some(
+            (withdraw) => withdraw.token.address !== withdrawnAsset.token.address && BigInt(withdraw.amount) > 0n
+          );
+
+          const inlcudePlusSign = isWithdrawingRewards && isWithdrawingAsset;
+
+          message = intl.formatMessage(
+            defineMessage({
+              description: 'transactionRejected.earn.withdraw',
+              defaultMessage: 'Withdrawing {asset}{plusRewards}',
+            }),
+            {
+              asset: isWithdrawingAsset
+                ? `${formatCurrencyAmount({
+                    amount: BigInt(withdrawnAsset.amount),
+                    token: withdrawnAsset.token,
+                    intl,
+                  })} ${withdrawnAsset.token.symbol}`
+                : '',
+              plusRewards: isWithdrawingRewards
+                ? `${inlcudePlusSign ? '+' : ''} ${intl.formatMessage(
+                    defineMessage({
+                      description: 'transactionRejected.earn.withdraw.plusRewards',
+                      defaultMessage: 'Rewards',
+                    })
+                  )}`
+                : '',
             }
           );
           break;

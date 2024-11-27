@@ -62,8 +62,8 @@ export const GraphNoData = () => {
   const mode = useThemeMode();
   return (
     <ContainerBox flexDirection="column" gap={2} fullWidth alignItems="center">
-      <Typography variant="h4">📊</Typography>
-      <Typography variant="h5" fontWeight={700} color={colors[mode].typography.typo3}>
+      <Typography variant="h4Bold">📊</Typography>
+      <Typography variant="h5Bold" fontWeight={700} color={colors[mode].typography.typo3}>
         <FormattedMessage
           description="graphNoDataAvailable"
           defaultMessage="There is no data available about this position yet"
@@ -83,8 +83,8 @@ export const GraphNoPriceAvailable = () => {
   const mode = useThemeMode();
   return (
     <ContainerBox flexDirection="column" gap={2} fullWidth alignItems="center">
-      <Typography variant="h4">📊</Typography>
-      <Typography variant="h5" fontWeight={700} color={colors[mode].typography.typo3}>
+      <Typography variant="h4Bold">📊</Typography>
+      <Typography variant="h5Bold" fontWeight={700} color={colors[mode].typography.typo3}>
         <FormattedMessage
           description="No price available"
           defaultMessage="We could not fetch the price of one of the tokens"

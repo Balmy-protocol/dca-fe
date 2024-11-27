@@ -38,6 +38,11 @@ const basePallete: PaletteOptions = {
   contrastThreshold: 3,
   tonalOffset: 0.2,
   divider: 'rgba(255, 255, 255, 0.12)',
+  typo1: colors.dark.typography.typo1,
+  typo2: colors.dark.typography.typo2,
+  typo3: colors.dark.typography.typo3,
+  typo4: colors.dark.typography.typo4,
+  typo5: colors.dark.typography.typo5,
 };
 export const darkModePallete: PaletteOptions = {
   ...basePallete,
@@ -67,6 +72,11 @@ export const darkModePallete: PaletteOptions = {
     dark: colors.dark.semantic.success.darker,
     light: colors.dark.semantic.success.light,
   },
+  typo1: colors.dark.typography.typo1,
+  typo2: colors.dark.typography.typo2,
+  typo3: colors.dark.typography.typo3,
+  typo4: colors.dark.typography.typo4,
+  typo5: colors.dark.typography.typo5,
   info: {
     //default
     main: colors.dark.typography.typo2,
@@ -94,10 +104,11 @@ export const darkModePallete: PaletteOptions = {
   text: {
     primary: colors.dark.typography.typo2,
     secondary: colors.dark.typography.typo3,
-    disabled: baseColors.disabledText,
+    disabled: colors.dark.typography.typo4,
   },
   gradient: {
     main: `linear-gradient(0deg, ${colors.dark.background.emphasis} -1.99%, ${baseColors.violet.violet500} 100%)`,
+    earnWizard: `linear-gradient(180deg, #1D132A 25.13%, rgba(52, 32, 81, 0.80) 100%);`,
     newsBanner: `linear-gradient(286deg, #7A1BFF 1.4%, #0EECC1 113.11%)`,
   },
 };
@@ -130,6 +141,11 @@ export const lightModePallete: PaletteOptions = {
     dark: colors.light.semantic.success.darker,
     light: colors.light.semantic.success.light,
   },
+  typo1: colors.light.typography.typo1,
+  typo2: colors.light.typography.typo2,
+  typo3: colors.light.typography.typo3,
+  typo4: colors.light.typography.typo4,
+  typo5: colors.light.typography.typo5,
   info: {
     //default
     main: colors.light.typography.typo2,
@@ -144,10 +160,11 @@ export const lightModePallete: PaletteOptions = {
   text: {
     primary: colors.light.typography.typo2,
     secondary: colors.light.typography.typo3,
-    disabled: baseColors.disabledText,
+    disabled: colors.light.typography.typo4,
   },
   gradient: {
     main: `linear-gradient(0deg, ${colors.light.background.secondary} -1.99%, ${baseColors.violet.violet500} 100%)`,
+    earnWizard: `linear-gradient(90deg, #EADBFF 0%, #D3B4FFCC 100%)`,
     newsBanner: `linear-gradient(286deg, #7A1BFF 1.4%, #0EECC1 113.11%)`,
   },
 };

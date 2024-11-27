@@ -375,6 +375,7 @@ export default class AccountService extends EventsManager<AccountServiceData> {
       }
 
       try {
+        void this.web3Service.eventService.identifyUser(this.user.id);
         void this.web3Service.eventService.trackEvent('User sign in', {
           with: wallet?.address,
         });
@@ -384,6 +385,7 @@ export default class AccountService extends EventsManager<AccountServiceData> {
     } else {
       await this.createUser({ label: 'Personal', signature: storedSignature, wallet });
       try {
+        void this.web3Service.eventService.identifyUser(this.user?.id);
         void this.web3Service.eventService.trackEvent('User sign up', {
           with: wallet?.address,
         });
@@ -432,12 +434,12 @@ export default class AccountService extends EventsManager<AccountServiceData> {
       accountWallet.address.toLowerCase() === this.activeWallet
         ? this.getActiveWallet()!
         : accountWallet.address === signedInWallet?.address
-          ? signedInWallet
-          : toWallet({
-              address: accountWallet.address,
-              isAuth: accountWallet.isAuth,
-              status: WalletStatus.disconnected,
-            })
+        ? signedInWallet
+        : toWallet({
+            address: accountWallet.address,
+            isAuth: accountWallet.isAuth,
+            status: WalletStatus.disconnected,
+          })
     );
 
     this.user = {
@@ -458,11 +460,12 @@ export default class AccountService extends EventsManager<AccountServiceData> {
   }
 
   setActiveWallet(wallet: string) {
-    this.activeWallet = find(this.user?.wallets || [], { address: wallet.toLowerCase() as Address })?.address;
-    if (!this.activeWallet) {
+    const newActiveWallet = find(this.user?.wallets || [], { address: wallet.toLowerCase() as Address })?.address;
+    if (!newActiveWallet) {
       throw new Error('Cannot find wallet');
     }
 
+    this.activeWallet = newActiveWallet;
     return;
   }
 

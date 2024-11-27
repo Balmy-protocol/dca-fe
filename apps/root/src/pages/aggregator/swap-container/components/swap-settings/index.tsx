@@ -62,7 +62,7 @@ const StyledOverlay = styled(ContainerBox).attrs({ flexDirection: 'column', gap:
 const StyledCloseIconButton = styled(IconButton)`
   ${({ theme: { palette, spacing } }) => `
   position: absolute;
-  top: -${spacing(8)};
+  top: -${spacing(12)};
   right: -${spacing(6)};
   padding: ${spacing(2.5)};
   color: ${colors[palette.mode].typography.typo2};
@@ -74,8 +74,11 @@ const StyledSettingTitle = styled(Typography).attrs({
 })``;
 
 const StyledAccordion = styled(Accordion).attrs({ defaultExpanded: false })`
-  ${({ theme: { spacing } }) => `
-  padding: ${spacing(5)} ${spacing(3)};
+  ${({ theme: { space, palette } }) => `
+  padding: ${space.s04};
+  background: none;
+  border-bottom: 1px solid ${colors[palette.mode].border.border1};
+  border-radius: 0 !important;
   `}
 `;
 
@@ -108,6 +111,7 @@ const AccordionDetails = styled(MuiAccordionDetails)(({ theme }) => ({
   paddingTop: theme.spacing(3),
   marginTop: 0,
   borderTop: 'none',
+  overflowY: 'scroll',
 }));
 
 const StyledApprovalContainer = styled(BackgroundPaper).attrs({ variant: 'outlined' })`
@@ -224,7 +228,7 @@ const SwapSettings = ({ shouldShow, onClose, setShouldShowFirstStep }: SwapSetti
         <StyledCloseIconButton aria-label="close" onClick={onClose}>
           <CloseIcon />
         </StyledCloseIconButton>
-        <Typography variant="h5" fontWeight={700}>
+        <Typography variant="h5Bold">
           <FormattedMessage description="advancedAggregatorSettings" defaultMessage="Advanced settings" />
         </Typography>
         <div>
@@ -323,7 +327,7 @@ const SwapSettings = ({ shouldShow, onClose, setShouldShowFirstStep }: SwapSetti
         {/* Universal Approval */}
         <StyledApprovalContainer>
           <ContainerBox flexDirection="column" gap={1}>
-            <Typography variant="h6Bold">
+            <Typography variant="h5Bold">
               <FormattedMessage
                 description="advancedAggregatorSettingsPermit2"
                 defaultMessage="Use Universal approval"

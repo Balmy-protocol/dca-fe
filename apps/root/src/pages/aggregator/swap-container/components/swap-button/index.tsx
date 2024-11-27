@@ -141,26 +141,15 @@ const SwapButton = ({
       fullWidth
       onClick={handleMultiSteps}
     >
-      <FormattedMessage description="proceed agg" defaultMessage="Continue to Swap" />
+      {isLoadingRoute && <CenteredLoadingIndicator size={36} color="secondary" />}
+      {!isLoadingRoute && <FormattedMessage description="proceed agg" defaultMessage="Continue to Swap" />}
     </Button>
   );
 
   const ActualSwapButton = (
     <Button size="large" variant="contained" disabled={!!shouldDisableButton} fullWidth onClick={handleSwap}>
-      {isLoadingRoute && <CenteredLoadingIndicator />}
-      {!isLoadingRoute && (
-        <>
-          {from?.address === PROTOCOL_TOKEN_ADDRESS && to?.address === wrappedProtocolToken.address && (
-            <FormattedMessage description="wrap agg" defaultMessage="Wrap" />
-          )}
-          {from?.address === wrappedProtocolToken.address && to?.address === PROTOCOL_TOKEN_ADDRESS && (
-            <FormattedMessage description="unwrap agg" defaultMessage="Unwrap" />
-          )}
-          {((from?.address !== PROTOCOL_TOKEN_ADDRESS && from?.address !== wrappedProtocolToken.address) ||
-            (to?.address !== PROTOCOL_TOKEN_ADDRESS && to?.address !== wrappedProtocolToken.address) ||
-            from.address === to.address) && <FormattedMessage description="swap agg" defaultMessage="Swap" />}
-        </>
-      )}
+      {isLoadingRoute && <CenteredLoadingIndicator size={36} color="secondary" />}
+      {!isLoadingRoute && <FormattedMessage description="swap agg" defaultMessage="Swap" />}
     </Button>
   );
 
@@ -172,21 +161,14 @@ const SwapButton = ({
       fullWidth
       onClick={handleSafeApproveAndSwap}
     >
-      {isLoadingRoute && <CenteredLoadingIndicator size={20} />}
+      {isLoadingRoute && <CenteredLoadingIndicator size={36} color="secondary" />}
       {!isLoadingRoute && (
         <>
-          {from?.address === PROTOCOL_TOKEN_ADDRESS && to?.address === wrappedProtocolToken.address && (
-            <FormattedMessage
-              description="wrap agg"
-              defaultMessage="Authorize {from} and wrap"
-              values={{ from: from.symbol }}
-            />
-          )}
-          {from?.address === wrappedProtocolToken.address && to?.address === PROTOCOL_TOKEN_ADDRESS && (
-            <FormattedMessage description="unwrap agg" defaultMessage="Unwrap" />
-          )}
-          {((from?.address !== PROTOCOL_TOKEN_ADDRESS && from?.address !== wrappedProtocolToken.address) ||
-            (to?.address !== PROTOCOL_TOKEN_ADDRESS && to?.address !== wrappedProtocolToken.address)) && (
+          {/* // Wrap and Unwrap wont require approval */}
+          {(from?.address === PROTOCOL_TOKEN_ADDRESS && to?.address === wrappedProtocolToken.address) ||
+          (from?.address === wrappedProtocolToken.address && to?.address === PROTOCOL_TOKEN_ADDRESS) ? (
+            <FormattedMessage description="swap agg" defaultMessage="Swap" />
+          ) : (
             <FormattedMessage
               description="approve and swap agg"
               defaultMessage="Authorize {from} and swap"

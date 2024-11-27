@@ -1,10 +1,17 @@
 import React, { useState } from 'react';
-import type { Meta } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react';
 
 import { TransactionReceipt } from '.';
 import { HelpOutlineIcon } from '../../icons';
 import type { TransactionReceiptProps } from '.';
-import { TokenType, TransactionEventIncomingTypes, TransactionEventTypes, TransactionStatus } from 'common-types';
+import {
+  IndexerUnits,
+  TokenType,
+  TransactionEventIncomingTypes,
+  TransactionEventTypes,
+  TransactionStatus,
+  WithdrawType,
+} from 'common-types';
 
 function StoryTransactionReceipt({ ...args }: TransactionReceiptProps) {
   const [open, setOpen] = useState(true);
@@ -25,6 +32,7 @@ const meta: Meta<typeof StoryTransactionReceipt> = {
   args: {
     transaction: {
       type: TransactionEventTypes.ERC20_TRANSFER,
+      unit: IndexerUnits.ERC20_TRANSFERS,
       tx: {
         initiatedBy: '0xaaaa',
         chainId: 1,
@@ -93,5 +101,102 @@ const meta: Meta<typeof StoryTransactionReceipt> = {
 };
 
 export default meta;
+
+type Story = StoryObj<typeof TransactionReceipt>;
+
+export const EarnWithdrawReceipt: Story = {
+  args: {
+    transaction: {
+      type: TransactionEventTypes.EARN_WITHDRAW,
+      unit: IndexerUnits.EARN,
+      tx: {
+        initiatedBy: '0xaaaa',
+        chainId: 1,
+        txHash: '0xhash',
+        timestamp: 1703711755,
+        spentInGas: {
+          amount: BigInt('5'),
+          amountInUnits: '0.0001',
+          amountInUSD: '1',
+        },
+        explorerLink: 'https://etherscan.io/tx/0x5bf9e7d45b5e2b023e4c6112c0610292e770ef7a3f7c031062fe93ac1f82c5e5',
+        network: {
+          name: 'Ethereum',
+          nativeCurrency: {
+            name: 'Ethereum',
+            symbol: 'ETH',
+            decimals: 18,
+            chainId: 1,
+            address: '0xaddress',
+            type: TokenType.NATIVE,
+            underlyingTokens: [],
+            icon: <HelpOutlineIcon />,
+            chainAddresses: [],
+          },
+          chainId: 1,
+          rpc: [],
+          mainCurrency: {
+            name: 'Ethereum',
+            symbol: 'ETH',
+            decimals: 18,
+            chainId: 1,
+            address: '0xaddress',
+            type: TokenType.NATIVE,
+            underlyingTokens: [],
+            icon: <HelpOutlineIcon />,
+            chainAddresses: [],
+          },
+        },
+        nativePrice: 10,
+      },
+      data: {
+        tokenFlow: TransactionEventIncomingTypes.INCOMING,
+        withdrawn: [
+          {
+            token: {
+              name: 'Token',
+              symbol: 'TKN',
+              decimals: 18,
+              chainId: 10,
+              address: '0xaddress',
+              type: TokenType.ERC20_TOKEN,
+              underlyingTokens: [],
+              icon: <HelpOutlineIcon />,
+              chainAddresses: [],
+            },
+            amount: {
+              amount: BigInt('10'),
+              amountInUnits: '0.1',
+              amountInUSD: '1',
+            },
+            withdrawType: WithdrawType.IMMEDIATE,
+          },
+          {
+            token: {
+              name: 'Token',
+              symbol: 'TKN',
+              decimals: 18,
+              chainId: 10,
+              address: '0xaddress',
+              type: TokenType.ERC20_TOKEN,
+              underlyingTokens: [],
+              icon: <HelpOutlineIcon />,
+              chainAddresses: [],
+            },
+            amount: {
+              amount: BigInt('10'),
+              amountInUnits: '0.1',
+              amountInUSD: '1',
+            },
+            withdrawType: WithdrawType.IMMEDIATE,
+          },
+        ],
+        recipient: '0x123',
+        status: TransactionStatus.DONE,
+      },
+    },
+  },
+  render: (args: TransactionReceiptProps) => <StoryTransactionReceipt {...args} />,
+};
 
 export { StoryTransactionReceipt };

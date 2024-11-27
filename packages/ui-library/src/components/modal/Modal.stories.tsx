@@ -6,6 +6,7 @@ import type { ModalProps } from '.';
 import { Button } from '@mui/material';
 import { OptionsMenu, OptionsMenuOptionType } from '../options-menu';
 import { ContentCopyIcon, DeleteIcon, EditIcon } from '../../icons';
+import { ContainerBox } from '../container-box';
 
 type Story = StoryObj<typeof Modal>;
 
@@ -35,7 +36,30 @@ export const ActionsModal: Story = {
       },
     ],
   },
-  render: (args: ModalProps) => <StoryModal {...args} />,
+  render: (args: ModalProps) => (
+    <StoryModal {...args}>
+      <ContainerBox>Some content</ContainerBox>
+      <ContainerBox>Some other content</ContainerBox>
+      <ContainerBox>And of course, more content</ContainerBox>
+    </StoryModal>
+  ),
+};
+
+export const HorizontalActionsModal: Story = {
+  args: {
+    actionsAlignment: 'horizontal',
+    actions: [
+      {
+        label: 'action 1',
+        onClick: () => {},
+      },
+      {
+        label: 'action 2',
+        onClick: () => {},
+      },
+    ],
+  },
+  render: (args: ModalProps) => <StoryModal {...args}>child</StoryModal>,
 };
 
 export const NestedModal: Story = {

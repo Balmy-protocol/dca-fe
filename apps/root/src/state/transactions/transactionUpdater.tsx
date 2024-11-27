@@ -6,7 +6,7 @@ import useBuildTransactionMessage from '@hooks/useBuildTransactionMessage';
 import useBuildRejectedTransactionMessage from '@hooks/useBuildRejectedTransactionMessage';
 import { Zoom, useSnackbar } from 'ui-library';
 import EtherscanLink from '@common/components/view-on-etherscan';
-import { Token, TransactionDetails, TransactionTypes } from '@types';
+import { EarnCreateTypeData, isDcaType, isEarnType, Token, TransactionDetails, TransactionTypes } from '@types';
 import { setInitialized } from '@state/initializer/actions';
 import useTransactionService from '@hooks/useTransactionService';
 import useSafeService from '@hooks/useSafeService';
@@ -31,19 +31,25 @@ import { isUndefined, map } from 'lodash';
 import { getImpactedTokensByTxType, getImpactedTokenForOwnWallet } from '@common/utils/transactions';
 import { Chains } from '@balmy/sdk';
 import useDcaIndexingBlocks from '@hooks/useDcaIndexingBlocks';
+// import useEarnIndexingBlocks from '@hooks/useEarnIndexingBlocks';
 import { ONE_DAY, SUPPORTED_NETWORKS_DCA, getTransactionRetries } from '@constants';
 import usePriceService from '@hooks/usePriceService';
 import { parseUsdPrice } from '@common/utils/currency';
+import useEarnService from '@hooks/earn/useEarnService';
+import useHasFetchedUserStrategies from '@hooks/earn/useHasFetchedUserStrategies';
 
 export default function Updater(): null {
   const transactionService = useTransactionService();
   const positionService = usePositionService();
+  const earnService = useEarnService();
   const loadedAsSafeApp = useLoadedAsSafeApp();
   const priceService = usePriceService();
   const safeService = useSafeService();
   const activeWallet = useActiveWallet();
   const wallets = useWallets();
   const dcaIndexingBlocks = useDcaIndexingBlocks();
+  const hasFetchedUserStrategies = useHasFetchedUserStrategies();
+  // const earnIndexingBlocks = useEarnIndexingBlocks();
 
   const dispatch = useAppDispatch();
   const state = useAppSelector((appState) => appState.transactions);
@@ -79,6 +85,12 @@ export default function Updater(): null {
           const txToCheck = transactions[hash];
           if (txToCheck.retries > getTransactionRetries(chainId)) {
             positionService.handleTransactionRejection({
+              ...txToCheck,
+              typeData: {
+                ...txToCheck.typeData,
+              },
+            } as TransactionDetails);
+            earnService.handleTransactionRejection({
               ...txToCheck,
               typeData: {
                 ...txToCheck.typeData,
@@ -163,6 +175,29 @@ export default function Updater(): null {
             };
           }
           break;
+        case TransactionTypes.earnCreate:
+          // parse the logs
+          const newEarnpositionParsedLogs = transactionService.parseLog({
+            logs: tx.receipt.logs,
+            chainId: tx.chainId,
+            eventToSearch: 'PositionCreated',
+          });
+          const newEarnpositionTokenWithPricePromise = getTokenWithPrice(tx.typeData.asset);
+
+          const [newEarnPositionParsedLog, newEarnPositionTokenWithPrice] = await Promise.all([
+            newEarnpositionParsedLogs,
+            newEarnpositionTokenWithPricePromise,
+          ]);
+
+          if ('positionId' in newEarnPositionParsedLog.args) {
+            extendedTypeData = {
+              positionId: newEarnPositionParsedLog.args.positionId,
+              asset: newEarnPositionTokenWithPrice,
+              assetAmount: tx.typeData.assetAmount,
+              strategyId: tx.typeData.strategyId,
+            } satisfies Partial<EarnCreateTypeData>['typeData'];
+          }
+          break;
         case TransactionTypes.migratePosition:
         case TransactionTypes.migratePositionYield:
           const migrateParsedLog = await transactionService.parseLog({
@@ -216,6 +251,37 @@ export default function Updater(): null {
             };
           }
           break;
+        case TransactionTypes.earnIncrease:
+          const increaseEarnPositionTokenWithPrice = await getTokenWithPrice(tx.typeData.asset);
+
+          extendedTypeData = {
+            asset: increaseEarnPositionTokenWithPrice,
+          };
+          break;
+        case TransactionTypes.earnWithdraw: {
+          const withdrawnTokensWithPrices = await Promise.all(
+            tx.typeData.withdrawn.map(async (withdrawnToken) => {
+              const withdrawnTokenWithPrice = await getTokenWithPrice(withdrawnToken.token);
+              return {
+                ...withdrawnToken,
+                token: withdrawnTokenWithPrice,
+              };
+            })
+          );
+
+          extendedTypeData = {
+            withdrawn: withdrawnTokensWithPrices,
+          };
+          break;
+        }
+        case TransactionTypes.earnClaimDelayedWithdraw: {
+          const claimDelayedWithdrawTokenWithPrice = await getTokenWithPrice(tx.typeData.claim);
+
+          extendedTypeData = {
+            claim: claimDelayedWithdrawTokenWithPrice,
+          };
+          break;
+        }
         case TransactionTypes.swap:
           const swapFromTokenWithPricePromise = getTokenWithPrice(tx.typeData.from);
           const swapToTokenWithPricePromise = getTokenWithPrice(tx.typeData.to);
@@ -249,13 +315,27 @@ export default function Updater(): null {
 
   useEffect(() => {
     pendingTransactions.forEach((transaction) => {
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      positionService.setPendingTransaction(transaction);
+      if (isDcaType(transaction)) {
+        // eslint-disable-next-line @typescript-eslint/no-floating-promises
+        positionService.setPendingTransaction(transaction);
+      }
     });
 
     dispatch(setInitialized());
     dispatch(setTransactionsChecking(pendingTransactions.map(({ hash, chainId }) => ({ hash, chainId }))));
   }, []);
+
+  useEffect(() => {
+    // We need to have the data loaded
+    if (hasFetchedUserStrategies) {
+      pendingTransactions.forEach((transaction) => {
+        if (isEarnType(transaction)) {
+          // eslint-disable-next-line @typescript-eslint/no-floating-promises
+          earnService.setPendingTransaction(transaction);
+        }
+      });
+    }
+  }, [hasFetchedUserStrategies]);
 
   const transactionChecker = React.useCallback(() => {
     const transactionsToCheck = Object.keys(transactions).filter(
@@ -297,6 +377,20 @@ export default function Updater(): null {
               receipt.blockNumber > BigInt(dcaIndexingBlocks[tx.chainId].processedUpTo)
             ) {
               positionService.handleTransaction({
+                ...tx,
+                typeData: {
+                  ...tx.typeData,
+                  ...extendedTypeData,
+                },
+              } as TransactionDetails);
+            }
+            if (
+              isEarnType(tx)
+              // Commenting until we have the earn indexing blocks
+              // && !isUndefined(earnIndexingBlocks[tx.chainId]?.processedUpTo) &&
+              // receipt.blockNumber > BigInt(earnIndexingBlocks[tx.chainId].processedUpTo)
+            ) {
+              earnService.handleTransaction({
                 ...tx,
                 typeData: {
                   ...tx.typeData,
@@ -390,6 +484,15 @@ export default function Updater(): null {
                   ...tx.typeData,
                 },
               } as TransactionDetails);
+
+              if (isEarnType(tx)) {
+                earnService.handleTransactionRejection({
+                  ...tx,
+                  typeData: {
+                    ...tx.typeData,
+                  },
+                } as TransactionDetails);
+              }
               dispatch(removeTransaction({ hash, chainId: tx.chainId }));
               enqueueSnackbar(
                 buildRejectedTransactionMessage({

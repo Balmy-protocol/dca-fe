@@ -10,10 +10,17 @@ import {
 import { defineMessage, useIntl } from 'react-intl';
 import { totalSupplyThreshold } from '../parsing';
 import { formatCurrencyAmount, formatUsdAmount, toSignificantFromBigDecimal } from '../currency';
+import { getIsDelayedWithdraw } from 'ui-library';
 
 export const getTransactionTitle = (tx: TransactionEvent) => {
   switch (tx.type) {
     case TransactionEventTypes.ERC20_APPROVAL:
+      if (tx.data.amount.amount === 0n) {
+        return defineMessage({
+          description: 'ERC20Revoked-Title',
+          defaultMessage: 'Approval revoked',
+        });
+      }
       return defineMessage({
         description: 'ERC20Approval-Title',
         defaultMessage: 'Approval',
@@ -52,6 +59,38 @@ export const getTransactionTitle = (tx: TransactionEvent) => {
       return defineMessage({
         description: 'Swap-Title',
         defaultMessage: 'Swap',
+      });
+    case TransactionEventTypes.EARN_CREATED:
+      return defineMessage({
+        description: 'EarnDeposited-Title',
+        defaultMessage: 'Invested',
+      });
+    case TransactionEventTypes.EARN_INCREASE:
+      return defineMessage({
+        description: 'EarnIncrease-Title',
+        defaultMessage: 'Invested',
+      });
+    case TransactionEventTypes.EARN_WITHDRAW:
+      if (getIsDelayedWithdraw(tx.data.withdrawn)) {
+        return defineMessage({
+          description: 'EarnWithdrawDelayed-Title',
+          defaultMessage: 'Initiated delayed withdrawal',
+        });
+      } else {
+        return defineMessage({
+          description: 'EarnWithdraw-Title',
+          defaultMessage: 'Withdrew',
+        });
+      }
+    case TransactionEventTypes.EARN_SPECIAL_WITHDRAW:
+      return defineMessage({
+        description: 'EarnMarketWithdraw-Title',
+        defaultMessage: 'Withdrew',
+      });
+    case TransactionEventTypes.EARN_CLAIM_DELAYED_WITHDRAW:
+      return defineMessage({
+        description: 'EarnClaimDelayedWithdraw-Title',
+        defaultMessage: 'Claimed delayed withdrawal',
       });
     case TransactionEventTypes.ERC20_TRANSFER:
     case TransactionEventTypes.NATIVE_TRANSFER:
@@ -97,6 +136,13 @@ export const getTransactionTokenFlow = (tx: TransactionEvent, wallets: string[])
     case TransactionEventTypes.DCA_CREATED:
       return TransactionEventIncomingTypes.INCOMING;
       break;
+    case TransactionEventTypes.EARN_CREATED:
+    case TransactionEventTypes.EARN_INCREASE:
+    case TransactionEventTypes.EARN_WITHDRAW:
+    case TransactionEventTypes.EARN_SPECIAL_WITHDRAW:
+    case TransactionEventTypes.EARN_CLAIM_DELAYED_WITHDRAW:
+      return TransactionEventIncomingTypes.INCOMING;
+      break;
     case TransactionEventTypes.DCA_PERMISSIONS_MODIFIED:
       return TransactionEventIncomingTypes.INCOMING;
     case TransactionEventTypes.DCA_TRANSFER:
@@ -128,6 +174,13 @@ export const getTransactionValue = (tx: TransactionEvent, intl: ReturnType<typeo
             defaultMessage: 'Unlimited',
           })
         );
+      } else if (tx.data.amount.amount === 0n) {
+        return intl.formatMessage(
+          defineMessage({
+            description: 'ERC20Revoked-TransactionValue',
+            defaultMessage: '-',
+          })
+        );
       } else {
         return `${formatCurrencyAmount({ amount: tx.data.amount.amount, token: tx.data.token, intl })} ${
           tx.data.token.symbol
@@ -135,29 +188,29 @@ export const getTransactionValue = (tx: TransactionEvent, intl: ReturnType<typeo
       }
     case TransactionEventTypes.ERC20_TRANSFER:
     case TransactionEventTypes.NATIVE_TRANSFER:
-      return `${isReceivingFunds ? '+' : '-'}${formatCurrencyAmount({
+      return `${isReceivingFunds ? '+' : '-'} ${formatCurrencyAmount({
         amount: tx.data.amount.amount,
         token: tx.data.token,
         intl,
       })} ${tx.data.token.symbol}`;
     case TransactionEventTypes.DCA_WITHDRAW:
-      return `+${formatCurrencyAmount({ amount: tx.data.withdrawn.amount, token: tx.data.toToken, intl })} ${
+      return `+ ${formatCurrencyAmount({ amount: tx.data.withdrawn.amount, token: tx.data.toToken, intl })} ${
         tx.data.toToken.symbol
       }`;
     case TransactionEventTypes.DCA_TERMINATED:
-      return `+${formatCurrencyAmount({
+      return `+ ${formatCurrencyAmount({
         amount: tx.data.withdrawnRemaining.amount,
         token: tx.data.fromToken,
         intl,
-      })} / +${formatCurrencyAmount({ amount: tx.data.withdrawnSwapped.amount, token: tx.data.toToken, intl })}`;
+      })} / + ${formatCurrencyAmount({ amount: tx.data.withdrawnSwapped.amount, token: tx.data.toToken, intl })}`;
     case TransactionEventTypes.SWAP:
-      return `-${formatCurrencyAmount({
+      return `- ${formatCurrencyAmount({
         amount: tx.data.amountIn.amount,
         token: tx.data.tokenIn,
         intl,
-      })} / +${formatCurrencyAmount({ amount: tx.data.amountOut.amount, token: tx.data.tokenOut, intl })}`;
+      })} / + ${formatCurrencyAmount({ amount: tx.data.amountOut.amount, token: tx.data.tokenOut, intl })}`;
     case TransactionEventTypes.DCA_MODIFIED:
-      return `${isReceivingFunds ? '+' : '-'}${formatCurrencyAmount({
+      return `${isReceivingFunds ? '+' : '-'} ${formatCurrencyAmount({
         amount: tx.data.difference.amount,
         token: tx.data.fromToken,
         intl,
@@ -165,6 +218,45 @@ export const getTransactionValue = (tx: TransactionEvent, intl: ReturnType<typeo
     case TransactionEventTypes.DCA_CREATED:
       return `${formatCurrencyAmount({ amount: tx.data.funds.amount, token: tx.data.fromToken, intl })} ${
         tx.data.fromToken.symbol
+      }`;
+    case TransactionEventTypes.EARN_CREATED:
+    case TransactionEventTypes.EARN_INCREASE:
+      return `${formatCurrencyAmount({ amount: tx.data.assetsDepositedAmount.amount, token: tx.data.asset, intl })} ${
+        tx.data.depositToken.symbol
+      }`;
+    case TransactionEventTypes.EARN_WITHDRAW:
+      const withdrawnAsset = tx.data.withdrawn[0];
+      const isWithdrawingRewards = tx.data.withdrawn.some(
+        (withdrawn) => withdrawn.token.address !== withdrawnAsset.token.address && withdrawn.amount.amount > 0n
+      );
+
+      const parsedAssetAmount =
+        withdrawnAsset.amount.amount > 0n
+          ? `+ ${formatCurrencyAmount({ amount: withdrawnAsset.amount.amount, token: withdrawnAsset.token, intl })} ${
+              withdrawnAsset.token.symbol
+            }`
+          : '';
+
+      return `${parsedAssetAmount} ${
+        isWithdrawingRewards
+          ? intl.formatMessage(
+              defineMessage({
+                description: 'earn.events.withdraw.value.plus-rewards',
+                defaultMessage: '+Rewards',
+              })
+            )
+          : ''
+      }`.trim();
+    case TransactionEventTypes.EARN_SPECIAL_WITHDRAW:
+      const specialWithdrawData = tx.data.tokens[0];
+      return `+ ${formatCurrencyAmount({
+        amount: specialWithdrawData.amount.amount,
+        token: specialWithdrawData.token,
+        intl,
+      })} ${specialWithdrawData.token.symbol}`;
+    case TransactionEventTypes.EARN_CLAIM_DELAYED_WITHDRAW:
+      return `+ ${formatCurrencyAmount({ amount: tx.data.withdrawn.amount, token: tx.data.token, intl })} ${
+        tx.data.token.symbol
       }`;
     case TransactionEventTypes.DCA_PERMISSIONS_MODIFIED:
     case TransactionEventTypes.DCA_TRANSFER:
@@ -204,6 +296,22 @@ export const getTransactionUsdValue = (txEvent: TransactionEvent, intl: ReturnTy
     case TransactionEventTypes.SWAP:
       amountInUsd = formatUsdAmount({ amount: txEvent.data.amountIn.amountInUSD, intl });
       break;
+    case TransactionEventTypes.EARN_CREATED:
+    case TransactionEventTypes.EARN_INCREASE:
+      amountInUsd = formatUsdAmount({ amount: txEvent.data.assetsDepositedAmount.amountInUSD, intl });
+      break;
+    case TransactionEventTypes.EARN_WITHDRAW:
+      amountInUsd = txEvent.data.withdrawn
+        .reduce((acc, withdrawn) => acc + Number(withdrawn.amount.amountInUSD || 0), 0)
+        .toString();
+      break;
+    case TransactionEventTypes.EARN_SPECIAL_WITHDRAW:
+      const specialWithdrawData = txEvent.data.tokens[0];
+      amountInUsd = formatUsdAmount({ amount: specialWithdrawData.amount.amountInUSD, intl });
+      break;
+    case TransactionEventTypes.EARN_CLAIM_DELAYED_WITHDRAW:
+      amountInUsd = formatUsdAmount({ amount: txEvent.data.withdrawn.amountInUSD, intl });
+      break;
   }
 
   return amountInUsd ? toSignificantFromBigDecimal(amountInUsd.toString(), 2) : '-';
@@ -226,6 +334,16 @@ export const getTransactionTokenValuePrice = (tx: TransactionEvent) => {
       return Number(tx.data.difference.amountInUSD) || 0;
     case TransactionEventTypes.DCA_CREATED:
       return Number(tx.data.funds.amountInUSD) || 0;
+    case TransactionEventTypes.EARN_CREATED:
+    case TransactionEventTypes.EARN_INCREASE:
+      return Number(tx.data.assetsDepositedAmount.amountInUSD) || 0;
+    case TransactionEventTypes.EARN_WITHDRAW:
+      return tx.data.withdrawn.reduce((acc, withdrawn) => acc + Number(withdrawn.amount.amountInUSD || 0), 0);
+    case TransactionEventTypes.EARN_SPECIAL_WITHDRAW:
+      const specialWithdrawData = tx.data.tokens[0];
+      return Number(specialWithdrawData.amount.amountInUSD) || 0;
+    case TransactionEventTypes.EARN_CLAIM_DELAYED_WITHDRAW:
+      return Number(tx.data.withdrawn.amountInUSD) || 0;
     case TransactionEventTypes.DCA_PERMISSIONS_MODIFIED:
     case TransactionEventTypes.DCA_TRANSFER:
       return 0;
@@ -239,14 +357,20 @@ export const getTransactionPriceColor = (tx: TransactionEvent) => {
     case TransactionEventTypes.ERC20_APPROVAL:
     case TransactionEventTypes.DCA_PERMISSIONS_MODIFIED:
     case TransactionEventTypes.DCA_CREATED:
+    case TransactionEventTypes.EARN_CREATED:
+    case TransactionEventTypes.EARN_INCREASE:
     case TransactionEventTypes.DCA_TRANSFER:
     case TransactionEventTypes.SWAP:
       return undefined;
+    case TransactionEventTypes.EARN_WITHDRAW:
+      if (getIsDelayedWithdraw(tx.data.withdrawn)) return undefined;
+    case TransactionEventTypes.EARN_SPECIAL_WITHDRAW:
     case TransactionEventTypes.ERC20_TRANSFER:
     case TransactionEventTypes.DCA_WITHDRAW:
     case TransactionEventTypes.DCA_TERMINATED:
     case TransactionEventTypes.DCA_MODIFIED:
     case TransactionEventTypes.NATIVE_TRANSFER:
+    case TransactionEventTypes.EARN_CLAIM_DELAYED_WITHDRAW:
       return tx.data.tokenFlow === TransactionEventIncomingTypes.OUTGOING ? 'error.dark' : 'success.dark';
   }
 
@@ -268,6 +392,14 @@ export const getTransactionInvolvedWallets = (tx: TransactionEvent) => {
     case TransactionEventTypes.DCA_CREATED:
       const { owner: dcaCreationOwner } = tx.data;
       wallets = [dcaCreationOwner];
+      break;
+    case TransactionEventTypes.EARN_CREATED:
+    case TransactionEventTypes.EARN_INCREASE:
+    case TransactionEventTypes.EARN_WITHDRAW:
+    case TransactionEventTypes.EARN_SPECIAL_WITHDRAW:
+    case TransactionEventTypes.EARN_CLAIM_DELAYED_WITHDRAW:
+      const { user } = tx.data;
+      wallets = [user];
       break;
     case TransactionEventTypes.DCA_TRANSFER:
       const { to: dcaTransferedTo } = tx.data;
@@ -309,12 +441,21 @@ export const getTransactionInvolvedTokens = (tx: TransactionEvent): Token[] => {
       return [tx.data.fromToken, tx.data.toToken];
     case TransactionEventTypes.DCA_PERMISSIONS_MODIFIED:
       return [];
+    case TransactionEventTypes.EARN_CREATED:
+    case TransactionEventTypes.EARN_INCREASE:
+      return [tx.data.depositToken];
+    case TransactionEventTypes.EARN_CLAIM_DELAYED_WITHDRAW:
+      return [tx.data.token];
+    case TransactionEventTypes.EARN_WITHDRAW:
+      return tx.data.withdrawn.map((withdrawn) => withdrawn.token);
+    case TransactionEventTypes.EARN_SPECIAL_WITHDRAW:
+      return [tx.data.tokens[0].token];
   }
 
   return [];
 };
 
-export type IncludedIndexerUnits = Exclude<IndexerUnits, IndexerUnits.CHAINLINK_REGISTRY | IndexerUnits.EARN>;
+export type IncludedIndexerUnits = Exclude<IndexerUnits, IndexerUnits.CHAINLINK_REGISTRY>;
 export type UnitsIndexedByChainPercentage = Record<
   Address,
   Record<IncludedIndexerUnits, Record<ChainId, { percentage: number; isIndexed: boolean }>>

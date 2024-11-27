@@ -1,6 +1,6 @@
 import * as React from 'react';
 import find from 'lodash/find';
-import { Typography, Link, OpenInNewIcon, Button, ContainerBox } from 'ui-library';
+import { Typography, Link, OpenInNewIcon, Button, ContainerBox, colors } from 'ui-library';
 import styled from 'styled-components';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import { NetworkStruct, Position, Token, TokenListId, Wallet, WalletStatus } from '@types';
@@ -21,7 +21,7 @@ const StyledCardFooterButton = styled(Button).attrs({ variant: 'outlined' })``;
 
 const StyledCallToActionContainer = styled(ContainerBox).attrs({ fullWidth: true, justifyContent: 'center' })``;
 
-interface PositionProp extends Omit<Position, 'from' | 'to'> {
+interface PositionProp extends DistributiveOmit<Position, 'from' | 'to'> {
   from: Token;
   to: Token;
 }
@@ -89,7 +89,11 @@ const PositionCardButton = ({
             color="inherit"
             sx={{ display: 'flex', alignItems: 'center' }}
           >
-            <Typography variant="bodySmallRegular" component="span" color="primary">
+            <Typography
+              variant="bodySmallRegular"
+              component="span"
+              color={({ palette }) => colors[palette.mode].typography.typo2}
+            >
               <FormattedMessage description="pending transaction" defaultMessage="Pending transaction" />
             </Typography>
             <OpenInNewIcon style={{ fontSize: '1rem' }} />

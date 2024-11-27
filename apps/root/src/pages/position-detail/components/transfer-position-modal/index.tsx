@@ -1,5 +1,4 @@
 import React from 'react';
-import styled from 'styled-components';
 import { Position, TransactionTypes } from '@types';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import { Typography, TextField, Modal } from 'ui-library';
@@ -11,15 +10,6 @@ import { deserializeError, shouldTrackError } from '@common/utils/errors';
 import useTrackEvent from '@hooks/useTrackEvent';
 import { Address } from 'viem';
 import { trimAddress } from '@common/utils/parsing';
-
-const StyledTransferContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: flex-start;
-  text-align: left;
-  gap: 10px;
-`;
 
 interface TransferPositionModalProps {
   position: Position;
@@ -128,6 +118,7 @@ const TransferPositionModal = ({ position, open, onCancel }: TransferPositionMod
       showCloseIcon
       onClose={onCancel}
       maxWidth="sm"
+      actionsAlignment="horizontal"
       title={
         <FormattedMessage
           description="transfer title"
@@ -138,52 +129,49 @@ const TransferPositionModal = ({ position, open, onCancel }: TransferPositionMod
       actions={[
         {
           label: <FormattedMessage description="Transfer" defaultMessage="Transfer" />,
-          color: 'secondary',
           variant: 'contained',
           disabled: toAddress === '' || (!isValid && toAddress !== ''),
           onClick: handleTransfer,
         },
       ]}
     >
-      <StyledTransferContainer>
-        <Typography variant="bodyRegular">
-          <FormattedMessage
-            description="transfer description"
-            defaultMessage="Set to whom you want to transfer your position to"
-          />
-        </Typography>
-        <Typography variant="bodyRegular">
-          <FormattedMessage
-            description="transfer sub description"
-            defaultMessage="This will transfer your position, your NFT and all the liquidity stored in the position to the new address."
-          />
-        </Typography>
-        <TextField
-          id="toAddress"
-          value={toAddress}
-          placeholder={intl.formatMessage(
-            defineMessage({ defaultMessage: 'Set the address to transfer', description: 'transferToModalPlaceholder' })
-          )}
-          autoComplete="off"
-          autoCorrect="off"
-          error={toAddress !== '' && !isValid}
-          helperText={toAddress !== '' && !isValid ? 'This is not a valid address' : ''}
-          fullWidth
-          type="text"
-          margin="normal"
-          spellCheck="false"
-          onChange={(evt) => validator(evt.target.value)}
-          // eslint-disable-next-line react/jsx-no-duplicate-props
-          inputProps={{
-            pattern: '^0x[A-Fa-f0-9]*$',
-            minLength: 1,
-            maxLength: 79,
-          }}
+      <Typography variant="bodyRegular">
+        <FormattedMessage
+          description="transfer description"
+          defaultMessage="Set to whom you want to transfer your position to"
         />
-        <Typography variant="bodyRegular">
-          <FormattedMessage description="transfer warning" defaultMessage="This cannot be undone." />
-        </Typography>
-      </StyledTransferContainer>
+      </Typography>
+      <Typography variant="bodyRegular">
+        <FormattedMessage
+          description="transfer sub description"
+          defaultMessage="This will transfer your position, your NFT and all the liquidity stored in the position to the new address."
+        />
+      </Typography>
+      <TextField
+        id="toAddress"
+        value={toAddress}
+        placeholder={intl.formatMessage(
+          defineMessage({ defaultMessage: 'Set the address to transfer', description: 'transferToModalPlaceholder' })
+        )}
+        autoComplete="off"
+        autoCorrect="off"
+        error={toAddress !== '' && !isValid}
+        helperText={toAddress !== '' && !isValid ? 'This is not a valid address' : ''}
+        fullWidth
+        type="text"
+        margin="normal"
+        spellCheck="false"
+        onChange={(evt) => validator(evt.target.value)}
+        // eslint-disable-next-line react/jsx-no-duplicate-props
+        inputProps={{
+          pattern: '^0x[A-Fa-f0-9]*$',
+          minLength: 1,
+          maxLength: 79,
+        }}
+      />
+      <Typography variant="bodyRegular">
+        <FormattedMessage description="transfer warning" defaultMessage="This cannot be undone." />
+      </Typography>
     </Modal>
   );
 };

@@ -76,7 +76,7 @@ const SwapContainer = () => {
   const handleChangeNetwork = React.useCallback(
     (newChainId: number) => {
       if (SUPPORTED_NETWORKS_DCA.includes(newChainId)) {
-        replaceHistory(`/create/${newChainId}`);
+        replaceHistory(`/invest/create/${newChainId}`);
         dispatch(setDCAChainId(newChainId));
         dispatch(setFrom(getProtocolToken(newChainId)));
         dispatch(setTo(null));

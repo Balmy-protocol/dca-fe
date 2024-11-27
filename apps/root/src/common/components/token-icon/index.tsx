@@ -1,10 +1,11 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Token } from '@types';
-import { SvgIcon, useTheme, colors } from 'ui-library';
+import { SvgIcon, useTheme, colors, ContainerBox } from 'ui-library';
 import CryptoIcons from '@assets/svg/color';
 import { PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import useTokenListUnfiltered from '@hooks/useTokenFromList';
+import { getLogoURL } from '@common/utils/urlParser';
 
 const StyledEmptyTokenIcon = styled.div<{ $realSize: string }>`
   ${({
@@ -15,28 +16,26 @@ const StyledEmptyTokenIcon = styled.div<{ $realSize: string }>`
   }) => `
   width: ${$realSize};
   height: ${$realSize};
-  background-color: ${mode === 'light' ? colors[mode].background.primary : colors[mode].background.secondary};
+  background-color: ${colors[mode].background.primary};
   border-radius: 50%;
   `};
 `;
-interface TokenButtonProps {
+
+const StyledTokenIconContainer = styled(ContainerBox)`
+  border: 1px solid ${({ theme }) => colors[theme.palette.mode].border.border1};
+  border-radius: 50%;
+`;
+
+export interface TokenIconProps {
   token?: Token;
   isInChip?: boolean;
   size?: number;
   withShadow?: boolean;
+  shadowType?: keyof (typeof colors)[keyof typeof colors]['dropShadow'];
+  border?: boolean;
 }
 
-function getLogoURL(logoURI: string) {
-  if (logoURI?.startsWith('ipfs://')) {
-    return `https://ipfs.io/ipfs/${logoURI.split('//')[1]}`;
-  }
-  if (typeof logoURI === 'string') {
-    return logoURI;
-  }
-  return '';
-}
-
-const TokenIcon = ({ token, isInChip, size = 7, withShadow }: TokenButtonProps) => {
+const TokenIcon = ({ token, isInChip, size = 7, withShadow, shadowType = 'dropShadow100', border }: TokenIconProps) => {
   const { spacing, palette } = useTheme();
   const realSize = spacing(size);
   const [hasError, setHasError] = React.useState(false);
@@ -45,14 +44,14 @@ const TokenIcon = ({ token, isInChip, size = 7, withShadow }: TokenButtonProps) 
   const tokenLogoUri = token?.logoURI || (token && foundToken && foundToken.logoURI);
   const addressToUse =
     token?.address && (token.address === PROTOCOL_TOKEN_ADDRESS ? `${token.chainId}-${token.address}` : token.address);
-  const boxShadow = withShadow ? colors[palette.mode].dropShadow.dropShadow100 : 'none';
+  const boxShadow = withShadow ? colors[palette.mode].dropShadow[shadowType] : 'none';
   if (CryptoIcons[addressToUse as keyof typeof CryptoIcons]) {
     componentToRender = (
       <SvgIcon
         component={CryptoIcons[addressToUse as keyof typeof CryptoIcons]}
         viewBox="0 0 32 32"
         className={isInChip ? 'MuiChip-icon' : ''}
-        style={{ fontSize: realSize, boxShadow }}
+        style={{ fontSize: realSize, boxShadow, borderRadius: '50%' }}
       />
     );
   } else if (tokenLogoUri && !hasError) {
@@ -69,6 +68,10 @@ const TokenIcon = ({ token, isInChip, size = 7, withShadow }: TokenButtonProps) 
     );
   } else {
     componentToRender = <StyledEmptyTokenIcon $realSize={realSize} className={isInChip ? 'MuiChip-icon' : ''} />;
+  }
+
+  if (border) {
+    return <StyledTokenIconContainer>{componentToRender}</StyledTokenIconContainer>;
   }
 
   return componentToRender;

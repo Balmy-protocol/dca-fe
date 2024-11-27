@@ -1,5 +1,5 @@
 import React from 'react';
-import { Grid, Alert, Typography, colors, Button, ContainerBox } from 'ui-library';
+import { Grid, Alert, Button, ContainerBox, Typography, colors } from 'ui-library';
 import isUndefined from 'lodash/isUndefined';
 import { AmountsOfToken, SetStateCallback, SwapOption, Token } from '@types';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
@@ -16,13 +16,13 @@ import AdvancedSettings from '../advanced-settings';
 import TokenPickerWithAmount from '@common/components/token-amount-input';
 import ToggleButton from '../toggle-button';
 import QuoteSelection from '../quote-selection';
-import { useThemeMode } from '@state/config/hooks';
 import SwapNetworkSelector from '../swap-network-selector';
 import SwapButton from '../swap-button';
 import { usePortfolioPrices } from '@state/balances/hooks';
 import { compact } from 'lodash';
 import { parseNumberUsdPriceToBigInt, parseUsdPrice } from '@common/utils/currency';
 import { ContactListActiveModal } from '@common/components/contact-modal';
+import FormWalletSelector from '@common/components/form-wallet-selector';
 
 interface SwapFirstStepProps {
   from: Token | null;
@@ -86,7 +86,6 @@ const SwapFirstStep = ({
   const intl = useIntl();
   const dispatch = useAppDispatch();
   const trackEvent = useTrackEvent();
-  const themeMode = useThemeMode();
   const [transactionWillFail, setTransactionWillFail] = React.useState(false);
   const prices = usePortfolioPrices(compact([from, to]));
 
@@ -101,7 +100,6 @@ const SwapFirstStep = ({
     : (selectedRoute &&
         selectedRoute?.buyToken.address === to?.address &&
         formatUnits(selectedRoute.buyAmount.amount, selectedRoute.buyToken.decimals || 18)) ||
-      '0.0' ||
       '';
 
   const fromUsdValueToUse =
@@ -181,12 +179,7 @@ const SwapFirstStep = ({
 
   return (
     <Grid container rowSpacing={6} flexDirection="column">
-      <Grid item xs={12}>
-        <AdvancedSettings onShowSettings={onShowSettings} />
-      </Grid>
-      <Typography variant="h4Bold" color={colors[themeMode].typography.typo1}>
-        <FormattedMessage description="makeASwap" defaultMessage="Make a Swap" />
-      </Typography>
+      <AdvancedSettings onShowSettings={onShowSettings} />
       {transferTo && (
         <Grid item xs={12}>
           <TransferTo
@@ -197,7 +190,20 @@ const SwapFirstStep = ({
         </Grid>
       )}
       <Grid item xs={12}>
-        <SwapNetworkSelector />
+        <ContainerBox flexDirection="column" gap={3}>
+          <ContainerBox gap={1} flexDirection="column">
+            <Typography variant="bodySmallSemibold" color={({ palette: { mode } }) => colors[mode].typography.typo4}>
+              <FormattedMessage description="aggregator.form.wallet-selector.title" defaultMessage="Wallet" />
+            </Typography>
+            <FormWalletSelector />
+          </ContainerBox>
+          <ContainerBox gap={1} flexDirection="column">
+            <Typography variant="bodySmallSemibold" color={({ palette: { mode } }) => colors[mode].typography.typo4}>
+              <FormattedMessage description="aggregator.form.network-selector.title" defaultMessage="Network" />
+            </Typography>
+            <SwapNetworkSelector />
+          </ContainerBox>
+        </ContainerBox>
       </Grid>
       <Grid item xs={12}>
         <Grid item xs={12} position="relative">
@@ -264,8 +270,8 @@ const SwapFirstStep = ({
                 description="aggregatorPriceNotFound"
                 defaultMessage="We couldn't calculate the price for {from}{and}{to}, which means we cannot estimate the price impact. Please be cautious and trade at your own risk."
                 values={{
-                  from: isUndefined(fromAmount.amountInUSD) ? selectedRoute.sellToken.symbol : '',
-                  to: isUndefined(toAmount.amountInUSD) ? selectedRoute.buyToken.symbol : '',
+                  from: isUndefined(fromAmount.amountInUSD) ? from?.symbol || selectedRoute.sellToken.symbol : '',
+                  to: isUndefined(toAmount.amountInUSD) ? to?.symbol || selectedRoute.buyToken.symbol : '',
                   and:
                     isUndefined(fromAmount.amountInUSD) && isUndefined(toAmount.amountInUSD)
                       ? intl.formatMessage(
@@ -285,7 +291,7 @@ const SwapFirstStep = ({
           <QuoteData quote={(!isLoadingRoute && selectedRoute) || null} isBuyOrder={isBuyOrder} to={to} />
         </Grid>
       )}
-      <Grid item xs={12}>
+      <Grid item xs={12} marginTop={({ spacing }) => spacing(2)}>
         <ContainerBox flexDirection="column" gap={3} fullWidth alignItems="center">
           <SwapButton
             cantFund={cantFund}

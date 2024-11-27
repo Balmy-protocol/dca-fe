@@ -1,3 +1,4 @@
+import { parseUsdPrice } from '@common/utils/currency';
 import { createAction } from '@reduxjs/toolkit';
 import { createAppAsyncThunk } from '@state/createAppAsyncThunk';
 import {
@@ -6,6 +7,8 @@ import {
   TransactionAdderPayload,
   TransactionTypes,
   TransactionDetails,
+  isEarnType,
+  EarnCreateTypeData,
 } from '@types';
 import { values } from 'lodash';
 
@@ -43,8 +46,8 @@ export const cleanTransactions = createAction<{
   indexedTransactions: { chainId: number; hash: string }[];
 }>('transactions/cleanTransactions');
 
-export const processConfirmedTransactions = createAppAsyncThunk<void, void>(
-  'transactions/processConfirmedTransactions',
+export const processConfirmedTransactionsForDca = createAppAsyncThunk<void, void>(
+  'transactions/processConfirmedTransactionsForDca',
   async (_, { extra: { web3Service }, getState }) => {
     const transactionService = web3Service.getTransactionService();
     const positionService = web3Service.getPositionService();
@@ -59,10 +62,10 @@ export const processConfirmedTransactions = createAppAsyncThunk<void, void>(
       .filter((tx) => !!tx.receipt);
 
     for (const tx of confirmedTransactions) {
-      const isNotIndexed =
+      const isDcaNotIndexed =
         dcaIndexingBlocks[tx.chainId] && tx.receipt!.blockNumber > BigInt(dcaIndexingBlocks[tx.chainId].processedUpTo);
 
-      if (isNotIndexed) {
+      if (isDcaNotIndexed) {
         let extendedTypeData = {};
         if (tx.type === TransactionTypes.newPosition) {
           const parsedLog = await transactionService.parseLog({
@@ -85,6 +88,80 @@ export const processConfirmedTransactions = createAppAsyncThunk<void, void>(
             ...extendedTypeData,
           },
         } as TransactionDetails);
+      }
+    }
+  }
+);
+
+export const processConfirmedTransactionsForEarn = createAppAsyncThunk<void, void>(
+  'transactions/processConfirmedTransactionsForEarn',
+  async (_, { extra: { web3Service }, getState }) => {
+    const transactionService = web3Service.getTransactionService();
+    const earnService = web3Service.getEarnService();
+    const priceService = web3Service.getPriceService();
+    const earnIndexingBlocks = transactionService.getEarnIndexingBlocks();
+    const state = getState().transactions;
+
+    const confirmedTransactions = values(state)
+      .reduce<TransactionDetails[]>((acc, chainTxs) => {
+        acc.push(...values(chainTxs));
+        return acc;
+      }, [])
+      .filter((tx) => !!tx.receipt);
+
+    for (const tx of confirmedTransactions) {
+      const isEarnNotIndexed =
+        earnIndexingBlocks[tx.chainId] &&
+        tx.receipt!.blockNumber > BigInt(earnIndexingBlocks[tx.chainId].processedUpTo);
+
+      if (isEarnNotIndexed) {
+        let extendedTypeData = {};
+        if (tx.type === TransactionTypes.earnCreate) {
+          const newEarnpositionParsedLogs = transactionService.parseLog({
+            logs: tx.receipt!.logs,
+            chainId: tx.chainId,
+            eventToSearch: 'PositionCreated',
+          });
+
+          const token = tx.typeData.asset;
+
+          const newEarnpositionTokenWithPricePromise = priceService.getUsdHistoricPrice(
+            [token],
+            undefined,
+            token.chainId
+          );
+
+          const [newEarnPositionParsedLog, newEarnPositionTokenWithPrice] = await Promise.all([
+            newEarnpositionParsedLogs,
+            newEarnpositionTokenWithPricePromise,
+          ]);
+
+          const tokenPrice = parseUsdPrice(
+            token,
+            10n ** BigInt(token.decimals),
+            newEarnPositionTokenWithPrice[token.address]
+          );
+          const asset = { ...token, price: tokenPrice };
+
+          if ('positionId' in newEarnPositionParsedLog.args) {
+            extendedTypeData = {
+              positionId: newEarnPositionParsedLog.args.positionId,
+              asset,
+              assetAmount: tx.typeData.assetAmount,
+              strategyId: tx.typeData.strategyId,
+            } satisfies Partial<EarnCreateTypeData>['typeData'];
+          }
+        }
+
+        if (isEarnType(tx)) {
+          earnService.handleTransaction({
+            ...tx,
+            typeData: {
+              ...tx.typeData,
+              ...extendedTypeData,
+            },
+          } as TransactionDetails);
+        }
       }
     }
   }

@@ -106,7 +106,7 @@ const ContactListModal = ({
       <StyledNoContactsContainer>
         <ContainerBox flexDirection="column" alignItems="center" gap={2}>
           <SeedlingEmoji size={spacing(8)} />
-          <Typography variant="h5" fontWeight="bold" color={colors[palette.mode].typography.typo3}>
+          <Typography variant="h5Bold" color={colors[palette.mode].typography.typo3}>
             <FormattedMessage description="noContactsTitle" defaultMessage="Your Contact List Awaits!" />
           </Typography>
           <StyledContactModalParagraph color={colors[palette.mode].typography.typo3}>
@@ -177,12 +177,11 @@ const ContactListModal = ({
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
-                  <SearchIcon htmlColor={colors[palette.mode].typography.typo5} />
+                  <SearchIcon htmlColor={colors[palette.mode].typography.typo3} />
                 </InputAdornment>
               ),
             }}
           />
-          {!innerInput && <DividerBorder2 />}
           <StyledContactListcontainer>
             {contactList.length === 0 && isLoadingContactList
               ? SKELETON_ROWS.map((key) => <SkeletonContactItem key={key} />)
@@ -260,12 +259,21 @@ const ContactModal = ({
             postContactStatus={postContactStatus}
             clearDefaultAddressValue={clearDefaultAddressValue}
             defaultAddressValue={defaultAddressValue}
+            goBack={() => setActiveModal(ContactListActiveModal.CONTACT_LIST)}
           />
         ),
       },
       [ContactListActiveModal.EDIT_CONTACT]: {
         title: <FormattedMessage description="editContactTitle" defaultMessage="Edit your Contact" />,
-        content: editingContact ? <EditContactModal setActiveModal={setActiveModal} contact={editingContact} /> : <></>,
+        content: editingContact ? (
+          <EditContactModal
+            setActiveModal={setActiveModal}
+            contact={editingContact}
+            goBack={() => setActiveModal(ContactListActiveModal.CONTACT_LIST)}
+          />
+        ) : (
+          <></>
+        ),
       },
       [ContactListActiveModal.NONE]: { content: <></> },
     }),

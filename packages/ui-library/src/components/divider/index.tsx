@@ -3,7 +3,13 @@ import Divider from '@mui/material/Divider';
 import styled from 'styled-components';
 import { colors } from '../../theme';
 
-const DividerBorderAccent = styled(Divider)`
+const BaseDivider = styled(Divider)<{ $thin?: boolean }>`
+  ${({ $thin = true }) => `
+    ${$thin ? 'border-width: 0.5px; border-bottom-width: thin;' : ''}
+  `}
+`;
+
+const DividerBorderAccent = styled(BaseDivider)`
   ${({
     theme: {
       palette: { mode },
@@ -13,7 +19,7 @@ const DividerBorderAccent = styled(Divider)`
   `}
 `;
 
-const DividerBorder1 = styled(Divider)`
+const DividerBorder1 = styled(BaseDivider)`
   ${({
     theme: {
       palette: { mode },
@@ -23,7 +29,7 @@ const DividerBorder1 = styled(Divider)`
   `}
 `;
 
-const DividerBorder2 = styled(Divider)`
+const DividerBorder2 = styled(BaseDivider)`
   ${({
     theme: {
       palette: { mode },

@@ -342,10 +342,10 @@ const ProfitLossGraph = ({ position }: ProfitLossGraphProps) => {
           </linearGradient>
         </defs>
         <XAxis
-          tickMargin={30}
-          minTickGap={30}
-          interval="preserveStartEnd"
           dataKey="name"
+          interval="preserveStartEnd"
+          tickMargin={4}
+          minTickGap={30}
           axisLine={false}
           tickLine={false}
           tickFormatter={(value: string) => `${value.split(' ')[0]} ${value.split(' ')[1]}`}

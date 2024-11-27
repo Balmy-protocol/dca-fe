@@ -15,6 +15,7 @@ import {
 } from 'viem';
 import COMPANION_ABI from '@abis/HubCompanion';
 import HUB_ABI from '@abis/Hub';
+import EARN_VAULT_ABI from '@abis/EarnVault';
 import { EventsManager } from './eventsManager';
 import { ApiErrorKeys } from '@constants';
 
@@ -31,9 +32,15 @@ type TransactionsHistoryServiceData = {
   };
 };
 
+type DecodeEventLog =
+  | DecodeEventLogReturnType<typeof COMPANION_ABI>
+  | DecodeEventLogReturnType<typeof HUB_ABI>
+  | DecodeEventLogReturnType<typeof EARN_VAULT_ABI>;
+
 export interface TransactionServiceData {
   transactionsHistory: TransactionsHistoryServiceData;
   dcaIndexingBlocks: ApiIndexingResponse['status'][IndexerUnits.DCA];
+  earnIndexingBlocks: ApiIndexingResponse['status'][IndexerUnits.EARN];
 }
 
 const initialState: TransactionServiceData = {
@@ -44,6 +51,7 @@ const initialState: TransactionServiceData = {
     tokenPagination: { moreEvents: true },
   },
   dcaIndexingBlocks: {},
+  earnIndexingBlocks: {},
 };
 
 export default class TransactionService extends EventsManager<TransactionServiceData> {
@@ -94,6 +102,14 @@ export default class TransactionService extends EventsManager<TransactionService
     this.serviceData = { ...this.serviceData, dcaIndexingBlocks };
   }
 
+  get earnIndexingBlocks() {
+    return this.serviceData.earnIndexingBlocks;
+  }
+
+  set earnIndexingBlocks(earnIndexingBlocks) {
+    this.serviceData = { ...this.serviceData, earnIndexingBlocks };
+  }
+
   logOutUser() {
     this.resetData();
   }
@@ -112,6 +128,10 @@ export default class TransactionService extends EventsManager<TransactionService
 
   getDcaIndexingBlocks() {
     return this.dcaIndexingBlocks;
+  }
+
+  getEarnIndexingBlocks() {
+    return this.earnIndexingBlocks;
   }
 
   // TRANSACTION HANDLING
@@ -152,7 +172,15 @@ export default class TransactionService extends EventsManager<TransactionService
     return blockNumber || Promise.reject(new Error('No provider'));
   }
 
-  async parseLog({ logs, chainId, eventToSearch }: { logs: Log[]; chainId: number; eventToSearch: string }) {
+  async parseLog({
+    logs,
+    chainId,
+    eventToSearch,
+  }: {
+    logs: Log[];
+    chainId: number;
+    eventToSearch: DecodeEventLog['eventName'];
+  }) {
     const hubAddress = this.contractService.getHUBAddress(chainId);
 
     const hubInstance = await this.contractService.getHubInstance({ chainId, readOnly: true });
@@ -161,21 +189,29 @@ export default class TransactionService extends EventsManager<TransactionService
 
     const hubCompanionAddress = this.contractService.getHUBCompanionAddress(chainId);
 
-    const parsedLogs: (DecodeEventLogReturnType<typeof COMPANION_ABI> | DecodeEventLogReturnType<typeof HUB_ABI>)[] =
-      [];
+    const earnVaultInstance = await this.contractService.getEarnVaultInstance({ chainId, readOnly: true });
+
+    const earnVaultAddress = this.contractService.getEarnVaultAddress(chainId);
+
+    const parsedLogs: DecodeEventLog[] = [];
 
     logs.forEach((log) => {
       try {
         let parsedLog;
 
-        if (log.address.toLowerCase() === hubCompanionAddress.toLowerCase()) {
+        if (hubCompanionAddress && hubCompanionInstance && log.address.toLowerCase() === hubCompanionAddress) {
           parsedLog = decodeEventLog({
             ...hubCompanionInstance,
             ...log,
           });
-        } else if (log.address.toLowerCase() === hubAddress.toLowerCase()) {
+        } else if (hubAddress && hubInstance && log.address.toLowerCase() === hubAddress) {
           parsedLog = decodeEventLog({
             ...hubInstance,
+            ...log,
+          });
+        } else if (earnVaultAddress && earnVaultInstance && log.address.toLowerCase() === earnVaultAddress) {
+          parsedLog = decodeEventLog({
+            ...earnVaultInstance,
             ...log,
           });
         }
@@ -253,7 +289,11 @@ export default class TransactionService extends EventsManager<TransactionService
       const allEvents = [...transactionsHistory.history.events, ...transactionsHistoryResponse.events];
 
       // Make a record to avoid duplicated events
-      const uniqueEventIdentifiers = keyBy(allEvents, (txEvent) => `${txEvent.tx.chainId}-${txEvent.tx.txHash}`);
+      // We include type, because there may be some events with the same hash and chainId
+      const uniqueEventIdentifiers = keyBy(
+        allEvents,
+        (txEvent) => `${txEvent.tx.chainId}-${txEvent.tx.txHash}-${txEvent.type}`
+      );
 
       transactionsHistory.history.indexing = Object.entries(transactionsHistoryResponse.indexed).reduce<
         TransactionsHistory['indexing']
@@ -279,8 +319,9 @@ export default class TransactionService extends EventsManager<TransactionService
     }
   }
 
-  async fetchDcaIndexingBlocks() {
-    const response = await this.meanApiService.getIndexingBlocksData([IndexerUnits.DCA]);
+  async fetchIndexingBlocks() {
+    const response = await this.meanApiService.getIndexingBlocksData([IndexerUnits.DCA, IndexerUnits.EARN]);
     this.dcaIndexingBlocks = response.data.status[IndexerUnits.DCA];
+    this.earnIndexingBlocks = response.data.status[IndexerUnits.EARN];
   }
 }

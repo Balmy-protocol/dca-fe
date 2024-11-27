@@ -3,7 +3,7 @@ import { toToken } from '@common/utils/currency';
 import { getGhTokenListLogoUrl } from '@constants';
 import { Token } from 'common-types';
 import styled from 'styled-components';
-import TokenIcon from '../token-icon';
+import TokenIcon, { TokenIconProps } from '../token-icon';
 
 const StyledNetworkLogoContainer = styled.div`
   position: absolute;
@@ -22,15 +22,24 @@ const StyledAssetLogosContainer = styled.div`
   display: flex;
 `;
 
-const TokenIconWithNetwork = ({ token }: { token: Token }) => (
+interface TokenIconWithNetworkProps {
+  token: Token;
+  tokenSize?: TokenIconProps['size'];
+  networkSize?: TokenIconProps['size'];
+  withShadow?: boolean;
+}
+
+const TokenIconWithNetwork = ({ token, tokenSize = 8, networkSize = 3.5, withShadow }: TokenIconWithNetworkProps) => (
   <StyledAssetLogosContainer>
-    <TokenIcon token={token} size={8} />
+    <TokenIcon token={token} size={tokenSize} withShadow={withShadow} />
     <StyledNetworkLogoContainer>
       <TokenIcon
-        size={3.5}
+        size={networkSize}
         token={toToken({
           logoURI: getGhTokenListLogoUrl(token.chainId, 'logo'),
         })}
+        withShadow={withShadow}
+        shadowType="dropShadow200"
       />
     </StyledNetworkLogoContainer>
   </StyledAssetLogosContainer>

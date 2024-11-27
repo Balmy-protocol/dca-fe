@@ -1,5 +1,5 @@
 import { createReducer } from '@reduxjs/toolkit';
-import { Address, formatUnits, parseUnits } from 'viem';
+import { Address, formatUnits } from 'viem';
 import findIndex from 'lodash/findIndex';
 import {
   DCAPositionModifiedAction,
@@ -183,10 +183,7 @@ export default createReducer(initialState, (builder) => {
 
           const newRemainingSwaps = BigInt(modifyRateAndSwapsPositionTypeData.newSwaps);
 
-          const newRate = parseUnits(
-            modifyRateAndSwapsPositionTypeData.newRate,
-            modifyRateAndSwapsPositionTypeData.decimals
-          );
+          const newRate = BigInt(modifyRateAndSwapsPositionTypeData.newRate);
 
           const modifiedAction: DCAPositionModifiedAction = {
             tx: dcaTx,

@@ -1,7 +1,6 @@
 import React from 'react';
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
 import { Button, ContainerBox, TextField, Zoom, useSnackbar } from 'ui-library';
-import styled from 'styled-components';
 import { Contact, SetStateCallback } from 'common-types';
 import { ContactListActiveModal } from '..';
 import useStoredLabels from '@hooks/useStoredLabels';
@@ -12,13 +11,10 @@ import useTrackEvent from '@hooks/useTrackEvent';
 interface AddContactModalProps {
   contact: Contact;
   setActiveModal: SetStateCallback<ContactListActiveModal>;
+  goBack?: () => void;
 }
 
-const StyledInputsContainer = styled(ContainerBox)`
-  margin: ${({ theme: { spacing } }) => `${spacing(7)} 0`};
-`;
-
-const EditContactModal = ({ contact, setActiveModal }: AddContactModalProps) => {
+const EditContactModal = ({ contact, setActiveModal, goBack }: AddContactModalProps) => {
   const storedLabels = useStoredLabels();
   const [contactLabel, setContactLabel] = React.useState(storedLabels[contact.address]?.label || '');
   const { triggerUpdate, isLoading } = useEditLabel();
@@ -68,8 +64,8 @@ const EditContactModal = ({ contact, setActiveModal }: AddContactModalProps) => 
   };
 
   return (
-    <ContainerBox flexDirection="column" fullWidth alignItems="center">
-      <StyledInputsContainer flexDirection="column" fullWidth gap={2}>
+    <>
+      <ContainerBox flexDirection="column" fullWidth gap={2}>
         <TextField
           value={contactLabel}
           placeholder={intl.formatMessage(
@@ -82,15 +78,22 @@ const EditContactModal = ({ contact, setActiveModal }: AddContactModalProps) => 
           fullWidth
         />
         <TextField id="editContactAddress" disabled value={contact.address} fullWidth type="text" />
-      </StyledInputsContainer>
-      <Button variant="contained" size="large" onClick={onEditContact} fullWidth disabled={isLoading}>
-        {isLoading ? (
-          <CenteredLoadingIndicator size={32} />
-        ) : (
-          <FormattedMessage description="update" defaultMessage="Update" />
+      </ContainerBox>
+      <ContainerBox gap={6}>
+        {goBack && (
+          <Button variant="outlined" size="large" onClick={goBack} fullWidth>
+            <FormattedMessage description="add-contact-modal.buttons.cancel" defaultMessage="Cancel" />
+          </Button>
         )}
-      </Button>
-    </ContainerBox>
+        <Button variant="contained" size="large" onClick={onEditContact} fullWidth disabled={isLoading}>
+          {isLoading ? (
+            <CenteredLoadingIndicator size={32} />
+          ) : (
+            <FormattedMessage description="update" defaultMessage="Update" />
+          )}
+        </Button>
+      </ContainerBox>
+    </>
   );
 };
 

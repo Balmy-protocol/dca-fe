@@ -17,14 +17,6 @@ const StyledContactItem = styled(ContainerBox).attrs(() => ({ justifyContent: 's
 `}
 `;
 
-const StyledUnlinkWalletContainer = styled(ContainerBox).attrs(() => ({
-  flexDirection: 'column',
-  justifyContent: 'center',
-  gap: 2,
-}))`
-  text-align: center;
-`;
-
 interface UnlinkWalletModalProps {
   open: boolean;
   onCancel: () => void;
@@ -75,16 +67,14 @@ const UnlinkWalletModal = ({ onUnlinkWallet, open, onCancel, walletToRemove }: U
       ]}
       actionsAlignment="horizontal"
     >
-      <StyledUnlinkWalletContainer>
-        <Typography variant="h6">{removeWalletMessage}</Typography>
-        <StyledContactItem>
-          <ContainerBox flexDirection="column" gap={1}>
-            <Typography variant="bodyBold" noWrap>
-              {walletToRemove?.address}
-            </Typography>
-          </ContainerBox>
-        </StyledContactItem>
-      </StyledUnlinkWalletContainer>
+      <Typography variant="h5Bold">{removeWalletMessage}</Typography>
+      <StyledContactItem>
+        <ContainerBox flexDirection="column" gap={1}>
+          <Typography variant="bodyBold" noWrap>
+            {walletToRemove?.address}
+          </Typography>
+        </ContainerBox>
+      </StyledContactItem>
     </Modal>
   );
 };

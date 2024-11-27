@@ -5,8 +5,9 @@ import WalletService from './walletService';
 import ProviderService from './providerService';
 import SdkService from './sdkService';
 import ContractService from './contractService';
-import { Address, TransactionRequest, TypedDataDomain } from 'viem';
+import { Address, Hex, TransactionRequest, TypedDataDomain } from 'viem';
 import { parseSignatureValues } from '@common/utils/signatures';
+import { PermitData } from '@balmy/sdk';
 
 export default class Permit2Service {
   contractService: ContractService;
@@ -91,6 +92,44 @@ export default class Permit2Service {
       deadline: Number(preparedSignature.permitData.deadline),
       nonce: BigInt(preparedSignature.permitData.nonce),
       rawSignature: fixedSignature.rawSignature,
+    };
+  }
+
+  async getPermit2EarnSignedData(
+    address: Address,
+    chainId: number,
+    token: Token,
+    amount: bigint,
+    wordIndex?: number
+  ): Promise<PermitData['permitData'] & { signature: Hex }> {
+    const signer = await this.providerService.getSigner(address);
+
+    if (!signer) {
+      throw new Error('No signer found');
+    }
+
+    const preparedSignature = await this.sdkService.sdk.earnService.preparePermitData({
+      appId: PERMIT_2_WORDS[wordIndex || 0] || PERMIT_2_WORDS[0],
+      chainId,
+      signerAddress: address,
+      token: token.address,
+      amount: amount,
+      signatureValidFor: '1d',
+    });
+
+    // eslint-disable-next-line no-underscore-dangle
+    const rawSignature = await signer?.signTypedData({
+      domain: preparedSignature.dataToSign.domain as TypedDataDomain,
+      types: preparedSignature.dataToSign.types,
+      message: preparedSignature.dataToSign.message,
+      account: address,
+      primaryType: preparedSignature.dataToSign.primaryType,
+    });
+
+    const fixedSignature = parseSignatureValues(rawSignature);
+    return {
+      ...preparedSignature.permitData,
+      signature: fixedSignature.rawSignature,
     };
   }
 

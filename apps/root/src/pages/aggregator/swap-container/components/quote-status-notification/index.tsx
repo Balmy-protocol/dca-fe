@@ -15,7 +15,7 @@ const StyledNotification = styled(ContainerBox).attrs({ alignItems: 'center', ga
 
 const StyledNotificationText = styled(Typography).attrs({ variant: 'bodySmallBold' })`
   ${({ theme: { palette } }) => `
-  color: ${colors[palette.mode].typography.typo2};
+    color: ${colors[palette.mode].typography.typo2};
   `}
 `;
 

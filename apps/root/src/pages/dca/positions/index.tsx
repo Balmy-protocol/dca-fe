@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Typography, Tabs, Tab, createStyles, ContainerBox, colors } from 'ui-library';
+import { Typography, UnderlinedTabs, Tab, createStyles, ContainerBox, colors } from 'ui-library';
 import { FormattedMessage } from 'react-intl';
 import { useOpenClosePositionTab } from '@state/tabs/hooks';
 import { useAppDispatch } from '@state/hooks';
@@ -28,29 +28,8 @@ const StyledPositionsContainer = styled.div`
 const StyledTab = withStyles(Tab, () =>
   createStyles({
     root: {
-      textTransform: 'none',
-      overflow: 'visible',
       padding: '10px',
     },
-    selected: {
-      fontWeight: '500',
-    },
-  })
-);
-
-const StyledTabs = withStyles(Tabs, (theme) =>
-  createStyles({
-    root: {
-      overflow: 'visible',
-      flex: 1,
-    },
-    flexContainer: {
-      borderBottom: `2px solid ${colors[theme.palette.mode].border.border1}`,
-    },
-    scroller: {
-      overflow: 'visible !important',
-    },
-    indicator: {},
   })
 );
 
@@ -68,10 +47,10 @@ const Positions = () => {
           </StyledDashboardContainer>
         ))}
       <ContainerBox flexDirection="column" gap={2}>
-        <Typography variant="h4">
+        <Typography variant="h2Bold" color={({ palette }) => colors[palette.mode].typography.typo1}>
           <FormattedMessage description="positions title" defaultMessage="Your positions" />
         </Typography>
-        <Typography variant="bodyRegular">
+        <Typography variant="bodyLargeRegular" color={({ palette }) => colors[palette.mode].typography.typo3}>
           <FormattedMessage
             description="positions description"
             defaultMessage="Here you will see the details of your open positions and be able to see further details about them. You will only be able to interact with them if you are on the correct network."
@@ -80,7 +59,7 @@ const Positions = () => {
       </ContainerBox>
       <ContainerBox flexDirection="column" flex={1} gap={14}>
         <StyledTabsContainers>
-          <StyledTabs value={tabIndex} onChange={(e, index: number) => dispatch(changeOpenClosePositionTab(index))}>
+          <UnderlinedTabs value={tabIndex} onChange={(e, index: number) => dispatch(changeOpenClosePositionTab(index))}>
             <StyledTab
               disableRipple
               label={
@@ -98,7 +77,7 @@ const Positions = () => {
                 </Typography>
               }
             />
-          </StyledTabs>
+          </UnderlinedTabs>
         </StyledTabsContainers>
         <StyledPositionsContainer>
           {tabIndex === 0 ? <CurrentPositions isLoading={!hasFetchedCurrentPositions} /> : <History />}

@@ -1,5 +1,5 @@
 import React, { forwardRef } from 'react';
-import { Table, TableBody, TableContainer, TableHead, TableRow, Typography, Paper } from '../';
+import { Table, TableBody, TableContainer, TableHead, TableRow, Typography } from '../';
 import styled from 'styled-components';
 import { TableVirtuoso, TableComponents, ItemContent, ScrollerProps, FixedHeaderContent } from 'react-virtuoso';
 import { colors } from '../../theme';
@@ -46,6 +46,20 @@ const StyledBodySmallBoldTypo2 = styled(Typography).attrs(
   })
 )``;
 
+const StyledBodySmallSemiboldTypo2 = styled(Typography).attrs(
+  ({
+    theme: {
+      palette: { mode },
+    },
+    ...rest
+  }) => ({
+    variant: 'bodySmallSemibold',
+    color: colors[mode].typography.typo2,
+    noWrap: true,
+    ...rest,
+  })
+)``;
+
 const StyledBodySmallLabelTypography = styled(Typography).attrs(
   ({
     theme: {
@@ -53,7 +67,7 @@ const StyledBodySmallLabelTypography = styled(Typography).attrs(
     },
     ...rest
   }) => ({
-    variant: 'bodySmallLabel',
+    variant: 'labelRegular',
     color: colors[mode].typography.typo3,
     noWrap: true,
     ...rest,
@@ -78,10 +92,10 @@ interface VirtualizedTableProps<Data, Context> {
   data: Data[];
   itemContent: ItemContent<Data, Context>;
   context?: VirtualizedTableContext & Context;
+  className?: string;
   fetchMore?: () => void;
   header: FixedHeaderContent;
   VirtuosoTableComponents: TableComponents<Data, Context>;
-  separateRows?: boolean;
   height?: React.CSSProperties['height'];
 }
 
@@ -93,9 +107,7 @@ function buildVirtuosoTableComponents<D, C extends VirtualizedTableContext>(): T
         context?: C;
       }
     >(function TableScroller(props, ref) {
-      return (
-        <TableContainer component={Paper} variant="outlined" sx={{ border: 'none !important' }} {...props} ref={ref} />
-      );
+      return <TableContainer {...props} ref={ref} />;
     }),
     Table: (props) => <Table sx={{ padding: 0 }} {...props} />,
     TableHead,
@@ -118,8 +130,8 @@ function VirtualizedTable<D, C>({
   fetchMore,
   header,
   VirtuosoTableComponents,
-  separateRows = true,
   height = '100%',
+  className,
 }: VirtualizedTableProps<D, C>) {
   return (
     <TableVirtuoso
@@ -130,7 +142,7 @@ function VirtualizedTable<D, C>({
       itemContent={itemContent}
       endReached={fetchMore}
       context={context}
-      className={!separateRows ? 'noSeparateRows' : ''}
+      className={className}
     />
   );
 }
@@ -142,6 +154,7 @@ export {
   StyledBodySmallBoldTypo2,
   buildVirtuosoTableComponents,
   StyledBodySmallLabelTypography,
+  StyledBodySmallSemiboldTypo2,
   type ItemContent,
   type VirtualizedTableContext,
 };

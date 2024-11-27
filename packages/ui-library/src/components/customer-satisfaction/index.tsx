@@ -81,7 +81,7 @@ const CustomerSatisfaction = ({
     <ContainerBox flexDirection="column" gap={3} alignItems="center">
       {!thankYouRef.current ? (
         <>
-          <Typography variant="bodySmallLabel" textAlign="center">
+          <Typography variant="labelRegular" textAlign="center">
             {mainQuestion}
           </Typography>
           <ContainerBox flexDirection="column" gap={2}>
@@ -108,7 +108,7 @@ const CustomerSatisfaction = ({
         </>
       ) : (
         <Zoom in={thankYouRef.current} unmountOnExit mountOnEnter>
-          <Typography variant="h6Bold" textAlign="center">
+          <Typography variant="h5Bold" textAlign="center">
             <FormattedMessage description="thankYouCSAT" defaultMessage="Thank you!" />
           </Typography>
         </Zoom>

@@ -100,7 +100,7 @@ export const PositionCardSkeleton = ({ isClosed }: { isClosed?: boolean }) => (
   <StyledSkeletonContainer>
     <StyledCardHeader>
       <ContainerBox gap={2} alignItems="center">
-        <ComposedTokenIcon isLoading size={8} />
+        <ComposedTokenIcon isLoading size={8} marginRight={5} />
         <Typography variant="bodyRegular">
           <Skeleton width="8ch" animation="wave" />
         </Typography>
@@ -125,7 +125,7 @@ export const PositionCardSkeleton = ({ isClosed }: { isClosed?: boolean }) => (
         <Typography variant="bodySmallRegular">
           <Skeleton variant="text" animation="wave" width="4ch" />
         </Typography>
-        <Typography variant="h4">
+        <Typography variant="h4Bold">
           <Skeleton variant="text" animation="wave" width="100%" />
         </Typography>
       </ContainerBox>
@@ -141,7 +141,7 @@ export const PositionCardSkeleton = ({ isClosed }: { isClosed?: boolean }) => (
   </StyledSkeletonContainer>
 );
 
-interface PositionProp extends Omit<Position, 'from' | 'to'> {
+interface PositionProp extends DistributiveOmit<Position, 'from' | 'to'> {
   from: Token;
   to: Token;
 }
@@ -172,7 +172,7 @@ export const TerminatedPosition = ({ position }: TerminatedPositionProps) => {
 
   const onViewDetails = () => {
     dispatch(setPosition(undefined));
-    pushToHistory(`/${chainId}/positions/${position.version}/${position.positionId}`);
+    pushToHistory(`/invest/positions/${chainId}/${position.version}/${position.positionId}`);
     trackEvent('Position List - Go to position details', {
       chainId: position.chainId,
     });
@@ -184,7 +184,7 @@ export const TerminatedPosition = ({ position }: TerminatedPositionProps) => {
         <ContainerBox gap={6} flexDirection="column">
           <StyledCardHeader>
             <ContainerBox gap={2}>
-              <ComposedTokenIcon tokens={[from, to]} size={8} />
+              <ComposedTokenIcon tokens={[from, to]} size={8} marginRight={5} />
               <ContainerBox gap={0.5} alignItems="center">
                 <Typography variant="bodyRegular">{from.symbol}</Typography>
                 <ArrowRightIcon fontSize="small" />
@@ -333,33 +333,18 @@ export const OpenPosition = ({
         <ContainerBox gap={6} flexDirection="column" justifyContent="space-between" flexGrow={1}>
           <ContainerBox gap={6} flexDirection="column">
             <StyledCardHeader>
-              <ContainerBox gap={2}>
-                <ComposedTokenIcon tokens={[from, to]} size={8} />
+              <ContainerBox gap={2} alignItems="center">
+                <ComposedTokenIcon tokens={[from, to]} size={8} marginRight={5} />
                 <ContainerBox gap={0.5} alignItems="center">
-                  <Typography variant="bodyRegular">{from.symbol}</Typography>
+                  <Typography variant="bodySemibold">{from.symbol}</Typography>
                   <ArrowRightIcon fontSize="small" />
-                  <Typography variant="bodyRegular">{to.symbol}</Typography>
+                  <Typography variant="bodySemibold">{to.symbol}</Typography>
                 </ContainerBox>
               </ContainerBox>
               <ContainerBox gap={4} alignItems="center">
                 <Hidden mdDown>
-                  <Typography variant="bodySmallRegular" maxWidth={'7ch'} textOverflow="ellipsis" overflow="hidden">
+                  <Typography variant="bodySmallRegular" maxWidth={'15ch'} textOverflow="ellipsis" overflow="hidden">
                     <Address address={position.user} />
-                  </Typography>
-                  <Typography variant="bodySmallRegular">
-                    <FormattedMessage
-                      description="positionFrequencyAdverb"
-                      defaultMessage="{frequency}"
-                      values={{
-                        frequency: capitalize(
-                          intl.formatMessage(
-                            STRING_SWAP_INTERVALS[
-                              position.swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS
-                            ].adverb
-                          )
-                        ),
-                      }}
-                    />
                   </Typography>
                 </Hidden>
                 <TokenIcon token={mainCurrencyToken} size={8} />
@@ -389,9 +374,9 @@ export const OpenPosition = ({
                       }
                     >
                       <ContainerBox gap={1} alignItems="center">
-                        <TokenIcon isInChip size={7} token={position.to} />
+                        <TokenIcon isInChip size={8} token={position.to} />
                         {showBalance ? (
-                          <Typography variant="bodyLargeBold" lineHeight={1}>
+                          <Typography variant="h3Bold" lineHeight={1}>
                             {formatCurrencyAmount({ amount: toWithdraw.amount, token: position.to, sigFigs: 4, intl })}
                           </Typography>
                         ) : (
@@ -413,22 +398,22 @@ export const OpenPosition = ({
                   </Typography>
                 )}
                 {!isPending && hasNoFunds && !isOldVersion && (toWithdraw.amount > 0n || remainingSwaps > 0n) && (
-                  <Typography variant="bodySmallBold" color="success.dark">
+                  <Typography variant="bodySmallRegular" color="success.dark">
                     <FormattedMessage description="finishedPosition" defaultMessage="Finished" />
                   </Typography>
                 )}
                 {!isPending && hasNoFunds && !isOldVersion && toWithdraw.amount <= 0n && remainingSwaps <= 0n && (
-                  <Typography variant="bodySmallBold" color="success.dark">
+                  <Typography variant="bodySmallRegular" color="success.dark">
                     <FormattedMessage description="donePosition" defaultMessage="Done" />
                   </Typography>
                 )}
                 {!isPending && !hasNoFunds && isStale && !isOldVersion && (
-                  <Typography variant="bodySmallBold" color="warning.dark">
+                  <Typography variant="bodySmallRegular" color="warning.dark">
                     <FormattedMessage description="stale" defaultMessage="Stale" />
                   </Typography>
                 )}
                 {isOldVersion && hasNoFunds && (
-                  <Typography variant="bodySmallBold" color="warning.dark">
+                  <Typography variant="bodySmallRegular" color="warning.dark">
                     <FormattedMessage description="deprecated" defaultMessage="Deprecated" />
                   </Typography>
                 )}

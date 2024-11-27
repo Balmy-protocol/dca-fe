@@ -11,6 +11,7 @@ export const ONE_HOUR = THIRTY_MINUTES * 2n;
 export const FOUR_HOURS = ONE_HOUR * 4n;
 export const ONE_DAY = FOUR_HOURS * 6n;
 export const ONE_WEEK = ONE_DAY * 7n;
+export const THREE_MONTHS = ONE_DAY * 30n * 3n;
 
 export const SWAP_INTERVALS = {
   hour: ONE_HOUR,

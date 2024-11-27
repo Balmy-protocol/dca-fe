@@ -12,6 +12,7 @@ const EMPTY_INDEXER_UNITS = {
   [IndexerUnits.ERC20_APPROVALS]: {},
   [IndexerUnits.ERC20_TRANSFERS]: {},
   [IndexerUnits.NATIVE_TRANSFERS]: {},
+  [IndexerUnits.EARN]: {},
 };
 
 export const IncludedIndexerUnitsArrayTypes: IncludedIndexerUnits[] = [
@@ -19,6 +20,7 @@ export const IncludedIndexerUnitsArrayTypes: IncludedIndexerUnits[] = [
   IndexerUnits.AGG_SWAPS,
   IndexerUnits.ERC20_APPROVALS,
   IndexerUnits.ERC20_TRANSFERS,
+  IndexerUnits.EARN,
   IndexerUnits.NATIVE_TRANSFERS,
 ] as const;
 

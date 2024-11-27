@@ -1,6 +1,14 @@
-// eslint-disable-next-line max-classes-per-file
 import { buildSDK, Chains, EstimatedQuoteRequest, QuoteResponse, SourceId, SOURCES_METADATA } from '@balmy/sdk';
-import { PreparedTransactionRequest, SwapOption, Token } from '@types';
+import {
+  SdkStrategy,
+  PreparedTransactionRequest,
+  SwapOption,
+  Token,
+  ChainId,
+  StrategyId,
+  SdkEarnPosition,
+  SdkEarnPositionId,
+} from '@types';
 import isNaN from 'lodash/isNaN';
 import { SwapSortOptions, SORT_MOST_PROFIT, GasKeys, TimeoutKey, getTimeoutKeyForChain } from '@constants/aggregator';
 import { AxiosInstance } from 'axios';
@@ -9,6 +17,9 @@ import { MEAN_API_URL, SUPPORTED_NETWORKS_DCA, NULL_ADDRESS } from '@constants/a
 import { ArrayOneOrMore } from '@balmy/sdk/dist/utility-types';
 import { Address } from 'viem';
 import { swapOptionToQuoteResponse } from '@common/utils/quotes';
+import { flatten } from 'lodash';
+import { THREE_MONTHS } from '@constants';
+import { nowInSeconds } from '@common/utils/time';
 
 export default class SdkService {
   sdk: ReturnType<typeof buildSDK<object>>;
@@ -19,6 +30,9 @@ export default class SdkService {
     this.axiosClient = axiosClient;
     this.sdk = buildSDK({
       dca: {
+        customAPIUrl: MEAN_API_URL,
+      },
+      earn: {
         customAPIUrl: MEAN_API_URL,
       },
       provider: {
@@ -35,7 +49,7 @@ export default class SdkService {
               supportedChains: [Chains.ROOTSTOCK.chainId],
               url: 'https://rpc.mainnet.rootstock.io/kwpo15zcnHLZSPbc4zbN9wJmc8SglX-M',
             },
-            { type: 'public-rpcs' },
+            { type: 'public-rpcs', config: { type: 'load-balance', maxAttempts: 2, maxConcurrent: 2 } },
           ],
         },
       },
@@ -487,6 +501,72 @@ export default class SdkService {
     });
 
     return sdkPositions[chainId][0];
+  }
+
+  async getAllStrategies(): Promise<SdkStrategy[]> {
+    const strategies = await this.sdk.earnService.getSupportedStrategies();
+    return flatten(Object.values(strategies));
+  }
+
+  async getDetailedStrategy({ strategyId }: { strategyId: StrategyId }): Promise<SdkStrategy> {
+    const strategy = await this.sdk.earnService.getStrategy({
+      strategy: strategyId,
+    });
+
+    return strategy;
+  }
+
+  async getUserStrategies({ accounts }: { accounts: Address[] }): Promise<Record<ChainId, SdkEarnPosition[]>> {
+    if (accounts.length === 0) {
+      return {};
+    }
+
+    const positionsByAccount = await this.sdk.earnService.getPositionsByAccount({
+      accounts: accounts as ArrayOneOrMore<Address>,
+      includeHistoricalBalancesFrom: nowInSeconds() - Number(THREE_MONTHS),
+    });
+
+    return positionsByAccount;
+  }
+
+  async getUserStrategy(positionStrategyId: SdkEarnPositionId): Promise<SdkEarnPosition> {
+    const positionsById = await this.sdk.earnService.getPositionsById({
+      ids: [positionStrategyId],
+      includeHistory: true,
+      includeHistoricalBalancesFrom: nowInSeconds() - Number(THREE_MONTHS),
+    });
+
+    return Object.values(positionsById)[0][0];
+  }
+
+  buildEarnCreatePositionTx(
+    args: Parameters<ReturnType<typeof buildSDK<object>>['earnService']['buildCreatePositionTx']>[0]
+  ) {
+    return this.sdk.earnService.buildCreatePositionTx(args) as Promise<PreparedTransactionRequest>;
+  }
+
+  buildEarnIncreasePositionTx(
+    args: Parameters<ReturnType<typeof buildSDK<object>>['earnService']['buildIncreasePositionTx']>[0]
+  ) {
+    return this.sdk.earnService.buildIncreasePositionTx(args) as Promise<PreparedTransactionRequest>;
+  }
+
+  buildEarnWithdrawPositionTx(
+    args: Parameters<ReturnType<typeof buildSDK<object>>['earnService']['buildWithdrawPositionTx']>[0]
+  ) {
+    return this.sdk.earnService.buildWithdrawPositionTx(args) as Promise<PreparedTransactionRequest>;
+  }
+
+  buildEarnClaimDelayedWithdrawPositionTx(
+    args: Parameters<ReturnType<typeof buildSDK<object>>['earnService']['buildClaimDelayedWithdrawPositionTx']>[0]
+  ) {
+    return this.sdk.earnService.buildClaimDelayedWithdrawPositionTx(args) as Promise<PreparedTransactionRequest>;
+  }
+
+  estimateMarketWithdraw(
+    args: Parameters<ReturnType<typeof buildSDK<object>>['earnService']['estimateMarketWithdraw']>[0]
+  ) {
+    return this.sdk.earnService.estimateMarketWithdraw(args);
   }
 
   getChart(args: Parameters<ReturnType<typeof buildSDK<object>>['priceService']['getChart']>[0]) {

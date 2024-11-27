@@ -53,6 +53,7 @@ const SlippageInput = ({ id, onChange, value }: SlippageInputProps) => {
         InputProps={{
           endAdornment: '%',
         }}
+        sx={{ flex: 1 }}
       />
       <OptionsButtons options={parsedOptions} activeOption={value} setActiveOption={handleChange} />
     </ContainerBox>

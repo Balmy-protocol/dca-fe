@@ -77,7 +77,7 @@ const QuoteSimulation = ({
       {(isLoading || isLoadingRoute) && <CenteredLoadingIndicator />}
       {!isLoading && (transactionSimulationError || transactionSimulation?.simulationResults.error) && (
         <>
-          <Typography variant="h6">
+          <Typography variant="h5Bold">
             <FormattedMessage description="blowfishSimulationTitle" defaultMessage="Transaction simulation" />
           </Typography>
           <Typography
@@ -95,7 +95,7 @@ const QuoteSimulation = ({
       )}
       {!isLoading && transactionSimulation && !transactionSimulation.simulationResults.error && (
         <StyledSimulation>
-          <Typography variant="h6">
+          <Typography variant="h5Bold">
             <FormattedMessage description="blowfishSimulationTitle" defaultMessage="Transaction simulation" />
           </Typography>
           {BLOWFISH_ENABLED_CHAINS.includes(currentNetwork.chainId) &&

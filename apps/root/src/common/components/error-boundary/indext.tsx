@@ -99,8 +99,9 @@ class ErrorBoundary extends Component<Props, State> {
       const location = window.location.pathname;
       let errorAction = 'Other';
       const swapPageRegex = /swap(?:\/(\w*))?(?:\/(\w*))?(?:\/(\w*))?/;
-      const createPageRegex = /create(?:\/(\w*))?(?:\/(\w*))?(?:\/(\w*))?/;
-      const positionPageRegex = /(\d+)\/positions\/(\d+)\/(\d+)/;
+      const investCreatePageRegex = /invest\/create(?:\/(\w*))?(?:\/(\w*))?(?:\/(\w*))?/;
+      const investPositionsPageRegex = /invest\/positions(?:\/(\w*))?(?:\/(\w*))?(?:\/(\w*))?/;
+      const earnPageRegex = /earn(?:\/(\w*))?(?:\/(\w*))?(?:\/(\w*))?/;
 
       if (location.startsWith('/swap')) {
         errorAction = 'Aggregator page';
@@ -111,9 +112,9 @@ class ErrorBoundary extends Component<Props, State> {
 
         errorAction = `${errorAction} - ${chainId} - ${from} - ${to}`;
       }
-      if (location.startsWith('/create')) {
+      if (location.startsWith('/invest/create')) {
         errorAction = 'Create page';
-        const params = createPageRegex.exec(location) || [];
+        const params = investCreatePageRegex.exec(location) || [];
 
         const chainId = params[1];
         const from = params[2];
@@ -121,11 +122,14 @@ class ErrorBoundary extends Component<Props, State> {
 
         errorAction = `${errorAction} - ${chainId} - ${from} - ${to}`;
       }
-      if (location.startsWith('/positions')) {
+      if (location.startsWith('/invest/positions')) {
         errorAction = 'Positions list page';
       }
-      if (positionPageRegex.test(location)) {
+      if (investPositionsPageRegex.test(location)) {
         errorAction = 'Positions details page';
+      }
+      if (earnPageRegex.test(location)) {
+        errorAction = 'Earn page';
       }
       const errorMessageToShow = errorMessage || errorMessageProp || (error && error.message);
       const errorInfoToShow = errorInfo && JSON.stringify(errorInfo);
@@ -134,20 +138,20 @@ class ErrorBoundary extends Component<Props, State> {
         errorStackTrace || errorStackTraceProp || (error && error.stack) || 'Unknown error stack';
       return (
         <StyledErrorContainer>
-          <Typography variant="h1">
+          <Typography variant="h1Bold">
             <SickIcon fontSize="inherit" />
           </Typography>
-          <Typography variant="h3">
+          <Typography variant="h3Bold">
             <FormattedMessage description="errorEncounteredOops" defaultMessage="Oooops" />
           </Typography>
-          <Typography variant="h4">
+          <Typography variant="h4Bold">
             <FormattedMessage
               description="errorEncountered"
               defaultMessage="Seems like we encountered an error we could not handle"
             />
           </Typography>
           {errorMessageToShow && (
-            <Typography variant="h5">
+            <Typography variant="h5Bold">
               <FormattedMessage
                 description="errorEncounteredName"
                 defaultMessage="This was due to: {name}"

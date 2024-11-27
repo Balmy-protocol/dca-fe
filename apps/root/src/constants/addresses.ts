@@ -591,6 +591,21 @@ export const SMOL_DOMAIN_ADDRESS: Record<number, Address> = {
   [NETWORKS.arbitrum.chainId]: '0xd64A2DF9d73CD1Cb50139A3eC3176070e00C67cA',
 };
 
+export const EARN_COMPANION_ADDRESS: Record<number, Address> = {
+  [Chains.POLYGON.chainId]: '0x814CE82aCDE3D99aB6f92e2722A87d8daa20d6cB',
+  [Chains.BASE.chainId]: '0x260B192b9A5679121FF7f9F0Cf3FED3238753A48',
+};
+
+export const EARN_VAULT_ADDRESS: Record<number, Address> = {
+  [Chains.POLYGON.chainId]: '0x58e5d76fbbd7e1b51f0fc0f66b7734e108be0461',
+  [Chains.BASE.chainId]: '0x9324a1f92a82b539f8fb1194a0b894025581ec33',
+};
+
+export const EARN_STRATEGY_REGISTRY: Record<number, Lowercase<Address>> = {
+  [Chains.POLYGON.chainId]: '0xb034a43d1ffe0f88ed3a50fc096179f543fd3f3a',
+  [Chains.BASE.chainId]: '0x04a3bd5cc16435f27e7b31e44e4e522c0bc413e9',
+};
+
 export const EXPLORER_URL = getAllChains().reduce<Record<number, string>>(
   (acc, network) => ({
     ...acc,
@@ -708,3 +723,5 @@ export const getTokenAddressForPriceFetching = (chainId: number, address: Addres
   const chainRecord = tokenAddressesForPriceFetching[chainId];
   return (chainRecord && chainRecord[address]) || address;
 };
+
+export const BALMY_FEES_LOGO_URL = 'https://ipfs.io/ipfs/Qmd2GuuoqECL2wDpjWCKfSNUPYCCWGhrYVf8fjtyeyWWBV';

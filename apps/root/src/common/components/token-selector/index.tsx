@@ -1,13 +1,11 @@
 import styled from 'styled-components';
 import React from 'react';
 import find from 'lodash/find';
-import { Chip, ContainerBox, Select, Skeleton, Typography, baseColors, colors, SPACING } from 'ui-library';
-import TokenIcon from '@common/components/token-icon';
+import { ContainerBox, Select, Skeleton, Typography, colors, SPACING } from 'ui-library';
 import useSelectedNetwork from '@hooks/useSelectedNetwork';
-import { formatCurrencyAmount, formatUsdAmount } from '@common/utils/currency';
 import useActiveWallet from '@hooks/useActiveWallet';
 import { Token, TokenListId } from '@types';
-import { TokenBalance, useWalletBalances } from '@state/balances/hooks';
+import { useWalletBalances } from '@state/balances/hooks';
 import useTokenList from '@hooks/useTokenList';
 import { formatUnits, isAddress } from 'viem';
 import { useThemeMode } from '@state/config/hooks';
@@ -16,6 +14,7 @@ import { orderBy } from 'lodash';
 import useAddCustomTokenToList from '@hooks/useAddCustomTokenToList';
 import { useCustomTokens } from '@state/token-lists/hooks';
 import { getTokenListId } from '@common/utils/parsing';
+import { SelectedTokenSelectorItem, TokenSelectorItem, TokenSelectorOption } from './token-items';
 
 interface TokenSelectorProps {
   handleChange: (token: Token) => void;
@@ -35,57 +34,7 @@ const StyledNetworkButtonsContainer = styled.div`
   flex-wrap: wrap;
 `;
 
-type TokenWithCustom = Token & { isCustomToken?: boolean };
-type OptionWithKeyAndToken = TokenBalance & { key: string; token: TokenWithCustom };
-
-const TokenItem = ({ item: { token, balance, balanceUsd, key } }: { item: OptionWithKeyAndToken }) => {
-  const mode = useThemeMode();
-  const intl = useIntl();
-
-  return (
-    <ContainerBox flexDirection="column" gap={1} flex={1}>
-      <ContainerBox alignItems="center" key={key} flex={1} gap={3}>
-        <TokenIcon size={6} token={token} />
-        <ContainerBox flexDirection="column" flex="1">
-          <Typography variant="bodySmallSemibold" color={colors[mode].typography.typo2}>
-            {token.name}
-          </Typography>
-          <Typography variant="bodySmallLabel" color={colors[mode].typography.typo3}>
-            {formatCurrencyAmount({ amount: balance, token, intl })}
-            {` `}
-            {token.symbol}
-          </Typography>
-        </ContainerBox>
-        {!!balanceUsd && (
-          <Chip
-            size="small"
-            label={
-              <Typography variant="bodySemibold">
-                ${formatUsdAmount({ amount: formatUnits(balanceUsd, token.decimals + 18), intl })}
-              </Typography>
-            }
-          />
-        )}
-      </ContainerBox>
-      {token.isCustomToken && (
-        <Typography variant="bodyBold" color={baseColors.disabledText}>
-          <Chip
-            color="warning"
-            size="medium"
-            label={intl.formatMessage(
-              defineMessage({
-                description: 'customTokenWarning',
-                defaultMessage: 'This is a custom token you are importing, trade at your own risk.',
-              })
-            )}
-          />
-        </Typography>
-      )}
-    </ContainerBox>
-  );
-};
-
-const SkeletonTokenItem = () => {
+export const SkeletonTokenSelectorItem = () => {
   const mode = useThemeMode();
 
   return (
@@ -105,7 +54,7 @@ const SkeletonTokenItem = () => {
   );
 };
 
-const searchFunction = ({ token }: OptionWithKeyAndToken, search: string) =>
+const searchFunction = ({ token }: TokenSelectorOption, search: string) =>
   token.name.toLowerCase().includes(search.toLowerCase()) ||
   token.symbol.toLowerCase().includes(search.toLowerCase()) ||
   token.address.toLowerCase().includes(search.toLowerCase());
@@ -121,7 +70,7 @@ const TokenSelector = ({ handleChange, selectedToken }: TokenSelectorProps) => {
 
   const availableTokens = React.useMemo(
     () =>
-      Object.keys(balances).map<OptionWithKeyAndToken>((tokenAddress) => ({
+      Object.keys(balances).map<TokenSelectorOption>((tokenAddress) => ({
         ...balances[tokenAddress],
         key: tokenAddress,
         token: tokens[`${selectedNetwork.chainId}-${tokenAddress.toLowerCase()}` as TokenListId],
@@ -129,7 +78,7 @@ const TokenSelector = ({ handleChange, selectedToken }: TokenSelectorProps) => {
     [balances]
   );
 
-  const items: OptionWithKeyAndToken[] = React.useMemo(() => {
+  const items: TokenSelectorOption[] = React.useMemo(() => {
     const parsedWithCustomTokens = availableTokens.map((tokenOption) => {
       const tokenKey = getTokenListId({
         chainId: tokenOption.token.chainId,
@@ -176,12 +125,13 @@ const TokenSelector = ({ handleChange, selectedToken }: TokenSelectorProps) => {
           placeholder={intl.formatMessage(
             defineMessage({ defaultMessage: 'Select a token to transfer', description: 'SelectTokenToTransfer' })
           )}
-          RenderItem={TokenItem}
-          SkeletonItem={SkeletonTokenItem}
+          RenderItem={TokenSelectorItem}
+          RenderSelectedValue={SelectedTokenSelectorItem}
+          SkeletonItem={SkeletonTokenSelectorItem}
           isLoading={isLoadingCustomToken}
           onSearchChange={onSearchChange}
           selectedItem={selectedItem}
-          onChange={(item: OptionWithKeyAndToken) => handleChange(item.token)}
+          onChange={({ token }: TokenSelectorOption) => handleChange(token)}
           disabledSearch={false}
           searchFunction={searchFunction}
           emptyOption={

@@ -6,10 +6,16 @@ import useTrackEvent from '@hooks/useTrackEvent';
 import useTransactionsHistory from '@hooks/useTransactionsHistory';
 import { useAppDispatch } from '@state/hooks';
 import { changeRoute } from '@state/tabs/actions';
-import { SetStateCallback, TransactionEvent, TransactionEventTypes, TransactionStatus, UserStatus } from 'common-types';
+import {
+  SetStateCallback,
+  StrategyId,
+  TransactionEvent,
+  TransactionEventTypes,
+  TransactionStatus,
+  UserStatus,
+} from 'common-types';
 import { FormattedMessage, useIntl } from 'react-intl';
 import {
-  KeyboardArrowRightIcon,
   Button,
   BackgroundPaper,
   VirtualizedList,
@@ -18,13 +24,15 @@ import {
   ForegroundPaper,
   TransactionReceipt,
   Skeleton,
-  Chip,
   YawningFaceEmoji,
   StyledBodySmallLabelTypography,
   StyledBodySmallRegularTypo2,
   Hidden,
   colors,
   HiddenNumber,
+  ContainerBox,
+  CircularProgress,
+  StyledBodySmallSemiboldTypo2,
 } from 'ui-library';
 import {
   filterEventsByUnitIndexed,
@@ -41,7 +49,7 @@ import ComposedTokenIcon from '@common/components/composed-token-icon';
 import useUser from '@hooks/useUser';
 import useWallets from '@hooks/useWallets';
 import useIsSomeWalletIndexed from '@hooks/useIsSomeWalletIndexed';
-import { ALL_WALLETS, WalletOptionValues } from '@common/components/wallet-selector';
+import { WalletOptionValues, ALL_WALLETS } from '@common/components/wallet-selector/types';
 import { formatUsdAmount } from '@common/utils/currency';
 import { findHubAddressVersion } from '@common/utils/parsing';
 import { HISTORY_ROUTE } from '@constants/routes';
@@ -53,7 +61,7 @@ const StyledNoActivity = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: ${spacing(2)}
+  gap: ${spacing(2)};
   `}
 `;
 const StyledOperation = styled.div`
@@ -73,9 +81,9 @@ const StyledPaper = styled(BackgroundPaper)`
   display: flex;
   flex-direction: column;
   flex: 1;
-  ${({ theme: { spacing } }) => `
-    gap: ${spacing(5)};
-    padding: ${spacing(4)};
+  ${({ theme: { space } }) => `
+    gap: ${space.s05};
+    padding: ${space.s04};
   `}
 `;
 
@@ -88,9 +96,11 @@ const StyledForegroundPaper = styled(ForegroundPaper)`
     padding: ${spacing(3)};
     gap: ${spacing(2)};
     transition: box-shadow 0.3s ease-in-out;
+    border-radius: ${spacing(2)};
+    border: 1px solid ${colors[palette.mode].border.border1};
     &:hover {
       background-color: ${colors[palette.mode].background.tertiary};
-      box-shadow: ${colors[palette.mode].dropShadow.dropShadow100}
+      box-shadow: ${colors[palette.mode].dropShadow.dropShadow100};
     }
   `}
 `;
@@ -111,16 +121,43 @@ const formatTokenElement = (txEvent: TransactionEvent): React.ReactElement => {
     case TransactionEventTypes.ERC20_APPROVAL:
     case TransactionEventTypes.ERC20_TRANSFER:
     case TransactionEventTypes.NATIVE_TRANSFER:
-      return <TokenIconWithNetwork token={txEvent.data.token} />;
+      return <TokenIconWithNetwork token={txEvent.data.token} tokenSize={8} withShadow />;
+    case TransactionEventTypes.EARN_CREATED:
+    case TransactionEventTypes.EARN_INCREASE:
+      return <TokenIconWithNetwork token={txEvent.data.depositToken} tokenSize={8} withShadow />;
+    case TransactionEventTypes.EARN_WITHDRAW:
+      const tokens = txEvent.data.withdrawn.map((withdrawn) => withdrawn.token);
+      return <ComposedTokenIcon tokens={tokens} withNetwork withShadow size={8} marginRight={4} />;
+    case TransactionEventTypes.EARN_SPECIAL_WITHDRAW:
+      const specialWithdrawTokens = txEvent.data.tokens.map((token) => token.token);
+      return <ComposedTokenIcon tokens={specialWithdrawTokens} withNetwork withShadow size={8} marginRight={4} />;
+    case TransactionEventTypes.EARN_CLAIM_DELAYED_WITHDRAW:
+      return <TokenIconWithNetwork token={txEvent.data.token} tokenSize={8} withShadow />;
     case TransactionEventTypes.DCA_MODIFIED:
     case TransactionEventTypes.DCA_CREATED:
     case TransactionEventTypes.DCA_WITHDRAW:
     case TransactionEventTypes.DCA_PERMISSIONS_MODIFIED:
     case TransactionEventTypes.DCA_TRANSFER:
     case TransactionEventTypes.DCA_TERMINATED:
-      return <ComposedTokenIcon withNetwork tokens={[txEvent.data.fromToken, txEvent.data.toToken]} />;
+      return (
+        <ComposedTokenIcon
+          marginRight={4}
+          withNetwork
+          withShadow
+          tokens={[txEvent.data.fromToken, txEvent.data.toToken]}
+          size={8}
+        />
+      );
     case TransactionEventTypes.SWAP:
-      return <ComposedTokenIcon withNetwork tokens={[txEvent.data.tokenIn, txEvent.data.tokenOut]} />;
+      return (
+        <ComposedTokenIcon
+          withNetwork
+          marginRight={4}
+          withShadow
+          tokens={[txEvent.data.tokenIn, txEvent.data.tokenOut]}
+          size={8}
+        />
+      );
   }
 };
 
@@ -161,12 +198,11 @@ const ActivityContent: ItemContent<TransactionEvent, Context> = (
       elevation={0}
       key={txHash}
       onClick={() => status === TransactionStatus.DONE && setShowReceipt(event)}
-      variant="outlined"
       sx={{ margin: (theme) => `0px ${theme.spacing(0.5)}` }}
     >
       {formatTokenElement(event)}
       <StyledOperation>
-        <StyledBodySmallRegularTypo2 noWrap={false}>{operation}</StyledBodySmallRegularTypo2>
+        <StyledBodySmallSemiboldTypo2 noWrap={false}>{operation}</StyledBodySmallSemiboldTypo2>
         <StyledBodySmallLabelTypography noWrap={false}>{formattedDate}</StyledBodySmallLabelTypography>
       </StyledOperation>
       <StyledValue>
@@ -174,13 +210,12 @@ const ActivityContent: ItemContent<TransactionEvent, Context> = (
           {showBalances ? txTokenFlow : <HiddenNumber size="small" />}
         </StyledBodySmallRegularTypo2>
         {status === TransactionStatus.PENDING ? (
-          <Chip
-            size="small"
-            variant="outlined"
-            color="primary"
-            sx={{ height: 'auto', '.MuiChip-label': { whiteSpace: 'normal', textAlign: 'center' } }}
-            label={<FormattedMessage defaultMessage="Waiting on confirmation" description="waiting-on-confirmation" />}
-          />
+          <ContainerBox gap={1} alignItems="center">
+            <CircularProgress size={12} color="warning" />
+            <Typography variant="labelRegular">
+              <FormattedMessage defaultMessage="Pending" description="home.activity.pending-status" />
+            </Typography>
+          </ContainerBox>
         ) : txValuePrice && showBalances ? (
           <StyledBodySmallLabelTypography noWrap={false}>
             ≈{` `}${formatUsdAmount({ amount: txValuePrice, intl })}
@@ -250,7 +285,7 @@ const Activity = ({ selectedWalletOption }: ActivityProps) => {
     () => (
       <StyledNoActivity>
         <YawningFaceEmoji />
-        <Typography variant="h5" fontWeight="bold">
+        <Typography variant="h5Bold">
           <FormattedMessage description="noActivityTitle" defaultMessage="No Activity Yet" />
         </Typography>
         <Typography variant="bodyRegular" textAlign="center">
@@ -285,9 +320,18 @@ const Activity = ({ selectedWalletOption }: ActivityProps) => {
   const onGoToPosition = React.useCallback(
     ({ chainId, positionId, hub }: { chainId: number; hub: string; positionId: number }) => {
       const version = findHubAddressVersion(hub);
-      pushToHistory(`/${chainId}/positions/${version}/${positionId}`);
+      pushToHistory(`/invest/positions/${chainId}/${version}/${positionId}`);
+      trackEvent('Home - Tx Receipt - View position');
     },
-    [pushToHistory]
+    [pushToHistory, trackEvent]
+  );
+
+  const onGoToEarnPosition = React.useCallback(
+    ({ chainId, strategyId }: { chainId: number; strategyId: StrategyId }) => {
+      pushToHistory(`/earn/vaults/${chainId}/${strategyId}`);
+      trackEvent('Home - Tx Receipt - View earn position');
+    },
+    [pushToHistory, trackEvent]
   );
 
   const context = React.useMemo(
@@ -302,6 +346,8 @@ const Activity = ({ selectedWalletOption }: ActivityProps) => {
         open={!isUndefined(showReceipt)}
         onClose={() => setShowReceipt(undefined)}
         onClickPositionId={onGoToPosition}
+        onClickEarnPositionId={onGoToEarnPosition}
+        showBalances={showBalances}
       />
       <StyledPaper variant="outlined">
         {!isLoading && (!wallets.length || !filteredEvents.length) ? (
@@ -322,13 +368,8 @@ const Activity = ({ selectedWalletOption }: ActivityProps) => {
             size="small"
             disabled={!isLoading && events.length === 0}
           >
-            <Typography
-              variant="bodyBold"
-              sx={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}
-              color={({ palette: { mode } }) => colors[mode].accent.primary}
-            >
+            <Typography variant="linkRegular" textAlign="center">
               <FormattedMessage description="seeAll" defaultMessage="See all" />
-              <KeyboardArrowRightIcon fontSize="inherit" />
             </Typography>
           </Button>
         </Hidden>

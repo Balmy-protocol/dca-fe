@@ -56,7 +56,7 @@ const YieldTokenSelector = ({
         type: OptionsMenuOptionType.option,
         label: (
           <StyledYieldOptionDescription>
-            <CloseCircleIcon color="info" />
+            <CloseCircleIcon />
             <StyledDcaInputLabel>
               <FormattedMessage description="noYieldOption" defaultMessage="No yield" />
             </StyledDcaInputLabel>

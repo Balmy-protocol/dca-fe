@@ -16,18 +16,14 @@ interface AddContactModalProps {
   clearDefaultAddressValue?: () => void;
   postContactStatus: PostContactStatus;
   setPostContactStatus: SetStateCallback<PostContactStatus>;
+  goBack?: () => void;
 }
 
-const StyledStatusTitle = styled(Typography).attrs({ variant: 'h5' })`
+const StyledStatusTitle = styled(Typography).attrs({ variant: 'h5Bold' })`
   ${({ theme: { palette } }) => `
-  font-weight: bold;
   color: ${colors[palette.mode].typography.typo1};
   text-align: center;
 `}
-`;
-
-const StyledInputsContainer = styled(ContainerBox)`
-  margin: ${({ theme: { spacing } }) => `${spacing(7)} 0`};
 `;
 
 const PostContactStatusContent = ({
@@ -58,6 +54,7 @@ const AddContactModal = ({
   clearDefaultAddressValue,
   postContactStatus,
   setPostContactStatus,
+  goBack,
 }: AddContactModalProps) => {
   const intl = useIntl();
   const contactListService = useContactListService();
@@ -157,8 +154,8 @@ const AddContactModal = ({
       ) : postContactStatus === PostContactStatus.SUCCESS ? (
         postContactSuccess
       ) : (
-        <ContainerBox flexDirection="column" fullWidth alignItems="center">
-          <StyledInputsContainer flexDirection="column" fullWidth gap={2}>
+        <>
+          <ContainerBox flexDirection="column" fullWidth gap={2}>
             <TextField
               placeholder={intl.formatMessage(
                 defineMessage({
@@ -176,7 +173,7 @@ const AddContactModal = ({
               autoComplete="off"
               autoCorrect="off"
               error={!isValidAddress && !!errorMessage}
-              helperText={errorMessage}
+              helperText={errorMessage || ' '}
               fullWidth
               type="text"
               spellCheck="false"
@@ -188,21 +185,28 @@ const AddContactModal = ({
                 maxLength: 79,
               }}
             />
-          </StyledInputsContainer>
-          <Button
-            variant="contained"
-            size="large"
-            onClick={onPostContact}
-            disabled={!!errorMessage || !contactAddress || postContactStatus === PostContactStatus.LOADING}
-            fullWidth
-          >
-            {postContactStatus === PostContactStatus.LOADING ? (
-              <CenteredLoadingIndicator size={24} />
-            ) : (
-              <FormattedMessage description="addContact" defaultMessage="Add Contact" />
+          </ContainerBox>
+          <ContainerBox gap={6}>
+            {goBack && (
+              <Button variant="outlined" size="large" onClick={goBack} fullWidth>
+                <FormattedMessage description="add-contact-modal.buttons.cancel" defaultMessage="Cancel" />
+              </Button>
             )}
-          </Button>
-        </ContainerBox>
+            <Button
+              variant="contained"
+              size="large"
+              onClick={onPostContact}
+              disabled={!!errorMessage || !contactAddress || postContactStatus === PostContactStatus.LOADING}
+              fullWidth
+            >
+              {postContactStatus === PostContactStatus.LOADING ? (
+                <CenteredLoadingIndicator size={24} />
+              ) : (
+                <FormattedMessage description="addContact" defaultMessage="Add Contact" />
+              )}
+            </Button>
+          </ContainerBox>
+        </>
       )}
     </>
   );

@@ -15,14 +15,15 @@ import {
   ContainerBox,
   Typography,
   Button,
-  ForegroundPaper,
-  EmptyWalletIcon,
   CircularProgressWithBrackground,
   Hidden,
   HiddenNumber,
   colors,
   VirtualizedTableContext,
   SPACING,
+  WalletIcon,
+  Wallet3Icon,
+  EmptyWalletIcon,
 } from 'ui-library';
 import { FormattedMessage, useIntl } from 'react-intl';
 import {
@@ -45,18 +46,16 @@ import { useShowSmallBalances, useShowBalances } from '@state/config/hooks';
 import WidgetFrame from '@pages/home/components/widget-frame';
 import { getAllChains } from '@balmy/sdk';
 import TokenIcon from '@common/components/token-icon';
-import { getGhTokenListLogoUrl } from '@constants';
 import { WalletActionType } from '@services/accountService';
+import { getGhTokenListLogoUrl } from '@constants/addresses';
 
-const StyledNoWallet = styled(ForegroundPaper).attrs({ variant: 'outlined' })`
-  ${({ theme: { spacing } }) => `
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  justify-content: center;
-  align-items: center;
-  gap: ${spacing(6)};
-  `}
+const StyledNoWallet = styled(ContainerBox).attrs({
+  flexDirection: 'column',
+  gap: 6,
+  justifyContent: 'center',
+  alignItems: 'center',
+})`
+  height: 100%;
 `;
 
 type BalanceItem = {
@@ -115,41 +114,50 @@ const BalanceTableBodySkeleton: ItemContent<BalanceItem, Context> = () => {
   );
 };
 
+const StyledNoWalletIconContainer = styled(ContainerBox)`
+  ${({
+    theme: {
+      spacing,
+      palette: { mode },
+    },
+  }) => `
+    border-radius: 50%;
+    border: 1px solid ${colors[mode].border.border1};
+    backdrop-filter: blur(15.294119834899902px);
+    padding: ${spacing(5)};
+    box-shadow: 0px 20px 25px rgba(150, 140, 242, 0.25);
+  `}
+`;
 const BalanceTableNotConnected = () => {
   const openConnectModal = useOpenConnectModal();
 
   return (
     <StyledNoWallet>
-      <ContainerBox flexDirection="column" gap={2} alignItems="center">
-        <Typography variant="h5">💸️</Typography>
-        <Typography variant="h5" fontWeight="bold">
-          <FormattedMessage description="noWalletConnected" defaultMessage="No Wallet Connected" />
-        </Typography>
-        <Typography variant="bodyRegular" textAlign="center">
-          <FormattedMessage
-            description="noWalletConnectedParagraph"
-            defaultMessage="Connect your wallet to view and manage your crypto BalanceTable"
+      <ContainerBox flexDirection="column" gap={4} alignItems="center">
+        <StyledNoWalletIconContainer>
+          <EmptyWalletIcon
+            fontSize="large"
+            sx={({ palette: { mode } }) => ({ color: colors[mode].typography.typo3 })}
           />
-        </Typography>
+        </StyledNoWalletIconContainer>
+        <ContainerBox flexDirection="column" gap={2} alignItems="center">
+          <Typography variant="h5Bold">
+            <FormattedMessage description="noWalletConnected" defaultMessage="No Wallet Connected" />
+          </Typography>
+          <Typography variant="bodyRegular" textAlign="center">
+            <FormattedMessage
+              description="noWalletConnectedParagraph"
+              defaultMessage="Connect your wallet to view and manage your crypto BalanceTable"
+            />
+          </Typography>
+        </ContainerBox>
       </ContainerBox>
-      <Button variant="contained" size="large" onClick={() => openConnectModal(WalletActionType.connect)} fullWidth>
+      <Button variant="contained" size="large" onClick={() => openConnectModal(WalletActionType.connect)}>
         <FormattedMessage description="connectYourWallet" defaultMessage="Connect your wallet" />
       </Button>
     </StyledNoWallet>
   );
 };
-
-const StyledNetworkLogoContainer = styled.div`
-  position: absolute;
-  bottom: -4px;
-  right: -4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 30px;
-  width: 16px;
-  height: 16px;
-`;
 
 const StyledAssetLogosContainer = styled.div`
   position: relative;
@@ -174,6 +182,18 @@ const StyledWalletIconContainer = styled.div<{ $size: number }>`
   `};
 `;
 
+const StyledNetworkLogoContainer = styled.div`
+  position: absolute;
+  bottom: -4px;
+  right: -4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 30px;
+  width: 16px;
+  height: 16px;
+`;
+
 const BalanceTableBodyItem: ItemContent<BalanceItem, Context> = (
   index: number,
   { balanceInUnits, balanceUsd, walletAddress, token, isLoadingPrice, price, relativeBalance }: BalanceItem,
@@ -186,22 +206,24 @@ const BalanceTableBodyItem: ItemContent<BalanceItem, Context> = (
       <TableCell>
         <Grid container flexDirection={'row'} alignItems={'center'} gap={3}>
           <StyledAssetLogosContainer>
-            <StyledWalletIconContainer $size={8}>
-              <EmptyWalletIcon size={SPACING(4)} />
-            </StyledWalletIconContainer>
             <StyledNetworkLogoContainer>
               <TokenIcon
                 size={3.5}
                 token={toToken({
                   logoURI: getGhTokenListLogoUrl(token.chainId, 'logo'),
                 })}
+                withShadow
+                shadowType="dropShadow200"
               />
             </StyledNetworkLogoContainer>
+            <StyledWalletIconContainer $size={8}>
+              <Wallet3Icon fontSize="small" />
+            </StyledWalletIconContainer>
           </StyledAssetLogosContainer>
           <ContainerBox flexDirection="column" flex="1" style={{ overflow: 'hidden' }}>
-            <StyledBodySmallBoldTypo2>
+            <StyledBodySmallRegularTypo2>
               <Address address={walletAddress} trimAddress />
-            </StyledBodySmallBoldTypo2>
+            </StyledBodySmallRegularTypo2>
             <StyledBodySmallRegularTypo3>{network?.name}</StyledBodySmallRegularTypo3>
           </ContainerBox>
         </Grid>
@@ -339,17 +361,14 @@ const BalanceTable = ({ token }: BalanceTableProps) => {
     };
   }, [allBalances, showSmallBalances]);
 
-  if (user?.status !== UserStatus.loggedIn && !isLoggingUser) {
-    return <BalanceTableNotConnected />;
-  }
-
+  const isLoggedIn = user?.status === UserStatus.loggedIn || isLoggingUser;
   const isLoading = isLoadingAllBalances || isLoggingUser;
 
   return (
     <WidgetFrame
       isLoading={isLoading}
       assetValue={assetsTotalValue.wallet}
-      Icon={EmptyWalletIcon}
+      Icon={WalletIcon}
       totalValue={totalAssetValue}
       widgetId="TokenProfileBalanceTable"
       title={<FormattedMessage defaultMessage="All wallets" description="allWallets" />}
@@ -359,15 +378,20 @@ const BalanceTable = ({ token }: BalanceTableProps) => {
         sigFigs: 3,
         intl,
       })} ${token.symbol}`}
+      solid
     >
-      <VirtualizedTable
-        data={isLoading ? (SKELETON_ROWS as unknown as BalanceItem[]) : balanceTableBalances}
-        VirtuosoTableComponents={VirtuosoTableComponents}
-        header={BalanceTableTableHeader}
-        itemContent={isLoading ? BalanceTableBodySkeleton : BalanceTableBodyItem}
-        separateRows={false}
-        context={intlContext}
-      />
+      {isLoggedIn ? (
+        <VirtualizedTable
+          data={isLoading ? (SKELETON_ROWS as unknown as BalanceItem[]) : balanceTableBalances}
+          VirtuosoTableComponents={VirtuosoTableComponents}
+          header={BalanceTableTableHeader}
+          itemContent={isLoading ? BalanceTableBodySkeleton : BalanceTableBodyItem}
+          context={intlContext}
+          className="variant-portfolio"
+        />
+      ) : (
+        <BalanceTableNotConnected />
+      )}
     </WidgetFrame>
   );
 };
