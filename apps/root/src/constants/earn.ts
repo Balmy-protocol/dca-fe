@@ -1,5 +1,5 @@
 // import { Chains } from '@balmy/sdk';
-import { FeeType } from 'common-types';
+import { FeeType, StrategyId } from 'common-types';
 import { defineMessage } from 'react-intl';
 
 export const FEE_TYPE_STRING_MAP: Record<FeeType, ReturnType<typeof defineMessage>> = {
@@ -30,3 +30,5 @@ export const BALMY_FEES = [{ percentage: 0.2, type: FeeType.PERFORMANCE }];
 //   Chains.ARBITRUM.chainId,
 //   Chains.BASE.chainId,
 // ];
+
+export const PROMOTED_STRATEGIES_IDS: StrategyId[] = [`137-0xb034a43d1ffe0f88ed3a50fc096179f543fd3f3a-1`];
