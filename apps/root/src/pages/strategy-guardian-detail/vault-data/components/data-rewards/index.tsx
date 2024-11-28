@@ -1,9 +1,10 @@
 import React from 'react';
 import { DisplayStrategy } from 'common-types';
 import { colors, ContainerBox, RainCoins, Skeleton, Typography } from 'ui-library';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 import TokenIcon from '@common/components/token-icon';
+import { formatListMessage } from '@common/utils/parsing';
 
 const StyledRewardsContainer = styled(ContainerBox).attrs({
   flexDirection: 'column',
@@ -27,6 +28,7 @@ const StyledRainCoins = styled(RainCoins)`
 `;
 
 const RewardsContainer = ({ strategy }: { strategy?: DisplayStrategy }) => {
+  const intl = useIntl();
   const isLoading = !strategy;
   const asset = strategy?.asset;
   const rewards = strategy?.rewards;
@@ -51,7 +53,10 @@ const RewardsContainer = ({ strategy }: { strategy?: DisplayStrategy }) => {
             values={{
               asset: asset?.symbol,
               apy: rewards?.apy,
-              rewards: rewards?.tokens.map((token) => token.symbol).join(', '),
+              rewards: formatListMessage({
+                items: rewards?.tokens.map((token) => token.symbol),
+                intl,
+              }),
             }}
           />
         )}
