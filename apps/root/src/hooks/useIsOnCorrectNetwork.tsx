@@ -19,7 +19,7 @@ function useIsOnCorrectNetwork() {
     async function callPromise() {
       try {
         const promiseResult = await providerService.getNetwork(activeWallet?.address);
-        const isSameNetwork = currentNetwork.chainId === promiseResult.chainId;
+        const isSameNetwork = currentNetwork.chainId === promiseResult?.chainId;
         setResult(isSameNetwork);
         setError(undefined);
       } catch (e) {

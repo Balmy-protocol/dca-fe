@@ -124,7 +124,7 @@ export default class AggregatorService {
 
     let isOnNetwork = false;
     try {
-      isOnNetwork = !chainId || (await this.providerService.getNetwork(takerAddress)).chainId === chainId;
+      isOnNetwork = !chainId || (await this.providerService.getNetwork(takerAddress))?.chainId === chainId;
     } catch {}
 
     const shouldValidate = takerAddress && isOnNetwork && !!sellAmount && balance >= sellAmount;
@@ -241,7 +241,7 @@ export default class AggregatorService {
 
     let isOnNetwork = false;
     try {
-      isOnNetwork = !chainId || (await this.providerService.getNetwork(takerAddress)).chainId === chainId;
+      isOnNetwork = !chainId || (await this.providerService.getNetwork(takerAddress))?.chainId === chainId;
     } catch {}
 
     const shouldValidate = takerAddress && isOnNetwork && !!sellAmount && balance >= sellAmount;

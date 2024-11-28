@@ -820,6 +820,7 @@ export default class PositionService extends EventsManager<PositionServiceData> 
     );
 
     const currentNetwork = await this.providerService.getNetwork(owner);
+    if (!currentNetwork) throw new Error('No network found');
 
     const allowanceTarget = this.getAllowanceTarget(currentNetwork.chainId, from, yieldFrom, false);
 
