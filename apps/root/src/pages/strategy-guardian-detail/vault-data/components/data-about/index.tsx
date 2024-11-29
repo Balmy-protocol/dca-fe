@@ -1,6 +1,6 @@
 import React from 'react';
 import { BALMY_FEES, FEE_TYPE_STRING_MAP } from '@constants/earn';
-import { DisplayStrategy, StrategyGuardian, Token } from 'common-types';
+import { DisplayStrategy, StrategyGuardian } from 'common-types';
 import {
   Accordion,
   AccordionDetails,
@@ -15,7 +15,6 @@ import {
 } from 'ui-library';
 import { FormattedMessage, IntlShape, useIntl } from 'react-intl';
 import DataHistoricalRate from '../data-historical-rate';
-import ComposedTokenIcon from '@common/components/composed-token-icon';
 import TokenIcon from '@common/components/token-icon';
 import { emptyTokenWithLogoURI } from '@common/utils/currency';
 import { BALMY_FEES_LOGO_URL } from '@constants';
@@ -36,42 +35,6 @@ const FeeItem = ({ fee, intl }: { fee: StrategyGuardian['fees'][number]; intl: I
 );
 
 const SKELETON_ROWS = Array.from(Array(3).keys());
-
-const RewardsContainer = ({
-  isLoading,
-  asset,
-  rewards,
-}: {
-  isLoading: boolean;
-  asset?: Token;
-  rewards?: { tokens: Token[]; apy: number };
-}) => (
-  <ContainerBox flexDirection="column" gap={2}>
-    <Typography variant="h5Bold">
-      {isLoading ? (
-        <Skeleton variant="text" width="6ch" />
-      ) : (
-        <FormattedMessage defaultMessage="Rewards" description="earn.strategy-details.vault-about.rewards" />
-      )}
-    </Typography>
-    <Typography variant="bodySmallRegular">
-      {isLoading ? (
-        <Skeleton variant="text" width="20ch" />
-      ) : (
-        <FormattedMessage
-          description="earn.strategy-details.vault-about.rewards-description"
-          defaultMessage="For each {asset} deposited, you will earn {apy}% APY in {rewards}."
-          values={{
-            asset: asset?.symbol,
-            apy: rewards?.apy,
-            rewards: rewards?.tokens.map((token) => token.symbol).join(', '),
-          }}
-        />
-      )}
-    </Typography>
-    <ComposedTokenIcon size={8} tokens={rewards?.tokens} isLoading={isLoading} />
-  </ContainerBox>
-);
 
 const DataAboutCollapsed = ({
   title,
@@ -147,17 +110,8 @@ const DataAbout = ({ strategy }: DataAboutProps) => {
   const intl = useIntl();
   const isLoading = !strategy;
 
-  const hasInvestment =
-    !!strategy?.userPositions?.length &&
-    strategy.userPositions.some((position) => position.balances.some((balance) => balance.amount.amount > 0n));
-
   return (
     <Grid container rowSpacing={6}>
-      <Grid item xs={12}>
-        {!isLoading && !hasInvestment && (
-          <RewardsContainer isLoading={isLoading} asset={strategy?.asset} rewards={strategy?.rewards} />
-        )}
-      </Grid>
       <Grid item xs={12}>
         <ContainerBox flexDirection="column" gap={3}>
           <DataAboutCollapsed

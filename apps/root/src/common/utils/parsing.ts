@@ -489,3 +489,23 @@ export const transformStoredPositionToPosition = (position: Position | undefined
           amount: BigInt(position.swappedYield.amount),
         },
       };
+
+export const formatListMessage = ({ items, intl }: { items?: string[]; intl: IntlShape }) => {
+  if (!items || !items.length) return '';
+
+  if (items.length === 1) return items[0];
+
+  const lastItem = items[items.length - 1];
+  const otherItems = items.slice(0, -1);
+
+  return intl.formatMessage(
+    {
+      defaultMessage: '{items} and {lastItem}',
+      description: 'common.format.items-list',
+    },
+    {
+      items: otherItems.join(', '),
+      lastItem,
+    }
+  );
+};

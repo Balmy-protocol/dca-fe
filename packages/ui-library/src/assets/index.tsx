@@ -6,6 +6,7 @@ import BackgroundGrid from './background-grid';
 import DonutShape from './donut-shape';
 import CoinStar from './coin-star';
 import NewsBannerBackgroundGrid from './news-banner-background-grid';
+import RainCoins from './rain-coins';
 
 export {
   BalmyLogoDark,
@@ -16,6 +17,7 @@ export {
   NewsBannerBackgroundGrid,
   DonutShape,
   CoinStar,
+  RainCoins,
 };
 
 export * from './networks';

@@ -110,6 +110,7 @@ export const darkModePallete: PaletteOptions = {
     main: `linear-gradient(0deg, ${colors.dark.background.emphasis} -1.99%, ${baseColors.violet.violet500} 100%)`,
     earnWizard: `linear-gradient(180deg, #1D132A 25.13%, rgba(52, 32, 81, 0.80) 100%);`,
     newsBanner: `linear-gradient(286deg, #7A1BFF 1.4%, #0EECC1 113.11%)`,
+    rewards: `linear-gradient(180deg, #473267 0%, #47326700 100%)`,
   },
 };
 
@@ -166,5 +167,6 @@ export const lightModePallete: PaletteOptions = {
     main: `linear-gradient(0deg, ${colors.light.background.secondary} -1.99%, ${baseColors.violet.violet500} 100%)`,
     earnWizard: `linear-gradient(90deg, #EADBFF 0%, #D3B4FFCC 100%)`,
     newsBanner: `linear-gradient(286deg, #7A1BFF 1.4%, #0EECC1 113.11%)`,
+    rewards: `linear-gradient(180deg, ${colors.light.background.tertiary} 0%, #F9F7FC00 100%)`,
   },
 };
