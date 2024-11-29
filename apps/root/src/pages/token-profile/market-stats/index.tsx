@@ -13,10 +13,14 @@ const StyledMarketStatsContainer = styled(BackgroundPaper).attrs({ variant: 'out
     display: flex;
     flex-direction: column;
     padding: ${spacing(6)};
-    gap: ${spacing(10)};
+    gap: ${spacing(8)};
     height: 100%;
     min-height: ${spacing(75)};
     `}
+`;
+
+const StyledBodyBold = styled(Typography).attrs({ variant: 'bodyBold' })`
+  line-height: 1;
 `;
 
 interface MarketStatsProps {
@@ -79,11 +83,11 @@ const MarketStats = ({ token }: MarketStatsProps) => {
           <ContainerBox key={index} flexDirection="column" gap={1}>
             <Typography variant="bodySmallRegular">{label}</Typography>
             {value ? (
-              <Typography variant="bodyBold" color={getPercentageColor(Number(value), mode)}>
+              <StyledBodyBold color={getPercentageColor(Number(value), mode)}>
                 {`${Number(value) > 0 ? '+' : ''}${value}%`}
-              </Typography>
+              </StyledBodyBold>
             ) : (
-              <Typography variant="bodyBold">{isLoadingPercentages ? <Skeleton variant="text" /> : '-'}</Typography>
+              <StyledBodyBold>{isLoadingPercentages ? <Skeleton variant="text" /> : '-'}</StyledBodyBold>
             )}
           </ContainerBox>
         ))}

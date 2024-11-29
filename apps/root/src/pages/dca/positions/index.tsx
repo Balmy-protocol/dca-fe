@@ -1,6 +1,14 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Typography, UnderlinedTabs, Tab, createStyles, ContainerBox, colors } from 'ui-library';
+import {
+  Typography,
+  UnderlinedTabs,
+  Tab,
+  createStyles,
+  ContainerBox,
+  colors,
+  StyledPageTitleDescription,
+} from 'ui-library';
 import { FormattedMessage } from 'react-intl';
 import { useOpenClosePositionTab } from '@state/tabs/hooks';
 import { useAppDispatch } from '@state/hooks';
@@ -50,12 +58,12 @@ const Positions = () => {
         <Typography variant="h2Bold" color={({ palette }) => colors[palette.mode].typography.typo1}>
           <FormattedMessage description="positions title" defaultMessage="Your positions" />
         </Typography>
-        <Typography variant="bodyLargeRegular" color={({ palette }) => colors[palette.mode].typography.typo3}>
+        <StyledPageTitleDescription>
           <FormattedMessage
             description="positions description"
             defaultMessage="Here you will see the details of your open positions and be able to see further details about them. You will only be able to interact with them if you are on the correct network."
           />
-        </Typography>
+        </StyledPageTitleDescription>
       </ContainerBox>
       <ContainerBox flexDirection="column" flex={1} gap={14}>
         <StyledTabsContainers>
