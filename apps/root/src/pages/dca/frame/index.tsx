@@ -1,5 +1,12 @@
 import React from 'react';
-import { colors, ContainerBox, StyledFormContainer, StyledNonFormContainer, Typography } from 'ui-library';
+import {
+  colors,
+  ContainerBox,
+  StyledFormContainer,
+  StyledNonFormContainer,
+  StyledPageTitleDescription,
+  Typography,
+} from 'ui-library';
 import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
 import { useCurrentRoute } from '@state/tabs/hooks';
 import useTrackEvent from '@hooks/useTrackEvent';
@@ -51,12 +58,12 @@ const DcaFrame = ({}: DcaFrameProps) => {
               <Typography variant="h1Bold" color={({ palette }) => colors[palette.mode].typography.typo1}>
                 <FormattedMessage defaultMessage="Recurring Investments" description="dca.title" />
               </Typography>
-              <Typography variant="bodyLargeRegular" color={({ palette }) => colors[palette.mode].typography.typo2}>
+              <StyledPageTitleDescription>
                 <FormattedMessage
                   defaultMessage="Automate your investments with recurring buys"
                   description="dca.title-description"
                 />
-              </Typography>
+              </StyledPageTitleDescription>
             </ContainerBox>
             {isCreate ? <CreatePosition /> : <Positions />}
           </ContainerBox>

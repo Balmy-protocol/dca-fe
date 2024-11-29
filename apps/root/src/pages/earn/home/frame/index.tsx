@@ -1,5 +1,5 @@
 import React from 'react';
-import { ContainerBox, StyledNonFormContainer, Typography } from 'ui-library';
+import { ContainerBox, StyledNonFormContainer, StyledPageTitleDescription, Typography } from 'ui-library';
 import EarnFAQ from '../../components/faq';
 import { useAppDispatch } from '@state/hooks';
 import { changeRoute } from '@state/tabs/actions';
@@ -39,12 +39,12 @@ const EarnFrame = () => {
                 <Typography variant="h1Bold">
                   <FormattedMessage defaultMessage="Earn" description="earn.all-strategies.title" />
                 </Typography>
-                <Typography variant="bodyLargeRegular">
+                <StyledPageTitleDescription>
                   <FormattedMessage
                     defaultMessage="Time to put your idle crypto to work! With our curated vaults, you can now earn across multiple chains and tokens, protected by expert Guardians. Start earning today with peace of mind."
                     description="earn.all-strategies.title-description"
                   />
-                </Typography>
+                </StyledPageTitleDescription>
               </ContainerBox>
               <OneClickMigrationCard />
             </ContainerBox>
