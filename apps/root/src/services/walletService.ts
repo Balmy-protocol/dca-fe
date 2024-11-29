@@ -21,7 +21,7 @@ export default class WalletService {
   async changeNetwork(newChainId: number, address?: string, callbackBeforeReload?: () => void): Promise<void> {
     try {
       const currentNetwork = await this.providerService.getNetwork(address);
-      if (currentNetwork && currentNetwork.chainId !== newChainId) {
+      if (currentNetwork?.chainId !== newChainId) {
         await this.providerService.attempToAutomaticallyChangeNetwork(newChainId, address, callbackBeforeReload, true);
       } else if (callbackBeforeReload) {
         callbackBeforeReload();
@@ -39,7 +39,7 @@ export default class WalletService {
     try {
       const currentNetwork = await this.providerService.getNetwork(address);
 
-      if (currentNetwork && currentNetwork.chainId !== newChainId) {
+      if (currentNetwork?.chainId !== newChainId) {
         await this.providerService.attempToAutomaticallyChangeNetwork(newChainId, address, callbackBeforeReload, false);
       } else if (callbackBeforeReload) {
         callbackBeforeReload();
