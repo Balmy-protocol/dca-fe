@@ -24,6 +24,8 @@ import { PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 const StyledExplorersContainer = styled(ForegroundPaper).attrs({ variant: 'outlined' })`
   ${({ theme: { spacing } }) => `
     padding: ${spacing(0)};
+    max-height: ${spacing(108.25)};
+    overflow-y: auto;
 `}
 `;
 
@@ -44,7 +46,7 @@ const StyledAccordionDetails = styled(AccordionDetails)`
 `;
 
 // Replace this value when implementing Token Overview: BLY-2748
-const DEFAULT_DISPLAYED_ITEMS = 15;
+const DEFAULT_DISPLAYED_ITEMS = 13;
 
 const ExplorerItem = ({ network, tokenAddress }: { network: Chain; tokenAddress: Address }) => {
   const onGoToEtherscan = () => {
