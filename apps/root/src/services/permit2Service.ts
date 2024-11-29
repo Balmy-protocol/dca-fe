@@ -37,6 +37,10 @@ export default class Permit2Service {
     }
     const network = await this.providerService.getNetwork(address);
 
+    if (!network) {
+      throw new Error('No network found');
+    }
+
     const preparedSignature = await this.sdkService.sdk.permit2Service.arbitrary.preparePermitData({
       appId: PERMIT_2_WORDS[wordIndex || 0] || PERMIT_2_WORDS[0],
       chainId: network.chainId,
@@ -167,6 +171,10 @@ export default class Permit2Service {
   async getPermit2SignatureInfo(address: Address, token: Token, amount: bigint, wordIndex?: number) {
     const network = await this.providerService.getNetwork();
 
+    if (!network) {
+      throw new Error('No network found');
+    }
+
     const preparedSignature = await this.sdkService.sdk.permit2Service.arbitrary.preparePermitData({
       appId: PERMIT_2_WORDS[wordIndex || 0] || PERMIT_2_WORDS[0],
       chainId: network.chainId,
@@ -181,6 +189,10 @@ export default class Permit2Service {
 
   async getPermit2DcaSignatureInfo(address: Address, token: Token, amount: bigint, wordIndex?: number) {
     const network = await this.providerService.getNetwork();
+
+    if (!network) {
+      throw new Error('No network found');
+    }
 
     const preparedSignature = await this.sdkService.sdk.dcaService.preparePermitData({
       appId: PERMIT_2_WORDS[wordIndex || 0] || PERMIT_2_WORDS[0],

@@ -21,7 +21,7 @@ export default class WalletService {
   async changeNetwork(newChainId: number, address?: string, callbackBeforeReload?: () => void): Promise<void> {
     try {
       const currentNetwork = await this.providerService.getNetwork(address);
-      if (currentNetwork.chainId !== newChainId) {
+      if (currentNetwork?.chainId !== newChainId) {
         await this.providerService.attempToAutomaticallyChangeNetwork(newChainId, address, callbackBeforeReload, true);
       } else if (callbackBeforeReload) {
         callbackBeforeReload();
@@ -38,7 +38,8 @@ export default class WalletService {
   ): Promise<void> {
     try {
       const currentNetwork = await this.providerService.getNetwork(address);
-      if (currentNetwork.chainId !== newChainId) {
+
+      if (currentNetwork?.chainId !== newChainId) {
         await this.providerService.attempToAutomaticallyChangeNetwork(newChainId, address, callbackBeforeReload, false);
       } else if (callbackBeforeReload) {
         callbackBeforeReload();
@@ -53,8 +54,7 @@ export default class WalletService {
     ownerAddress: Address
   ): Promise<{ token: Token; balance: bigint } | undefined> {
     const currentNetwork = await this.providerService.getNetwork(ownerAddress);
-
-    if (!address) return Promise.resolve(undefined);
+    if (!address || !currentNetwork) return Promise.resolve(undefined);
 
     const erc20 = await this.contractService.getERC20TokenInstance({
       tokenAddress: address,
