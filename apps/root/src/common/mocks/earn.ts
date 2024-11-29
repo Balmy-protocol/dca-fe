@@ -231,6 +231,7 @@ export const createEmptyEarnPosition = (strategy: DisplayStrategy, owner: Addres
 export const sdkBaseEarnPositionMock: BaseSdkEarnPosition = {
   id: '10-0xusdc-1',
   createdAt: 1720042607,
+  lastUpdatedAt: 1720042607,
   owner: '0xaddress',
   permissions: {
     '0xboth': [EarnPermission.INCREASE, EarnPermission.WITHDRAW],
