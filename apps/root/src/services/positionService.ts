@@ -648,12 +648,21 @@ export default class PositionService extends EventsManager<PositionServiceData> 
     });
     if (!permissionManagerInstance) throw new Error('No permission manager instance found');
 
-    const hash = await permissionManagerInstance.write.transferFrom([position.user, toAddress, position.positionId], {
-      chain: null,
-      account: position.user,
+    const data = encodeFunctionData({
+      ...permissionManagerInstance,
+      functionName: 'transferFrom',
+      args: [position.user, toAddress, position.positionId],
     });
+
+    const res = await this.providerService.sendTransaction({
+      to: permissionManagerInstance.address,
+      data,
+      chainId: position.chainId,
+      from: position.user,
+    });
+
     return {
-      hash,
+      hash: res.hash,
       from: position.user,
       chainId: position.chainId,
     };

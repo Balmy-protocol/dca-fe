@@ -1415,12 +1415,19 @@ describe('Position Service', () => {
     >;
     beforeEach(() => {
       permissionManagerInstanceMock = {
+        address: '0xpermissionManager',
         write: {
           transferFrom: jest.fn().mockResolvedValue('transferFrom'),
         },
       } as unknown as jest.Mocked<Awaited<ReturnType<ContractService['getPermissionManagerInstance']>>>;
 
       contractService.getPermissionManagerInstance.mockResolvedValue(permissionManagerInstanceMock);
+      mockedEncondeFunctionData.mockReturnValue('0xtransferdata');
+      providerService.sendTransaction.mockResolvedValue({
+        hash: '0xtransferFrom-hash',
+        from: '0xmyaccount',
+        chainId: 10,
+      });
     });
     test('it should call the transferFrom of the permissionManager for the new user', async () => {
       const result = await positionService.transfer(
@@ -1430,17 +1437,23 @@ describe('Position Service', () => {
         '0xtoAddress'
       );
 
-      // @ts-expect-error viem shit
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-      expect(permissionManagerInstanceMock.write.transferFrom).toHaveBeenCalledTimes(1);
-      // @ts-expect-error viem shit
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-      expect(permissionManagerInstanceMock.write.transferFrom).toHaveBeenCalledWith(
-        ['0xmyaccount', '0xtoAddress', 1n],
-        { account: '0xmyaccount', chain: null }
-      );
+      expect(mockedEncondeFunctionData).toHaveBeenCalledTimes(1);
+      expect(mockedEncondeFunctionData).toHaveBeenCalledWith({
+        ...permissionManagerInstanceMock,
+        functionName: 'transferFrom',
+        args: ['0xmyaccount', '0xtoAddress', 1n],
+      });
+
+      expect(providerService.sendTransaction).toHaveBeenCalledTimes(1);
+      expect(providerService.sendTransaction).toHaveBeenCalledWith({
+        to: '0xpermissionManager',
+        data: '0xtransferdata',
+        from: '0xmyaccount',
+        chainId: 10,
+      });
+
       expect(result).toEqual({
-        hash: 'transferFrom',
+        hash: '0xtransferFrom-hash',
         from: '0xmyaccount',
         chainId: 10,
       });
