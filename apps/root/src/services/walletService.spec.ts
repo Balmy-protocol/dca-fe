@@ -363,14 +363,23 @@ describe('Wallet Service', () => {
 
   describe('approveSpecificToken', () => {
     let approveMock: jest.Mock;
+    let erc20TokenInstanceMock: Awaited<ReturnType<ContractService['getERC20TokenInstance']>>;
 
     beforeEach(() => {
       approveMock = jest.fn().mockResolvedValue('0xhash');
-      contractService.getERC20TokenInstance.mockResolvedValue({
+      erc20TokenInstanceMock = {
+        address: '0xerc20',
         write: {
           approve: approveMock,
         },
-      } as unknown as ReturnType<ContractService['getERC20TokenInstance']>);
+      } as unknown as Awaited<ReturnType<ContractService['getERC20TokenInstance']>>;
+      contractService.getERC20TokenInstance.mockResolvedValue(erc20TokenInstanceMock);
+      providerService.sendTransaction.mockResolvedValue({
+        hash: '0xhash',
+        from: '0xaccount',
+        chainId: 1,
+      });
+      mockedEncodeFunctionData.mockReturnValue('0xdata');
     });
 
     test('it should call the approve method of the token contract', async () => {
@@ -388,11 +397,21 @@ describe('Wallet Service', () => {
         readOnly: false,
         wallet: '0xaccount',
       });
-      expect(approveMock).toHaveBeenCalledTimes(1);
-      expect(approveMock).toHaveBeenCalledWith(['0xaddressToApprove', 10n], {
-        account: '0xaccount',
-        chain: null,
+      expect(mockedEncodeFunctionData).toHaveBeenCalledTimes(1);
+      expect(mockedEncodeFunctionData).toHaveBeenCalledWith({
+        ...erc20TokenInstanceMock,
+        functionName: 'approve',
+        args: ['0xaddressToApprove', 10n],
       });
+
+      expect(providerService.sendTransaction).toHaveBeenCalledTimes(1);
+      expect(providerService.sendTransaction).toHaveBeenCalledWith({
+        to: '0xerc20',
+        data: '0xdata',
+        from: '0xaccount',
+        chainId: 1,
+      });
+
       expect(result).toEqual({
         hash: '0xhash',
         from: '0xaccount',
@@ -414,10 +433,19 @@ describe('Wallet Service', () => {
         readOnly: false,
         wallet: '0xaccount',
       });
-      expect(approveMock).toHaveBeenCalledTimes(1);
-      expect(approveMock).toHaveBeenCalledWith(['0xaddressToApprove', maxUint256], {
-        account: '0xaccount',
-        chain: null,
+      expect(mockedEncodeFunctionData).toHaveBeenCalledTimes(1);
+      expect(mockedEncodeFunctionData).toHaveBeenCalledWith({
+        ...erc20TokenInstanceMock,
+        functionName: 'approve',
+        args: ['0xaddressToApprove', maxUint256],
+      });
+
+      expect(providerService.sendTransaction).toHaveBeenCalledTimes(1);
+      expect(providerService.sendTransaction).toHaveBeenCalledWith({
+        to: '0xerc20',
+        data: '0xdata',
+        from: '0xaccount',
+        chainId: 1,
       });
       expect(result).toEqual({
         hash: '0xhash',
@@ -566,11 +594,19 @@ describe('Wallet Service', () => {
     });
     test("it should transfer token using the ERC721 interface if it's an ERC721 token", async () => {
       const transferFromFn = jest.fn().mockResolvedValue('transferFrom');
-      contractService.getERC721TokenInstance.mockResolvedValue({
+      const erc721TokenInstanceMock = {
+        address: '0xERC721Address',
         write: {
           transferFrom: transferFromFn,
         },
-      } as unknown as ReturnType<ContractService['getERC721TokenInstance']>);
+      } as unknown as Awaited<ReturnType<ContractService['getERC721TokenInstance']>>;
+      contractService.getERC721TokenInstance.mockResolvedValue(erc721TokenInstanceMock);
+      mockedEncodeFunctionData.mockReturnValue('0xdata');
+      providerService.sendTransaction.mockResolvedValue({
+        hash: '0xhash',
+        from: '0xfrom',
+        chainId: 1,
+      });
 
       const txResponse = await walletService.transferNFT({
         from: '0xfrom',
@@ -586,12 +622,18 @@ describe('Wallet Service', () => {
         readOnly: false,
         wallet: '0xfrom',
       });
-      expect(txResponse).toEqual({
-        hash: 'transferFrom',
-        from: '0xfrom',
+
+      expect(mockedEncodeFunctionData).toHaveBeenCalledTimes(1);
+      expect(mockedEncodeFunctionData).toHaveBeenCalledWith({
+        ...erc721TokenInstanceMock,
+        functionName: 'transferFrom',
+        args: ['0xfrom', '0xto', 1111n],
       });
-      expect(transferFromFn).toHaveBeenCalledTimes(1);
-      expect(transferFromFn).toHaveBeenCalledWith(['0xfrom', '0xto', 1111n], { account: '0xfrom', chain: null });
+      expect(txResponse).toEqual({
+        hash: '0xhash',
+        from: '0xfrom',
+        chainId: 1,
+      });
     });
   });
 });
