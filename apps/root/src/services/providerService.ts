@@ -40,7 +40,7 @@ export default class ProviderService {
   }
 
   async sendTransaction(transactionToSend: TransactionRequestWithChain): Promise<SubmittedTransaction> {
-    const signer = await this.accountService.getWalletSigner(transactionToSend.from);
+    const signer = await this.getSigner(transactionToSend.from, transactionToSend.chainId);
     if (!signer) {
       throw new Error('Provider Service: No signer found');
     }

@@ -194,13 +194,21 @@ export default class WalletService {
       readOnly: false,
     });
 
-    const hash = await erc20.write.approve([addressToApprove, amount || maxUint256], {
-      account: ownerAddress,
-      chain: null,
+    const data = encodeFunctionData({
+      ...erc20,
+      functionName: 'approve',
+      args: [addressToApprove, amount || maxUint256],
+    });
+
+    const res = await this.providerService.sendTransaction({
+      to: erc20.address,
+      data,
+      chainId: token.chainId,
+      from: ownerAddress,
     });
 
     return {
-      hash,
+      hash: res.hash,
       from: ownerAddress,
       chainId: token.chainId,
     };
@@ -316,11 +324,23 @@ export default class WalletService {
       readOnly: false,
     });
 
-    const hash = await erc721Contract.write.transferFrom([from, to, tokenId], { account: from, chain: null });
+    const data = encodeFunctionData({
+      ...erc721Contract,
+      functionName: 'transferFrom',
+      args: [from, to, tokenId],
+    });
+
+    const res = await this.providerService.sendTransaction({
+      to: erc721Contract.address,
+      data,
+      from,
+      chainId: token.chainId,
+    });
 
     return {
-      hash,
+      hash: res.hash,
       from,
+      chainId: token.chainId,
     };
   }
 }

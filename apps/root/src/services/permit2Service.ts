@@ -31,7 +31,7 @@ export default class Permit2Service {
   }
 
   async getPermit2SignedData(address: Address, token: Token, amount: bigint, wordIndex?: number) {
-    const signer = await this.providerService.getSigner(address);
+    const signer = await this.providerService.getSigner(address, token.chainId);
     if (!signer) {
       throw new Error('No signer found');
     }
@@ -63,7 +63,7 @@ export default class Permit2Service {
   }
 
   async getPermit2DcaSignedData(address: Address, chainId: number, token: Token, amount: bigint, wordIndex?: number) {
-    const signer = await this.providerService.getSigner(address);
+    const signer = await this.providerService.getSigner(address, chainId);
 
     if (!signer) {
       throw new Error('No signer found');
@@ -102,7 +102,7 @@ export default class Permit2Service {
     amount: bigint,
     wordIndex?: number
   ): Promise<PermitData['permitData'] & { signature: Hex }> {
-    const signer = await this.providerService.getSigner(address);
+    const signer = await this.providerService.getSigner(address, chainId);
 
     if (!signer) {
       throw new Error('No signer found');
