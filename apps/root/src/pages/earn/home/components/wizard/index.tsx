@@ -6,11 +6,12 @@ import SuggestedStrategies from './components/suggested-strategies';
 import { WizardSelection } from './components/wizard-selection';
 
 const StyledContainer = styled(ForegroundPaper).attrs({ elevation: 0 })`
-  ${({ theme: { palette, spacing } }) => `
+  ${({ theme: { palette, space } }) => `
     display: flex;
     flex-direction: column;
+    overflow: hidden;
     background: ${palette.gradient.earnWizard};
-    padding: ${spacing(3)};
+    padding: ${space.s05};
   `}
 `;
 
@@ -40,10 +41,10 @@ const EarnWizard = () => {
         {!shouldShowWizard3dObject && (
           <ContainerBox style={{ position: 'relative' }} justifyContent="end" alignItems="end">
             <div style={{ position: 'absolute' }}>
-              <DonutShape top={spacing(10)} />
+              <DonutShape top={spacing(16)} width="142px" height="142px" />
             </div>
             <div style={{ position: 'absolute' }}>
-              <CoinStar right={spacing(30)} />
+              <CoinStar right={spacing(25)} width={spacing(12)} height={spacing(12)} padding={spacing(7.25)} />
             </div>
           </ContainerBox>
         )}
