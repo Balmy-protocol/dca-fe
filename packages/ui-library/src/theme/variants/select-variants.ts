@@ -18,6 +18,10 @@ export const buildSelectVariant = (mode: 'light' | 'dark'): Components => ({
           color: `${colors[mode].accentPrimary} !important`,
         },
       },
+      standard: {
+        paddingTop: `0 !important`,
+        paddingBottom: `${SPACING(1)} !important`,
+      },
     },
   },
   MuiMenu: {
@@ -30,34 +34,30 @@ export const buildSelectVariant = (mode: 'light' | 'dark'): Components => ({
         '&.MuiSelect-MuiMenu': {
           top: SPACING(2),
           boxShadow: colors[mode].dropShadow.dropShadow200,
-          '& .MuiMenu-paper': {
-            backgroundColor: colors[mode].background.secondary,
-            border: `1px solid ${colors[mode].border.border2}`,
-            '& .MuiMenu-list': {
-              padding: `${SPACING(3)} !important`,
-              gap: SPACING(0.5),
-              '& .MuiDivider-root': {
-                margin: `${SPACING(4)} ${SPACING(0)}`,
-              },
-              '& .MuiMenuItem-root': {
-                padding: SPACING(3),
-                borderRadius: SPACING(2),
-                border: `1px solid ${colors[mode].border.border1}`,
-                backgroundColor: colors[mode].background.secondary,
-                '&:hover': {
-                  backgroundColor: colors[mode].background.emphasis,
-                },
-              },
-              '& .Mui-selected': {
-                padding: SPACING(3),
+          '& .MuiMenu-paper .MuiMenu-list': {
+            padding: `${SPACING(3)} !important`,
+            gap: SPACING(0.5),
+            '& .MuiDivider-root': {
+              margin: `${SPACING(4)} ${SPACING(0)}`,
+            },
+            '& .MuiMenuItem-root': {
+              padding: SPACING(3),
+              borderRadius: SPACING(2),
+              border: `1px solid ${colors[mode].border.border1}`,
+              backgroundColor: colors[mode].background.secondary,
+              '&:hover': {
                 backgroundColor: colors[mode].background.emphasis,
               },
             },
           },
+          '& .Mui-selected': {
+            padding: SPACING(3),
+            backgroundColor: colors[mode].background.emphasis,
+          },
         },
       },
       paper: {
-        backgroundColor: colors[mode].background.secondary,
+        backgroundColor: colors[mode].background.modals,
         border: `1px solid ${colors[mode].border.border2}`,
       },
     },
