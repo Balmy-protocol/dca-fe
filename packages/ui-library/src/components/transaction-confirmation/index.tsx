@@ -444,8 +444,7 @@ const StyledContainer = styled(ContainerBox).attrs({ gap: 10, fullWidth: true, f
       top: 0;
       bottom: 0;
       left: 0;
-      background-color: ${colors[mode].background.quartery};
-      backdrop-filter: blur(30px);
+      background-color: ${colors[mode].background.quarteryNoAlpha};
       border-radius: ${spacing(4)};
       right: 0;
     `}

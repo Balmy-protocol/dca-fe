@@ -71,6 +71,7 @@ import React from 'react';
 import { getTransactionTokenFlow } from '.';
 import { getTokenListId, transformStoredPositionToPosition } from '../parsing';
 import { getNewPositionFromTxTypeData } from '../transactions';
+import { getSdkEarnPositionId } from '../earn/parsing';
 
 interface ParseParams<T> {
   event: T;
@@ -871,9 +872,11 @@ const parseTransactionApiEventToTransactionEvent = (
   } else if (EARN_TYPE_EVENTS.includes(event.type)) {
     const typedEvent = event as BaseApiEvent & EarnTransactionApiDataEvent;
     earnBaseEventData = {
-      positionId: `${typedEvent.tx.chainId}-${typedEvent.data.vault.toLowerCase() as Lowercase<Address>}-${Number(
-        typedEvent.data.positionId
-      )}`,
+      positionId: getSdkEarnPositionId({
+        chainId: typedEvent.tx.chainId,
+        vault: typedEvent.data.vault.toLowerCase() as Lowercase<Address>,
+        positionId: typedEvent.data.positionId,
+      }),
       strategyId: `${typedEvent.tx.chainId}-${EARN_STRATEGY_REGISTRY[typedEvent.tx.chainId]}-${Number(
         typedEvent.data.strategyId
       )}`,
@@ -921,13 +924,11 @@ const buildBaseDcaPendingEventData = (position: Position): BaseDcaDataEvent => {
   };
 };
 
-const buildBaseEarnPendingEventData = (earnEvent: TransactionDetailsBase & TransactionEarnTypeDataOptions) => {
-  return {
-    positionId: earnEvent.typeData.positionId,
-    strategyId: earnEvent.typeData.strategyId,
-    user: earnEvent.from as Address,
-  };
-};
+const buildBaseEarnPendingEventData = (earnEvent: TransactionDetailsBase & TransactionEarnTypeDataOptions) => ({
+  positionId: earnEvent.typeData.positionId,
+  strategyId: earnEvent.typeData.strategyId,
+  user: earnEvent.from as Address,
+});
 
 const transformNonIndexedEvent = ({
   event,

@@ -563,7 +563,7 @@ export const EARN_COMPANION_ADDRESS: Record<number, Address> = {
   [Chains.BASE.chainId]: '0x260B192b9A5679121FF7f9F0Cf3FED3238753A48',
 };
 
-export const EARN_VAULT_ADDRESS: Record<number, Address> = {
+export const EARN_VAULT_ADDRESS: Record<number, Lowercase<Address>> = {
   [Chains.POLYGON.chainId]: '0x58e5d76fbbd7e1b51f0fc0f66b7734e108be0461',
   [Chains.BASE.chainId]: '0x9324a1f92a82b539f8fb1194a0b894025581ec33',
 };
