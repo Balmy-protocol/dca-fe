@@ -57,7 +57,7 @@ export const buildSelectVariant = (mode: 'light' | 'dark'): Components => ({
         },
       },
       paper: {
-        backgroundColor: colors[mode].background.tertiary,
+        backgroundColor: colors[mode].background.modals,
         border: `1px solid ${colors[mode].border.border2}`,
       },
     },
