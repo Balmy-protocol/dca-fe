@@ -882,8 +882,8 @@ const StyledContainer = styled(ContainerBox).attrs({ fullWidth: true, alignItems
   }) =>
     $isAbsolute &&
     `position: absolute; top: 0; bottom: 0; left: 0;background-color: ${
-      colors[mode].background.quartery
-    };border-radius: ${spacing(4)}; backdrop-filter: blur(30px);`}
+      colors[mode].background.quarteryNoAlpha
+    };border-radius: ${spacing(4)};`}
 `;
 
 const StyledPositioner = styled(ContainerBox).attrs({ gap: 5, fullWidth: true, flexDirection: 'column', flex: 1 })<{
