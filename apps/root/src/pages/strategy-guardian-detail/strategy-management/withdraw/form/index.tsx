@@ -1,7 +1,6 @@
-import { DisplayStrategy, FeeType } from 'common-types';
 import React from 'react';
+import { DisplayStrategy, FeeType, SetStateCallback } from 'common-types';
 import WithdrawAssetInput from '../asset-input';
-import EarnWithdrawTransactionManager from '../tx-manager';
 import EarnWithdrawChangesSummary from '../changes-summary';
 import StrategyManagementFees from '../../components/fees';
 import { useEarnManagementState } from '@state/earn-management/hooks';
@@ -10,15 +9,56 @@ import DelayedWithdrawContainer from '../delayed-withdraw-container';
 import { useIntl, defineMessage } from 'react-intl';
 import { AllWalletsBalances } from '@state/balances/hooks';
 import { isSameToken } from '@common/utils/currency';
+import useEarnWithdrawActions from '../hooks/useEarnWithdrawActions';
+import EarnWithdrawCTAButton from '../cta-button';
+import MarketWithdrawModal from '../market-withdraw-modal';
+import EarnWithdrawTransactionSteps from '../tx-steps';
+import EarnWithdrawTransactionConfirmation from '../tx-confirmation';
+import styled from 'styled-components';
+import { ContainerBox } from 'ui-library';
+
+const StyledButtonContainer = styled(ContainerBox).attrs({ alignItems: 'center', justifyContent: 'center' })`
+  margin-top: ${({ theme }) => theme.spacing(2)};
+`;
 
 interface WithdrawFormProps {
   strategy?: DisplayStrategy;
   setHeight: (a?: number) => void;
+  shouldShowSteps: boolean;
+  setShouldShowSteps: SetStateCallback<boolean>;
+  shouldShowConfirmation: boolean;
+  setShouldShowConfirmation: SetStateCallback<boolean>;
 }
 
-const WithdrawForm = ({ strategy, setHeight }: WithdrawFormProps) => {
+const WithdrawForm = ({
+  strategy,
+  setHeight,
+  shouldShowSteps,
+  setShouldShowSteps,
+  shouldShowConfirmation,
+  setShouldShowConfirmation,
+}: WithdrawFormProps) => {
   const { withdrawAmount } = useEarnManagementState();
   const intl = useIntl();
+
+  const {
+    onWithdraw,
+    currentTransaction,
+    transactionSteps,
+    transactionOnAction,
+    handleBackTransactionSteps,
+    handleMultiSteps,
+    tokensToWithdraw,
+    applicationIdentifier,
+    shouldShowMarketWithdrawModal,
+    setShouldShowMarketWithdrawModal,
+  } = useEarnWithdrawActions({
+    strategy,
+    setShouldShowSteps,
+    setShouldShowConfirmation,
+  });
+
+  const recapDataProps = React.useMemo(() => ({ strategy, withdraw: tokensToWithdraw }), [strategy, tokensToWithdraw]);
 
   const usdBalances = React.useMemo(() => {
     return strategy?.userPositions?.reduce<AllWalletsBalances>((acc, curr) => {
@@ -37,6 +77,31 @@ const WithdrawForm = ({ strategy, setHeight }: WithdrawFormProps) => {
 
   return (
     <>
+      <MarketWithdrawModal
+        onHandleProceed={handleMultiSteps}
+        onWithdraw={onWithdraw}
+        shouldShowMarketWithdrawModal={shouldShowMarketWithdrawModal}
+        setShouldShowMarketWithdrawModal={setShouldShowMarketWithdrawModal}
+        strategy={strategy}
+      />
+      <EarnWithdrawTransactionSteps
+        shouldShow={shouldShowSteps}
+        handleClose={handleBackTransactionSteps}
+        transactions={transactionSteps}
+        onAction={transactionOnAction.onAction}
+        applicationIdentifier={applicationIdentifier}
+        setShouldShowFirstStep={() => {}}
+        setHeight={setHeight}
+        recapDataProps={recapDataProps}
+      />
+      <EarnWithdrawTransactionConfirmation
+        applicationIdentifier={applicationIdentifier}
+        strategy={strategy}
+        currentTransaction={currentTransaction}
+        shouldShowConfirmation={shouldShowConfirmation}
+        setShouldShowConfirmation={setShouldShowConfirmation}
+        setHeight={setHeight}
+      />
       <DelayedWithdrawContainer strategy={strategy} />
       <FormWalletSelector
         chipDescription={intl.formatMessage(
@@ -50,7 +115,14 @@ const WithdrawForm = ({ strategy, setHeight }: WithdrawFormProps) => {
       <WithdrawAssetInput strategy={strategy} />
       <EarnWithdrawChangesSummary strategy={strategy} />
       <StrategyManagementFees strategy={strategy} feeType={FeeType.WITHDRAW} assetAmount={withdrawAmount} />
-      <EarnWithdrawTransactionManager strategy={strategy} setHeight={setHeight} />
+      <StyledButtonContainer>
+        <EarnWithdrawCTAButton
+          onWithdraw={onWithdraw}
+          onShowMarketWithdrawModal={() => setShouldShowMarketWithdrawModal(true)}
+          onHandleProceed={handleMultiSteps}
+          strategy={strategy}
+        />
+      </StyledButtonContainer>
     </>
   );
 };

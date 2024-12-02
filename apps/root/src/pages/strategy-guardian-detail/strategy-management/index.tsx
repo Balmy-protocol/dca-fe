@@ -40,6 +40,8 @@ const StrategyManagement = ({ chainId, strategyGuardianId }: StrategyManagementP
   const [tab, setTab] = React.useState(0);
   const strategy = useStrategyDetails({ chainId, strategyGuardianId });
   const [height, setHeight] = React.useState<number | undefined>(undefined);
+  const [shouldShowConfirmation, setShouldShowConfirmation] = React.useState(false);
+  const [shouldShowSteps, setShouldShowSteps] = React.useState(false);
   const dispatch = useAppDispatch();
 
   const delayedWithdrawalsCount = React.useMemo(
@@ -57,32 +59,51 @@ const StrategyManagement = ({ chainId, strategyGuardianId }: StrategyManagementP
 
   const hasAssetDelayedWithdrawal = strategy?.asset.withdrawTypes.includes(WithdrawType.DELAYED);
 
+  const formProps = React.useMemo(
+    () => ({
+      strategy,
+      setHeight,
+      shouldShowConfirmation,
+      setShouldShowConfirmation,
+      shouldShowSteps,
+      setShouldShowSteps,
+    }),
+    [strategy, setHeight, shouldShowConfirmation, setShouldShowConfirmation, shouldShowSteps, setShouldShowSteps]
+  );
+
   return (
     <StyledBackgroundPaper sx={{ height: height }}>
-      <Typography variant="h4Bold">{strategy?.farm.name || <Skeleton width="6ch" variant="text" />}</Typography>
-      <ContainerBox>
-        <UnderlinedTabs value={tab} onChange={(_, val: number) => setTab(val)}>
-          <Tab
-            label={
-              <Typography variant="bodyRegular" color="inherit">
-                {<FormattedMessage description="earn.strategy-management.tabs.deposit" defaultMessage="Deposit" />}
-              </Typography>
-            }
-          />
-          <Tab
-            label={
-              <StyledBadge badgeContent={delayedWithdrawalsCount} color="primary">
-                <Typography variant="bodyRegular" color="inherit">
-                  <FormattedMessage description="earn.strategy-management.tabs.withdraw" defaultMessage="Withdraw" />
-                </Typography>
-              </StyledBadge>
-            }
-          />
-        </UnderlinedTabs>
-        {hasAssetDelayedWithdrawal && <DelayWithdrawWarning />}
-      </ContainerBox>
-      {tab === 0 && <DepositForm strategy={strategy} setHeight={setHeight} />}
-      {tab === 1 && <WithdrawForm strategy={strategy} setHeight={setHeight} />}
+      {!shouldShowSteps && !shouldShowConfirmation && (
+        <>
+          <Typography variant="h4Bold">{strategy?.farm.name || <Skeleton width="6ch" variant="text" />}</Typography>
+          <ContainerBox>
+            <UnderlinedTabs value={tab} onChange={(_, val: number) => setTab(val)}>
+              <Tab
+                label={
+                  <Typography variant="bodyRegular" color="inherit">
+                    {<FormattedMessage description="earn.strategy-management.tabs.deposit" defaultMessage="Deposit" />}
+                  </Typography>
+                }
+              />
+              <Tab
+                label={
+                  <StyledBadge badgeContent={delayedWithdrawalsCount} color="primary">
+                    <Typography variant="bodyRegular" color="inherit">
+                      <FormattedMessage
+                        description="earn.strategy-management.tabs.withdraw"
+                        defaultMessage="Withdraw"
+                      />
+                    </Typography>
+                  </StyledBadge>
+                }
+              />
+            </UnderlinedTabs>
+            {hasAssetDelayedWithdrawal && <DelayWithdrawWarning />}
+          </ContainerBox>
+        </>
+      )}
+      {tab === 0 && <DepositForm {...formProps} />}
+      {tab === 1 && <WithdrawForm {...formProps} />}
     </StyledBackgroundPaper>
   );
 };
