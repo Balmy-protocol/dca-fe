@@ -4,7 +4,6 @@ import {
   DisplayStrategy,
   EarnPermission,
   EarnWithdrawTypeData,
-  SetStateCallback,
   SignStatus,
   TransactionActionApproveCompanionSignEarnData,
   TransactionActionEarnWithdrawData,
@@ -30,15 +29,9 @@ import { TRANSACTION_ACTION_APPROVE_COMPANION_SIGN_EARN, TRANSACTION_ACTION_EARN
 
 interface UseEarnWithdrawActionsParams {
   strategy?: DisplayStrategy;
-  setShouldShowSteps: SetStateCallback<boolean>;
-  setShouldShowConfirmation: SetStateCallback<boolean>;
 }
 
-const useEarnWithdrawActions = ({
-  strategy,
-  setShouldShowSteps,
-  setShouldShowConfirmation,
-}: UseEarnWithdrawActionsParams) => {
+const useEarnWithdrawActions = ({ strategy }: UseEarnWithdrawActionsParams) => {
   const intl = useIntl();
   const asset = strategy?.asset;
   const activeWallet = useActiveWallet();
@@ -48,7 +41,9 @@ const useEarnWithdrawActions = ({
   const [currentTransaction, setCurrentTransaction] = React.useState<{ hash: Hash; chainId: number } | undefined>();
   const { withdrawAmount: assetAmountInUnits, withdrawRewards } = useEarnManagementState();
   const addTransaction = useTransactionAdder();
+  const [shouldShowConfirmation, setShouldShowConfirmation] = React.useState(false);
   const [, setModalLoading, setModalError, setModalClosed] = useTransactionModal();
+  const [shouldShowSteps, setShouldShowSteps] = React.useState(false);
   const [transactionsToExecute, setTransactionsToExecute] = React.useState<TransactionStep[]>([]);
   const [shouldShowMarketWithdrawModal, setShouldShowMarketWithdrawModal] = React.useState(false);
 
@@ -448,11 +443,14 @@ const useEarnWithdrawActions = ({
 
   return React.useMemo(
     () => ({
+      shouldShowConfirmation,
       onWithdraw,
       currentTransaction,
+      setShouldShowConfirmation,
       transactionOnAction,
       handleMultiSteps,
       transactionSteps: transactionsToExecute,
+      shouldShowSteps,
       handleBackTransactionSteps,
       tokensToWithdraw,
       applicationIdentifier: TransactionApplicationIdentifier.EARN_WITHDRAW,
@@ -460,11 +458,13 @@ const useEarnWithdrawActions = ({
       setShouldShowMarketWithdrawModal,
     }),
     [
+      shouldShowConfirmation,
       currentTransaction,
       onWithdraw,
       transactionOnAction,
       handleMultiSteps,
       transactionsToExecute,
+      shouldShowSteps,
       handleBackTransactionSteps,
       tokensToWithdraw,
       shouldShowMarketWithdrawModal,

@@ -7,7 +7,6 @@ import {
   EarnCreateTypeData,
   EarnIncreaseTypeData,
   EarnPermission,
-  SetStateCallback,
   SignStatus,
   TransactionActionApproveCompanionSignEarnData,
   TransactionActionApproveTokenSignEarnData,
@@ -45,15 +44,9 @@ import useContractService from '@hooks/useContractService';
 
 interface UseEarnDepositActionParams {
   strategy?: DisplayStrategy;
-  setShouldShowSteps: SetStateCallback<boolean>;
-  setShouldShowConfirmation: SetStateCallback<boolean>;
 }
 
-const useEarnDepositActions = ({
-  strategy,
-  setShouldShowSteps,
-  setShouldShowConfirmation,
-}: UseEarnDepositActionParams) => {
+const useEarnDepositActions = ({ strategy }: UseEarnDepositActionParams) => {
   const asset = strategy?.asset;
   const intl = useIntl();
   const activeWallet = useActiveWallet();
@@ -65,6 +58,8 @@ const useEarnDepositActions = ({
   const [currentTransaction, setCurrentTransaction] = React.useState<{ hash: Hash; chainId: number } | undefined>();
   const { depositAmount: assetAmountInUnits } = useEarnManagementState();
   const addTransaction = useTransactionAdder();
+  const [shouldShowSteps, setShouldShowSteps] = React.useState(false);
+  const [shouldShowConfirmation, setShouldShowConfirmation] = React.useState(false);
   const contractService = useContractService();
   const [transactionsToExecute, setTransactionsToExecute] = React.useState<TransactionStep[]>([]);
   const [, setModalLoading, setModalError, setModalClosed] = useTransactionModal();
@@ -828,17 +823,23 @@ const useEarnDepositActions = ({
   return React.useMemo(
     () => ({
       transactionSteps: transactionsToExecute,
+      shouldShowSteps,
+      shouldShowConfirmation,
       handleMultiSteps,
       onDeposit,
       currentTransaction,
       transactionOnAction,
       handleBackTransactionSteps,
+      setShouldShowConfirmation,
       transactionType,
       requiresCompanionSignature,
       isIncrease,
     }),
     [
       transactionsToExecute,
+      setShouldShowConfirmation,
+      shouldShowSteps,
+      shouldShowConfirmation,
       currentTransaction,
       transactionOnAction,
       handleBackTransactionSteps,
