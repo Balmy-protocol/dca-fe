@@ -102,27 +102,31 @@ const WithdrawForm = ({
         setShouldShowConfirmation={setShouldShowConfirmation}
         setHeight={setHeight}
       />
-      <DelayedWithdrawContainer strategy={strategy} />
-      <FormWalletSelector
-        chipDescription={intl.formatMessage(
-          defineMessage({
-            id: 'earn.strategy-management.withdraw.form-wallet-selector.chip-description',
-            defaultMessage: 'Available:',
-          })
-        )}
-        overrideUsdBalances={usdBalances}
-      />
-      <WithdrawAssetInput strategy={strategy} />
-      <EarnWithdrawChangesSummary strategy={strategy} />
-      <StrategyManagementFees strategy={strategy} feeType={FeeType.WITHDRAW} assetAmount={withdrawAmount} />
-      <StyledButtonContainer>
-        <EarnWithdrawCTAButton
-          onWithdraw={onWithdraw}
-          onShowMarketWithdrawModal={() => setShouldShowMarketWithdrawModal(true)}
-          onHandleProceed={handleMultiSteps}
-          strategy={strategy}
-        />
-      </StyledButtonContainer>
+      {!shouldShowConfirmation && !shouldShowSteps && (
+        <>
+          <DelayedWithdrawContainer strategy={strategy} />
+          <FormWalletSelector
+            chipDescription={intl.formatMessage(
+              defineMessage({
+                id: 'earn.strategy-management.withdraw.form-wallet-selector.chip-description',
+                defaultMessage: 'Available:',
+              })
+            )}
+            overrideUsdBalances={usdBalances}
+          />
+          <WithdrawAssetInput strategy={strategy} />
+          <EarnWithdrawChangesSummary strategy={strategy} />
+          <StrategyManagementFees strategy={strategy} feeType={FeeType.WITHDRAW} assetAmount={withdrawAmount} />
+          <StyledButtonContainer>
+            <EarnWithdrawCTAButton
+              onWithdraw={onWithdraw}
+              onShowMarketWithdrawModal={() => setShouldShowMarketWithdrawModal(true)}
+              onHandleProceed={handleMultiSteps}
+              strategy={strategy}
+            />
+          </StyledButtonContainer>
+        </>
+      )}
     </>
   );
 };

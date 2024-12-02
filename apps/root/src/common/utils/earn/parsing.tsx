@@ -19,6 +19,7 @@ import {
   AmountsOfToken,
   DelayedWithdrawalStatus,
   StrategyId,
+  SdkEarnPositionId,
 } from 'common-types';
 import { compact, find, isUndefined } from 'lodash';
 import { NETWORKS } from '@constants';
@@ -703,4 +704,16 @@ export const groupPositionsByStrategy = (userPositions: EarnPosition[]) => {
   }, {});
 
   return Object.values(strategiesRecord);
+};
+
+export const getSdkEarnPositionId = ({
+  chainId,
+  vault,
+  positionId,
+}: {
+  chainId: number;
+  vault: Lowercase<Address>;
+  positionId: string | bigint;
+}): SdkEarnPositionId => {
+  return `${chainId}-${vault}-${Number(positionId)}`;
 };

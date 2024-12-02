@@ -1084,9 +1084,6 @@ export class EarnService extends EventsManager<EarnServiceData> {
           ...this.userStrategies.filter((s) => s.id !== `${transaction.chainId}-${strategyId}-${transaction.hash}`),
         ];
 
-        const earnVaultAddress = this.contractService.getEarnVaultAddress(transaction.chainId);
-        if (!earnVaultAddress) throw new Error('No earn vault address found');
-
         const depositFee = this.allStrategies
           .find((s) => s.id === strategyId)
           ?.guardian?.fees.find((fee) => fee.type === FeeType.DEPOSIT);
@@ -1095,7 +1092,7 @@ export class EarnService extends EventsManager<EarnServiceData> {
         const newUserStrategy = getNewEarnPositionFromTxTypeData({
           newEarnPositionTypeData,
           user: transaction.from as Address,
-          id: `${transaction.chainId}-${earnVaultAddress}-${Number(positionId)}`,
+          id: positionId,
           depositFee: depositFee?.percentage,
           transaction: transaction.hash,
           companionAddress,

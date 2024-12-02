@@ -37,6 +37,7 @@ import usePriceService from '@hooks/usePriceService';
 import { parseUsdPrice } from '@common/utils/currency';
 import useEarnService from '@hooks/earn/useEarnService';
 import useHasFetchedUserStrategies from '@hooks/earn/useHasFetchedUserStrategies';
+import { getSdkEarnPositionId } from '@common/utils/earn/parsing';
 
 export default function Updater(): null {
   const transactionService = useTransactionService();
@@ -191,10 +192,15 @@ export default function Updater(): null {
 
           if ('positionId' in newEarnPositionParsedLog.args) {
             extendedTypeData = {
-              positionId: newEarnPositionParsedLog.args.positionId,
+              positionId: getSdkEarnPositionId({
+                chainId: tx.chainId,
+                vault: tx.typeData.vault,
+                positionId: newEarnPositionParsedLog.args.positionId,
+              }),
               asset: newEarnPositionTokenWithPrice,
               assetAmount: tx.typeData.assetAmount,
               strategyId: tx.typeData.strategyId,
+              vault: tx.typeData.vault,
             } satisfies Partial<EarnCreateTypeData>['typeData'];
           }
           break;
