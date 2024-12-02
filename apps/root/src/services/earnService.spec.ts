@@ -1124,6 +1124,7 @@ describe('Earn Service', () => {
                 profit: { amount: 0n, amountInUnits: '0', amountInUSD: '0' },
               },
             ],
+            lastUpdatedAt: now - 1000,
           });
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore
@@ -1165,6 +1166,7 @@ describe('Earn Service', () => {
                 profit: { amount: 0n, amountInUnits: '0', amountInUSD: '0' },
               },
             ],
+            lastUpdatedAt: now - 1000,
           });
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore
@@ -1212,6 +1214,7 @@ describe('Earn Service', () => {
                 profit: { amount: 0n, amountInUnits: '0', amountInUSD: '0' },
               },
             ],
+            lastUpdatedAt: now - 1000,
           });
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore

@@ -423,7 +423,8 @@ export class EarnService extends EventsManager<EarnServiceData> {
       // it can happen that the fetched user strategy is still not indexed with our virtual events, so we need to apply the changes to the balances based on the different events that we had locally
       const currentHistory = updatedUserStrategies[userStrategyIndex].history;
       const eventsThatWeHaveThatTheUserStrategyIsMissing = currentHistory?.filter(
-        (event) => !userStrategy.history?.some((e) => e.tx.hash === event.tx.hash)
+        // We keep only events that are after the last updated at timestamp from the api
+        (event) => event.tx.timestamp > userStrategy.lastUpdatedAt
       );
 
       if (eventsThatWeHaveThatTheUserStrategyIsMissing) {
