@@ -10,12 +10,6 @@ describe.skip('Pair Service', () => {
     test('it should fetch and parse all the available pairs from graphql', async () => {});
   });
 
-  describe('addNewPair', () => {
-    test('it should add a new pair if it doesnt exist', async () => {});
-
-    test('it should update the swapInfo if the pair already exists', async () => {});
-  });
-
   describe('availablePairExists', () => {
     test('it should return true or false if a pair exists or not', async () => {});
   });
