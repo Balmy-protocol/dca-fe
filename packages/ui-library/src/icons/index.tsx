@@ -135,6 +135,9 @@ import UnlockIcon from './unlock';
 import ChartIcon from './chart';
 import ClockIcon from './clock';
 import TrendUpIcon from './trend-up';
+import InformationIcon from './information';
+import PersonOutlineRoundedIcon from './person-outline-rounded';
+import ShieldTickIcon from './shield-tick';
 
 export {
   HelpOutline as HelpOutlineIcon,
@@ -274,4 +277,7 @@ export {
   ChartIcon,
   ClockIcon,
   TrendUpIcon,
+  InformationIcon,
+  PersonOutlineRoundedIcon,
+  ShieldTickIcon,
 };
