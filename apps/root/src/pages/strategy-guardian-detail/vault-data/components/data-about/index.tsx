@@ -23,7 +23,7 @@ interface DataAboutProps {
   collapsed: boolean;
 }
 
-const FeeItem = ({ fee, intl }: { fee: StrategyGuardian['fees'][number]; intl: IntlShape }) => (
+export const FeeItem = ({ fee, intl }: { fee: StrategyGuardian['fees'][number]; intl: IntlShape }) => (
   <ContainerBox gap={1} alignItems="center">
     <Typography variant="bodySmallRegular" color={({ palette: { mode } }) => colors[mode].typography.typo3}>
       {intl.formatMessage(FEE_TYPE_STRING_MAP[fee.type])}:

@@ -41,6 +41,7 @@ export enum StrategyColumnKeys {
   PLATFORM = 'platform',
   PLATFORM_USER_BALANCE = 'platformUserBalance',
   SINGLE_WALLET = 'singleWallet',
+  MIGRATE = 'migrate',
 }
 
 const StyledWalletsPlusIndicator = styled(ContainerBox)`
@@ -385,4 +386,23 @@ export const migrationOptionsColumnConfigs: StrategyColumnConfig<StrategiesTable
     label: <FormattedMessage description="earn.one-click-migration-modal.column.wallet" defaultMessage="Wallet" />,
     renderCell: (data) => <StyledBoxedOwners owners={[data.wallet]} />,
   },
+  // {
+  //   key: StrategyColumnKeys.MIGRATE,
+  //   label: null,
+  //   renderCell: (data) => (
+  //     <Typography variant="linkRegular" color={({ palette: { mode } }) => colors[mode].accent.primary}>
+  //       {data.strategies.length === 1 ? (
+  //         <FormattedMessage
+  //           description="earn.one-click-migration-modal.column.migrate-single"
+  //           defaultMessage="Continue in vault"
+  //         />
+  //       ) : (
+  //         <FormattedMessage
+  //           description="earn.one-click-migration-modal.column.migrate-multiple"
+  //           defaultMessage="Select guardian"
+  //         />
+  //       )}
+  //     </Typography>
+  //   ),
+  // },
 ];

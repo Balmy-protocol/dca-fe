@@ -107,10 +107,12 @@ const StrategiesTableHeader = <T extends StrategiesTableVariants>({
   columns,
   variant,
   disabled,
+  showEndChevron = true,
 }: {
   columns: StrategyColumnConfig<T>[];
   variant: T;
   disabled?: boolean;
+  showEndChevron?: boolean;
 }) => {
   const dispatch = useAppDispatch();
   const { orderBy } = useStrategiesFilters(variant);
@@ -148,7 +150,7 @@ const StrategiesTableHeader = <T extends StrategiesTableVariants>({
             </StyledHeaderTableCell>
           </Hidden>
         ))}
-        <StyledTableEnd size="small"></StyledTableEnd>
+        {showEndChevron && <StyledTableEnd size="small"></StyledTableEnd>}
       </StyledHeaderTableRow>
     </TableHead>
   );
@@ -157,9 +159,11 @@ const StrategiesTableHeader = <T extends StrategiesTableVariants>({
 const AllStrategiesTableBodySkeleton = <T extends StrategiesTableVariants>({
   columns,
   rowsPerPage,
+  showEndChevron = true,
 }: {
   columns: StrategyColumnConfig<T>[];
   rowsPerPage: number;
+  showEndChevron?: boolean;
 }) => (
   <>
     {Array.from(Array(rowsPerPage).keys()).map((i) => (
@@ -173,7 +177,7 @@ const AllStrategiesTableBodySkeleton = <T extends StrategiesTableVariants>({
             )}
           </StyledBodyTableCell>
         ))}
-        <StyledTableEnd size="small"></StyledTableEnd>
+        {showEndChevron && <StyledTableEnd size="small"></StyledTableEnd>}
       </TableRow>
     ))}
   </>
@@ -185,6 +189,7 @@ interface RowProps<T extends StrategiesTableVariants> {
   onRowClick: (strategy: RowClickParamValue<T>) => void;
   variant: T;
   showBalances?: boolean;
+  showEndChevron?: boolean;
 }
 
 const renderBodyCell = (cell: React.ReactNode | string) =>
@@ -196,6 +201,7 @@ const Row = <T extends StrategiesTableVariants>({
   onRowClick,
   variant,
   showBalances = true,
+  showEndChevron = true,
 }: RowProps<T>) => {
   const [hovered, setHovered] = React.useState(false);
 
@@ -219,6 +225,8 @@ const Row = <T extends StrategiesTableVariants>({
           </StyledBodyTableCell>
         </Hidden>
       ))}
+            {showEndChevron && (
+
       <StyledTableEnd size="small">
         <StyledNavContainer alignItems="center">
           <DividerBorder2 orientation="vertical" />
@@ -228,6 +236,7 @@ const Row = <T extends StrategiesTableVariants>({
           />
         </StyledNavContainer>
       </StyledTableEnd>
+      )}
     </StyledTableRow>
   );
 };
@@ -253,6 +262,7 @@ interface StrategiesTableProps<T extends StrategiesTableVariants> {
   rowsPerPage: number;
   showBalances?: boolean;
   showPagination?: boolean;
+  showEndChevron?: boolean;
 }
 
 const StrategiesTable = <T extends StrategiesTableVariants>({
@@ -267,6 +277,7 @@ const StrategiesTable = <T extends StrategiesTableVariants>({
   rowsPerPage,
   showBalances = true,
   showPagination = true,
+  showEndChevron = true,
 }: StrategiesTableProps<T>) => {
   // Keeps the table height consistent
   const emptyRows = createEmptyRows(rowsPerPage - visibleRows.length);
@@ -285,10 +296,19 @@ const StrategiesTable = <T extends StrategiesTableVariants>({
     >
       {isEmptyPortfolio && <EmptyPortfolio contained />}
       <Table sx={{ tableLayout: 'auto' }} stickyHeader={isPortfolio}>
-        <StrategiesTableHeader columns={columns} variant={variant} disabled={isEmptyPortfolio} />
+        <StrategiesTableHeader
+          columns={columns}
+          variant={variant}
+          disabled={isEmptyPortfolio}
+          showEndChevron={showEndChevron}
+        />
         <TableBody>
           {isLoading ? (
-            <AllStrategiesTableBodySkeleton columns={columns} rowsPerPage={rowsPerPage} />
+            <AllStrategiesTableBodySkeleton
+              columns={columns}
+              rowsPerPage={rowsPerPage}
+              showEndChevron={showEndChevron}
+            />
           ) : (
             <>
               {visibleRows.map((row, index) => (
@@ -299,6 +319,7 @@ const StrategiesTable = <T extends StrategiesTableVariants>({
                   onRowClick={onGoToStrategy}
                   variant={variant}
                   showBalances={showBalances}
+                  showEndChevron={showEndChevron}
                 />
               ))}
               {emptyRows}

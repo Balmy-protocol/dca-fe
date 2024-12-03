@@ -68,9 +68,10 @@ const useAvailableDepositTokens = () => {
                 amountInUnits: formatUnits(balance, token.decimals),
               },
             };
+          } else {
+            // eslint-disable-next-line no-param-reassign
+            acc[`${token.strategy.farm.id}-${walletAddress}`].strategies.push(token.strategy);
           }
-          // eslint-disable-next-line no-param-reassign
-          acc[`${token.strategy.farm.id}-${walletAddress}`].strategies.push(token.strategy);
         });
 
         return acc;

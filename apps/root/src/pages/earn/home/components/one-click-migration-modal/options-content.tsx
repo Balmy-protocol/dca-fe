@@ -20,23 +20,14 @@ const StyledHowItWorksCollapseContainer = styled(ForegroundPaper).attrs({ varian
 
 interface OneClickMigrationOptionsContentProps {
   farms: FarmWithAvailableDepositTokens[];
-  onGoToStrategy: (farm: FarmWithAvailableDepositTokens) => void;
   onGoToDetails: (farm: FarmWithAvailableDepositTokens) => void;
 }
 
-const OneClickMigrationOptionsContent = ({
-  farms,
-  onGoToStrategy,
-  onGoToDetails,
-}: OneClickMigrationOptionsContentProps) => {
+const OneClickMigrationOptionsContent = ({ farms, onGoToDetails }: OneClickMigrationOptionsContentProps) => {
   const [isHelpExpanded, setIsHelpExpanded] = React.useState(false);
 
   const handleOnGoToDetails = (farm: FarmWithAvailableDepositTokens) => {
-    if (farm.strategies.length === 1) {
-      onGoToStrategy(farm);
-    } else {
-      onGoToDetails(farm);
-    }
+    onGoToDetails(farm);
   };
 
   return (
