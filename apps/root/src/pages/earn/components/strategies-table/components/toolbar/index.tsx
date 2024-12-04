@@ -4,6 +4,9 @@ import { ContainerBox, InputAdornment, SearchIcon, TextField, Typography, colors
 import TableFilters from '../filters';
 import { StrategiesTableVariants } from '@state/strategies-filters/reducer';
 import DelayedWithdrawContainer from '../delayed-withdraw-container';
+import styled from 'styled-components';
+import useEarnPositions from '@hooks/earn/useEarnPositions';
+import { getDelayedWithdrawals } from '@common/utils/earn/parsing';
 
 interface AllStrategiesTableToolbarProps {
   isLoading: boolean;
@@ -13,6 +16,13 @@ interface AllStrategiesTableToolbarProps {
   disabled?: boolean;
 }
 
+const StyledTextField = styled(TextField)`
+  flex: 1;
+  min-width: ${({ theme: { spacing } }) => spacing(30)};
+  max-width: ${({ theme: { spacing } }) => spacing(70)};
+  margin-left: auto;
+`;
+
 const AllStrategiesTableToolbar = ({
   isLoading,
   handleSearchChange,
@@ -21,6 +31,12 @@ const AllStrategiesTableToolbar = ({
   disabled,
 }: AllStrategiesTableToolbarProps) => {
   const intl = useIntl();
+
+  const { userStrategies } = useEarnPositions();
+  const hasDelayedWithdraws = React.useMemo(
+    () => getDelayedWithdrawals({ userStrategies }).length > 0,
+    [userStrategies]
+  );
 
   return (
     <ContainerBox justifyContent="space-between" alignItems="end" flexWrap="wrap" gap={3}>
@@ -51,10 +67,16 @@ const AllStrategiesTableToolbar = ({
           </Typography>
         </ContainerBox>
       )}
-      <ContainerBox gap={6} alignItems="center" justifyContent="space-between" flexWrap="wrap">
-        <DelayedWithdrawContainer />
-        <ContainerBox gap={6} alignItems="center">
-          <TextField
+      <ContainerBox
+        gap={6}
+        alignItems="center"
+        justifyContent={!hasDelayedWithdraws ? 'end' : 'space-between'}
+        flexWrap="wrap"
+        flex={!hasDelayedWithdraws ? 1 : undefined}
+      >
+        {hasDelayedWithdraws && <DelayedWithdrawContainer />}
+        <ContainerBox gap={6} alignItems="center" fullWidth={!hasDelayedWithdraws}>
+          <StyledTextField
             size="small"
             placeholder={intl.formatMessage(
               defineMessage({
