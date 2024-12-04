@@ -1,9 +1,5 @@
 import { EARN_ACCESS_NOW_ROUTE } from '@constants/routes';
-import useActiveWallet from '@hooks/useActiveWallet';
-import useOpenConnectModal from '@hooks/useOpenConnectModal';
 import usePushToHistory from '@hooks/usePushToHistory';
-import useWallets from '@hooks/useWallets';
-import { WalletActionType } from '@services/accountService';
 import { useThemeMode } from '@state/config/hooks';
 import React from 'react';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
@@ -125,9 +121,6 @@ const FeatureCard = styled(({ title, description, FeatureAsset, ...props }: Feat
 
 const EarnGainAccessModal = ({ isOpen, onClose }: EarnGainAccessModalProps) => {
   const intl = useIntl();
-  const activeWallet = useActiveWallet();
-  const wallets = useWallets();
-  const openConnectModal = useOpenConnectModal();
   const pushToHistory = usePushToHistory();
   const themeMode = useThemeMode();
 
@@ -139,30 +132,15 @@ const EarnGainAccessModal = ({ isOpen, onClose }: EarnGainAccessModalProps) => {
   const actions = React.useMemo(
     () =>
       [
-        ...(!activeWallet?.address && !wallets.length
-          ? [
-              {
-                label: intl.formatMessage(
-                  defineMessage({
-                    description: 'earn.gain-access.modal.connect-wallet',
-                    defaultMessage: 'Connect Wallet',
-                  })
-                ),
-                onClick: () => openConnectModal(WalletActionType.connect),
-                variant: 'contained',
-              },
-            ]
-          : [
-              {
-                label: intl.formatMessage(
-                  defineMessage({ description: 'earn.gain-access.modal.access-now', defaultMessage: 'Access now' })
-                ),
-                onClick: handleAccessNow,
-                variant: 'contained',
-              },
-            ]),
+        {
+          label: intl.formatMessage(
+            defineMessage({ description: 'earn.gain-access.modal.access-now', defaultMessage: 'Access now' })
+          ),
+          onClick: handleAccessNow,
+          variant: 'contained',
+        },
       ] as ModalProps['actions'],
-    [activeWallet, wallets, intl, openConnectModal, handleAccessNow]
+    [handleAccessNow, intl]
   );
 
   return (
