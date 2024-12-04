@@ -26,19 +26,21 @@ const EarnAccessNowFrame = () => {
       <ContainerBox flexDirection="column" gap={20}>
         <ContainerBox flexDirection="column" gap={12}>
           <ContainerBox flexDirection="column" gap={3} alignItems="center">
-            <Typography variant="h1Bold" textAlign="center">
-              <FormattedMessage
-                description="earn-access-now.title"
-                defaultMessage="Check Your Eligibility{br}for"
-                values={{
-                  br: <br />,
-                }}
-              />{' '}
-              <StyledTitleSpan>
-                <FormattedMessage description="earn-access-now.title.early-access" defaultMessage="Earn Early Access" />
-              </StyledTitleSpan>
-            </Typography>
-            <StyledPageTitleDescription textAlign="center" maxWidth="50ch">
+            <ContainerBox flexDirection="column">
+              <Typography variant="h1Bold" textAlign="center">
+                <FormattedMessage description="earn-access-now.title" defaultMessage="Check Your Eligibility" />{' '}
+              </Typography>
+              <Typography variant="h1Bold" textAlign="center">
+                <FormattedMessage description="earn-access-now.title.for" defaultMessage="for" />{' '}
+                <StyledTitleSpan>
+                  <FormattedMessage
+                    description="earn-access-now.title.early-access"
+                    defaultMessage="Earn Early Access"
+                  />
+                </StyledTitleSpan>
+              </Typography>
+            </ContainerBox>
+            <StyledPageTitleDescription textAlign="center">
               <FormattedMessage
                 description="earn-access-now.subtitle"
                 defaultMessage="Find out if you meet the criteria to join Earn Early Access and explore our exclusive yield strategies."
