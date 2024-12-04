@@ -1,4 +1,5 @@
 // component exports
+export * from './radio';
 export * from './dialogtitle';
 export * from './backcontrol';
 export * from './toolbar';

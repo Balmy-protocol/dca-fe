@@ -28,6 +28,7 @@ const StyledDialogContent = styled(DialogContent)<{ withTitle: boolean }>`
     ${withTitle && 'flex-direction: column;'}
     overflow-y: visible;
     gap: ${space.s05}
+    position: relative;
   `}
 `;
 
@@ -138,7 +139,7 @@ const Modal: React.FC<ModalProps> = ({
 
   const titleComponent = useMemo(
     () =>
-      withTitle ? (
+      !!title ? (
         <StyledDialogTitle>
           <StyledDialogHeader>
             <ContainerBox flexDirection="column" gap={2}>
@@ -153,14 +154,21 @@ const Modal: React.FC<ModalProps> = ({
             </ContainerBox>
             {headerButton}
           </StyledDialogHeader>
-          <StyledCloseIconContainer>
-            <StyledCloseIconButton aria-label="close" onClick={onClose}>
-              <CloseIcon sx={{ color: colors[mode].typography.typo2 }} size={spacing(3)} />
-            </StyledCloseIconButton>
-          </StyledCloseIconContainer>
         </StyledDialogTitle>
       ) : null,
-    [headerButton, mode, onClose, title, withTitle, spacing, subtitle]
+    [title, subtitle, headerButton, mode]
+  );
+
+  const closeIconComponent = useMemo(
+    () =>
+      showCloseIcon ? (
+        <StyledCloseIconContainer>
+          <StyledCloseIconButton aria-label="close" onClick={onClose}>
+            <CloseIcon sx={{ color: colors[mode].typography.typo2 }} size={spacing(3)} />
+          </StyledCloseIconButton>
+        </StyledCloseIconContainer>
+      ) : null,
+    [showCloseIcon, onClose, mode, spacing]
   );
 
   return (
@@ -178,6 +186,7 @@ const Modal: React.FC<ModalProps> = ({
     >
       <StyledDialogContent withTitle={withTitle || !!fullHeight}>
         {titleComponent}
+        {closeIconComponent}
         <StyledModalDialogChildren>{children}</StyledModalDialogChildren>
       </StyledDialogContent>
       {(showCloseButton || !!actions?.length) && (
