@@ -1,5 +1,5 @@
 import React from 'react';
-import { Grid, StyledFormContainer, ContainerBox, Typography, colors } from 'ui-library';
+import { Grid, StyledFormContainer, ContainerBox, Typography, colors, StyledPageTitleDescription } from 'ui-library';
 import { changeRoute } from '@state/tabs/actions';
 import { useAppDispatch } from '@state/hooks';
 import useTrackEvent from '@hooks/useTrackEvent';
@@ -27,12 +27,12 @@ const TransferFrame = ({}: TransferFrameProps) => {
               <Typography variant="h1Bold" color={({ palette }) => colors[palette.mode].typography.typo1}>
                 <FormattedMessage defaultMessage="Transfer" description="transfer.title" />
               </Typography>
-              <Typography variant="bodyLargeRegular" color={({ palette }) => colors[palette.mode].typography.typo1}>
+              <StyledPageTitleDescription>
                 <FormattedMessage
                   defaultMessage="Send your assets, store your contacts"
                   description="transfer.title-description"
                 />
-              </Typography>
+              </StyledPageTitleDescription>
             </ContainerBox>
             <TransferForm />
           </ContainerBox>

@@ -46,7 +46,7 @@ const EarnPortfolioFinancialData = ({
               defaultMessage="Investment & Earnings Summary"
             />
           </Typography>
-          <FinancialOverview userPositions={userStrategies} isLoading={isLoading} size="small" isFiat />
+          <FinancialOverview userPositions={userStrategies} isLoading={isLoading} size="small" isFiat showLastMonth />
         </ContainerBox>
         <ContainerBox gap={3} flexDirection="column">
           <Typography variant="h6Bold" color={({ palette: { mode } }) => colors[mode].typography.typo1}>

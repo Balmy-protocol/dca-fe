@@ -18,6 +18,7 @@ import {
 import find from 'lodash/find';
 import { TransactionAction, TransactionAction as TransactionStep } from '@common/components/transaction-steps';
 import {
+  EARN_VAULT_ADDRESS,
   PERMIT_2_ADDRESS,
   TRANSACTION_ACTION_APPROVE_COMPANION_SIGN_EARN,
   TRANSACTION_ACTION_APPROVE_TOKEN,
@@ -135,7 +136,7 @@ const useEarnDepositActions = ({ strategy }: UseEarnDepositActionParams) => {
 
         typeData = {
           type: TransactionTypes.earnCreate,
-          typeData: baseTypeData,
+          typeData: { ...baseTypeData, vault: EARN_VAULT_ADDRESS[strategy.network.chainId] },
         };
       }
 

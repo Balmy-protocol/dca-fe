@@ -1,4 +1,4 @@
-import { Chains, TimeString } from '@balmy/sdk';
+import { buildSDK, Chains, TimeString } from '@balmy/sdk';
 import { ChainId } from '@types';
 import { defineMessage } from 'react-intl';
 
@@ -120,6 +120,9 @@ export const DEFAULT_AGGREGATOR_SETTINGS: {
   sourceTimeout: TimeoutKey.balance,
 };
 
+const tempSdk = buildSDK();
+const aggSupportedChains = tempSdk.quoteService.supportedChains();
+
 export const AGGREGATOR_SUPPORTED_CHAINS: ChainId[] = [
   Chains.ARBITRUM.chainId,
   Chains.AVALANCHE.chainId,
@@ -141,4 +144,4 @@ export const AGGREGATOR_SUPPORTED_CHAINS: ChainId[] = [
   Chains.SCROLL.chainId,
   Chains.MODE.chainId,
   Chains.BLAST.chainId,
-];
+].filter((chainId) => aggSupportedChains.includes(chainId));

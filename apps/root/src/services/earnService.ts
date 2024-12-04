@@ -423,7 +423,8 @@ export class EarnService extends EventsManager<EarnServiceData> {
       // it can happen that the fetched user strategy is still not indexed with our virtual events, so we need to apply the changes to the balances based on the different events that we had locally
       const currentHistory = updatedUserStrategies[userStrategyIndex].history;
       const eventsThatWeHaveThatTheUserStrategyIsMissing = currentHistory?.filter(
-        (event) => !userStrategy.history?.some((e) => e.tx.hash === event.tx.hash)
+        // We keep only events that are after the last updated at timestamp from the api
+        (event) => event.tx.timestamp > userStrategy.lastUpdatedAt
       );
 
       if (eventsThatWeHaveThatTheUserStrategyIsMissing) {
@@ -1083,9 +1084,6 @@ export class EarnService extends EventsManager<EarnServiceData> {
           ...this.userStrategies.filter((s) => s.id !== `${transaction.chainId}-${strategyId}-${transaction.hash}`),
         ];
 
-        const earnVaultAddress = this.contractService.getEarnVaultAddress(transaction.chainId);
-        if (!earnVaultAddress) throw new Error('No earn vault address found');
-
         const depositFee = this.allStrategies
           .find((s) => s.id === strategyId)
           ?.guardian?.fees.find((fee) => fee.type === FeeType.DEPOSIT);
@@ -1094,7 +1092,7 @@ export class EarnService extends EventsManager<EarnServiceData> {
         const newUserStrategy = getNewEarnPositionFromTxTypeData({
           newEarnPositionTypeData,
           user: transaction.from as Address,
-          id: `${transaction.chainId}-${earnVaultAddress}-${Number(positionId)}`,
+          id: positionId,
           depositFee: depositFee?.percentage,
           transaction: transaction.hash,
           companionAddress,

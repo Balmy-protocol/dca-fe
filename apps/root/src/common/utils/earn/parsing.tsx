@@ -19,6 +19,7 @@ import {
   AmountsOfToken,
   DelayedWithdrawalStatus,
   StrategyId,
+  SdkEarnPositionId,
 } from 'common-types';
 import { compact, find, isUndefined } from 'lodash';
 import { NETWORKS } from '@constants';
@@ -29,6 +30,8 @@ import { TableStrategy } from '@pages/earn/components/strategies-table';
 import { ColumnOrder, StrategiesTableVariants } from '@state/strategies-filters/reducer';
 import { Address, formatUnits, parseUnits } from 'viem';
 import { FarmWithAvailableDepositTokens } from '@hooks/earn/useAvailableDepositTokens';
+import { nowInSeconds } from '../time';
+import { findClosestTimestamp } from '@common/components/earn/action-graph-components';
 
 export const sdkStrategyTokenToToken = (
   sdkToken: SdkStrategyToken,
@@ -352,6 +355,8 @@ export function parseUserStrategiesFinancialData(userPositions: EarnPosition[] =
   totalInvested: Record<Address, AmountsOfToken>;
   currentProfit: Record<Address, AmountsOfToken>;
   earnings: Record<StrategyReturnPeriods, { total: number; byToken: Record<Address, AmountsOfToken> }>;
+  monthlyEarnings: Record<Address, AmountsOfToken>;
+  totalMonthlyEarnings: number;
 } {
   const totalInvested = userPositions.reduce<Record<Address, AmountsOfToken>>((acc, position) => {
     const assetBalance = position.balances.find((balance) => isSameToken(balance.token, position.strategy.asset));
@@ -465,7 +470,86 @@ export function parseUserStrategiesFinancialData(userPositions: EarnPosition[] =
 
   const currentProfitRate = totalInvestedUsd !== 0 ? (currentProfitUsd / totalInvestedUsd) * 100 : 0;
 
-  return { totalInvestedUsd, currentProfitUsd, currentProfitRate, earnings, totalInvested, currentProfit };
+  const today = nowInSeconds();
+  const monthlyEarnings = userPositions.reduce<Record<Address, AmountsOfToken>>((acc, position) => {
+    if (!position.historicalBalances) return acc;
+    const timestamps = position.historicalBalances
+      // at least 30 days ago
+      .filter((balance) => balance.timestamp < today - 30 * 24 * 60 * 60)
+      .map((balance) => balance.timestamp);
+    // Should always be ordered as descending
+    const latestBalance = position.historicalBalances[0];
+    const closestTimestamp = findClosestTimestamp(timestamps, today);
+
+    const historicalBalance = position.historicalBalances.find((balance) => balance.timestamp === closestTimestamp);
+
+    if (!historicalBalance) {
+      if (!latestBalance) return acc;
+      latestBalance.balances.forEach((balance) => {
+        if (!acc[balance.token.address]) {
+          // eslint-disable-next-line no-param-reassign
+          acc[balance.token.address] = {
+            amount: 0n,
+            amountInUnits: '0.00',
+            amountInUSD: '0.00',
+          };
+        }
+        // eslint-disable-next-line no-param-reassign
+        acc[balance.token.address] = {
+          amount: acc[balance.token.address].amount + balance.profit.amount,
+          amountInUnits: formatUnits(acc[balance.token.address].amount + balance.profit.amount, balance.token.decimals),
+          amountInUSD: (Number(acc[balance.token.address].amountInUSD) + Number(balance.profit.amountInUSD)).toFixed(
+            18
+          ),
+        };
+      });
+    } else {
+      const balances = historicalBalance.balances;
+      const currentBalances = latestBalance.balances;
+
+      balances.forEach((balance) => {
+        const currentBalanceToken = currentBalances.find((b) => isSameToken(b.token, balance.token));
+        if (!currentBalanceToken) return;
+
+        if (!acc[balance.token.address]) {
+          // eslint-disable-next-line no-param-reassign
+          acc[balance.token.address] = {
+            amount: 0n,
+            amountInUnits: '0.00',
+            amountInUSD: '0.00',
+          };
+        }
+
+        const amountProfit = currentBalanceToken.profit.amount - balance.profit.amount;
+        const amountProfitInUsd = Number(currentBalanceToken.profit.amountInUSD) - Number(balance.profit.amountInUSD);
+
+        // eslint-disable-next-line no-param-reassign
+        acc[balance.token.address] = {
+          amount: acc[balance.token.address].amount + amountProfit,
+          amountInUnits: formatUnits(acc[balance.token.address].amount + amountProfit, balance.token.decimals),
+          amountInUSD: (Number(acc[balance.token.address].amountInUSD) + amountProfitInUsd).toFixed(18),
+        };
+      });
+    }
+
+    return acc;
+  }, {});
+
+  const totalMonthlyEarnings = Object.values(monthlyEarnings).reduce((acc, amount) => {
+    // eslint-disable-next-line no-param-reassign
+    return acc + Number(amount.amountInUSD) || 0;
+  }, 0);
+
+  return {
+    totalInvestedUsd,
+    currentProfitUsd,
+    currentProfitRate,
+    earnings,
+    totalInvested,
+    currentProfit,
+    monthlyEarnings,
+    totalMonthlyEarnings,
+  };
 }
 
 export function calculateUserStrategiesBalances(userPositions: EarnPosition[] = []): EarnPosition['balances'] {
@@ -620,4 +704,16 @@ export const groupPositionsByStrategy = (userPositions: EarnPosition[]) => {
   }, {});
 
   return Object.values(strategiesRecord);
+};
+
+export const getSdkEarnPositionId = ({
+  chainId,
+  vault,
+  positionId,
+}: {
+  chainId: number;
+  vault: Lowercase<Address>;
+  positionId: string | bigint;
+}): SdkEarnPositionId => {
+  return `${chainId}-${vault}-${Number(positionId)}`;
 };

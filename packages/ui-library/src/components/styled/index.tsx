@@ -1,6 +1,7 @@
 import styled from 'styled-components';
 import { MAX_FORM_WIDTH } from '../../theme/constants';
-import { Grid } from '../';
+import { Grid, Typography } from '../';
+import { colors } from '../../theme/colors';
 
 export const StyledFormContainer = styled(Grid).attrs({
   flex: '1',
@@ -26,4 +27,9 @@ export const ColorCircle = styled.div<{ color?: string; size?: number }>`
     border-radius: 50%;
     display: inline-block
   `}
+`;
+
+export const StyledPageTitleDescription = styled(Typography).attrs({ variant: 'bodyLargeRegular' })`
+  color: ${({ theme: { palette } }) => colors[palette.mode].typography.typo2};
+  max-width: 60ch;
 `;

@@ -33,12 +33,10 @@ const StyledSelectionContainer = styled(StyledWizardBaseContainer).attrs({
   justifyContent: 'center',
   fullWidth: true,
 })`
-  ${({ theme: { palette, spacing, space, breakpoints } }) => `
-      padding: ${space.s04};
-      border: 1px solid ${colors[palette.mode].earnWizard.border};
-      border-radius: ${spacing(3)};
-      ${breakpoints.down('md')} {
-        justify-content: start;
+  ${({ theme: { space, breakpoints } }) => `
+    padding: ${space.s03} 0;
+    ${breakpoints.down('md')} {
+      justify-content: start;
       }
     `}
 `;

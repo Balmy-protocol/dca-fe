@@ -1,13 +1,7 @@
 import find from 'lodash/find';
-import {
-  NON_AUTOMATIC_CHAIN_CHANGING_WALLETS,
-  NETWORKS,
-  LATEST_VERSION,
-  DEFAULT_NETWORK_FOR_VERSION,
-  CHAIN_CHANGING_WALLETS_WITH_REFRESH,
-} from '@constants';
+import { NON_AUTOMATIC_CHAIN_CHANGING_WALLETS, NETWORKS, CHAIN_CHANGING_WALLETS_WITH_REFRESH } from '@constants';
 import { Address, PublicClient, WalletClient } from 'viem';
-import { SubmittedTransaction, Token, TransactionRequestWithChain, WalletStatus } from '@types';
+import { NetworkStruct, SubmittedTransaction, Token, TransactionRequestWithChain, WalletStatus } from '@types';
 import AccountService from './accountService';
 import SdkService from './sdkService';
 import { viemTransactionTypeToSdkStype } from '@common/utils/wagmi';
@@ -114,16 +108,18 @@ export default class ProviderService {
     return provider.getBalance({ address });
   }
 
-  async getNetwork(address?: string) {
-    const signer = await this.getSigner(address);
-    if (signer) {
+  async getNetwork(address?: string): Promise<NetworkStruct | undefined> {
+    try {
+      const signer = await this.getSigner(address);
+      if (!signer) throw new Error('No signer found');
+
       const chainId = await signer?.getChainId();
       const foundNetwork = find(NETWORKS, { chainId: chainId });
 
       return foundNetwork!;
+    } catch (error) {
+      console.error('Error getting network from signer', error);
     }
-
-    return Promise.resolve(DEFAULT_NETWORK_FOR_VERSION[LATEST_VERSION]);
   }
 
   getProvider(chainId: number) {

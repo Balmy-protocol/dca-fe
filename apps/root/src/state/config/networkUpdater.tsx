@@ -22,6 +22,8 @@ const NetworkUpdater = () => {
         const isConnected = !!accountService.getUser();
         if (isConnected && activeWallet?.address) {
           const web3Network = await providerService.getNetwork(activeWallet.address);
+          if (!web3Network) throw new Error('No network found');
+
           const networkToSet = find(NETWORKS, { chainId: web3Network.chainId });
           if (SUPPORTED_NETWORKS.includes(web3Network.chainId) || aggSupportedNetworks.includes(web3Network.chainId)) {
             dispatch(setNetwork(networkToSet as NetworkStruct));

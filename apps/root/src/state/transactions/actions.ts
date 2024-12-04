@@ -1,4 +1,5 @@
 import { parseUsdPrice } from '@common/utils/currency';
+import { getSdkEarnPositionId } from '@common/utils/earn/parsing';
 import { createAction } from '@reduxjs/toolkit';
 import { createAppAsyncThunk } from '@state/createAppAsyncThunk';
 import {
@@ -145,10 +146,15 @@ export const processConfirmedTransactionsForEarn = createAppAsyncThunk<void, voi
 
           if ('positionId' in newEarnPositionParsedLog.args) {
             extendedTypeData = {
-              positionId: newEarnPositionParsedLog.args.positionId,
+              positionId: getSdkEarnPositionId({
+                chainId: tx.chainId,
+                vault: tx.typeData.vault,
+                positionId: newEarnPositionParsedLog.args.positionId,
+              }),
               asset,
               assetAmount: tx.typeData.assetAmount,
               strategyId: tx.typeData.strategyId,
+              vault: tx.typeData.vault,
             } satisfies Partial<EarnCreateTypeData>['typeData'];
           }
         }

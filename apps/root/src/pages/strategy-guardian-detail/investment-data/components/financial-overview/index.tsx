@@ -13,15 +13,27 @@ interface FinancialOverviewProps {
   size?: 'medium' | 'small';
   isLoading?: boolean;
   isFiat?: boolean;
+  showLastMonth?: boolean;
 }
 
 const StyledOverviewItem = styled(ContainerBox).attrs({ flexDirection: 'column', gap: 1 })``;
 
-const FinancialOverview = ({ userPositions, size = 'medium', isLoading, isFiat = true }: FinancialOverviewProps) => {
-  const { currentProfitUsd, currentProfitRate, totalInvested, currentProfit, totalInvestedUsd } = React.useMemo(
-    () => parseUserStrategiesFinancialData(userPositions),
-    [userPositions]
-  );
+const FinancialOverview = ({
+  userPositions,
+  size = 'medium',
+  isLoading,
+  isFiat = true,
+  showLastMonth,
+}: FinancialOverviewProps) => {
+  const {
+    currentProfitUsd,
+    currentProfitRate,
+    totalInvested,
+    currentProfit,
+    totalInvestedUsd,
+    totalMonthlyEarnings,
+    monthlyEarnings,
+  } = React.useMemo(() => parseUserStrategiesFinancialData(userPositions), [userPositions]);
 
   const intl = useIntl();
 
@@ -31,6 +43,7 @@ const FinancialOverview = ({ userPositions, size = 'medium', isLoading, isFiat =
 
   let amountInvested;
   let amountProfit;
+  let lastMonthEarnings;
 
   if (isFiat) {
     amountInvested = {
@@ -43,9 +56,15 @@ const FinancialOverview = ({ userPositions, size = 'medium', isLoading, isFiat =
       amountInUnits: currentProfitUsd.toFixed(2),
       amountInUSD: currentProfitUsd.toFixed(2),
     };
+    lastMonthEarnings = {
+      amount: parseUnits(totalMonthlyEarnings.toString(), 2),
+      amountInUnits: totalMonthlyEarnings.toFixed(2),
+      amountInUSD: totalMonthlyEarnings.toFixed(2),
+    };
   } else {
     amountInvested = (mainAsset && totalInvested[mainAsset.address]) || undefined;
     amountProfit = (mainAsset && currentProfit[mainAsset.address]) || undefined;
+    lastMonthEarnings = (mainAsset && monthlyEarnings[mainAsset.address]) || undefined;
   }
 
   return (
@@ -109,6 +128,46 @@ const FinancialOverview = ({ userPositions, size = 'medium', isLoading, isFiat =
           useNetworthNumber={isFiat}
         />
       </StyledOverviewItem>
+      {showLastMonth && (
+        <StyledOverviewItem>
+          <ContainerBox gap={1} alignItems="center">
+            <Typography variant="bodySmallRegular">
+              <FormattedMessage
+                defaultMessage="Last Month 🔥"
+                description="strategy-detail.vault-investment-data.last-month"
+              />
+            </Typography>
+            <Tooltip
+              title={
+                <FormattedMessage
+                  description="strategy-detail.vault-investment-data.last-month-tooltip"
+                  defaultMessage="Earning since last month"
+                />
+              }
+            >
+              <ContainerBox>
+                <InfoCircleIcon
+                  fontSize="small"
+                  sx={({ palette }) => ({ color: colors[palette.mode].typography.typo4 })}
+                />
+              </ContainerBox>
+            </Tooltip>
+          </ContainerBox>
+          <TokenAmount
+            token={isFiat ? emptyTokenWithDecimals(2) : mainAsset}
+            amount={lastMonthEarnings}
+            amountTypographyVariant={size === 'medium' ? 'h3Bold' : 'bodyBold'}
+            isLoading={isLoading}
+            amountColorVariant={isPortfolioEmpty ? 'typo4' : undefined}
+            subtitleColorVariant={isPortfolioEmpty ? 'typo4' : 'success.dark'}
+            titlePrefix="+"
+            showIcon={!isFiat}
+            showSymbol={!isFiat}
+            showSubtitle={!isFiat}
+            useNetworthNumber={isFiat}
+          />
+        </StyledOverviewItem>
+      )}
     </ContainerBox>
   );
 };

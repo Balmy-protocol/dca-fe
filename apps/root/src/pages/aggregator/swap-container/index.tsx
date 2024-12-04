@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { colors, ContainerBox, Typography } from 'ui-library';
+import { ContainerBox, StyledPageTitleDescription, Typography } from 'ui-library';
 import { getProtocolToken } from '@common/mocks/tokens';
 import useSelectedNetwork from '@hooks/useSelectedNetwork';
 import { NETWORKS } from '@constants';
@@ -139,12 +139,12 @@ const SwapContainer = () => {
           <Typography variant="h1Bold">
             <FormattedMessage defaultMessage="Swap" description="swap.title" />
           </Typography>
-          <Typography variant="bodyLargeRegular" color={({ palette }) => colors[palette.mode].typography.typo1}>
+          <StyledPageTitleDescription>
             <FormattedMessage
               defaultMessage="Swap your assets with the best prices"
               description="swap.title-description"
             />
-          </Typography>
+          </StyledPageTitleDescription>
         </ContainerBox>
         <Swap
           isLoadingRoute={isLoadingSwapOptions || isLoadingCustomFromToken || isLoadingCustomToToken}

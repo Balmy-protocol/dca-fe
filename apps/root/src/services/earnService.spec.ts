@@ -284,6 +284,7 @@ describe('Earn Service', () => {
             },
             assetAmount: '1000000000000000000',
             strategyId: '0xvault' as SavedSdkStrategy['id'],
+            vault: '0xvault' as Lowercase<Address>,
           },
         };
 
@@ -396,6 +397,7 @@ describe('Earn Service', () => {
           },
           assetAmount: '1000000000000000000',
           strategyId: '0xvault' as SavedSdkStrategy['id'],
+          vault: '0xvault' as Lowercase<Address>,
         },
       };
 
@@ -552,8 +554,9 @@ describe('Earn Service', () => {
                 underlyingTokens: [],
               },
               assetAmount: '1000000000000000000',
-              positionId: 20n,
+              positionId: '10-0xvault-20' as SdkEarnPositionId,
               strategyId: '0xvault' as SavedSdkStrategy['id'],
+              vault: '0xvault' as Lowercase<Address>,
             } satisfies EarnCreateTypeData['typeData'],
           },
         },
@@ -1124,6 +1127,7 @@ describe('Earn Service', () => {
                 profit: { amount: 0n, amountInUnits: '0', amountInUSD: '0' },
               },
             ],
+            lastUpdatedAt: now - 1000,
           });
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore
@@ -1165,6 +1169,7 @@ describe('Earn Service', () => {
                 profit: { amount: 0n, amountInUnits: '0', amountInUSD: '0' },
               },
             ],
+            lastUpdatedAt: now - 1000,
           });
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore
@@ -1212,6 +1217,7 @@ describe('Earn Service', () => {
                 profit: { amount: 0n, amountInUnits: '0', amountInUSD: '0' },
               },
             ],
+            lastUpdatedAt: now - 1000,
           });
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore

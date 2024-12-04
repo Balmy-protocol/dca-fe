@@ -1,5 +1,5 @@
 import React from 'react';
-import { ContainerBox, StyledNonFormContainer, Typography } from 'ui-library';
+import { ContainerBox, StyledNonFormContainer, StyledPageTitleDescription, Typography } from 'ui-library';
 import EarnFAQ from '../../components/faq';
 import { useAppDispatch } from '@state/hooks';
 import { changeRoute } from '@state/tabs/actions';
@@ -30,12 +30,12 @@ const EarnPortfolioFrame = () => {
             <Typography variant="h1Bold">
               <FormattedMessage defaultMessage="Portfolio" description="earn.portfolio.title" />
             </Typography>
-            <Typography variant="bodyLargeRegular">
+            <StyledPageTitleDescription>
               <FormattedMessage
                 defaultMessage="Track your investments and see how your crypto has worked for you over time at a glance."
                 description="earn.portfolio.title-description"
               />
-            </Typography>
+            </StyledPageTitleDescription>
           </ContainerBox>
           <ContainerBox flexDirection="column" gap={16}>
             <EarnPortfolioFinancialData isLoading={!hasFetchedUserStrategies} userStrategies={activeUserStrategies} />

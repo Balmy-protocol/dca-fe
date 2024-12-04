@@ -1,6 +1,6 @@
 /* eslint-disable no-template-curly-in-string */
 
-import { Chains, getAllChains } from '@balmy/sdk';
+import { buildSDK, Chains, getAllChains } from '@balmy/sdk';
 import { NetworkStruct, PositionVersions } from '@types';
 import findKey from 'lodash/findKey';
 import { Chain } from '@balmy/sdk/dist/types';
@@ -533,59 +533,26 @@ export const PERMISSION_MANAGER_ADDRESS: AddressMap<PositionVersions> = {
   },
 };
 
-export const PERMIT_2_ADDRESS: Record<number, Address> = {
-  [NETWORKS.polygon.chainId]: '0x000000000022D473030F116dDEE9F6B43aC78BA3',
-  [NETWORKS.optimism.chainId]: '0x000000000022D473030F116dDEE9F6B43aC78BA3',
-  [NETWORKS.arbitrum.chainId]: '0x000000000022D473030F116dDEE9F6B43aC78BA3',
-  [NETWORKS.mainnet.chainId]: '0x000000000022D473030F116dDEE9F6B43aC78BA3',
-  [NETWORKS.bsc.chainId]: '0x000000000022D473030F116dDEE9F6B43aC78BA3',
-  [NETWORKS.baseGoerli.chainId]: '0x000000000022D473030F116dDEE9F6B43aC78BA3 ',
-  [NETWORKS.avalanche.chainId]: '0x000000000022D473030F116dDEE9F6B43aC78BA3',
-  [NETWORKS.fantom.chainId]: '0x000000000022D473030F116dDEE9F6B43aC78BA3',
-  [NETWORKS.moonbeam.chainId]: '0x000000000022D473030F116dDEE9F6B43aC78BA3',
-  [NETWORKS.moonriver.chainId]: '0x000000000022D473030F116dDEE9F6B43aC78BA3',
-  [NETWORKS.fuse.chainId]: '0x000000000022D473030F116dDEE9F6B43aC78BA3',
-  [NETWORKS.evmos.chainId]: '0x000000000022D473030F116dDEE9F6B43aC78BA3',
-  [NETWORKS.celo.chainId]: '0x000000000022D473030F116dDEE9F6B43aC78BA3',
-  [NETWORKS.xdai.chainId]: '0x000000000022D473030F116dDEE9F6B43aC78BA3',
-  [NETWORKS.kava.chainId]: '0x000000000022D473030F116dDEE9F6B43aC78BA3',
-  [NETWORKS.heco.chainId]: '0x000000000022D473030F116dDEE9F6B43aC78BA3',
-  [NETWORKS.okex.chainId]: '0x000000000022D473030F116dDEE9F6B43aC78BA3',
-  [Chains.POLYGON_ZKEVM.chainId]: '0x000000000022D473030F116dDEE9F6B43aC78BA3',
-  [Chains.BASE.chainId]: '0x000000000022D473030F116dDEE9F6B43aC78BA3',
-  [Chains.LINEA.chainId]: '0x000000000022D473030F116dDEE9F6B43aC78BA3',
-  [Chains.ROOTSTOCK.chainId]: '0x000000000022D473030F116dDEE9F6B43aC78BA3',
-  [Chains.BLAST.chainId]: '0x000000000022D473030F116dDEE9F6B43aC78BA3',
-  [Chains.SCROLL.chainId]: '0x000000000022D473030F116dDEE9F6B43aC78BA3',
-  [Chains.MODE.chainId]: '0x000000000022D473030F116dDEE9F6B43aC78BA3',
-  [Chains.MANTLE.chainId]: '0x000000000022D473030F116dDEE9F6B43aC78BA3',
-};
+const tempSdk = buildSDK();
+const permit2SupportedChains = tempSdk.permit2Service.quotes.supportedChains();
 
-export const MEAN_PERMIT_2_ADDRESS: Record<number, Address> = {
-  [NETWORKS.polygon.chainId]: '0xED306e38BB930ec9646FF3D917B2e513a97530b1',
-  [NETWORKS.optimism.chainId]: '0xED306e38BB930ec9646FF3D917B2e513a97530b1',
-  [NETWORKS.arbitrum.chainId]: '0xED306e38BB930ec9646FF3D917B2e513a97530b1',
-  [NETWORKS.mainnet.chainId]: '0xED306e38BB930ec9646FF3D917B2e513a97530b1',
-  [NETWORKS.bsc.chainId]: '0xED306e38BB930ec9646FF3D917B2e513a97530b1',
-  [NETWORKS.avalanche.chainId]: '0xED306e38BB930ec9646FF3D917B2e513a97530b1',
-  [NETWORKS.fantom.chainId]: '0xED306e38BB930ec9646FF3D917B2e513a97530b1',
-  [NETWORKS.moonbeam.chainId]: '0xED306e38BB930ec9646FF3D917B2e513a97530b1',
-  [NETWORKS.moonriver.chainId]: '0xED306e38BB930ec9646FF3D917B2e513a97530b1',
-  [NETWORKS.fuse.chainId]: '0xED306e38BB930ec9646FF3D917B2e513a97530b1',
-  [NETWORKS.evmos.chainId]: '0xED306e38BB930ec9646FF3D917B2e513a97530b1',
-  [NETWORKS.celo.chainId]: '0xED306e38BB930ec9646FF3D917B2e513a97530b1',
-  [NETWORKS.xdai.chainId]: '0xED306e38BB930ec9646FF3D917B2e513a97530b1',
-  [NETWORKS.kava.chainId]: '0xED306e38BB930ec9646FF3D917B2e513a97530b1',
-  [NETWORKS.okex.chainId]: '0xED306e38BB930ec9646FF3D917B2e513a97530b1',
-  [Chains.BASE.chainId]: '0xED306e38BB930ec9646FF3D917B2e513a97530b1',
-  [Chains.LINEA.chainId]: '0xED306e38BB930ec9646FF3D917B2e513a97530b1',
-  [Chains.ROOTSTOCK.chainId]: '0xED306e38BB930ec9646FF3D917B2e513a97530b1',
-  [Chains.POLYGON_ZKEVM.chainId]: '0xED306e38BB930ec9646FF3D917B2e513a97530b1',
-  [Chains.BLAST.chainId]: '0xED306e38BB930ec9646FF3D917B2e513a97530b1',
-  [Chains.SCROLL.chainId]: '0xED306e38BB930ec9646FF3D917B2e513a97530b1',
-  [Chains.MODE.chainId]: '0xED306e38BB930ec9646FF3D917B2e513a97530b1',
-  [Chains.MANTLE.chainId]: '0xED306e38BB930ec9646FF3D917B2e513a97530b1',
-};
+export const MEAN_PERMIT_2_ADDRESS: Record<number, Address> = permit2SupportedChains.reduce<Record<number, Address>>(
+  (acc, chainId) => {
+    // eslint-disable-next-line no-param-reassign
+    acc[chainId] = tempSdk.permit2Service.quotes.permit2AdapterContract.address(chainId);
+    return acc;
+  },
+  {}
+);
+
+export const PERMIT_2_ADDRESS: Record<number, Address> = permit2SupportedChains.reduce<Record<number, Address>>(
+  (acc, chainId) => {
+    // eslint-disable-next-line no-param-reassign
+    acc[chainId] = tempSdk.permit2Service.permit2Contract.address(chainId);
+    return acc;
+  },
+  {}
+);
 
 export const SMOL_DOMAIN_ADDRESS: Record<number, Address> = {
   [NETWORKS.arbitrum.chainId]: '0xd64A2DF9d73CD1Cb50139A3eC3176070e00C67cA',
@@ -596,7 +563,7 @@ export const EARN_COMPANION_ADDRESS: Record<number, Address> = {
   [Chains.BASE.chainId]: '0x260B192b9A5679121FF7f9F0Cf3FED3238753A48',
 };
 
-export const EARN_VAULT_ADDRESS: Record<number, Address> = {
+export const EARN_VAULT_ADDRESS: Record<number, Lowercase<Address>> = {
   [Chains.POLYGON.chainId]: '0x58e5d76fbbd7e1b51f0fc0f66b7734e108be0461',
   [Chains.BASE.chainId]: '0x9324a1f92a82b539f8fb1194a0b894025581ec33',
 };

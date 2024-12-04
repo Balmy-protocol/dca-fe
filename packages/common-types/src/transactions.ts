@@ -160,8 +160,9 @@ export interface EarnCreateTypeData {
   typeData: {
     asset: Token;
     assetAmount: string;
-    positionId?: bigint;
+    positionId?: SdkEarnPositionId;
     strategyId: StrategyId;
+    vault: Lowercase<Address>;
   };
 }
 
