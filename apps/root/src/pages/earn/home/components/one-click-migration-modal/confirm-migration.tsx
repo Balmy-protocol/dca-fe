@@ -21,7 +21,6 @@ import {
   InfoCircleIcon,
   Grid,
   Radio,
-  StarIcon,
   MovingStarIcon,
 } from 'ui-library';
 import { getLogoURL } from '@common/utils/urlParser';
@@ -62,8 +61,7 @@ interface StrategyItemProps {
 }
 const StrategyItem = ({ strategy, selected, onSelect }: StrategyItemProps) => {
   const intl = useIntl();
-  const isPromoted = true;
-  // const isPromoted = PROMOTED_STRATEGIES_IDS.includes(strategy.id);
+  const isPromoted = PROMOTED_STRATEGIES_IDS.includes(strategy.id);
 
   return (
     <StyledStrategyItem $selected={selected} onClick={() => onSelect(strategy)}>
