@@ -49,6 +49,7 @@ import useTrackEvent from '@hooks/useTrackEvent';
 import NetWorth, { NetWorthVariants } from '@common/components/net-worth';
 import { WalletOptionValues, ALL_WALLETS, WalletSelectorVariants } from '@common/components/wallet-selector/types';
 import GuardianListSubscribeModal from '../guardian-list-subscribe-modal';
+// import EarnGainAccessModal from '../earn-gain-access-modal';
 
 const helpOptions = [
   {
@@ -281,6 +282,11 @@ const Navigation = ({ children }: React.PropsWithChildren) => {
         isOpen={showGuardianListSubscribeModal}
         onClose={() => setShowGuardianListSubscribeModal(false)}
       />
+      {/* // TODO: Enable for early access release */}
+      {/* <EarnGainAccessModal
+        isOpen={showGuardianListSubscribeModal}
+        onClose={() => setShowGuardianListSubscribeModal(false)}
+      /> */}
       <NavigationUI
         headerContent={
           <NetWorth

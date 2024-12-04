@@ -1,4 +1,5 @@
 import GuardianListSubscribeModal from '@frame/components/guardian-list-subscribe-modal';
+// import EarnGainAccessModal from '@frame/components/earn-gain-access-modal';
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
@@ -30,6 +31,11 @@ const EarnBanner = () => {
         isOpen={showGuardianListSubscribeModal}
         onClose={() => setShowGuardianListSubscribeModal(false)}
       />
+      {/* // TODO: Enable for early access release */}
+      {/* <EarnGainAccessModal
+        isOpen={showGuardianListSubscribeModal}
+        onClose={() => setShowGuardianListSubscribeModal(false)}
+      /> */}
       <StyledBannerContainer onClick={() => setShowGuardianListSubscribeModal(true)}>
         <Typography variant="h6Bold" color="#FFF" style={{ maxWidth: '35%', textWrap: 'wrap' }}>
           <FormattedMessage defaultMessage="Join the BETA" description="earn.banner.join-beta" />

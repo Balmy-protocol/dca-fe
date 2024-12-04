@@ -52,7 +52,9 @@ const StyledDialogTitle = styled.div`
   flex-grow: 0;
 `;
 
-const StyledDialog = styled(Dialog)``;
+const StyledDialog = styled(Dialog)<{ $customMaxWidth?: string }>`
+  ${({ $customMaxWidth }) => $customMaxWidth && `max-width: ${$customMaxWidth};`}
+`;
 
 const StyledPaperModal = styled(ForegroundPaper)`
   ${({ theme: { palette, space } }) => `
@@ -82,6 +84,7 @@ export interface ModalProps extends PropsWithChildren {
   showCloseIcon?: boolean;
   showCloseButton?: boolean;
   maxWidth?: Breakpoint;
+  customMaxWidth?: string;
   title?: React.ReactNode;
   subtitle?: React.ReactNode;
   headerButton?: React.ReactNode;
@@ -105,6 +108,7 @@ const Modal: React.FC<ModalProps> = ({
   open,
   onClose,
   maxWidth,
+  customMaxWidth,
   showCloseIcon,
   showCloseButton,
   subtitle,
@@ -165,7 +169,10 @@ const Modal: React.FC<ModalProps> = ({
       fullWidth
       maxWidth={maxWidth || 'lg'}
       onClose={handleClose}
-      PaperProps={fullHeightProps}
+      PaperProps={{
+        ...fullHeightProps,
+        style: { maxWidth: customMaxWidth },
+      }}
       keepMounted={keepMounted}
       PaperComponent={StyledPaperModal}
     >
