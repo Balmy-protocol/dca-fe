@@ -1,3 +1,7 @@
+import useOpenConnectModal from '@hooks/useOpenConnectModal';
+import useTrackEvent from '@hooks/useTrackEvent';
+import useUser from '@hooks/useUser';
+import { WalletActionType } from '@services/accountService';
 import React from 'react';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
@@ -16,6 +20,7 @@ const StyledBackgroundPaper = styled(BackgroundPaper).attrs({
 
 const ClaimCodeForm = () => {
   const intl = useIntl();
+  const user = useUser();
   const [accessCode, setAccessCode] = React.useState('');
   const [validationState, setValidationState] = React.useState<{
     error: boolean;
@@ -26,6 +31,16 @@ const ClaimCodeForm = () => {
     helperText: '',
     isLoading: false,
   });
+  const trackEvent = useTrackEvent();
+
+  const openConnectWalletModal = useOpenConnectModal();
+
+  const isLoggedIn = !!user;
+
+  const onConnectWallet = React.useCallback(() => {
+    openConnectWalletModal(WalletActionType.connect);
+    trackEvent('Earn Early Access - Claim code form - Connect wallet');
+  }, [openConnectWalletModal]);
 
   const handleChangeAccessCode = (e: React.ChangeEvent<HTMLInputElement>) => {
     setAccessCode(e.target.value);
@@ -106,13 +121,22 @@ const ClaimCodeForm = () => {
         </ContainerBox>
       </ContainerBox>
       <ContainerBox justifyContent="flex-start" alignItems="center" gap={2}>
-        <Button
-          variant="contained"
-          onClick={validateCode}
-          disabled={validationState.isLoading || accessCode.length < 9}
-        >
-          <FormattedMessage description="earn-access-now.claim-code-form.button" defaultMessage="Validate Code" />
-        </Button>
+        {isLoggedIn ? (
+          <Button
+            variant="contained"
+            onClick={validateCode}
+            disabled={validationState.isLoading || accessCode.length < 9}
+          >
+            <FormattedMessage description="earn-access-now.claim-code-form.button" defaultMessage="Validate Code" />
+          </Button>
+        ) : (
+          <Button variant="contained" onClick={onConnectWallet}>
+            <FormattedMessage
+              description="earn-access-now.claim-code-form.connect-wallet"
+              defaultMessage="Connect Wallet"
+            />
+          </Button>
+        )}
         {validationState.isLoading && <CircularProgress size={20} />}
       </ContainerBox>
     </StyledBackgroundPaper>
