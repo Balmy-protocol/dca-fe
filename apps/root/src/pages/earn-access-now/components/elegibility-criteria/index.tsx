@@ -1,4 +1,5 @@
 import Address from '@common/components/address';
+import useUser from '@hooks/useUser';
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
@@ -13,6 +14,9 @@ const StyledBackgroundPaper = styled(BackgroundPaper).attrs({
 `;
 
 const ElegibilityCriteria = () => {
+  const user = useUser();
+  const isLoggedIn = !!user;
+
   return (
     <StyledBackgroundPaper>
       <ContainerBox flexDirection="column" gap={2}>
@@ -69,7 +73,7 @@ const ElegibilityCriteria = () => {
         </ContainerBox>
       </ContainerBox>
       <ContainerBox justifyContent="flex-start">
-        <Button variant="contained">
+        <Button variant="contained" disabled={!isLoggedIn}>
           <FormattedMessage description="earn-access-now.eligibility.button" defaultMessage="Check your Wallets Now" />
         </Button>
       </ContainerBox>
