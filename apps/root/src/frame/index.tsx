@@ -33,6 +33,7 @@ const DCA = lazy(() => import('@pages/dca'));
 const Transfer = lazy(() => import('@pages/transfer'));
 const EarnHome = lazy(() => import('@pages/earn/home'));
 const EarnPortfolio = lazy(() => import('@pages/earn/portfolio'));
+const EarnAccessNowFrame = lazy(() => import('@pages/earn-access-now/frame'));
 const Aggregator = lazy(() => import('@pages/aggregator'));
 const History = lazy(() => import('@pages/history'));
 const PositionDetail = lazy(() => import('@pages/position-detail'));
@@ -137,6 +138,7 @@ const AppFrame = ({ config: { wagmiClient } }: AppFrameProps) => {
                               {process.env.EARN_ENABLED === 'true' && (
                                 <>
                                   <Route path="/earn" element={<EarnHome />} />
+                                  <Route path="/earn/access-now" element={<EarnAccessNowFrame />} />
                                   <Route path="/earn/:assetTokenId?/:rewardTokenId?" element={<EarnHome />} />
                                   <Route path={`/${EARN_PORTFOLIO.key}`} element={<EarnPortfolio />} />
                                   <Route
