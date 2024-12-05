@@ -8,6 +8,7 @@ import {
   WalletType,
   ApiNewWallet,
   WalletSignature,
+  EarnEarlyAccess,
 } from '@types';
 import { find, findIndex, isEqual, uniqBy } from 'lodash';
 import Web3Service from './web3Service';
@@ -30,6 +31,7 @@ export interface AccountServiceData {
   activeWallet?: Address;
   accounts: Account[];
   isLoggingUser: boolean;
+  earnEarlyAccess?: EarnEarlyAccess;
 }
 
 function timeout(ms: number) {
@@ -100,6 +102,14 @@ export default class AccountService extends EventsManager<AccountServiceData> {
     this.serviceData = { ...this.serviceData, isLoggingUser };
   }
 
+  get earnEarlyAccess() {
+    return this.serviceData.earnEarlyAccess;
+  }
+
+  set earnEarlyAccess(earnEarlyAccess) {
+    this.serviceData = { ...this.serviceData, earnEarlyAccess };
+  }
+
   setWalletActionType(walletActionType: WalletActionType) {
     this.walletActionType = walletActionType;
   }
@@ -110,6 +120,10 @@ export default class AccountService extends EventsManager<AccountServiceData> {
 
   getIsLoggingUser() {
     return this.serviceData.isLoggingUser;
+  }
+
+  getEarnEarlyAccess() {
+    return this.serviceData.earnEarlyAccess;
   }
 
   getWallets(): Wallet[] {
@@ -374,6 +388,11 @@ export default class AccountService extends EventsManager<AccountServiceData> {
         this.web3Service.onUpdateConfig(config);
       }
 
+      const earn = accounts[0].earn;
+      if (earn) {
+        this.earnEarlyAccess = earn;
+      }
+
       try {
         void this.web3Service.eventService.identifyUser(this.user.id);
         void this.web3Service.eventService.trackEvent('User sign in', {
@@ -434,12 +453,12 @@ export default class AccountService extends EventsManager<AccountServiceData> {
       accountWallet.address.toLowerCase() === this.activeWallet
         ? this.getActiveWallet()!
         : accountWallet.address === signedInWallet?.address
-        ? signedInWallet
-        : toWallet({
-            address: accountWallet.address,
-            isAuth: accountWallet.isAuth,
-            status: WalletStatus.disconnected,
-          })
+          ? signedInWallet
+          : toWallet({
+              address: accountWallet.address,
+              isAuth: accountWallet.isAuth,
+              status: WalletStatus.disconnected,
+            })
     );
 
     this.user = {
@@ -648,5 +667,25 @@ export default class AccountService extends EventsManager<AccountServiceData> {
       config,
       signature,
     });
+  }
+
+  async claimEarnInviteCode({ inviteCode }: { inviteCode: string }): Promise<{ status: number; message?: string }> {
+    const user = this.getUser();
+    if (!user) return { status: 500, message: 'User not found' };
+
+    const signature = await this.getWalletVerifyingSignature({});
+
+    try {
+      await this.meanApiService.claimEarnInviteCode({ inviteCode, accountId: user.id, signature });
+      this.earnEarlyAccess = { ...this.earnEarlyAccess, earlyAccess: true };
+
+      return { status: 200 };
+    } catch (error: unknown) {
+      const errorResponse = error as { response?: { status: number; data?: { message?: string } } };
+      return {
+        status: errorResponse.response?.status || 500,
+        message: errorResponse.response?.data?.message || 'An unknown error occurred',
+      };
+    }
   }
 }

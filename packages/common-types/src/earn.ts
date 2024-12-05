@@ -172,3 +172,10 @@ export enum DelayedWithdrawalStatus {
   PENDING = 'pending',
   READY = 'ready',
 }
+
+export type EarnEarlyAccess = {
+  earlyAccess: boolean;
+  // inviteCodes: { code: string; claimed: boolean }[];
+  // tier: { achievements: string[]; level: number };
+  // referrals: { accountId: string; ...more }[];
+};

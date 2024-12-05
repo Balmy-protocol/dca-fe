@@ -8,8 +8,9 @@ import {
   EARN_ROUTE,
   EARN_PORTFOLIO,
   EARN_GROUP,
-  NON_NAVIGABLE_ROUTES,
+  NON_NAVIGABLE_EARN_ROUTES,
   EARN_SUBSCRIBE_ROUTE,
+  EARN_ACCESS_NOW_ROUTE,
 } from '@constants/routes';
 import { useAppDispatch } from '@hooks/state';
 import usePushToHistory from '@hooks/usePushToHistory';
@@ -49,7 +50,8 @@ import useTrackEvent from '@hooks/useTrackEvent';
 import NetWorth, { NetWorthVariants } from '@common/components/net-worth';
 import { WalletOptionValues, ALL_WALLETS, WalletSelectorVariants } from '@common/components/wallet-selector/types';
 import GuardianListSubscribeModal from '../guardian-list-subscribe-modal';
-// import EarnGainAccessModal from '../earn-gain-access-modal';
+import EarnGainAccessModal from '../earn-gain-access-modal';
+import useEarnAccess from '@hooks/useEarnAccess';
 
 const helpOptions = [
   {
@@ -119,8 +121,9 @@ const Navigation = ({ children }: React.PropsWithChildren) => {
   const trackEvent = useTrackEvent();
   const useUnlimitedApproval = useUseUnlimitedApproval();
   const [selectedWalletOption, setSelectedWalletOption] = React.useState<WalletOptionValues>(ALL_WALLETS);
-  const [showGuardianListSubscribeModal, setShowGuardianListSubscribeModal] = React.useState(false);
+  const [showEarnModal, setShowEarnModal] = React.useState(false);
   // const switchActiveWalletOnConnection = useSwitchActiveWalletOnConnection();
+  const { isEarnEnabled, hasEarnAccess } = useEarnAccess();
 
   React.useEffect(() => {
     if (HOME_ROUTES.includes(location.pathname)) {
@@ -147,14 +150,14 @@ const Navigation = ({ children }: React.PropsWithChildren) => {
   const onSectionClick = useCallback(
     (section: Section, openInNewTab?: boolean) => {
       if (section.type === SectionType.link && section.key === EARN_GROUP.key) {
-        setShowGuardianListSubscribeModal(true);
+        setShowEarnModal(true);
       }
 
       if (
         section.type === SectionType.divider ||
         section.type === SectionType.group ||
         section.key === currentRoute ||
-        NON_NAVIGABLE_ROUTES.includes(section.key)
+        (!hasEarnAccess && NON_NAVIGABLE_EARN_ROUTES.includes(section.key))
       ) {
         return;
       }
@@ -278,15 +281,11 @@ const Navigation = ({ children }: React.PropsWithChildren) => {
 
   return (
     <>
-      <GuardianListSubscribeModal
-        isOpen={showGuardianListSubscribeModal}
-        onClose={() => setShowGuardianListSubscribeModal(false)}
-      />
-      {/* // TODO: Enable for early access release */}
-      {/* <EarnGainAccessModal
-        isOpen={showGuardianListSubscribeModal}
-        onClose={() => setShowGuardianListSubscribeModal(false)}
-      /> */}
+      {isEarnEnabled ? (
+        <EarnGainAccessModal isOpen={showEarnModal} onClose={() => setShowEarnModal(false)} />
+      ) : (
+        <GuardianListSubscribeModal isOpen={showEarnModal} onClose={() => setShowEarnModal(false)} />
+      )}
       <NavigationUI
         headerContent={
           <NetWorth
@@ -330,7 +329,7 @@ const Navigation = ({ children }: React.PropsWithChildren) => {
               //   label: intl.formatMessage(EARN_ROUTE.label),
               //   type: SectionType.link,
               // },
-              ...((process.env.EARN_ENABLED === 'true'
+              ...((hasEarnAccess
                 ? [
                     {
                       ...EARN_GROUP,
@@ -355,6 +354,7 @@ const Navigation = ({ children }: React.PropsWithChildren) => {
                     {
                       ...EARN_SUBSCRIBE_ROUTE,
                       label: intl.formatMessage(EARN_SUBSCRIBE_ROUTE.label),
+                      activeKeys: [EARN_ACCESS_NOW_ROUTE.key],
                       type: SectionType.link,
                     },
                   ]) satisfies LinkSection[]),

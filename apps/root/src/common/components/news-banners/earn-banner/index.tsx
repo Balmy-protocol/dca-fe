@@ -1,9 +1,13 @@
 import GuardianListSubscribeModal from '@frame/components/guardian-list-subscribe-modal';
-// import EarnGainAccessModal from '@frame/components/earn-gain-access-modal';
+import useEarnAccess from '@hooks/useEarnAccess';
+import EarnGainAccessModal from '@frame/components/earn-gain-access-modal';
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 import { ContainerBox, Typography } from 'ui-library';
+import useTrackEvent from '@hooks/useTrackEvent';
+import usePushToHistory from '@hooks/usePushToHistory';
+import { EARN_ROUTE } from '@constants/routes';
 
 const EarnBannerShapeUrl = 'url("https://ipfs.io/ipfs/QmbT5C7T1ciiva3sSWPYt9oTBeLRW7TAJSRQtD5NNDdLxh")';
 
@@ -24,19 +28,28 @@ const StyledBannerContainer = styled(ContainerBox).attrs({
 `;
 
 const EarnBanner = () => {
-  const [showGuardianListSubscribeModal, setShowGuardianListSubscribeModal] = React.useState(false);
+  const [showEarnModal, setShowEarnModal] = React.useState(false);
+  const { hasEarnAccess } = useEarnAccess();
+  const trackEvent = useTrackEvent();
+  const pushToHistory = usePushToHistory();
+
+  const handleClick = () => {
+    trackEvent('Earn - Click earn banner', { hasEarnAccess });
+    if (hasEarnAccess) {
+      pushToHistory(`/${EARN_ROUTE.key}`);
+    } else {
+      setShowEarnModal(true);
+    }
+  };
+
   return (
     <>
-      <GuardianListSubscribeModal
-        isOpen={showGuardianListSubscribeModal}
-        onClose={() => setShowGuardianListSubscribeModal(false)}
-      />
-      {/* // TODO: Enable for early access release */}
-      {/* <EarnGainAccessModal
-        isOpen={showGuardianListSubscribeModal}
-        onClose={() => setShowGuardianListSubscribeModal(false)}
-      /> */}
-      <StyledBannerContainer onClick={() => setShowGuardianListSubscribeModal(true)}>
+      {hasEarnAccess ? (
+        <EarnGainAccessModal isOpen={showEarnModal} onClose={() => setShowEarnModal(false)} />
+      ) : (
+        <GuardianListSubscribeModal isOpen={showEarnModal} onClose={() => setShowEarnModal(false)} />
+      )}
+      <StyledBannerContainer onClick={handleClick}>
         <Typography variant="h6Bold" color="#FFF" style={{ maxWidth: '35%', textWrap: 'wrap' }}>
           <FormattedMessage defaultMessage="Join the BETA" description="earn.banner.join-beta" />
         </Typography>

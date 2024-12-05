@@ -13,6 +13,10 @@ import ElegibilityCriteria from '../components/elegibility-criteria';
 import ClaimCodeForm from '../components/claim-code-form';
 import AboutEarnGuardian from '../components/about-earn-guardian';
 import EarnEarlyAccessFAQ from '../faq';
+import { useAppDispatch } from '@state/hooks';
+import { changeRoute } from '@state/tabs/actions';
+import useTrackEvent from '@hooks/useTrackEvent';
+import { EARN_ACCESS_NOW_ROUTE } from '@constants/routes';
 
 const StyledTitleSpan = styled('span')`
   background: linear-gradient(90deg, #791aff 24.91%, #4a00b2 86.35%);
@@ -21,6 +25,14 @@ const StyledTitleSpan = styled('span')`
 `;
 
 const EarnAccessNowFrame = () => {
+  const dispatch = useAppDispatch();
+  const trackEvent = useTrackEvent();
+
+  React.useEffect(() => {
+    dispatch(changeRoute(EARN_ACCESS_NOW_ROUTE.key));
+    trackEvent('Earn - Visit earn access now page');
+  }, []);
+
   return (
     <StyledNonFormContainer>
       <ContainerBox flexDirection="column" gap={20}>
