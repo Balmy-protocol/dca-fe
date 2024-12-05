@@ -28,7 +28,7 @@ const EarnAccessNowFrame = () => {
           <ContainerBox flexDirection="column" gap={3} alignItems="center">
             <ContainerBox flexDirection="column">
               <Typography variant="h1Bold" textAlign="center">
-                <FormattedMessage description="earn-access-now.title" defaultMessage="Check Your Eligibility" />{' '}
+                <FormattedMessage description="earn-access-now.title" defaultMessage="Check Your Eligibility" />
               </Typography>
               <Typography variant="h1Bold" textAlign="center">
                 <FormattedMessage description="earn-access-now.title.for" defaultMessage="for" />{' '}
