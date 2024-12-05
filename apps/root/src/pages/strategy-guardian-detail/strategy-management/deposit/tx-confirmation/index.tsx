@@ -36,8 +36,7 @@ const EarnDepositTransactionConfirmation = ({
 }: EarnDepositTransactionConfirmationProps) => {
   const intl = useIntl();
   const dispatch = useAppDispatch();
-  const { depositAmount: assetAmountInUnits } = useEarnManagementState();
-  const asset = strategy?.asset;
+  const { depositAmount: assetAmountInUnits, asset } = useEarnManagementState();
 
   const onResetForm = () => {
     setShouldShowConfirmation(false);

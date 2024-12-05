@@ -9,6 +9,7 @@ import { parseUnits } from 'viem';
 import { formatCurrencyAmount, parseNumberUsdPriceToBigInt, parseUsdPrice } from '@common/utils/currency';
 import { EarnDepositRecapDataProps } from '@common/components/transaction-steps/recap-data';
 import { GuardianFeeType } from '@balmy/sdk/dist/services/earn/types';
+import { useEarnManagementState } from '@state/earn-management/hooks';
 
 const RecapDataContainer = styled(ContainerBox).attrs({ flexDirection: 'column', alignItems: 'start', gap: 3 })``;
 const RecapDataGroupContainer = styled(ContainerBox).attrs({ alignItems: 'flex-start', gap: 8 })``;
@@ -38,7 +39,8 @@ const RecapDataItemValue = styled(Typography).attrs(
 
 const EarnDepositRecapData = ({ strategy, assetAmount: assetAmountInUnits }: EarnDepositRecapDataProps) => {
   const intl = useIntl();
-  const token = strategy?.asset;
+  const { asset } = useEarnManagementState();
+  const token = asset;
   if (!token) return null;
 
   const depositAmount = parseUnits(assetAmountInUnits || '0', token.decimals);

@@ -44,6 +44,7 @@ const StrategyDetailFrame = () => {
 
   React.useEffect(() => {
     dispatch(changeRoute(EARN_PORTFOLIO.key));
+    // dispatch(resetEarnForm());
     trackEvent('Earn - Visit strategy detail page', { chainId });
   }, []);
 
@@ -75,8 +76,6 @@ const StrategyDetailFrame = () => {
 
   React.useEffect(() => {
     if (strategyGuardianId) {
-      dispatch(resetEarnForm());
-
       try {
         void earnService.fetchMultipleEarnPositionsFromStrategy(strategyGuardianId);
       } catch (error) {

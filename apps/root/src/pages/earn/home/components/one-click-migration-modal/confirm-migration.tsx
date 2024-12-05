@@ -1,7 +1,7 @@
 import { formatCurrencyAmount, formatUsdAmount } from '@common/utils/currency';
 import TokenIcon from '@common/components/token-icon';
 import { FarmWithAvailableDepositTokens } from '@hooks/earn/useAvailableDepositTokens';
-import { Strategy } from 'common-types';
+import { Strategy, Token } from 'common-types';
 import React from 'react';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
@@ -159,7 +159,7 @@ const StrategyItem = ({ strategy, selected, onSelect }: StrategyItemProps) => {
   );
 };
 interface OneClickMigrationConfirmMigrationContentProps {
-  onGoToStrategy: (strategy: Strategy) => void;
+  onGoToStrategy: (strategy: Strategy, token: Token, depositAmount: string) => void;
   onGoBack: () => void;
   selectedFarm: Nullable<FarmWithAvailableDepositTokens>;
 }
@@ -177,11 +177,11 @@ const OneClickMigrationConfirmMigrationContent = ({
     onGoBack();
   };
   const handleOnGoToStrategy = React.useCallback(() => {
-    if (!selectedStrategy) {
+    if (!selectedStrategy || !selectedFarm) {
       return;
     }
-    onGoToStrategy(selectedStrategy);
-  }, [onGoToStrategy, selectedStrategy]);
+    onGoToStrategy(selectedStrategy, selectedFarm.token, selectedFarm.balance.amountInUnits);
+  }, [onGoToStrategy, selectedStrategy, selectedFarm]);
 
   if (!selectedFarm) {
     return null;

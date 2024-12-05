@@ -10,6 +10,7 @@ import WithdrawForm from './withdraw/form';
 import DelayWithdrawWarning from './components/delay-withdraw-warning';
 import { WithdrawType } from 'common-types';
 import { getDelayedWithdrawals } from '@common/utils/earn/parsing';
+import { useEarnManagementState } from '@state/earn-management/hooks';
 
 const StyledBackgroundPaper = styled(BackgroundPaper).attrs({ variant: 'outlined', elevation: 0 })`
   ${({ theme: { spacing } }) => `
@@ -41,6 +42,7 @@ const StrategyManagement = ({ chainId, strategyGuardianId }: StrategyManagementP
   const strategy = useStrategyDetails({ chainId, strategyGuardianId });
   const [height, setHeight] = React.useState<number | undefined>(undefined);
   const dispatch = useAppDispatch();
+  const { asset } = useEarnManagementState();
 
   const delayedWithdrawalsCount = React.useMemo(
     () =>
@@ -52,8 +54,8 @@ const StrategyManagement = ({ chainId, strategyGuardianId }: StrategyManagementP
   );
 
   React.useEffect(() => {
-    if (strategy?.asset) dispatch(setAsset(strategy.asset));
-  }, [strategy?.asset]);
+    if (strategy?.asset && !asset) dispatch(setAsset(strategy.asset));
+  }, [strategy?.asset?.address, asset]);
 
   const hasAssetDelayedWithdrawal = strategy?.asset.withdrawTypes.includes(WithdrawType.DELAYED);
 

@@ -47,7 +47,7 @@ interface UseEarnDepositActionParams {
 }
 
 const useEarnDepositActions = ({ strategy }: UseEarnDepositActionParams) => {
-  const asset = strategy?.asset;
+  const { asset } = useEarnManagementState();
   const intl = useIntl();
   const activeWallet = useActiveWallet();
   const trackEvent = useTrackEvent();
@@ -631,7 +631,8 @@ const useEarnDepositActions = ({ strategy }: UseEarnDepositActionParams) => {
 
   const buildSteps = React.useCallback(
     (isApproved?: boolean) => {
-      if (!asset || !assetAmountInUnits || assetAmountInUnits === '' || !activeWallet?.address) {
+      console.log('Building steps', asset, assetAmountInUnits, activeWallet?.address, strategy);
+      if (!asset || !assetAmountInUnits || assetAmountInUnits === '' || !activeWallet?.address || !strategy) {
         return [];
       }
 
@@ -663,7 +664,7 @@ const useEarnDepositActions = ({ strategy }: UseEarnDepositActionParams) => {
       if (!isApproved) {
         newSteps.push({
           hash: '',
-          chainId: strategy.network.chainId,
+          chainId: asset.chainId,
           onAction: (amount) => onApproveToken(amount),
           onActionConfirmed: (hash) => onApproveTransactionConfirmed(hash),
           checkForPending: false,
@@ -693,7 +694,7 @@ const useEarnDepositActions = ({ strategy }: UseEarnDepositActionParams) => {
       if (asset.address !== PROTOCOL_TOKEN_ADDRESS) {
         newSteps.push({
           hash: '',
-          chainId: strategy.network.chainId,
+          chainId: asset.chainId,
           onAction: onSignPermit2Approval,
           checkForPending: false,
           done: false,
@@ -716,7 +717,7 @@ const useEarnDepositActions = ({ strategy }: UseEarnDepositActionParams) => {
       if (requiresCompanionSignature) {
         newSteps.push({
           hash: '',
-          chainId: strategy.network.chainId,
+          chainId: asset.chainId,
           onAction: onSignCompanionApproval,
           checkForPending: false,
           done: false,
@@ -737,7 +738,7 @@ const useEarnDepositActions = ({ strategy }: UseEarnDepositActionParams) => {
 
       newSteps.push({
         hash: '',
-        chainId: strategy.network.chainId,
+        chainId: asset.chainId,
         onAction: () => onDeposit(),
         checkForPending: true,
         done: false,
@@ -761,6 +762,7 @@ const useEarnDepositActions = ({ strategy }: UseEarnDepositActionParams) => {
       onSignPermit2Approval,
       onApproveTransactionConfirmed,
       onSignEarnToS,
+      strategy,
     ]
   );
 
