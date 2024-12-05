@@ -17,6 +17,8 @@ const StyledOneClickMigrationCard = styled(ContainerBox).attrs(() => ({ gap: 2, 
     background-color: ${colors[mode].background.secondary};
     border: 1.5px solid ${colors[mode].semantic.informative.primary};
     border-radius: ${spacing(2)};
+    max-width: 532px;
+    align-self: center;
   `}
 `;
 

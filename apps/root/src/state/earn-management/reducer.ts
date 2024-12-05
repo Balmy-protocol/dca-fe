@@ -1,11 +1,21 @@
 import { createReducer } from '@reduxjs/toolkit';
 
 import { Token } from '@types';
-import { setAsset, setDepositAmount, resetEarnForm, setWithdrawAmount, setWithdrawRewards } from './actions';
+import {
+  setAsset,
+  setDepositAmount,
+  resetEarnForm,
+  setWithdrawAmount,
+  setWithdrawRewards,
+  setDepositAsset,
+  setDepositAssetAmount,
+} from './actions';
 
 export interface EarnManagementState {
   asset?: Token;
   depositAmount?: string;
+  depositAssetAmount?: string;
+  depositAsset?: Token;
   withdrawAmount?: string;
   withdrawRewards: boolean;
   chainId?: number;
@@ -13,6 +23,8 @@ export interface EarnManagementState {
 
 export const initialState: EarnManagementState = {
   asset: undefined,
+  depositAssetAmount: undefined,
+  depositAsset: undefined,
   depositAmount: undefined,
   withdrawAmount: undefined,
   withdrawRewards: false,
@@ -27,6 +39,12 @@ export default createReducer(initialState, (builder) => {
     })
     .addCase(setDepositAmount, (state, { payload }) => {
       state.depositAmount = payload;
+    })
+    .addCase(setDepositAssetAmount, (state, { payload }) => {
+      state.depositAssetAmount = payload;
+    })
+    .addCase(setDepositAsset, (state, { payload }) => {
+      state.depositAsset = payload;
     })
     .addCase(setWithdrawAmount, (state, { payload }) => {
       state.withdrawAmount = payload;

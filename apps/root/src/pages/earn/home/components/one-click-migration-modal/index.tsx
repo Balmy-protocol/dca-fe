@@ -6,7 +6,7 @@ import OneClickMigrationOptionsContent from './options-content';
 import usePushToHistory from '@hooks/usePushToHistory';
 import useTrackEvent from '@hooks/useTrackEvent';
 import OneClickMigrationConfirmMigrationContent from './confirm-migration';
-import { Strategy } from 'common-types';
+import { Strategy, Token } from 'common-types';
 
 interface OneClickMigrationModalProps {
   open: boolean;
@@ -30,11 +30,13 @@ const OneClickMigrationModal = ({ open, onClose }: OneClickMigrationModalProps) 
     setStep(OneClickMigrationModalStep.SELECT_VAULTS);
   }, [onClose]);
   const handleOnGoToStrategy = React.useCallback(
-    (strategy: Strategy) => {
+    (strategy: Strategy, token: Token, depositAmount: string, underlyingAmount: string, underlyingToken: Token) => {
       handleClose();
       // Give a little time for the modal to close
       setTimeout(() => {
-        pushToHistory(`/earn/vaults/${strategy.network.chainId}/${strategy.id}`);
+        pushToHistory(
+          `/earn/vaults/${strategy.network.chainId}/${strategy.id}?triggerSteps=true&assetToDeposit=${token.address}&assetToDepositAmount=${depositAmount}&underlyingAmount=${underlyingAmount}&underlyingAsset=${underlyingToken.address}`
+        );
         trackEvent('Earn One Click Migration - Go to strategy', {
           chainId: strategy.network.chainId,
         });

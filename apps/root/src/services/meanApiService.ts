@@ -654,4 +654,13 @@ export default class MeanApiService {
       signature,
     });
   }
+
+  async transformTokensToUnderlying(tokens: { token: Token; amount: bigint }[]) {
+    return this.axiosClient.post<MeanApiUnderlyingResponse>(`${MEAN_API_URL}/v2/transforms/to-underlying`, {
+      tokens: tokens.map((tokenObj) => ({
+        dependent: `${tokenObj.token.chainId}:${tokenObj.token.address}`,
+        dependentAmount: tokenObj.amount.toString(),
+      })),
+    });
+  }
 }

@@ -44,7 +44,7 @@ import TotalFooter from './components/total-footer';
 import { FarmWithAvailableDepositTokens } from '@hooks/earn/useAvailableDepositTokens';
 import { PROMOTED_STRATEGIES_IDS } from '@constants/earn';
 import PromotedFlag from './components/promoted-flag';
-import useTierLevel from '@hooks/tiers/useTierLevel';
+import { isNil } from 'lodash';
 
 export type StrategyWithWalletBalance = Strategy & {
   walletBalance?: AmountsOfToken;
@@ -222,7 +222,6 @@ interface RowProps<T extends StrategiesTableVariants> {
   variant: T;
   showBalances?: boolean;
   showEndChevron?: boolean;
-  tierLevel: number;
 }
 
 const renderBodyCell = (cell: React.ReactNode | string) =>
@@ -235,14 +234,13 @@ const Row = <T extends StrategiesTableVariants>({
   variant,
   showBalances = true,
   showEndChevron = true,
-  tierLevel,
 }: RowProps<T>) => {
   const [hovered, setHovered] = React.useState(false);
 
   const strategy = getStrategyFromTableObject(rowData, variant);
   const needsTier = getNeedsTierFromTableObject(rowData, variant);
   const isPromoted = PROMOTED_STRATEGIES_IDS.includes(strategy.id as StrategyId);
-  const isLocked = Boolean(needsTier && tierLevel < needsTier);
+  const isLocked = !isNil(needsTier);
 
   const condition = isLocked ? StrategyConditionType.LOCKED : isPromoted ? StrategyConditionType.PROMOTED : undefined;
   // If TierIcon is rendered, needsTier is defined
@@ -319,7 +317,6 @@ const StrategiesTable = <T extends StrategiesTableVariants>({
   showPagination = true,
   showEndChevron = true,
 }: StrategiesTableProps<T>) => {
-  const { tierLevel } = useTierLevel();
   // Keeps the table height consistent
   const emptyRows = createEmptyRows(rowsPerPage - visibleRows.length);
 
@@ -361,7 +358,6 @@ const StrategiesTable = <T extends StrategiesTableVariants>({
                   variant={variant}
                   showBalances={showBalances}
                   showEndChevron={showEndChevron}
-                  tierLevel={tierLevel ?? 0}
                 />
               ))}
               {emptyRows}
