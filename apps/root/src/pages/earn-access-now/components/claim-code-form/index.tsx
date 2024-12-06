@@ -1,7 +1,10 @@
 import useOpenConnectModal from '@hooks/useOpenConnectModal';
-import useTrackEvent from '@hooks/useTrackEvent';
 import useUser from '@hooks/useUser';
 import { WalletActionType } from '@services/accountService';
+import useAccountService from '@hooks/useAccountService';
+import usePushToHistory from '@hooks/usePushToHistory';
+import useTrackEvent from '@hooks/useTrackEvent';
+import confetti from 'canvas-confetti';
 import React from 'react';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
@@ -21,7 +24,9 @@ const StyledBackgroundPaper = styled(BackgroundPaper).attrs({
 const ClaimCodeForm = () => {
   const intl = useIntl();
   const user = useUser();
+  const accountService = useAccountService();
   const [accessCode, setAccessCode] = React.useState('');
+  const pushToHistory = usePushToHistory();
   const [validationState, setValidationState] = React.useState<{
     error: boolean;
     helperText: string;
@@ -50,31 +55,78 @@ const ClaimCodeForm = () => {
   };
 
   const validateCode = React.useCallback(async () => {
-    // TODO: Differentiate between invalid code and already redeemed code
-    // Simulate API call delay
-    const isCodeValid = Math.random() < 0.5;
-    setValidationState((prev) => ({ ...prev, isLoading: true }));
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+    if (!accessCode) return;
 
-    if (isCodeValid) {
-      setValidationState({
-        error: false,
-        helperText: '',
-        isLoading: false,
-      });
-    } else {
-      setValidationState({
-        error: true,
-        helperText: intl.formatMessage(
-          defineMessage({
-            description: 'earn-access-now.claim-code-form.error',
-            defaultMessage: 'The code entered is either invalid or has already been redeemed.',
-          })
-        ),
-        isLoading: false,
-      });
+    trackEvent('Earn - Early Access - Attempt to claim code');
+    setValidationState((prev) => ({ ...prev, isLoading: true }));
+    const response = await accountService.claimEarnInviteCode({ inviteCode: accessCode });
+    switch (response.status) {
+      case 200:
+        trackEvent('Earn - Early Access - Code claimed');
+
+        setValidationState({
+          error: false,
+          helperText: '',
+          isLoading: false,
+        });
+        // eslint-disable-next-line @typescript-eslint/no-floating-promises
+        confetti({
+          particleCount: 100,
+          spread: 70,
+          angle: 60,
+          origin: { x: 0 },
+        });
+        // eslint-disable-next-line @typescript-eslint/no-floating-promises
+        confetti({
+          particleCount: 100,
+          spread: 70,
+          angle: 120,
+          origin: { x: 1 },
+        });
+        pushToHistory('/earn');
+        break;
+
+      case 404:
+        trackEvent('Earn - Early Access - Code claim invalid');
+        setValidationState({
+          error: true,
+          helperText: intl.formatMessage(
+            defineMessage({
+              description: 'earn-access-now.claim-code-form.error.invalid',
+              defaultMessage: 'The code entered is invalid.',
+            })
+          ),
+          isLoading: false,
+        });
+        break;
+
+      case 400:
+        trackEvent('Earn - Early Access - Code already claimed');
+        setValidationState({
+          error: true,
+          helperText: intl.formatMessage(
+            defineMessage({
+              description: 'earn-access-now.claim-code-form.error.claimed',
+              defaultMessage: 'This code has already been redeemed.',
+            })
+          ),
+          isLoading: false,
+        });
+        break;
+      default:
+        trackEvent('Earn - Early Access - Code claim unknown error');
+        setValidationState({
+          error: true,
+          helperText: intl.formatMessage(
+            defineMessage({
+              description: 'earn-access-now.claim-code-form.error.unknown',
+              defaultMessage: 'An unknown error occurred.',
+            })
+          ),
+          isLoading: false,
+        });
     }
-  }, [intl]);
+  }, [intl, accessCode]);
 
   return (
     <StyledBackgroundPaper>

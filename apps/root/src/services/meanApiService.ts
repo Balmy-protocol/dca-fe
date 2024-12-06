@@ -25,6 +25,7 @@ import {
   IndexerUnits,
   TokenListId,
   User,
+  EarnEarlyAccess,
 } from '@types';
 import { CLAIM_ABIS } from '@constants/campaigns';
 
@@ -35,6 +36,7 @@ import { SavedCustomConfig } from '@state/base-types';
 
 type AccountWithConfig = Account & {
   config: Partial<SavedCustomConfig>;
+  earn?: EarnEarlyAccess;
 };
 
 const DEFAULT_SAFE_DEADLINE_SLIPPAGE = {
@@ -542,6 +544,23 @@ export default class MeanApiService {
       params: {
         positions: positionIds.join(','),
       },
+    });
+  }
+
+  async claimEarnInviteCode({
+    inviteCode,
+    accountId,
+    signature,
+  }: {
+    inviteCode: string;
+    accountId: string;
+    signature: WalletSignature;
+  }) {
+    return this.authorizedRequest<{ status: number }>({
+      method: 'POST',
+      url: `${MEAN_API_URL}/v1/accounts/${accountId}/earn/invites/claim`,
+      data: { inviteCode },
+      signature,
     });
   }
 }
