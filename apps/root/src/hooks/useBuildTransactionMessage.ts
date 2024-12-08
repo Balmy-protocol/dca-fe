@@ -211,20 +211,6 @@ function useBuildTransactionMessages() {
           );
           break;
         }
-        case TransactionTypes.newPair: {
-          const newPairTypeData = tx.typeData;
-          message = intl.formatMessage(
-            defineMessage({
-              description: 'transactionMessagesNewPair',
-              defaultMessage: 'The pair {from}:{to} has been created',
-            }),
-            {
-              from: newPairTypeData.token0.symbol,
-              to: newPairTypeData.token1.symbol,
-            }
-          );
-          break;
-        }
         case TransactionTypes.approveToken: {
           const tokenApprovalTypeData = tx.typeData;
           message = intl.formatMessage(
@@ -253,45 +239,6 @@ function useBuildTransactionMessages() {
                 sigFigs: 4,
                 intl,
               }),
-            }
-          );
-          break;
-        }
-        case TransactionTypes.eulerClaimClaimFromMigrator: {
-          const eulerClaimClaimFromMigratorTypeData = tx.typeData;
-          message = intl.formatMessage(
-            defineMessage({
-              description: 'transactionMessagesEulerClaimClaimFromMigrator',
-              defaultMessage: 'You claimed your due for {token} from the Euler Claim page',
-            }),
-            {
-              token: eulerClaimClaimFromMigratorTypeData.token.symbol,
-            }
-          );
-          break;
-        }
-        case TransactionTypes.eulerClaimPermitMany: {
-          const eulerClaimPermitManyTypeData = tx.typeData;
-          message = intl.formatMessage(
-            defineMessage({
-              description: 'transactionMessagesEulerClaimPermitMany',
-              defaultMessage: 'Mean Finance can now close {positions} positions',
-            }),
-            {
-              positions: eulerClaimPermitManyTypeData.positionIds.length,
-            }
-          );
-          break;
-        }
-        case TransactionTypes.eulerClaimTerminateMany: {
-          const eulerClaimTerminateManyTypeData = tx.typeData;
-          message = intl.formatMessage(
-            defineMessage({
-              description: 'transactionMessagesEulerClaimTerminateMany',
-              defaultMessage: '{positions} positions were closed',
-            }),
-            {
-              positions: eulerClaimTerminateManyTypeData.positionIds.length,
             }
           );
           break;
