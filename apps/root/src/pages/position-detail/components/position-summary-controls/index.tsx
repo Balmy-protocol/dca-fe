@@ -144,7 +144,7 @@ const PositionSummaryControls = ({ show, pendingTransaction, position, ownerWall
     };
 
     try {
-      void fetchPositionCsv();
+      if (show) void fetchPositionCsv();
     } catch (e) {
       console.error('Error fetching CSV content:', e);
     }
@@ -152,7 +152,7 @@ const PositionSummaryControls = ({ show, pendingTransaction, position, ownerWall
     return () => {
       if (downloadUrl) URL.revokeObjectURL(downloadUrl);
     };
-  }, []);
+  }, [show]);
 
   const onTerminate = () => {
     setShowTerminateModal(true);
