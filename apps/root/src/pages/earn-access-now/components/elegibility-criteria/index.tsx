@@ -4,21 +4,31 @@ import React from 'react';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 import { BackgroundPaper, Button, colors, ContainerBox, InformationIcon, Typography } from 'ui-library';
+import ElegibilityConfirmation from '../elegibility-confirmation';
 
 const StyledBackgroundPaper = styled(BackgroundPaper).attrs({
   variant: 'outlined',
 })`
+  transition: all 0.3s ease-in-out;
+  min-height: ${({ theme }) => theme.spacing(87.5)};
   display: flex;
   flex-direction: column;
-  gap: ${({ theme }) => theme.spacing(6)};
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  position: relative;
 `;
 
-const ElegibilityCriteria = () => {
+const InitialElegibilityCriteriaData = ({
+  setIsCheckingEligibility,
+}: {
+  setIsCheckingEligibility: (value: boolean) => void;
+}) => {
   const user = useUser();
   const isLoggedIn = !!user;
 
   return (
-    <StyledBackgroundPaper>
+    <ContainerBox flexDirection="column" gap={6}>
       <ContainerBox flexDirection="column" gap={2}>
         <Typography variant="h5Bold" color={({ palette }) => colors[palette.mode].typography.typo1}>
           <FormattedMessage description="earn-access-now.eligibility.title" defaultMessage="Eligibility Requirements" />
@@ -73,10 +83,27 @@ const ElegibilityCriteria = () => {
         </ContainerBox>
       </ContainerBox>
       <ContainerBox justifyContent="flex-start">
-        <Button variant="contained" disabled={!isLoggedIn}>
+        <Button variant="contained" disabled={!isLoggedIn} onClick={() => setIsCheckingEligibility(true)}>
           <FormattedMessage description="earn-access-now.eligibility.button" defaultMessage="Check your Wallets Now" />
         </Button>
       </ContainerBox>
+    </ContainerBox>
+  );
+};
+
+interface ElegibilityCriteriaProps {
+  setIsCheckingEligibility: (value: boolean) => void;
+  isCheckingEligibility: boolean;
+}
+
+const ElegibilityCriteria = ({ setIsCheckingEligibility, isCheckingEligibility }: ElegibilityCriteriaProps) => {
+  return (
+    <StyledBackgroundPaper>
+      {isCheckingEligibility ? (
+        <ElegibilityConfirmation />
+      ) : (
+        <InitialElegibilityCriteriaData setIsCheckingEligibility={setIsCheckingEligibility} />
+      )}
     </StyledBackgroundPaper>
   );
 };

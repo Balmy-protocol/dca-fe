@@ -7,7 +7,7 @@ import { useThemeMode } from '@state/config/hooks';
 import useMergedTokensBalances from '@hooks/useMergedTokensBalances';
 import { ALL_WALLETS } from '@common/components/wallet-selector/types';
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
-import { findTokenAnyMatch, getIsSameOrTokenEquivalent } from '@common/utils/currency';
+import { findTokenAnyMatch, getIsSameOrTokenEquivalent, parseExponentialNumberToString } from '@common/utils/currency';
 import { parseUnits } from 'viem';
 import { SkeletonTokenSelectorItem } from '@common/components/token-selector';
 import { TokenSelectorItem } from '@common/components/token-selector/token-items';
@@ -128,7 +128,7 @@ export const WizardSelection = ({
           token: asset,
           balance: balanceItem ? parseUnits(balanceItem.totalBalanceInUnits, asset.decimals) : undefined,
           balanceUsd: balanceItem
-            ? parseUnits((balanceItem.totalBalanceUsd || 0).toString(), asset.decimals + 18)
+            ? parseUnits(parseExponentialNumberToString(balanceItem.totalBalanceUsd || 0), asset.decimals + 18)
             : undefined,
           chainsWithBalance: balanceItem ? balanceItem.tokens.map((token) => token.token.chainId) : [],
         };

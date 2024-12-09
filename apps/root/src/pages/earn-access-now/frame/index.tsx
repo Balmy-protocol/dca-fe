@@ -27,6 +27,7 @@ const StyledTitleSpan = styled('span')`
 const EarnAccessNowFrame = () => {
   const dispatch = useAppDispatch();
   const trackEvent = useTrackEvent();
+  const [isCheckingEligibility, setIsCheckingEligibility] = React.useState(false);
 
   React.useEffect(() => {
     dispatch(changeRoute(EARN_ACCESS_NOW_ROUTE.key));
@@ -60,12 +61,23 @@ const EarnAccessNowFrame = () => {
             </StyledPageTitleDescription>
           </ContainerBox>
           <Grid container spacing={8}>
-            <Grid item xs={12} md={6} order={{ xs: 2, md: 1 }}>
-              <ElegibilityCriteria />
+            <Grid
+              item
+              xs={12}
+              md={isCheckingEligibility ? 12 : 6}
+              order={{ xs: 2, md: 1 }}
+              sx={{ transition: 'all 0.4s ease-in-out' }}
+            >
+              <ElegibilityCriteria
+                setIsCheckingEligibility={setIsCheckingEligibility}
+                isCheckingEligibility={isCheckingEligibility}
+              />
             </Grid>
-            <Grid item xs={12} md={6} order={{ xs: 1, md: 2 }}>
-              <ClaimCodeForm />
-            </Grid>
+            {!isCheckingEligibility && (
+              <Grid item xs={12} md={6} order={{ xs: 1, md: 2 }}>
+                <ClaimCodeForm />
+              </Grid>
+            )}
           </Grid>
         </ContainerBox>
         <AboutEarnGuardian />
