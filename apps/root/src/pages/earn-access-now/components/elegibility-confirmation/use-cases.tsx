@@ -9,7 +9,7 @@ import {
   Radio,
   Typography,
 } from 'ui-library';
-import { FormattedMessage } from 'react-intl';
+import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
 import styled from 'styled-components';
 import useOpenConnectModal from '@hooks/useOpenConnectModal';
@@ -21,6 +21,9 @@ import useWallets from '@hooks/useWallets';
 import { Address as ViemAddress } from 'viem';
 import Address from '@common/components/address';
 import { ElegibilityConfirmationStatus } from '.';
+import useWallet from '@hooks/useWallet';
+import { WalletStatus } from '@types';
+import { getDisplayWallet } from '@common/utils/parsing';
 
 const TitleContainer = styled(ContainerBox).attrs({
   flexDirection: 'column',
@@ -138,8 +141,15 @@ export const NeedsSignatureCase = ({
   elegibleWallets: ViemAddress[];
   setStatus: (status: ElegibilityConfirmationStatus) => void;
 }) => {
+  const intl = useIntl();
   const wallets = useWallets();
-  const [walletToSign, setWalletToSign] = React.useState<ViemAddress | null>(null);
+  const [walletToSign, setWalletToSign] = React.useState<ViemAddress | undefined>();
+  const wallet = useWallet(walletToSign || '');
+  const openConnectWalletModal = useOpenConnectModal();
+  const trackEvent = useTrackEvent();
+
+  const isWalletConnected = wallet?.status === WalletStatus.connected;
+  const selectedWalletDisplay = getDisplayWallet(wallet);
 
   React.useEffect(() => {
     if (elegibleWallets.length === 1) {
@@ -149,8 +159,14 @@ export const NeedsSignatureCase = ({
 
   const requestSignature = () => {
     if (!walletToSign) return;
+    trackEvent('Earn Early Access - Elegibility needs signature - Request signature');
     // TODO: Request signature
     setStatus(ElegibilityConfirmationStatus.OWNERSHIP_CONFIRMED);
+  };
+
+  const onConnectWallet = () => {
+    openConnectWalletModal(WalletActionType.link);
+    trackEvent('Earn Early Access - Elegibility needs signature - Link wallet');
   };
 
   return (
@@ -168,7 +184,7 @@ export const NeedsSignatureCase = ({
               description="earn-access-now.eligibility.confirmation.needs-signature.description"
               defaultMessage="Your wallet {walletAddress} meets the eligibility criteria. <b>Please sign to confirm ownership</b>, and you'll unlock Earn Early Access for all your connected wallets."
               values={{
-                walletAddress: wallets[0].address,
+                walletAddress: getDisplayWallet(wallets[0]),
                 b: (chunks: React.ReactNode) => <b>{chunks}</b>,
               }}
             />
@@ -185,21 +201,21 @@ export const NeedsSignatureCase = ({
       </TitleContainer>
       <ContainerBox flexDirection="column" gap={4} fullWidth>
         {elegibleWallets.length > 1 &&
-          elegibleWallets.map((wallet, index) => (
+          elegibleWallets.map((walletAddress, index) => (
             <>
               <ContainerBox
-                key={wallet}
+                key={walletAddress}
                 justifyContent="space-between"
                 alignItems="center"
-                onClick={() => setWalletToSign(wallet)}
+                onClick={() => setWalletToSign(walletAddress)}
                 style={{ cursor: 'pointer' }}
                 fullWidth
               >
                 <ContainerBox gap={2} alignItems="center">
-                  <Radio checked={wallet === walletToSign} />
+                  <Radio checked={walletAddress === walletToSign} />
                   <DividerBorder2 orientation="vertical" flexItem />
                   <Typography variant="bodyRegular" color={({ palette }) => colors[palette.mode].typography.typo3}>
-                    <Address address={wallet} trimAddress showDetailsOnHover />
+                    <Address address={walletAddress} trimAddress showDetailsOnHover />
                   </Typography>
                 </ContainerBox>
                 <CheckCircleOutlineIcon
@@ -210,13 +226,31 @@ export const NeedsSignatureCase = ({
             </>
           ))}
       </ContainerBox>
-
-      <Button variant="contained" onClick={requestSignature} disabled={!walletToSign}>
-        <FormattedMessage
-          description="earn-access-now.eligibility.confirmation.needs-signature.button"
-          defaultMessage="Sign to confirm ownership"
-        />
-      </Button>
+      {isWalletConnected || !walletToSign ? (
+        <Button variant="contained" onClick={requestSignature} disabled={!walletToSign}>
+          <FormattedMessage
+            description="earn-access-now.eligibility.confirmation.needs-signature.button"
+            defaultMessage="Sign to confirm ownership"
+          />
+        </Button>
+      ) : (
+        <Button variant="contained" onClick={onConnectWallet}>
+          <FormattedMessage
+            description="reconnect wallet"
+            defaultMessage="Switch to {wallet}'s Wallet"
+            values={{
+              wallet: selectedWalletDisplay
+                ? `${selectedWalletDisplay}`
+                : intl.formatMessage(
+                    defineMessage({
+                      description: 'reconnectWalletFallback',
+                      defaultMessage: 'Owner',
+                    })
+                  ),
+            }}
+          />
+        </Button>
+      )}
     </>
   );
 };

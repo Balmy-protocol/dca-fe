@@ -93,7 +93,7 @@ const ElegibilityConfirmation = () => {
   React.useEffect(() => {
     setTimeout(() => {
       // TODO: Implement eligibility check
-      setStatus(ElegibilityConfirmationStatus.ELIGIBLE);
+      setStatus(ElegibilityConfirmationStatus.NEEDS_SIGNATURE);
     }, 3500);
   }, [wallets]);
 
