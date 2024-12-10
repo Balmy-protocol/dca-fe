@@ -20,6 +20,8 @@ export type Wallet = {
   label?: string;
   isAuth: boolean;
   ens?: string | null;
+  isOwner: boolean;
+  achievements: Achievement[];
 };
 
 export enum UserStatus {
@@ -42,6 +44,11 @@ export interface AccountLabelsAndContactList {
   labels: AccountLabels;
   contacts: ContactList;
 }
+
+export type Achievement = {
+  id: string;
+  achieved: string | number;
+};
 
 export type AccountId = string;
 export type Account = {

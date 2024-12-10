@@ -144,6 +144,8 @@ const Navigation = ({ children }: React.PropsWithChildren) => {
       dispatch(changeRoute('settings'));
     } else if (location.pathname.startsWith('/token')) {
       dispatch(changeRoute('token'));
+    } else if (location.pathname.startsWith('/tier-view')) {
+      dispatch(changeRoute('tier-view'));
     }
   }, []);
 

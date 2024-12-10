@@ -41,6 +41,8 @@ describe('Event Service', () => {
       status: WalletStatus.disconnected,
       isAuth: false,
       type: WalletType.external,
+      isOwner: false,
+      achievements: [],
     });
     setConfigMock = jest.fn();
     trackMock = jest.fn();

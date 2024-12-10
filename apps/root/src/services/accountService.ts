@@ -8,7 +8,7 @@ import {
   WalletType,
   ApiNewWallet,
   WalletSignature,
-  EarnEarlyAccess,
+  ApiWallet,
 } from '@types';
 import { find, findIndex, isEqual, uniqBy } from 'lodash';
 import Web3Service from './web3Service';
@@ -21,6 +21,7 @@ import { WalletClient } from 'viem';
 import { MAIN_NETWORKS } from '@constants';
 import { SavedCustomConfig } from '@state/base-types';
 import WalletClientsService, { AvailableProvider } from './walletClientsService';
+import TierService from './tierService';
 
 export const LAST_LOGIN_KEY = 'last_logged_in_with';
 export const WALLET_SIGNATURE_KEY = 'wallet_auth_signature';
@@ -31,7 +32,7 @@ export interface AccountServiceData {
   activeWallet?: Address;
   accounts: Account[];
   isLoggingUser: boolean;
-  earnEarlyAccess?: EarnEarlyAccess;
+  earlyAccessEnabled?: boolean;
 }
 
 function timeout(ms: number) {
@@ -59,13 +60,21 @@ export default class AccountService extends EventsManager<AccountServiceData> {
 
   walletClientService: WalletClientsService;
 
+  tierService: TierService;
+
   switchActiveWalletOnConnection: boolean;
 
-  constructor(web3Service: Web3Service, meanApiService: MeanApiService, walletClientsService: WalletClientsService) {
+  constructor(
+    web3Service: Web3Service,
+    meanApiService: MeanApiService,
+    walletClientsService: WalletClientsService,
+    tierService: TierService
+  ) {
     super(initialState);
     this.web3Service = web3Service;
     this.walletClientService = walletClientsService;
     this.meanApiService = meanApiService;
+    this.tierService = tierService;
     this.walletActionType = WalletActionType.none;
     this.switchActiveWalletOnConnection = true;
   }
@@ -102,12 +111,12 @@ export default class AccountService extends EventsManager<AccountServiceData> {
     this.serviceData = { ...this.serviceData, isLoggingUser };
   }
 
-  get earnEarlyAccess() {
-    return this.serviceData.earnEarlyAccess;
+  get earlyAccessEnabled() {
+    return this.serviceData.earlyAccessEnabled;
   }
 
-  set earnEarlyAccess(earnEarlyAccess) {
-    this.serviceData = { ...this.serviceData, earnEarlyAccess };
+  set earlyAccessEnabled(earlyAccessEnabled) {
+    this.serviceData = { ...this.serviceData, earlyAccessEnabled };
   }
 
   setWalletActionType(walletActionType: WalletActionType) {
@@ -122,8 +131,8 @@ export default class AccountService extends EventsManager<AccountServiceData> {
     return this.serviceData.isLoggingUser;
   }
 
-  getEarnEarlyAccess() {
-    return this.serviceData.earnEarlyAccess;
+  getEarlyAccessEnabled() {
+    return this.serviceData.earlyAccessEnabled;
   }
 
   getWallets(): Wallet[] {
@@ -294,7 +303,10 @@ export default class AccountService extends EventsManager<AccountServiceData> {
 
     if (accountIndex !== -1) {
       const accounts = [...this.accounts];
-      accounts[accountIndex].wallets = [...this.accounts[accountIndex].wallets, { address, isAuth }];
+      accounts[accountIndex].wallets = [
+        ...this.accounts[accountIndex].wallets,
+        { address, isAuth, isOwner: isAuth, achievements: [] },
+      ];
       this.accounts = accounts;
     } else {
       throw new Error('tried to link a wallet to a user that was not set');
@@ -390,7 +402,16 @@ export default class AccountService extends EventsManager<AccountServiceData> {
 
       const earn = accounts[0].earn;
       if (earn) {
-        this.earnEarlyAccess = earn;
+        this.earlyAccessEnabled = earn.earlyAccess;
+      }
+
+      const referrals = accounts[0].referrals;
+
+      if (earn?.inviteCodes) {
+        // TODO: REMOVE [] WHEN BE RETURNS THE CORRECT DATA
+        this.tierService.setReferrals(referrals || []);
+        this.tierService.setInviteCodes(earn.inviteCodes);
+        this.tierService.calculateAndSetUserTier();
       }
 
       try {
@@ -425,6 +446,8 @@ export default class AccountService extends EventsManager<AccountServiceData> {
       isAuth: true,
       type: WalletType.external,
       status: WalletStatus.disconnected,
+      isOwner: true,
+      achievements: [],
     };
 
     const newAccount: Account = {
@@ -432,7 +455,7 @@ export default class AccountService extends EventsManager<AccountServiceData> {
       label,
       labels: {},
       contacts: [],
-      wallets: [walletToSet],
+      wallets: [{ ...walletToSet, achievements: [] }],
     };
 
     this.accounts = [...this.accounts, newAccount];
@@ -525,7 +548,7 @@ export default class AccountService extends EventsManager<AccountServiceData> {
     };
 
     const modifiedAccounts = this.accounts.map((account) =>
-      account.id === user.id ? { ...account, wallets: newUserWallets } : account
+      account.id === user.id ? { ...account, wallets: newUserWallets as unknown as ApiWallet[] } : account
     );
 
     this.accounts = modifiedAccounts;
@@ -677,7 +700,7 @@ export default class AccountService extends EventsManager<AccountServiceData> {
 
     try {
       await this.meanApiService.claimEarnInviteCode({ inviteCode, accountId: user.id, signature });
-      this.earnEarlyAccess = { ...this.earnEarlyAccess, earlyAccess: true };
+      this.earlyAccessEnabled = true;
 
       return { status: 200 };
     } catch (error: unknown) {

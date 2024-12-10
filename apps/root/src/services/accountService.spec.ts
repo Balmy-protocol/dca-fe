@@ -10,6 +10,7 @@ import { getConnectorData, getChainIdFromWalletClient } from '@common/utils/wagm
 import { Connector } from 'wagmi';
 import { WalletClient } from 'viem';
 import WalletClientsService, { AvailableProvider } from './walletClientsService';
+import TierService from './tierService';
 
 jest.mock('./web3Service');
 jest.mock('@common/utils/provider-info', () => ({
@@ -22,6 +23,7 @@ jest.mock('@common/utils/wagmi', () => ({
 
 const MockedMeanApiService = jest.mocked(MeanApiService, { shallow: true });
 const MockedWeb3Service = jest.mocked(Web3Service, { shallow: true });
+const MockedTierService = jest.mocked(TierService, { shallow: true });
 const MockedWalletClientsService = jest.mocked(WalletClientsService, { shallow: true });
 const mockedGetConnectorData = jest.mocked(getConnectorData, { shallow: true });
 const mockedGetChainIdFromWalletClient = jest.mocked(getChainIdFromWalletClient, { shallow: true });
@@ -30,6 +32,7 @@ describe('Account Service', () => {
   let web3Service: jest.MockedObject<Web3Service>;
   let meanApiService: jest.MockedObject<MeanApiService>;
   let walletClientService: jest.MockedObject<WalletClientsService>;
+  let tierService: jest.MockedObject<TierService>;
   let accountService: AccountService;
   let activeWallet: Wallet;
   let user: User;
@@ -55,11 +58,12 @@ describe('Account Service', () => {
 
     meanApiService = createMockInstance(MockedMeanApiService);
 
+    tierService = createMockInstance(MockedTierService);
     walletClientService = createMockInstance(MockedWalletClientsService);
 
     mockedGetChainIdFromWalletClient.mockResolvedValue(10);
 
-    accountService = new AccountService(web3Service, meanApiService, walletClientService);
+    accountService = new AccountService(web3Service, meanApiService, walletClientService, tierService);
 
     signMessageMock = jest.fn().mockResolvedValue('signature');
 
@@ -81,6 +85,8 @@ describe('Account Service', () => {
       label: 'External wallet',
       status: WalletStatus.connected,
       isAuth: true,
+      isOwner: true,
+      achievements: [],
     };
 
     accounts = [
@@ -93,10 +99,14 @@ describe('Account Service', () => {
           {
             address: '0xaddress',
             isAuth: true,
+            isOwner: true,
+            achievements: [],
           },
           {
             address: '0xsecondaddress',
             isAuth: false,
+            isOwner: false,
+            achievements: [],
           },
         ],
       },
@@ -109,6 +119,8 @@ describe('Account Service', () => {
           {
             address: '0xaddress',
             isAuth: true,
+            isOwner: true,
+            achievements: [],
           },
         ],
       },
@@ -681,14 +693,19 @@ describe('Account Service', () => {
               label: 'User label',
               labels: {},
               contacts: [],
+              referrals: [],
               wallets: [
                 {
                   address: '0xaddress',
                   isAuth: true,
+                  isOwner: true,
+                  achievements: [],
                 },
                 {
                   address: '0xsecondaddress',
                   isAuth: false,
+                  isOwner: false,
+                  achievements: [],
                 },
               ],
               config: {},
@@ -699,10 +716,13 @@ describe('Account Service', () => {
               labels: {},
               contacts: [],
               config: {},
+              referrals: [],
               wallets: [
                 {
                   address: '0xaddress',
                   isAuth: true,
+                  isOwner: true,
+                  achievements: [],
                 },
               ],
             },

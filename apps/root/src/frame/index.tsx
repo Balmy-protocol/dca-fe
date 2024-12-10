@@ -40,6 +40,7 @@ const History = lazy(() => import('@pages/history'));
 const PositionDetail = lazy(() => import('@pages/position-detail'));
 const StrategyGuardianDetail = lazy(() => import('@pages/strategy-guardian-detail'));
 const TokenProfile = lazy(() => import('@pages/token-profile'));
+const TierView = lazy(() => import('@pages/tier-view'));
 
 const StyledGridContainer = styled(Grid)<{ isSmall?: boolean }>`
   flex-wrap: nowrap;
@@ -153,6 +154,8 @@ const AppFrame = ({ config: { wagmiClient } }: AppFrameProps) => {
                                 </>
                               )}
                               <Route path="/invest/positions/:positionId" element={<PositionDetail />} />
+                              {/* TODO: Remove this route below when the early access ends */}
+                              {hasEarnAccess && <Route path="/tier-view" element={<TierView />} />}
                               {/* // TODO: Remove this route below it's no longer used (@mixpanel) */}
                               <Route
                                 path="/positions/:positionId"
