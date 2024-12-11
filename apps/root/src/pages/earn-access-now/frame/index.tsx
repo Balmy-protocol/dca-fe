@@ -8,6 +8,7 @@ import {
   StyledNonFormContainer,
   StyledPageTitleDescription,
   Typography,
+  Zoom,
 } from 'ui-library';
 import ElegibilityCriteria from '../components/elegibility-criteria';
 import ClaimCodeForm from '../components/claim-code-form';
@@ -17,6 +18,7 @@ import { useAppDispatch } from '@state/hooks';
 import { changeRoute } from '@state/tabs/actions';
 import useTrackEvent from '@hooks/useTrackEvent';
 import { EARN_ACCESS_NOW_ROUTE } from '@constants/routes';
+import ElegibilityConfirmation from '../components/elegibility-confirmation';
 
 const StyledTitleSpan = styled('span')`
   background: linear-gradient(90deg, #791aff 24.91%, #4a00b2 86.35%);
@@ -60,23 +62,25 @@ const EarnAccessNowFrame = () => {
               />
             </StyledPageTitleDescription>
           </ContainerBox>
-          <Grid container spacing={8}>
-            <Grid
-              item
-              xs={12}
-              md={isCheckingEligibility ? 12 : 6}
-              order={{ xs: 2, md: 1 }}
-              sx={{ transition: 'all 0.4s ease-in-out' }}
-            >
-              <ElegibilityCriteria
-                setIsCheckingEligibility={setIsCheckingEligibility}
-                isCheckingEligibility={isCheckingEligibility}
-              />
-            </Grid>
-            {!isCheckingEligibility && (
-              <Grid item xs={12} md={6} order={{ xs: 1, md: 2 }}>
-                <ClaimCodeForm />
-              </Grid>
+          <Grid container spacing={6}>
+            {isCheckingEligibility ? (
+              <Zoom in mountOnEnter>
+                <Grid item xs={12}>
+                  <ElegibilityConfirmation />
+                </Grid>
+              </Zoom>
+            ) : (
+              <>
+                <Grid item xs={12} md={7}>
+                  <ClaimCodeForm />
+                </Grid>
+                <Grid item xs={12} md={5}>
+                  <ElegibilityCriteria
+                    setIsCheckingEligibility={setIsCheckingEligibility}
+                    isCheckingEligibility={isCheckingEligibility}
+                  />
+                </Grid>
+              </>
             )}
           </Grid>
         </ContainerBox>

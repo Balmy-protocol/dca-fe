@@ -1,10 +1,18 @@
 import React from 'react';
-import { colors, ContainerBox, Zoom } from 'ui-library';
-import { ElegibleCase, LoadingCase, NeedsSignatureCase, NotEligibleStatus, OwnershipConfirmedCase } from './use-cases';
+import { colors, ContainerBox } from 'ui-library';
+import {
+  ElegibilityConfirmationStatus,
+  ElegibleCase,
+  LoadingCase,
+  NeedsSignatureCase,
+  NotEligibleStatus,
+  OwnershipConfirmedCase,
+} from './use-cases';
 import { Address } from 'viem';
 import useWallets from '@hooks/useWallets';
 import styled from 'styled-components';
 import confetti from 'canvas-confetti';
+import { StyledElegibilityCriteriaBackgroundPaper } from '../elegibility-criteria';
 
 const StyledAnimatedElipse = styled(({ showAnimation, ...props }: { showAnimation?: boolean }) => {
   React.useEffect(() => {
@@ -46,14 +54,6 @@ const StyledAnimatedElipse = styled(({ showAnimation, ...props }: { showAnimatio
     }
   }
 `;
-
-export enum ElegibilityConfirmationStatus {
-  LOADING = 'LOADING',
-  NOT_ELIGIBLE = 'NOT_ELIGIBLE',
-  ELIGIBLE = 'ELIGIBLE',
-  NEEDS_SIGNATURE = 'NEEDS_SIGNATURE',
-  OWNERSHIP_CONFIRMED = 'OWNERSHIP_CONFIRMED',
-}
 
 interface ElegibilityConfirmationBaseProps {
   setStatus: (status: ElegibilityConfirmationStatus) => void;
@@ -99,16 +99,14 @@ const ElegibilityConfirmation = () => {
 
   const StatusComponent = STATUS_MAP[status];
   return (
-    <>
-      <Zoom in unmountOnExit mountOnEnter>
-        <ContainerBox flexDirection="column" gap={6} justifyContent="center" alignItems="center">
-          <StatusComponent setStatus={setStatus} elegibleWallets={elegibleWallets} />
-        </ContainerBox>
-      </Zoom>
+    <StyledElegibilityCriteriaBackgroundPaper>
+      <ContainerBox flexDirection="column" gap={6} justifyContent="center" alignItems="center">
+        <StatusComponent setStatus={setStatus} elegibleWallets={elegibleWallets} />
+      </ContainerBox>
       {StatusWithElipse.includes(status) && (
         <StyledAnimatedElipse showAnimation={StatusWithSuccessAnimation.includes(status)} />
       )}
-    </>
+    </StyledElegibilityCriteriaBackgroundPaper>
   );
 };
 
