@@ -29,7 +29,7 @@ const StyledBannerContainer = styled(ContainerBox).attrs({
 
 const EarnBanner = () => {
   const [showEarnModal, setShowEarnModal] = React.useState(false);
-  const { hasEarnAccess } = useEarnAccess();
+  const { isEarnEnabled, hasEarnAccess } = useEarnAccess();
   const trackEvent = useTrackEvent();
   const pushToHistory = usePushToHistory();
 
@@ -44,7 +44,7 @@ const EarnBanner = () => {
 
   return (
     <>
-      {hasEarnAccess ? (
+      {isEarnEnabled ? (
         <EarnGainAccessModal isOpen={showEarnModal} onClose={() => setShowEarnModal(false)} />
       ) : (
         <GuardianListSubscribeModal isOpen={showEarnModal} onClose={() => setShowEarnModal(false)} />
