@@ -169,7 +169,7 @@ const Navigation = ({ children }: React.PropsWithChildren) => {
       pushToHistory(`/${section.key}`);
       trackEvent('Main - Changed active app', { newSection: section.key, oldSection: currentRoute });
     },
-    [dispatch, pushToHistory, currentRoute]
+    [dispatch, pushToHistory, currentRoute, hasEarnAccess]
   );
 
   const openExternalLink = (url: string) => {
