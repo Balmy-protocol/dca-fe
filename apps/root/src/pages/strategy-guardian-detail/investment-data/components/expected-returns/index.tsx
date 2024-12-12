@@ -16,13 +16,25 @@ interface ExpectedReturnsProps {
   hidePeriods?: StrategyReturnPeriods[];
   isLoading?: boolean;
   isFiat?: boolean;
+  isSimulated?: boolean;
+  size?: 'small' | 'medium';
 }
 
-const ExpectedReturns = ({ userPositions, hidePeriods, isLoading, isFiat = true }: ExpectedReturnsProps) => {
+const ExpectedReturns = ({
+  userPositions,
+  hidePeriods,
+  isLoading,
+  isFiat = true,
+  isSimulated,
+  size = 'medium',
+}: ExpectedReturnsProps) => {
   const intl = useIntl();
   const { earnings } = React.useMemo(() => parseUserStrategiesFinancialData(userPositions), [userPositions]);
 
   const mainAsset = userPositions?.[0]?.strategy?.asset;
+
+  const baseAmountsColor = isSimulated ? 'success.dark' : undefined;
+
   return (
     <ContainerBox alignItems="flex-start" flexWrap="wrap" gap={2}>
       {STRATEGY_RETURN_PERIODS.filter((period) => !hidePeriods?.includes(period.period)).map((period, index) => (
@@ -36,7 +48,9 @@ const ExpectedReturns = ({ userPositions, hidePeriods, isLoading, isFiat = true 
             />
           )}
           <ContainerBox flexDirection="column" gap={1} key={period.period}>
-            <Typography variant="bodySmallRegular">{intl.formatMessage(period.title)}</Typography>
+            <Typography variant={size === 'small' ? 'bodyExtraSmall' : 'bodySmallRegular'}>
+              {intl.formatMessage(period.title)}
+            </Typography>
             <TokenAmount
               token={isFiat ? emptyTokenWithDecimals(2) : mainAsset}
               amount={
@@ -49,11 +63,16 @@ const ExpectedReturns = ({ userPositions, hidePeriods, isLoading, isFiat = true 
                   : earnings[period.period].byToken[mainAsset?.address || '0x']
               }
               isLoading={isLoading}
-              amountColorVariant={!userPositions?.length ? 'typo4' : undefined}
+              amountColorVariant={baseAmountsColor || (!userPositions?.length ? 'typo4' : undefined)}
+              subtitleColorVariant={baseAmountsColor}
               showIcon={false}
               useNetworthNumber={isFiat}
-              showSymbol={!isFiat}
+              showSymbol={!isFiat && !isSimulated}
               showSubtitle={!isFiat}
+              titlePrefix={isSimulated ? '+' : undefined}
+              subtitlePrefix={isSimulated ? '+' : undefined}
+              amountTypographyVariant={size === 'small' ? 'bodySmallBold' : undefined}
+              usdPriceTypographyVariant={size === 'small' ? 'bodyExtraSmall' : undefined}
             />
           </ContainerBox>
         </>
