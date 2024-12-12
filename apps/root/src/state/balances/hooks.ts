@@ -170,3 +170,18 @@ export function useStoredNativeBalance(chainId: number) {
     ).toFixed(2),
   }));
 }
+
+export function useTotalTokenBalance(token?: Token) {
+  const intl = useIntl();
+  const allBalances = useAppSelector((state: RootState) => state.balances);
+
+  if (!token) return { amount: 0n, amountInUnits: '0.0', amountInUSD: '0.00' };
+
+  const tokenBalances = allBalances.balances[token.chainId]?.balancesAndPrices?.[token.address];
+  const totalAmount = Object.values(tokenBalances?.balances || {}).reduce((acc, balance) => acc + balance, 0n);
+  return {
+    amount: totalAmount,
+    amountInUnits: formatCurrencyAmount({ amount: totalAmount, token, intl }),
+    amountInUSD: parseUsdPrice(token, totalAmount, parseNumberUsdPriceToBigInt(tokenBalances?.price)).toFixed(2),
+  };
+}
