@@ -1,6 +1,7 @@
 import { AccountId, EarnInviteCode, Address, Achievement, User } from '@types';
 import { EventsManager } from './eventsManager';
 import Web3Service from './web3Service';
+import MeanApiService from './meanApiService';
 
 export const LAST_LOGIN_KEY = 'last_logged_in_with';
 export const WALLET_SIGNATURE_KEY = 'wallet_auth_signature';
@@ -65,9 +66,12 @@ const TIER_REQUIREMENTS = [
 export default class TierService extends EventsManager<TierServiceData> {
   web3Service: Web3Service;
 
-  constructor(web3Service: Web3Service) {
+  meanApiService: MeanApiService;
+
+  constructor(web3Service: Web3Service, meanApiService: MeanApiService) {
     super(initialState);
     this.web3Service = web3Service;
+    this.meanApiService = meanApiService;
   }
 
   get tier() {
@@ -269,5 +273,16 @@ export default class TierService extends EventsManager<TierServiceData> {
     const progress = totalRequirements > 0 ? (totalCompleted / totalRequirements) * 100 : 0;
 
     return { progress: Math.min(progress, 100), missing, details };
+  }
+
+  async pollUser() {
+    const signature = await this.web3Service.accountService.getWalletVerifyingSignature({});
+    if (!signature) return;
+    const accounts = await this.meanApiService.getAccounts({ signature });
+    const account = accounts.accounts[0];
+
+    this.setReferrals(account.referrals || []);
+    this.setInviteCodes(account.earn?.inviteCodes || []);
+    this.calculateAndSetUserTier();
   }
 }
