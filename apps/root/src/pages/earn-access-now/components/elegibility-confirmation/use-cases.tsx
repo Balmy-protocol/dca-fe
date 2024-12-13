@@ -20,10 +20,17 @@ import { EARN_ROUTE } from '@constants/routes';
 import useWallets from '@hooks/useWallets';
 import { Address as ViemAddress } from 'viem';
 import Address from '@common/components/address';
-import { ElegibilityConfirmationStatus } from '.';
 import useWallet from '@hooks/useWallet';
 import { WalletStatus } from '@types';
 import { getDisplayWallet } from '@common/utils/parsing';
+
+export enum ElegibilityConfirmationStatus {
+  LOADING = 'LOADING',
+  NOT_ELIGIBLE = 'NOT_ELIGIBLE',
+  ELIGIBLE = 'ELIGIBLE',
+  NEEDS_SIGNATURE = 'NEEDS_SIGNATURE',
+  OWNERSHIP_CONFIRMED = 'OWNERSHIP_CONFIRMED',
+}
 
 const TitleContainer = styled(ContainerBox).attrs({
   flexDirection: 'column',
@@ -268,6 +275,26 @@ export const OwnershipConfirmedCase = () => (
         <FormattedMessage
           description="earn-access-now.eligibility.confirmation.ownership-confirmed.description"
           defaultMessage="You now have Early Access with all your connected wallets. Welcome to Earn!"
+        />
+      </StyledDescription>
+    </TitleContainer>
+    <ClaimEarnButton />
+  </>
+);
+
+export const CodeSuccessfullyClaimed = () => (
+  <>
+    <TitleContainer>
+      <StyledTitle>
+        <FormattedMessage
+          description="earn-access-now.eligibility.confirmation.code-successfully-claimed.title"
+          defaultMessage="Early Access Unlocked! 🎉"
+        />
+      </StyledTitle>
+      <StyledDescription>
+        <FormattedMessage
+          description="earn-access-now.eligibility.confirmation.code-successfully-claimed.description"
+          defaultMessage="Start exploring exclusive strategies, secure your investments, and grow your returns."
         />
       </StyledDescription>
     </TitleContainer>
