@@ -180,3 +180,8 @@ export type EarnEarlyAccess = {
   // tier: { achievements: string[]; level: number };
   // referrals: { accountId: string; ...more }[];
 };
+
+export enum StrategyConditionType {
+  PROMOTED = 'PROMOTED',
+  LOCKED = 'LOCKED',
+}

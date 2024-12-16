@@ -1,5 +1,12 @@
 import React from 'react';
-import { AmountsOfToken, EarnPosition, SetStateCallback, Strategy, StrategyId } from 'common-types';
+import {
+  AmountsOfToken,
+  EarnPosition,
+  SetStateCallback,
+  Strategy,
+  StrategyConditionType,
+  StrategyId,
+} from 'common-types';
 import {
   BackgroundPaper,
   ContainerBox,
@@ -19,6 +26,7 @@ import {
   Hidden,
   SortIcon,
   colors,
+  ShieldTickIcon,
 } from 'ui-library';
 import styled from 'styled-components';
 import { useAppDispatch } from '@state/hooks';
@@ -59,13 +67,32 @@ const StyledBackgroundPaper = styled(BackgroundPaper).attrs({ variant: 'outlined
   position: relative;
 `;
 
-const StyledTableRow = styled(TableRow)<{ $isPromoted?: boolean }>`
-  ${({ theme: { palette, spacing }, $isPromoted }) =>
-    $isPromoted &&
+const StyledTableRow = styled(TableRow)<{ $condition?: StrategyConditionType }>`
+  ${({ theme: { palette, spacing }, $condition }) =>
+    $condition === StrategyConditionType.PROMOTED &&
     `
     box-shadow: 0px 0px 0px 1.5px ${colors[palette.mode].semantic.success.darker};
     border-radius: ${spacing(2)};
   `}
+  ${({ theme: { palette, spacing }, $condition }) =>
+    $condition === StrategyConditionType.LOCKED &&
+    `
+    box-shadow: 0px 0px 0px 1.5px ${colors[palette.mode].border.accent};
+    border-radius: ${spacing(2)};
+  `}
+`;
+
+interface StyledTierBadgeProps {
+  CurrentTierBadge: React.ComponentType;
+}
+const StyledTierBadge = styled(({ CurrentTierBadge, ...props }: StyledTierBadgeProps) => (
+  <CurrentTierBadge {...props} />
+))`
+  position: absolute;
+  z-index: 1;
+  top: 50%;
+  left: 0;
+  transform: translate(-50%, -50%);
 `;
 
 const StyledTableEnd = styled(TableCell)`
@@ -82,12 +109,12 @@ const StyledNavContainer = styled(ContainerBox)`
   margin: 0 auto;
 `;
 
-const StyledBodyTableCell = styled(TableCell)<{ $isPromoted?: boolean }>`
-  ${({ theme: { spacing }, $isPromoted }) => `
+const StyledBodyTableCell = styled(TableCell)<{ $hasCondition?: boolean }>`
+  ${({ theme: { spacing }, $hasCondition }) => `
   height: ${spacing(14.5)};
   padding-top: ${spacing(0.5)};
   padding-bottom: ${spacing(0.5)};
-  ${$isPromoted && `position: relative;`}
+  ${$hasCondition && `position: relative;`}
 `}
 `;
 
@@ -207,9 +234,14 @@ const Row = <T extends StrategiesTableVariants>({
 
   const strategy = getStrategyFromTableObject(rowData, variant);
   const isPromoted = PROMOTED_STRATEGIES_IDS.includes(strategy.id as StrategyId);
+  // TODO: remove this once we have a real locked strategy
+  const isLocked = !!strategy.id;
+
+  const condition = isLocked ? StrategyConditionType.LOCKED : isPromoted ? StrategyConditionType.PROMOTED : undefined;
+
   return (
     <StyledTableRow
-      $isPromoted={isPromoted}
+      $condition={condition}
       key={strategy.id}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
@@ -219,23 +251,26 @@ const Row = <T extends StrategiesTableVariants>({
     >
       {columns.map((column, i) => (
         <Hidden {...column.hiddenProps} key={`${strategy.id}-${column.key}`}>
-          <StyledBodyTableCell key={`${strategy.id}-${column.key}`} $isPromoted={isPromoted && i === 0}>
-            {isPromoted && i === 0 && <PromotedFlag />}
+          <StyledBodyTableCell key={`${strategy.id}-${column.key}`} $hasCondition={!!condition && i === 0}>
+            {condition === StrategyConditionType.PROMOTED && i === 0 && <PromotedFlag />}
+            {condition === StrategyConditionType.LOCKED && i === 0 && (
+              // TODO: Replace with the necessary tier badge
+              <StyledTierBadge CurrentTierBadge={ShieldTickIcon} />
+            )}
             {renderBodyCell(column.renderCell(rowData, showBalances))}
           </StyledBodyTableCell>
         </Hidden>
       ))}
-            {showEndChevron && (
-
-      <StyledTableEnd size="small">
-        <StyledNavContainer alignItems="center">
-          <DividerBorder2 orientation="vertical" />
-          <AnimatedChevronRightIcon
-            $hovered={hovered}
-            sx={({ palette }) => ({ color: colors[palette.mode].accentPrimary })}
-          />
-        </StyledNavContainer>
-      </StyledTableEnd>
+      {showEndChevron && (
+        <StyledTableEnd size="small">
+          <StyledNavContainer alignItems="center">
+            <DividerBorder2 orientation="vertical" />
+            <AnimatedChevronRightIcon
+              $hovered={hovered}
+              sx={({ palette }) => ({ color: colors[palette.mode].accentPrimary })}
+            />
+          </StyledNavContainer>
+        </StyledTableEnd>
       )}
     </StyledTableRow>
   );

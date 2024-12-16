@@ -6,6 +6,7 @@ import { SetStateCallback, Strategy } from 'common-types';
 import StrategyCardItem from '../strategy-card-item';
 import { getStrategyFromTableObject } from '@common/utils/earn/parsing';
 import EmptyPortfolio from '../strategies-table/components/empty-portfolio';
+import { DataCardVariants } from '@pages/strategy-guardian-detail/vault-data/components/data-cards';
 
 interface StrategiesListProps<
   T extends StrategiesTableVariants.ALL_STRATEGIES | StrategiesTableVariants.USER_STRATEGIES,
@@ -51,7 +52,10 @@ const StrategiesList = <T extends StrategiesTableVariants.ALL_STRATEGIES | Strat
           ))
         : visibleStrategies.map((tableStrategy, index) => (
             <Grid item xs={12} md={6} key={index}>
-              <StrategyCardItem strategy={getStrategyFromTableObject<T>(tableStrategy, variant as T) as Strategy} />
+              <StrategyCardItem
+                strategy={getStrategyFromTableObject<T>(tableStrategy, variant as T) as Strategy}
+                variant={DataCardVariants.Home}
+              />
             </Grid>
           ))}
       {!isPortfolio && (

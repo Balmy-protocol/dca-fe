@@ -12,6 +12,7 @@ import {
   InfoCircleIcon,
   SkeletonProps,
   DividerBorder2,
+  ShieldTickIcon,
 } from 'ui-library';
 import { SPACING } from 'ui-library/src/theme/constants';
 
@@ -24,6 +25,7 @@ interface DataCardsProps {
   strategy?: Strategy | DisplayStrategy;
   dataCardsGap?: number;
   variant?: DataCardVariants;
+  isLocked?: boolean;
 }
 
 interface DataCardProps {
@@ -31,17 +33,21 @@ interface DataCardProps {
   content: React.ReactNode;
   info?: React.ReactNode;
   variant?: DataCardVariants;
+  isLocked?: boolean;
 }
 
-const StyledDataCardBox = styled(ContainerBox)<{ $isDetails: boolean }>`
+const StyledDataCardBox = styled(ContainerBox)<{ $isDetails: boolean; $isLocked?: boolean }>`
   ${({
     theme: {
       palette: { mode },
       spacing,
     },
     $isDetails,
+    $isLocked,
   }) => `
-    border: 1px solid ${$isDetails ? colors[mode].border.border1 : colors[mode].border.border2};
+    border: 1px solid ${
+      $isLocked ? colors[mode].accentPrimary : $isDetails ? colors[mode].border.border1 : colors[mode].border.border2
+    };
     background-color: ${colors[mode].background.tertiary};
     padding: ${spacing(3)};
     border-radius: ${spacing(3)};
@@ -58,7 +64,7 @@ const StyledDataCardsContainer = styled(ContainerBox).attrs({
   `};
 `;
 
-const DataCard = ({ title, content, info, variant }: DataCardProps) => (
+const DataCard = ({ title, content, info, variant, isLocked }: DataCardProps) => (
   <StyledDataCardBox
     alignItems="center"
     justifyContent="center"
@@ -66,6 +72,7 @@ const DataCard = ({ title, content, info, variant }: DataCardProps) => (
     gap={1}
     flex={1}
     $isDetails={variant === DataCardVariants.Details}
+    $isLocked={isLocked}
   >
     <ContainerBox alignItems="center" justifyContent="center" gap={1}>
       <Typography variant="bodySmallBold" whiteSpace="nowrap">
@@ -105,7 +112,7 @@ const StyledDataCardYieldTypeBox = styled(ContainerBox)`
   `};
 `;
 
-const DataCards = ({ strategy, dataCardsGap = 4, variant = DataCardVariants.Details }: DataCardsProps) => {
+const DataCards = ({ strategy, dataCardsGap = 4, variant = DataCardVariants.Details, isLocked }: DataCardsProps) => {
   const intl = useIntl();
   const loading = !strategy;
 
@@ -123,6 +130,26 @@ const DataCards = ({ strategy, dataCardsGap = 4, variant = DataCardVariants.Deta
           }
           variant={variant}
         />
+        {isLocked && (
+          <DataCard
+            title={
+              <FormattedMessage
+                defaultMessage="Required"
+                description="earn.strategy-details.vault-data.required-tier"
+              />
+            }
+            // TODO: Replace with the necessary tier badge
+            content={loading ? <SkeletonDataCard /> : <ShieldTickIcon />}
+            info={
+              <FormattedMessage
+                defaultMessage="The minimum tier required to access this vault."
+                description="earn.strategy-details.vault-data.required-tier-info"
+              />
+            }
+            variant={variant}
+            isLocked={isLocked}
+          />
+        )}
         <DataCard
           title={<FormattedMessage defaultMessage="TVL" description="earn.strategy-details.vault-data.tvl" />}
           content={
