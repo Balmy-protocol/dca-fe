@@ -219,8 +219,6 @@ const ReferralsTable = () => {
   const availableInviteCodes =
     totalInviteCodes - inviteCodes.filter((inviteCode) => inviteCode.isReferralActive).length;
 
-  console.log(inviteCodes);
-
   return (
     <StyledReferralTable>
       <ContainerBox gap={2}>

@@ -344,6 +344,7 @@ export default class AccountService extends EventsManager<AccountServiceData> {
         address,
         status: WalletStatus.connected,
         isAuth: true,
+        isOwner: false,
       });
     }
 
@@ -375,6 +376,8 @@ export default class AccountService extends EventsManager<AccountServiceData> {
           return {
             ...foundWallet,
             isAuth: accountWallet.isAuth,
+            isOwner: accountWallet.isOwner,
+            achievements: accountWallet.achievements,
           };
         }
 
@@ -382,6 +385,8 @@ export default class AccountService extends EventsManager<AccountServiceData> {
           address: accountWallet.address,
           isAuth: accountWallet.isAuth,
           status: WalletStatus.disconnected,
+          isOwner: accountWallet.isOwner,
+          achievements: accountWallet.achievements,
         });
       });
 
