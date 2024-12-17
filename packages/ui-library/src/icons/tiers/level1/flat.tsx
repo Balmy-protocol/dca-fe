@@ -14,73 +14,73 @@ export default function TierLevel1Flat({ size, ...props }: IconProps) {
 
   return (
     <CustomSvgIcon
-      viewBox="0 0 14 17.5415"
+      viewBox="0 0 13 18"
       style={size ? { fontSize: size } : {}}
       {...props}
       sx={{ fill: 'transparent !important' }}
     >
       <path
-        d="M1.12292 0.644347C1.12292 0.601301 1.15782 0.566406 1.20087 0.566406H7.01113H12.8214C12.8644 0.566406 12.8993 0.601302 12.8993 0.644347V14.7009C12.8993 14.7033 12.8981 14.7055 12.8961 14.7068C9.30058 16.9749 4.72168 16.9749 1.12619 14.7068C1.12416 14.7055 1.12292 14.7033 1.12292 14.7009V0.644347Z"
+        d="M0.637939 2.34766C0.637939 1.51923 1.30951 0.847656 2.13794 0.847656H6.52615H10.9143C11.7428 0.847656 12.4144 1.51923 12.4144 2.34766V14.2258C12.4144 14.699 12.1716 15.1391 11.7714 15.3916C8.56673 17.4132 4.48556 17.4132 1.28091 15.3916C0.880679 15.1391 0.637939 14.699 0.637939 14.2258V2.34766Z"
         stroke={colors[mode].typography.typo4}
       />
-      <g filter="url(#filter0_dddd_2709_144812)">
+      <g filter="url(#filter0_dddd_14115_6722)">
         <path
-          d="M8.31841 4.72727V12H6.78077V6.18679H6.73816L5.07267 7.23082V5.86719L6.8731 4.72727H8.31841Z"
+          d="M7.83343 5.00852V12.2812H6.29578V6.46804H6.25317L4.58769 7.51207V6.14844L6.38811 5.00852H7.83343Z"
           fill={colors[mode].typography.typo4}
         />
       </g>
       <defs>
         <filter
-          id="filter0_dddd_2709_144812"
-          x="4.08198"
-          y="4.52843"
-          width="5.22702"
-          height="11.0379"
+          id="filter0_dddd_14115_6722"
+          x="0.0652595"
+          y="4.10407"
+          width="12.2906"
+          height="24.4578"
           filterUnits="userSpaceOnUse"
           colorInterpolationFilters="sRGB"
         >
-          <feFlood floodOpacity="0" result="BackgroundImageFixFlat1" />
+          <feFlood floodOpacity="0" result="BackgroundImageFix" />
           <feColorMatrix
             in="SourceAlpha"
             type="matrix"
             values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"
             result="hardAlpha"
           />
-          <feOffset dy="0.19813" />
-          <feGaussianBlur stdDeviation="0.19813" />
+          <feOffset dy="0.904477" />
+          <feGaussianBlur stdDeviation="0.904477" />
           <feColorMatrix type="matrix" values="0 0 0 0 0.176471 0 0 0 0 0.0470588 0 0 0 0 0.372549 0 0 0 0.05 0" />
-          <feBlend mode="normal" in2="BackgroundImageFixFlat1" result="effect1_dropShadow_2709_144812" />
+          <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_14115_6722" />
           <feColorMatrix
             in="SourceAlpha"
             type="matrix"
             values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"
             result="hardAlpha"
           />
-          <feOffset dy="0.594389" />
-          <feGaussianBlur stdDeviation="0.297195" />
+          <feOffset dy="2.71343" />
+          <feGaussianBlur stdDeviation="1.35672" />
           <feColorMatrix type="matrix" values="0 0 0 0 0.176471 0 0 0 0 0.0470588 0 0 0 0 0.372549 0 0 0 0.04 0" />
-          <feBlend mode="normal" in2="effect1_dropShadow_2709_144812" result="effect2_dropShadow_2709_144812" />
+          <feBlend mode="normal" in2="effect1_dropShadow_14115_6722" result="effect2_dropShadow_14115_6722" />
           <feColorMatrix
             in="SourceAlpha"
             type="matrix"
             values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"
             result="hardAlpha"
           />
-          <feOffset dy="1.38691" />
-          <feGaussianBlur stdDeviation="0.396259" />
+          <feOffset dy="6.33134" />
+          <feGaussianBlur stdDeviation="1.80895" />
           <feColorMatrix type="matrix" values="0 0 0 0 0.176471 0 0 0 0 0.0470588 0 0 0 0 0.372549 0 0 0 0.03 0" />
-          <feBlend mode="normal" in2="effect2_dropShadow_2709_144812" result="effect3_dropShadow_2709_144812" />
+          <feBlend mode="normal" in2="effect2_dropShadow_14115_6722" result="effect3_dropShadow_14115_6722" />
           <feColorMatrix
             in="SourceAlpha"
             type="matrix"
             values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"
             result="hardAlpha"
           />
-          <feOffset dy="2.57569" />
-          <feGaussianBlur stdDeviation="0.495324" />
+          <feOffset dy="11.7582" />
+          <feGaussianBlur stdDeviation="2.26119" />
           <feColorMatrix type="matrix" values="0 0 0 0 0.176471 0 0 0 0 0.0470588 0 0 0 0 0.372549 0 0 0 0.01 0" />
-          <feBlend mode="normal" in2="effect3_dropShadow_2709_144812" result="effect4_dropShadow_2709_144812" />
-          <feBlend mode="normal" in="SourceGraphic" in2="effect4_dropShadow_2709_144812" result="shape" />
+          <feBlend mode="normal" in2="effect3_dropShadow_14115_6722" result="effect4_dropShadow_14115_6722" />
+          <feBlend mode="normal" in="SourceGraphic" in2="effect4_dropShadow_14115_6722" result="shape" />
         </filter>
       </defs>
     </CustomSvgIcon>

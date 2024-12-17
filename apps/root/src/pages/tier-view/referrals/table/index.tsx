@@ -39,7 +39,7 @@ const StyledTableEnd = styled(TableCell).attrs({ size: 'small' })`
 `;
 
 const ReferralsTableHeader = () => (
-  <TableRow>
+  <TableRow sx={{ backgroundColor: 'transparent !important' }}>
     <TableCell>
       <StyledBodySmallLabelTypography>
         <FormattedMessage description="tier-view.referrals.table.code" defaultMessage="Code" />
@@ -189,7 +189,7 @@ const ReferralsBodyItem = ({
             variant="bodySmallRegular"
             sx={{ textDecorationLine: claimedBy ? 'strikethrough' : 'none' }}
             color={({ palette }) =>
-              claimedBy ? colors[palette.mode].typography.typo2 : colors[palette.mode].typography.typo4
+              claimedBy ? colors[palette.mode].typography.typo4 : colors[palette.mode].typography.typo2
             }
           >
             {code}

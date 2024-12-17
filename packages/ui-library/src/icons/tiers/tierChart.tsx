@@ -1,11 +1,20 @@
 import React from 'react';
 import { CustomSvgIcon, SvgIconProps } from '../../components/svgicon';
+import { Palette, useTheme } from '@mui/material';
 
 interface IconProps extends SvgIconProps {
   size?: string;
 }
 
+const GRADIENT_COLOR: Record<Palette['mode'], { start: string; end: string }> = {
+  light: { start: '#791AFF', end: '#4A00B2' },
+  dark: { start: '#07DFAA', end: '#049571' },
+};
+
 export default function TierChartIcon({ size, ...props }: IconProps) {
+  const { palette } = useTheme();
+  const { start, end } = GRADIENT_COLOR[palette.mode];
+
   return (
     <CustomSvgIcon viewBox="0 0 25 24" style={size ? { fontSize: size } : {}} {...props}>
       <path
@@ -33,8 +42,8 @@ export default function TierChartIcon({ size, ...props }: IconProps) {
           y2="22"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stopColor="#791AFF" />
-          <stop offset="1" stopColor="#4A00B3" />
+          <stop stopColor={start} />
+          <stop offset="1" stopColor={end} />
         </linearGradient>
         <linearGradient
           id="paint1_linear_2788_74743"
@@ -44,8 +53,8 @@ export default function TierChartIcon({ size, ...props }: IconProps) {
           y2="13.6889"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stopColor="#791AFF" />
-          <stop offset="1" stopColor="#4A00B3" />
+          <stop stopColor={start} />
+          <stop offset="1" stopColor={end} />
         </linearGradient>
         <linearGradient
           id="paint2_linear_2788_74743"
@@ -55,8 +64,8 @@ export default function TierChartIcon({ size, ...props }: IconProps) {
           y2="12.0964"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stopColor="#791AFF" />
-          <stop offset="1" stopColor="#4A00B3" />
+          <stop stopColor={start} />
+          <stop offset="1" stopColor={end} />
         </linearGradient>
         <linearGradient
           id="paint3_linear_2788_74743"
@@ -66,8 +75,8 @@ export default function TierChartIcon({ size, ...props }: IconProps) {
           y2="10.5"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stopColor="#791AFF" />
-          <stop offset="1" stopColor="#4A00B3" />
+          <stop stopColor={start} />
+          <stop offset="1" stopColor={end} />
         </linearGradient>
       </defs>
     </CustomSvgIcon>

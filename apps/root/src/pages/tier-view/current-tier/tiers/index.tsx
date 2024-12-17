@@ -2,7 +2,7 @@ import useTierLevel from '@hooks/tiers/useTierLevel';
 import React from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
-import { baseColors, colors, ContainerBox, Grid, TierPillTabs, Typography } from 'ui-library';
+import { colors, ContainerBox, Grid, TierPillTabs, Typography } from 'ui-library';
 import { TIER_LEVEL_OPTIONS, TIER_REWARDS, TierReward } from '../../constants';
 
 const StyledTierRewardBox = styled(ContainerBox).attrs({ flexDirection: 'column', gap: 6, flex: 1 })`
@@ -29,7 +29,7 @@ const StyledTierRewardBoxBadge = styled(ContainerBox).attrs({ gap: 2, alignItems
     },
   }) => `
     background-color: ${colors[mode].background.tertiary};
-    border: 1px solid ${colors[mode].border.accent};
+    border: 1px solid ${colors[mode].accent.primary};
     border-radius: ${spacing(2)};
     padding: ${spacing(0.5)} ${spacing(2)};
   `}
@@ -72,7 +72,7 @@ const TriangleBehindFlag = styled.div`
 const ComingSoonFlag = () => (
   <StyledComingSoonFlagContainer>
     <StyledComingSoonFlag>
-      <Typography variant="bodySmallRegular" color={baseColors.white}>
+      <Typography variant="bodySmallRegular" color={({ palette }) => colors[palette.mode].background.tertiary}>
         <FormattedMessage description="tier-view.current-tier.tiers.coming-soon" defaultMessage="Coming soon" />
       </Typography>
     </StyledComingSoonFlag>

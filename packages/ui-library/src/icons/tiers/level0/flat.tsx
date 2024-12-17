@@ -11,85 +11,30 @@ export default function TierLevel0Flat({ size, ...props }: IconProps) {
   const {
     palette: { mode },
   } = useTheme();
-
   return (
-    <CustomSvgIcon viewBox="0 0 20 19" style={size ? { fontSize: size } : {}} {...props} sx={{ fill: 'transparent' }}>
-      <g filter="url(#filter0_dddd_2750_122200)">
-        <path
-          d="M3.83455 3.52778C3.83455 3.35661 3.94948 3.20677 4.11481 3.16241L9.90196 1.60954C9.96618 1.5923 10.0338 1.5923 10.098 1.60954L15.8852 3.16241C16.0505 3.20677 16.1655 3.35661 16.1655 3.52778V15.9801C16.1655 16.1542 16.0467 16.3058 15.8777 16.3474L10.0905 17.7733L10.1377 17.9649L10.0905 17.7733C10.0311 17.7879 9.96895 17.7879 9.9095 17.7733L9.86229 17.9649L9.9095 17.7733L4.12235 16.3474C3.95333 16.3058 3.83455 16.1542 3.83455 15.9801V3.52778Z"
-          stroke={colors[mode].typography.typo4}
-          strokeWidth="0.394683"
-        />
-      </g>
+    <CustomSvgIcon
+      viewBox="0 0 13 18"
+      style={size ? { fontSize: size } : {}}
+      {...props}
+      sx={{ fill: 'transparent !important' }}
+    >
       <path
-        d="M4.13721 2.05713C4.13721 2.01048 4.17503 1.97266 4.22168 1.97266H10H15.7783C15.825 1.97266 15.8628 2.01048 15.8628 2.05713V17.5081C15.8628 17.5547 15.825 17.5926 15.7783 17.5926H10H4.22168C4.17503 17.5926 4.13721 17.5547 4.13721 17.5081V2.05713Z"
+        d="M0.5 2.47266C0.5 1.64423 1.17157 0.972656 2 0.972656H6.36279H10.7256C11.554 0.972656 12.2256 1.64423 12.2256 2.47266V15.0926C12.2256 15.921 11.554 16.5926 10.7256 16.5926H6.36279H2C1.17157 16.5926 0.5 15.921 0.5 15.0926V2.47266Z"
         stroke={colors[mode].typography.typo4}
       />
-      <g filter="url(#filter1_dddd_2750_122200)">
+      <g filter="url(#filter0_dddd_14115_6708)">
         <path
-          d="M9.99856 13.4411C9.38776 13.4387 8.8622 13.2884 8.42185 12.9901C7.98388 12.6918 7.64652 12.2597 7.40978 11.6939C7.17541 11.1281 7.0594 10.4474 7.06177 9.65199C7.06177 8.8589 7.17896 8.183 7.41333 7.62429C7.65007 7.06558 7.98743 6.64062 8.42541 6.34943C8.86575 6.05587 9.39013 5.90909 9.99856 5.90909C10.607 5.90909 11.1302 6.05587 11.5682 6.34943C12.0085 6.64299 12.347 7.06913 12.5838 7.62784C12.8205 8.18419 12.9377 8.8589 12.9353 9.65199C12.9353 10.4498 12.817 11.1316 12.5802 11.6974C12.3459 12.2633 12.0097 12.6953 11.5717 12.9936C11.1337 13.2919 10.6094 13.4411 9.99856 13.4411ZM9.99856 12.1662C10.4152 12.1662 10.7478 11.9567 10.9964 11.5376C11.245 11.1186 11.3681 10.4901 11.3657 9.65199C11.3657 9.10038 11.3089 8.6411 11.1953 8.27415C11.084 7.9072 10.9254 7.63139 10.7194 7.44673C10.5158 7.26207 10.2755 7.16974 9.99856 7.16974C9.58426 7.16974 9.25282 7.37689 9.00424 7.79119C8.75566 8.20549 8.63019 8.82576 8.62782 9.65199C8.62782 10.2107 8.68345 10.6771 8.79472 11.0511C8.90836 11.4228 9.06816 11.7022 9.27413 11.8892C9.48009 12.0739 9.72157 12.1662 9.99856 12.1662Z"
+          d="M6.3616 12.4411C5.7508 12.4387 5.22523 12.2884 4.78489 11.9901C4.34692 11.6918 4.00956 11.2597 3.77282 10.6939C3.53844 10.1281 3.42244 9.44744 3.42481 8.65199C3.42481 7.8589 3.54199 7.183 3.77637 6.62429C4.01311 6.06558 4.35047 5.64062 4.78844 5.34943C5.22878 5.05587 5.75317 4.90909 6.3616 4.90909C6.97002 4.90909 7.49323 5.05587 7.9312 5.34943C8.37154 5.64299 8.71008 6.06913 8.94682 6.62784C9.18357 7.18419 9.30075 7.8589 9.29839 8.65199C9.29839 9.44981 9.18001 10.1316 8.94327 10.6974C8.7089 11.2633 8.37272 11.6953 7.93475 11.9936C7.49678 12.2919 6.97239 12.4411 6.3616 12.4411ZM6.3616 11.1662C6.77826 11.1662 7.11089 10.9567 7.35947 10.5376C7.60805 10.1186 7.73115 9.49006 7.72878 8.65199C7.72878 8.10038 7.67197 7.6411 7.55833 7.27415C7.44706 6.9072 7.28844 6.63139 7.08248 6.44673C6.87888 6.26207 6.63858 6.16974 6.3616 6.16974C5.9473 6.16974 5.61586 6.37689 5.36728 6.79119C5.1187 7.20549 4.99322 7.82576 4.99086 8.65199C4.99086 9.2107 5.04649 9.67708 5.15776 10.0511C5.2714 10.4228 5.4312 10.7022 5.63716 10.8892C5.84313 11.0739 6.08461 11.1662 6.3616 11.1662Z"
           fill={colors[mode].typography.typo4}
         />
       </g>
       <defs>
         <filter
-          id="filter0_dddd_2750_122200"
-          x="0.497639"
-          y="0.725673"
-          width="19.0047"
-          height="28.2433"
-          filterUnits="userSpaceOnUse"
-          colorInterpolationFilters="sRGB"
-        >
-          <feFlood floodOpacity="0" result="BackgroundImageFix" />
-          <feColorMatrix
-            in="SourceAlpha"
-            type="matrix"
-            values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"
-            result="hardAlpha"
-          />
-          <feOffset dy="0.44851" />
-          <feGaussianBlur stdDeviation="0.560637" />
-          <feColorMatrix type="matrix" values="0 0 0 0 0.176471 0 0 0 0 0.0470588 0 0 0 0 0.372549 0 0 0 0.08 0" />
-          <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_2750_122200" />
-          <feColorMatrix
-            in="SourceAlpha"
-            type="matrix"
-            values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"
-            result="hardAlpha"
-          />
-          <feOffset dy="2.01829" />
-          <feGaussianBlur stdDeviation="1.00915" />
-          <feColorMatrix type="matrix" values="0 0 0 0 0.176471 0 0 0 0 0.0470588 0 0 0 0 0.372549 0 0 0 0.07 0" />
-          <feBlend mode="normal" in2="effect1_dropShadow_2750_122200" result="effect2_dropShadow_2750_122200" />
-          <feColorMatrix
-            in="SourceAlpha"
-            type="matrix"
-            values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"
-            result="hardAlpha"
-          />
-          <feOffset dy="4.4851" />
-          <feGaussianBlur stdDeviation="1.34553" />
-          <feColorMatrix type="matrix" values="0 0 0 0 0.176471 0 0 0 0 0.0470588 0 0 0 0 0.372549 0 0 0 0.04 0" />
-          <feBlend mode="normal" in2="effect2_dropShadow_2750_122200" result="effect3_dropShadow_2750_122200" />
-          <feColorMatrix
-            in="SourceAlpha"
-            type="matrix"
-            values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"
-            result="hardAlpha"
-          />
-          <feOffset dy="7.84892" />
-          <feGaussianBlur stdDeviation="1.56978" />
-          <feColorMatrix type="matrix" values="0 0 0 0 0.176471 0 0 0 0 0.0470588 0 0 0 0 0.372549 0 0 0 0.01 0" />
-          <feBlend mode="normal" in2="effect3_dropShadow_2750_122200" result="effect4_dropShadow_2750_122200" />
-          <feBlend mode="normal" in="SourceGraphic" in2="effect4_dropShadow_2750_122200" result="shape" />
-        </filter>
-        <filter
-          id="filter1_dddd_2750_122200"
-          x="2.53572"
-          y="5.00568"
-          width="14.9256"
-          height="24.7163"
+          id="filter0_dddd_14115_6708"
+          x="-1.101"
+          y="4.00458"
+          width="14.9251"
+          height="24.7171"
           filterUnits="userSpaceOnUse"
           colorInterpolationFilters="sRGB"
         >
@@ -103,7 +48,7 @@ export default function TierLevel0Flat({ size, ...props }: IconProps) {
           <feOffset dy="0.904477" />
           <feGaussianBlur stdDeviation="0.904477" />
           <feColorMatrix type="matrix" values="0 0 0 0 0.176471 0 0 0 0 0.0470588 0 0 0 0 0.372549 0 0 0 0.05 0" />
-          <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_2750_122200" />
+          <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_14115_6708" />
           <feColorMatrix
             in="SourceAlpha"
             type="matrix"
@@ -113,7 +58,7 @@ export default function TierLevel0Flat({ size, ...props }: IconProps) {
           <feOffset dy="2.71343" />
           <feGaussianBlur stdDeviation="1.35672" />
           <feColorMatrix type="matrix" values="0 0 0 0 0.176471 0 0 0 0 0.0470588 0 0 0 0 0.372549 0 0 0 0.04 0" />
-          <feBlend mode="normal" in2="effect1_dropShadow_2750_122200" result="effect2_dropShadow_2750_122200" />
+          <feBlend mode="normal" in2="effect1_dropShadow_14115_6708" result="effect2_dropShadow_14115_6708" />
           <feColorMatrix
             in="SourceAlpha"
             type="matrix"
@@ -123,7 +68,7 @@ export default function TierLevel0Flat({ size, ...props }: IconProps) {
           <feOffset dy="6.33134" />
           <feGaussianBlur stdDeviation="1.80895" />
           <feColorMatrix type="matrix" values="0 0 0 0 0.176471 0 0 0 0 0.0470588 0 0 0 0 0.372549 0 0 0 0.03 0" />
-          <feBlend mode="normal" in2="effect2_dropShadow_2750_122200" result="effect3_dropShadow_2750_122200" />
+          <feBlend mode="normal" in2="effect2_dropShadow_14115_6708" result="effect3_dropShadow_14115_6708" />
           <feColorMatrix
             in="SourceAlpha"
             type="matrix"
@@ -133,19 +78,9 @@ export default function TierLevel0Flat({ size, ...props }: IconProps) {
           <feOffset dy="11.7582" />
           <feGaussianBlur stdDeviation="2.26119" />
           <feColorMatrix type="matrix" values="0 0 0 0 0.176471 0 0 0 0 0.0470588 0 0 0 0 0.372549 0 0 0 0.01 0" />
-          <feBlend mode="normal" in2="effect3_dropShadow_2750_122200" result="effect4_dropShadow_2750_122200" />
-          <feBlend mode="normal" in="SourceGraphic" in2="effect4_dropShadow_2750_122200" result="shape" />
+          <feBlend mode="normal" in2="effect3_dropShadow_14115_6708" result="effect4_dropShadow_14115_6708" />
+          <feBlend mode="normal" in="SourceGraphic" in2="effect4_dropShadow_14115_6708" result="shape" />
         </filter>
-        <linearGradient
-          id="paint0_linear_2750_122200"
-          x1="6.80737"
-          y1="9.78261"
-          x2="14.6254"
-          y2="9.78261"
-          gradientUnits="userSpaceOnUse"
-        >
-          <stop stopColor="#A35B30" />
-        </linearGradient>
       </defs>
     </CustomSvgIcon>
   );

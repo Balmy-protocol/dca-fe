@@ -31,7 +31,6 @@ export type TierReward = {
   icon: React.ReactNode;
   badge?: MessageDescriptor;
   comingSoon: boolean;
-  infoTitle?: MessageDescriptor;
 };
 
 export const TIER_REWARDS: Record<number, TierReward[]> = {

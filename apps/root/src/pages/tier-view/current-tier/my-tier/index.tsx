@@ -36,7 +36,6 @@ const StyledTierLevelSpan = styled(Typography).attrs({ variant: 'h1Bold' })`
   ${({ theme: { palette } }) => `
     background: ${palette.gradient.tierLevel};
     background-clip: text;
-    -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
   `}
 `;

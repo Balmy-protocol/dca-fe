@@ -1,4 +1,4 @@
-import React, { createElement } from 'react';
+import React from 'react';
 import useTierLevel from '@hooks/tiers/useTierLevel';
 import useEarnAccess from '@hooks/useEarnAccess';
 import styled from 'styled-components';
@@ -23,6 +23,16 @@ const StyledTierPill = styled(ContainerBox).attrs({ gap: 2, alignItems: 'center'
   `}
 `;
 
+const StyledTierPillChevronContainer = styled(ContainerBox)`
+  ${({
+    theme: {
+      palette: { mode },
+    },
+  }) => `
+    color: ${colors[mode].accent.primary};
+  `}
+`;
+
 const TierPill = () => {
   const { tierLevel } = useTierLevel();
   const { hasEarnAccess } = useEarnAccess();
@@ -40,16 +50,16 @@ const TierPill = () => {
     pushToHistory('/tier-view');
   };
 
+  const TierIcon = ActiveTiersIcons[tierLevel];
   return (
     <StyledTierPill onClick={onClick} onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}>
-      {createElement(ActiveTiersIcons[tierLevel], { size: '1rem' })}
+      <TierIcon size="1rem" />
       <Typography variant="bodySmallSemibold" sx={({ palette }) => ({ color: colors[palette.mode].accent.primary })}>
         {intl.formatMessage(TIER_LEVEL_OPTIONS[tierLevel].title)}
       </Typography>
-      <AnimatedChevronRightIcon
-        $hovered={hovered}
-        sx={({ palette }) => ({ color: colors[palette.mode].accent.primary })}
-      />
+      <StyledTierPillChevronContainer>
+        <AnimatedChevronRightIcon $hovered={hovered} />
+      </StyledTierPillChevronContainer>
     </StyledTierPill>
   );
 };
