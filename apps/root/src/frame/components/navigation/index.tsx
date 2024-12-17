@@ -52,6 +52,7 @@ import { WalletOptionValues, ALL_WALLETS, WalletSelectorVariants } from '@common
 import GuardianListSubscribeModal from '../guardian-list-subscribe-modal';
 import EarnGainAccessModal from '../earn-gain-access-modal';
 import useEarnAccess from '@hooks/useEarnAccess';
+import TierPill from '../tier-pill';
 
 const helpOptions = [
   {
@@ -144,6 +145,8 @@ const Navigation = ({ children }: React.PropsWithChildren) => {
       dispatch(changeRoute('settings'));
     } else if (location.pathname.startsWith('/token')) {
       dispatch(changeRoute('token'));
+    } else if (location.pathname.startsWith('/tier-view')) {
+      dispatch(changeRoute('tier-view'));
     }
   }, []);
 
@@ -287,6 +290,7 @@ const Navigation = ({ children }: React.PropsWithChildren) => {
         <GuardianListSubscribeModal isOpen={showEarnModal} onClose={() => setShowEarnModal(false)} />
       )}
       <NavigationUI
+        extraHeaderTools={<TierPill />}
         headerContent={
           <NetWorth
             variant={NetWorthVariants.nav}

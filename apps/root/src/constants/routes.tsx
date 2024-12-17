@@ -67,6 +67,10 @@ export const HISTORY_ROUTE = {
   key: 'history',
 };
 
+export const TIER_VIEW_ROUTE = {
+  key: 'tier-view',
+};
+
 const StyledComingSoonContainer = styled(ContainerBox)`
   ${({
     theme: {

@@ -37,6 +37,7 @@ import { SavedCustomConfig } from '@state/base-types';
 type AccountWithConfig = Account & {
   config: Partial<SavedCustomConfig>;
   earn?: EarnEarlyAccess;
+  referrals: AccountId[];
 };
 
 const DEFAULT_SAFE_DEADLINE_SLIPPAGE = {

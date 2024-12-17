@@ -27,6 +27,7 @@ import getWagmiConfig from './wagmiConfig';
 import { EarnService } from './earnService';
 import WalletClientsService from './walletClientsService';
 import { reconnect } from '@wagmi/core';
+import TierService from './tierService';
 
 /* eslint-disable */
 let deepDiffMapper = (function () {
@@ -164,6 +165,8 @@ export default class Web3Service {
 
   walletClientsService: WalletClientsService;
 
+  tierService: TierService;
+
   constructor() {
     this.loadedAsSafeApp = false;
 
@@ -173,7 +176,8 @@ export default class Web3Service {
     this.safeService = new SafeService();
     this.meanApiService = new MeanApiService(this.axiosClient);
     this.walletClientsService = new WalletClientsService(this);
-    this.accountService = new AccountService(this, this.meanApiService, this.walletClientsService);
+    this.tierService = new TierService(this, this.meanApiService);
+    this.accountService = new AccountService(this, this.meanApiService, this.walletClientsService, this.tierService);
     this.sdkService = new SdkService(this.axiosClient);
     this.providerService = new ProviderService(this.accountService, this.sdkService, this.walletClientsService);
     this.contractService = new ContractService(this.providerService);
@@ -260,6 +264,10 @@ export default class Web3Service {
 
   setOnUpdateConfig(onUpdateConfig: (config: Partial<SavedCustomConfig>) => void) {
     this.onUpdateConfig = onUpdateConfig;
+  }
+
+  getTierService() {
+    return this.tierService;
   }
 
   getAccountService() {

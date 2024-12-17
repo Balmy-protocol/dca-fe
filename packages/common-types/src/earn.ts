@@ -1,4 +1,4 @@
-import { NetworkStruct, TokenListId, Token } from '.';
+import { NetworkStruct, TokenListId, Token, AccountId } from '.';
 import { AmountsOfToken, Timestamp } from '@balmy/sdk';
 import {
   Strategy as SdkBaseStrategy,
@@ -172,10 +172,11 @@ export enum DelayedWithdrawalStatus {
   PENDING = 'pending',
   READY = 'ready',
 }
+export type EarnInviteCode = { code: string; claimedBy?: AccountId };
 
 export type EarnEarlyAccess = {
   earlyAccess: boolean;
-  // inviteCodes: { code: string; claimed: boolean }[];
+  inviteCodes: EarnInviteCode[];
   // tier: { achievements: string[]; level: number };
   // referrals: { accountId: string; ...more }[];
 };

@@ -397,7 +397,6 @@ const Navigation = ({
               <MenuIcon sx={{ color: colors[mode].accentPrimary }} />
             </IconButton>
             <AppBarRightContainer alignItems="center" justifyContent="flex-end" flex={1} gap={2}>
-              {extraHeaderTools}
               <OptionsMenu
                 options={helpOptions}
                 mainDisplay={
@@ -407,6 +406,7 @@ const Navigation = ({
                 }
               />
               <OptionsMenu options={settingsOptions} mainDisplay={<CogIcon />} />
+              {extraHeaderTools}
             </AppBarRightContainer>
           </Toolbar>
         </Container>

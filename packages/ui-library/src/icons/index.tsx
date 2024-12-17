@@ -138,7 +138,28 @@ import TrendUpIcon from './trend-up';
 import InformationIcon from './information';
 import PersonOutlineRoundedIcon from './person-outline-rounded';
 import ShieldTickIcon from './shield-tick';
-
+import {
+  TierLevel0Flat,
+  TierLevel0Active,
+  TierLevel0Big,
+  TierLevel1Flat,
+  TierLevel1Active,
+  TierLevel1Big,
+  TierLevel2Flat,
+  TierLevel2Active,
+  TierLevel2Big,
+  TierLevel3Flat,
+  TierLevel3Active,
+  TierLevel3Big,
+  TierLevel4Flat,
+  TierLevel4Active,
+  TierLevel4Big,
+  TierChartIcon,
+  TierGiftIcon,
+  TierMedalStarIcon,
+  TierTicketDiscountIcon,
+} from './tiers';
+import TickSquareIcon from './tickSquare';
 export {
   HelpOutline as HelpOutlineIcon,
   HelpOutlineOutlined as HelpOutlineOutlinedIcon,
@@ -280,4 +301,24 @@ export {
   InformationIcon,
   PersonOutlineRoundedIcon,
   ShieldTickIcon,
+  TierLevel0Flat,
+  TierLevel0Active,
+  TierLevel0Big,
+  TierLevel1Flat,
+  TierLevel1Active,
+  TierLevel1Big,
+  TierLevel2Flat,
+  TierLevel2Active,
+  TierLevel2Big,
+  TierLevel3Flat,
+  TierLevel3Active,
+  TierLevel3Big,
+  TierLevel4Flat,
+  TierLevel4Active,
+  TierLevel4Big,
+  TierChartIcon,
+  TierGiftIcon,
+  TierMedalStarIcon,
+  TierTicketDiscountIcon,
+  TickSquareIcon,
 };

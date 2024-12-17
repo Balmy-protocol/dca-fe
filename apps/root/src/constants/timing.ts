@@ -8,6 +8,7 @@ export enum IntervalSetActions {
   globalBalance = 1000 * 60 * 1, // one minute
   strategyUpdate = 1000 * 60 * 60, // 1 hour
   earnPositionsUpdate = 1000 * 60 * 10, // 10 minutes
+  tierUpdate = 1000 * 60 * 10, // 10 minutes
 }
 
 export enum TimeoutPromises {

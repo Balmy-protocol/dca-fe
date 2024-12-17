@@ -33,6 +33,7 @@ declare module '@mui/material/styles' {
     linkRegular: React.CSSProperties;
     linkSmall: React.CSSProperties;
     labelLarge: React.CSSProperties;
+    labelExtraLarge: React.CSSProperties;
     labelRegular: React.CSSProperties;
     labelSemiBold: React.CSSProperties;
   }
@@ -63,12 +64,14 @@ declare module '@mui/material/styles' {
     labelLarge?: React.CSSProperties;
     labelRegular?: React.CSSProperties;
     labelSemiBold?: React.CSSProperties;
+    labelExtraLarge?: React.CSSProperties;
   }
 
   interface Palette {
     gradient: PaletteColor & {
       earnWizard: string;
       newsBanner: string;
+      tierLevel: string;
       rewards: string;
     };
     typo1: string;
@@ -83,6 +86,7 @@ declare module '@mui/material/styles' {
       earnWizard?: string;
       newsBanner?: string;
       rewards?: string;
+      tierLevel?: string;
     };
     typo1?: string;
     typo2?: string;
@@ -119,5 +123,6 @@ declare module '@mui/material/Typography' {
     labelLarge: true;
     labelRegular: true;
     labelSemiBold: true;
+    labelExtraLarge: true;
   }
 }
