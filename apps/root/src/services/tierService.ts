@@ -18,10 +18,8 @@ const initialState: TierServiceData = { tier: 0, inviteCodes: [], referrals: [],
 // Mapping of achievement IDs to specific requirements
 export enum AchievementKeys {
   SWAP_VOLUME = 'agg-swaps',
-  DCA_SWAPS = 'dca-positions',
   TWEET = 'tweet_shared',
   MIGRATED_VOLUME = 'migrated_volume',
-  OWNS_NFT = 'lobster-nft-holder',
   REFERRALS = 'referrals',
 }
 
@@ -227,15 +225,6 @@ export default class TierService extends EventsManager<TierServiceData> {
         details[AchievementKeys.TWEET] = { current: currentTweet, required: 1 };
         if (currentTweet < 1) {
           missing[AchievementKeys.TWEET] = true;
-        }
-      }
-
-      // NFT Ownership
-      if (nextTier.level === 0) {
-        const currentNFT = totalAchievements[AchievementKeys.OWNS_NFT] ? 1 : 0;
-        details[AchievementKeys.OWNS_NFT] = { current: currentNFT, required: 1 };
-        if (currentNFT < 1) {
-          missing[AchievementKeys.OWNS_NFT] = true;
         }
       }
     }

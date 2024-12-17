@@ -1,5 +1,5 @@
 import useTierLevel from '@hooks/tiers/useTierLevel';
-import React, { createElement } from 'react';
+import React from 'react';
 import { defineMessage, FormattedMessage, MessageDescriptor, useIntl } from 'react-intl';
 import styled from 'styled-components';
 import {
@@ -45,10 +45,6 @@ const MESSAGES_BY_MISSING_ACHIEVEMENTS: Record<AchievementKeys, MessageDescripto
     description: 'tier-view.current-tier.my-tier.tier-progress.missing-achievement-swap-volume',
     defaultMessage: 'Swap ${missing}',
   }),
-  [AchievementKeys.DCA_SWAPS]: defineMessage({
-    description: 'tier-view.current-tier.my-tier.tier-progress.missing-achievement-dca-swaps',
-    defaultMessage: 'Make {missing} more DCA swaps',
-  }),
   [AchievementKeys.MIGRATED_VOLUME]: defineMessage({
     description: 'tier-view.current-tier.my-tier.tier-progress.missing-achievement-migrated-volume',
     defaultMessage: 'Migrate ${missing} more liquidity',
@@ -56,10 +52,6 @@ const MESSAGES_BY_MISSING_ACHIEVEMENTS: Record<AchievementKeys, MessageDescripto
   [AchievementKeys.TWEET]: defineMessage({
     description: 'tier-view.current-tier.my-tier.tier-progress.missing-achievement-tweet',
     defaultMessage: 'Share a tweet',
-  }),
-  [AchievementKeys.OWNS_NFT]: defineMessage({
-    description: 'tier-view.current-tier.my-tier.tier-progress.missing-achievement-owns-nft',
-    defaultMessage: 'Own the Lobster NFT',
   }),
   [AchievementKeys.REFERRALS]: defineMessage({
     description: 'tier-view.current-tier.my-tier.tier-progress.missing-achievement-referrals',
@@ -85,12 +77,13 @@ const MyTier = () => {
       };
     });
 
+  const TierIcon = ActiveTiersIcons[tierLevel];
   return (
     <Grid container spacing={6}>
       {/* current tier */}
       <Grid item xs={12} md={6}>
         <StyledMyTierCard>
-          {createElement(ActiveTiersIcons[tierLevel], { size: '4.8125rem' })}
+          <TierIcon size="4.8125rem" />
           <ContainerBox gap={1} flexDirection="column">
             <Typography variant="h1Bold" color={({ palette }) => colors[palette.mode].typography.typo1}>
               <FormattedMessage

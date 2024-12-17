@@ -1,4 +1,4 @@
-import React, { createElement, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { BigIntish } from '@balmy/sdk';
 import isUndefined from 'lodash/isUndefined';
 import { ContainerBox } from '../container-box';
@@ -79,6 +79,11 @@ export const ActiveTiersIcons: Record<number, React.ElementType> = {
   4: TierLevel4Active,
 };
 
+const TierPillIcon = ({ tierLevel, isActive }: { tierLevel: number; isActive: boolean }) => {
+  const TierIcon = isActive ? ActiveTiersIcons[tierLevel] : FlatTiersIcons[tierLevel];
+  return <TierIcon size="1rem" />;
+};
+
 const TierPillTabs = ({ options, onChange, selected, disabled }: TierPillTabsProps) => {
   const [uncontrolledSelection, setUncontrolledSelection] = useState<BigIntish | undefined>(options[0]?.key);
 
@@ -99,7 +104,7 @@ const TierPillTabs = ({ options, onChange, selected, disabled }: TierPillTabsPro
   const selection = isUndefined(selected) ? uncontrolledSelection : selected;
 
   return (
-    <ContainerBox gap={2}>
+    <ContainerBox gap={2} flexWrap="wrap">
       {options.map(({ key, label, isCurrent }, index) => (
         <TierPillTab
           key={key.toString()}
@@ -108,9 +113,7 @@ const TierPillTabs = ({ options, onChange, selected, disabled }: TierPillTabsPro
           selected={key === selection}
         >
           <ContainerBox gap={1} alignItems="center">
-            {key === selection
-              ? createElement(ActiveTiersIcons[index], { size: '1rem' })
-              : createElement(FlatTiersIcons[index], { size: '1rem' })}
+            <TierPillIcon tierLevel={index} isActive={key === selection} />
             <Typography
               variant="bodySmallBold"
               color={({ palette: { mode } }) =>
