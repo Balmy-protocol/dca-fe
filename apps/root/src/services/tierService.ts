@@ -208,16 +208,6 @@ export default class TierService extends EventsManager<TierServiceData> {
         missing[AchievementKeys.SWAP_VOLUME] = requiredSwapVolume - currentSwapVolume;
       }
 
-      // DCA Swaps (only for Tier 0)
-      if (nextTier.level === 0) {
-        const requiredDCASwaps = 30;
-        const currentDCASwaps = totalAchievements[AchievementKeys.DCA_SWAPS] || 0;
-        details[AchievementKeys.DCA_SWAPS] = { current: currentDCASwaps, required: requiredDCASwaps };
-        if (currentDCASwaps < requiredDCASwaps) {
-          missing[AchievementKeys.DCA_SWAPS] = requiredDCASwaps - currentDCASwaps;
-        }
-      }
-
       // Migration Volume
       if (nextTier.level === 3) {
         const requiredMigrationVolume = 2000;

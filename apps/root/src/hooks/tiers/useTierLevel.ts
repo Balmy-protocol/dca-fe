@@ -1,6 +1,7 @@
 import TierService, { TierServiceData } from '@services/tierService';
 import useServiceEvents from '@hooks/useServiceEvents';
 import useTierService from './useTierService';
+import React from 'react';
 
 const useTierLevel = () => {
   const tierService = useTierService();
@@ -8,7 +9,7 @@ const useTierLevel = () => {
 
   const { progress, missing, details } = tierService.getProgressPercentageToNextTier();
 
-  return { tierLevel, progress, missing, details };
+  return React.useMemo(() => ({ tierLevel, progress, missing, details }), [tierLevel, progress, missing, details]);
 };
 
 export default useTierLevel;
