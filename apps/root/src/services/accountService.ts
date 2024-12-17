@@ -716,4 +716,81 @@ export default class AccountService extends EventsManager<AccountServiceData> {
       };
     }
   }
+
+  async verifyWalletOwnership(wallet: Address) {
+    const user = this.getUser();
+    if (!user) return;
+
+    const signature = await this.getWalletVerifyingSignature({});
+
+    const expirationDate = new Date();
+    expirationDate.setMinutes(expirationDate.getMinutes() + 30);
+    const expiration = expirationDate.toString();
+
+    const message = `By signing this message you are authorizing the account (${user.id}) to add this wallet as owner to it. This signature will expire on ${expiration}.`;
+
+    const walletClient = await this.walletClientService.getWalletClient(wallet);
+    if (!walletClient || !walletClient.signMessage) {
+      throw new Error('No wallet client found');
+    }
+    const verifyingSignature = await walletClient.signMessage({
+      account: wallet,
+      message,
+    });
+
+    await this.meanApiService.verifyWalletOwnership({
+      wallet,
+      accountId: user.id,
+      signature,
+      verifyingSignature,
+      expiration,
+    });
+
+    const updatedWallets = user.wallets.map((userWallet) =>
+      userWallet.address === wallet ? { ...userWallet, isOwner: true } : userWallet
+    );
+
+    this.user = { ...user, wallets: updatedWallets };
+
+    const accountIndex = findIndex(this.accounts, { id: user.id });
+
+    if (accountIndex !== -1) {
+      const accounts = [...this.accounts];
+      const updatedAccountWallets = this.accounts[accountIndex].wallets.map((accountWallet) =>
+        accountWallet.address === wallet ? { ...accountWallet, isOwner: true } : accountWallet
+      );
+      accounts[accountIndex].wallets = updatedAccountWallets;
+      this.accounts = accounts;
+    } else {
+      throw new Error('tried to link a wallet to a user that was not set');
+    }
+  }
+
+  async claimEarnEarlyAccess(elegibleAndOwnedAddress: Address) {
+    const user = this.getUser();
+    if (!user) return;
+
+    const signature = await this.getWalletVerifyingSignature({});
+
+    await this.meanApiService.claimEarnEarlyAccess({
+      accountId: user.id,
+      signature,
+      elegibleAndOwnedAddress,
+    });
+
+    this.earlyAccessEnabled = true;
+  }
+
+  async getElegibilityAchievements() {
+    const user = this.getUser();
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    const signature = await this.getWalletVerifyingSignature({});
+    return this.meanApiService.getElegibilityAchievements({
+      signature,
+      addresses: user.wallets.map((wallet) => wallet.address),
+    });
+  }
 }
