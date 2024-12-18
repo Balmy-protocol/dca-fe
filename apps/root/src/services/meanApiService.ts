@@ -33,6 +33,7 @@ import { CLAIM_ABIS } from '@constants/campaigns';
 import { getProtocolToken, getWrappedProtocolToken } from '@common/mocks/tokens';
 import { Address, PublicClient, getContract } from 'viem';
 import { SavedCustomConfig } from '@state/base-types';
+import { ElegibilityAchievementsResponse } from '@hooks/earn/useElegibilityCriteria';
 
 type AccountWithConfig = Account & {
   config: Partial<SavedCustomConfig>;
@@ -562,6 +563,62 @@ export default class MeanApiService {
       url: `${MEAN_API_URL}/v1/accounts/${accountId}/earn/invites/claim`,
       data: { inviteCode },
       signature,
+    });
+  }
+
+  async verifyWalletOwnership({
+    wallet,
+    accountId,
+    signature,
+    verifyingSignature,
+    expiration,
+  }: {
+    wallet: Address;
+    accountId: string;
+    signature: WalletSignature;
+    verifyingSignature: string;
+    expiration: string;
+  }) {
+    return this.authorizedRequest({
+      method: 'PUT',
+      url: `${MEAN_API_URL}/v1/accounts/${accountId}/wallets/${wallet}`,
+      signature,
+      data: {
+        isOwner: true,
+        isAuth: false,
+        signature: verifyingSignature,
+        expiration,
+      },
+    });
+  }
+
+  async claimEarnEarlyAccess({
+    accountId,
+    signature,
+    elegibleAndOwnedAddress,
+  }: {
+    accountId: string;
+    signature: WalletSignature;
+    elegibleAndOwnedAddress: Address;
+  }) {
+    return this.authorizedRequest({
+      method: 'POST',
+      url: `${MEAN_API_URL}/v1/accounts/${accountId}/earn/eligibility/claim`,
+      signature,
+      data: {
+        address: elegibleAndOwnedAddress,
+      },
+    });
+  }
+
+  async getElegibilityAchievements({ signature, addresses }: { signature: WalletSignature; addresses: string[] }) {
+    return this.authorizedRequest<ElegibilityAchievementsResponse>({
+      method: 'GET',
+      url: `${MEAN_API_URL}/v1/earn/eligibility/achievements`,
+      signature,
+      params: {
+        addresses,
+      },
     });
   }
 }

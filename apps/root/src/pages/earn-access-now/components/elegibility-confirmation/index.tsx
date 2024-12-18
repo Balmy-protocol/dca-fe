@@ -8,11 +8,14 @@ import {
   NotEligibleStatus,
   OwnershipConfirmedCase,
 } from './use-cases';
-import { Address } from 'viem';
-import useWallets from '@hooks/useWallets';
 import styled from 'styled-components';
 import confetti from 'canvas-confetti';
 import { StyledElegibilityCriteriaBackgroundPaper } from '../elegibility-criteria';
+import useElegibilityCriteria, { ElegibilityStatus } from '@hooks/earn/useElegibilityCriteria';
+import { Address, Wallet } from 'common-types';
+import useWallets from '@hooks/useWallets';
+import usePrevious from '@hooks/usePrevious';
+import { isEqual } from 'lodash';
 
 const StyledAnimatedElipse = styled(({ showAnimation, ...props }: { showAnimation?: boolean }) => {
   React.useEffect(() => {
@@ -56,11 +59,12 @@ const StyledAnimatedElipse = styled(({ showAnimation, ...props }: { showAnimatio
 `;
 
 interface ElegibilityConfirmationBaseProps {
-  setStatus: (status: ElegibilityConfirmationStatus) => void;
+  setElegibilityStatus: (status: ElegibilityStatus) => void;
+  elegibleAndOwnedAddress?: Address;
 }
 
 interface NeedsSignatureProps extends ElegibilityConfirmationBaseProps {
-  elegibleWallets: Address[];
+  elegibleWallets: Wallet[];
 }
 
 type ElegibilityConfirmationProps = NeedsSignatureProps;
@@ -74,37 +78,41 @@ const STATUS_MAP: Record<ElegibilityConfirmationStatus, React.ComponentType<Eleg
 };
 
 const StatusWithElipse: ElegibilityConfirmationStatus[] = [
-  ElegibilityConfirmationStatus.NOT_ELIGIBLE,
   ElegibilityConfirmationStatus.ELIGIBLE,
   ElegibilityConfirmationStatus.NEEDS_SIGNATURE,
   ElegibilityConfirmationStatus.OWNERSHIP_CONFIRMED,
 ];
 
 const StatusWithSuccessAnimation: ElegibilityConfirmationStatus[] = [
-  ElegibilityConfirmationStatus.NOT_ELIGIBLE,
   ElegibilityConfirmationStatus.ELIGIBLE,
   ElegibilityConfirmationStatus.NEEDS_SIGNATURE,
 ];
 
 const ElegibilityConfirmation = () => {
-  const [status, setStatus] = React.useState(ElegibilityConfirmationStatus.LOADING);
+  const { fetchElegibilityAchievements, elegibilityStatus, setElegibilityStatus, elegibleWallets } =
+    useElegibilityCriteria();
   const wallets = useWallets();
-  const elegibleWallets: Address[] = wallets.map((wallet) => wallet.address);
+  const prevWallets = usePrevious(wallets);
   React.useEffect(() => {
-    setTimeout(() => {
-      // TODO: Implement eligibility check
-      setStatus(ElegibilityConfirmationStatus.NEEDS_SIGNATURE);
-    }, 3500);
+    const walletAddresses = wallets.map((wallet) => wallet.address);
+    const prevWalletsAddresses = prevWallets?.map((wallet) => wallet.address);
+    if (!isEqual(walletAddresses, prevWalletsAddresses)) {
+      void fetchElegibilityAchievements();
+    }
   }, [wallets]);
 
-  const StatusComponent = STATUS_MAP[status];
+  const StatusComponent = STATUS_MAP[elegibilityStatus.status];
   return (
     <StyledElegibilityCriteriaBackgroundPaper>
       <ContainerBox flexDirection="column" gap={6} justifyContent="center" alignItems="center">
-        <StatusComponent setStatus={setStatus} elegibleWallets={elegibleWallets} />
+        <StatusComponent
+          setElegibilityStatus={setElegibilityStatus}
+          elegibleAndOwnedAddress={elegibilityStatus.elegibleAndOwnedAddress}
+          elegibleWallets={elegibleWallets}
+        />
       </ContainerBox>
-      {StatusWithElipse.includes(status) && (
-        <StyledAnimatedElipse showAnimation={StatusWithSuccessAnimation.includes(status)} />
+      {StatusWithElipse.includes(elegibilityStatus.status) && (
+        <StyledAnimatedElipse showAnimation={StatusWithSuccessAnimation.includes(elegibilityStatus.status)} />
       )}
     </StyledElegibilityCriteriaBackgroundPaper>
   );

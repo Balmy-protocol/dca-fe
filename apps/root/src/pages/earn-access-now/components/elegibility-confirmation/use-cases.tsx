@@ -17,12 +17,13 @@ import { WalletActionType } from '@services/accountService';
 import useTrackEvent from '@hooks/useTrackEvent';
 import usePushToHistory from '@hooks/usePushToHistory';
 import { EARN_ROUTE } from '@constants/routes';
-import useWallets from '@hooks/useWallets';
-import { Address as ViemAddress } from 'viem';
 import Address from '@common/components/address';
 import useWallet from '@hooks/useWallet';
-import { WalletStatus } from '@types';
+import { Wallet, WalletStatus } from '@types';
 import { getDisplayWallet } from '@common/utils/parsing';
+import useAccountService from '@hooks/useAccountService';
+import { Address as ViemAddress } from 'viem';
+import { ElegibilityStatus } from '@hooks/earn/useElegibilityCriteria';
 
 export enum ElegibilityConfirmationStatus {
   LOADING = 'LOADING',
@@ -51,19 +52,43 @@ const StyledViewableButton = styled(Button).attrs({ variant: 'contained' })`
   pointer-events: none;
 `;
 
-const ClaimEarnButton = () => {
+const ClaimEarnButton = ({
+  elegibleAndOwnedAddress,
+  hasAlreadyClaimed,
+}: {
+  elegibleAndOwnedAddress?: ViemAddress;
+  hasAlreadyClaimed?: boolean;
+}) => {
   const pushToHistory = usePushToHistory();
+  const accountService = useAccountService();
+  const [isLoading, setIsLoading] = React.useState(false);
+  const trackEvent = useTrackEvent();
 
-  const onEnterEarnNow = () => {
-    pushToHistory(`/${EARN_ROUTE.key}`);
+  const onEnterEarnNow = async () => {
+    setIsLoading(true);
+    try {
+      if (!hasAlreadyClaimed && elegibleAndOwnedAddress) {
+        await accountService.claimEarnEarlyAccess(elegibleAndOwnedAddress);
+      }
+      pushToHistory(`/${EARN_ROUTE.key}`);
+      trackEvent('Earn Early Access - Elegibility confirmation - Claim early access');
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
-    <Button variant="contained" onClick={onEnterEarnNow}>
-      <FormattedMessage
-        description="earn-access-now.eligibility.confirmation.eligible.button"
-        defaultMessage="Enter Earn Now!"
-      />
+    <Button variant="contained" onClick={onEnterEarnNow} disabled={isLoading} fullWidth>
+      {isLoading ? (
+        <CenteredLoadingIndicator size={20} color="secondary" />
+      ) : (
+        <FormattedMessage
+          description="earn-access-now.eligibility.confirmation.eligible.button"
+          defaultMessage="Enter Earn Now!"
+        />
+      )}
     </Button>
   );
 };
@@ -114,46 +139,43 @@ export const NotEligibleStatus = () => {
   );
 };
 
-export const ElegibleCase = () => {
-  // TODO: Specify elegible wallet address if isAuth
-
-  return (
-    <>
-      <TitleContainer>
-        <StyledTitle>
-          <FormattedMessage
-            description="earn-access-now.eligibility.confirmation.eligible.title"
-            defaultMessage="You're Eligible for Earn Early Access! 🎉"
-          />
-        </StyledTitle>
-        <StyledDescription>
-          <FormattedMessage
-            description="earn-access-now.eligibility.confirmation.eligible.description"
-            defaultMessage="Your wallet meets the eligibility criteria. <b>You now have full access to Earn with all your connected wallets</b>. Start exploring yield strategies today!"
-            values={{
-              b: (chunks: React.ReactNode) => <b>{chunks}</b>,
-            }}
-          />
-        </StyledDescription>
-      </TitleContainer>
-      <ClaimEarnButton />
-    </>
-  );
-};
+export const ElegibleCase = ({ elegibleWallets }: { elegibleWallets: Wallet[] }) => (
+  <>
+    <TitleContainer>
+      <StyledTitle>
+        <FormattedMessage
+          description="earn-access-now.eligibility.confirmation.eligible.title"
+          defaultMessage="You're Eligible for Earn Early Access! 🎉"
+        />
+      </StyledTitle>
+      <StyledDescription>
+        <FormattedMessage
+          description="earn-access-now.eligibility.confirmation.eligible.description"
+          defaultMessage="Your wallet {walletAddress} meets the eligibility criteria. <b>You now have full access to Earn with all your connected wallets</b>. Start exploring yield strategies today!"
+          values={{
+            walletAddress: getDisplayWallet(elegibleWallets[0]),
+            b: (chunks: React.ReactNode) => <b>{chunks}</b>,
+          }}
+        />
+      </StyledDescription>
+    </TitleContainer>
+    <ClaimEarnButton elegibleAndOwnedAddress={elegibleWallets[0].address} />
+  </>
+);
 
 export const NeedsSignatureCase = ({
   elegibleWallets,
-  setStatus,
+  setElegibilityStatus,
 }: {
-  elegibleWallets: ViemAddress[];
-  setStatus: (status: ElegibilityConfirmationStatus) => void;
+  elegibleWallets: Wallet[];
+  setElegibilityStatus: (status: ElegibilityStatus) => void;
 }) => {
   const intl = useIntl();
-  const wallets = useWallets();
-  const [walletToSign, setWalletToSign] = React.useState<ViemAddress | undefined>();
-  const wallet = useWallet(walletToSign || '');
+  const [walletToSign, setWalletToSign] = React.useState<Wallet | undefined>();
+  const wallet = useWallet(walletToSign?.address || '');
   const openConnectWalletModal = useOpenConnectModal();
   const trackEvent = useTrackEvent();
+  const accountService = useAccountService();
 
   const isWalletConnected = wallet?.status === WalletStatus.connected;
   const selectedWalletDisplay = getDisplayWallet(wallet);
@@ -164,11 +186,19 @@ export const NeedsSignatureCase = ({
     }
   }, [elegibleWallets]);
 
-  const requestSignature = () => {
+  const requestSignature = async () => {
     if (!walletToSign) return;
+
     trackEvent('Earn Early Access - Elegibility needs signature - Request signature');
-    // TODO: Request signature
-    setStatus(ElegibilityConfirmationStatus.OWNERSHIP_CONFIRMED);
+    try {
+      await accountService.verifyWalletOwnership(walletToSign.address);
+      setElegibilityStatus({
+        status: ElegibilityConfirmationStatus.OWNERSHIP_CONFIRMED,
+        elegibleAndOwnedAddress: walletToSign.address,
+      });
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const onConnectWallet = () => {
@@ -186,12 +216,12 @@ export const NeedsSignatureCase = ({
           />
         </StyledTitle>
         <StyledDescription>
-          {wallets.length === 1 ? (
+          {elegibleWallets.length === 1 ? (
             <FormattedMessage
               description="earn-access-now.eligibility.confirmation.needs-signature.description"
               defaultMessage="Your wallet {walletAddress} meets the eligibility criteria. <b>Please sign to confirm ownership</b>, and you'll unlock Earn Early Access for all your connected wallets."
               values={{
-                walletAddress: getDisplayWallet(wallets[0]),
+                walletAddress: getDisplayWallet(elegibleWallets[0]),
                 b: (chunks: React.ReactNode) => <b>{chunks}</b>,
               }}
             />
@@ -208,21 +238,21 @@ export const NeedsSignatureCase = ({
       </TitleContainer>
       <ContainerBox flexDirection="column" gap={4} fullWidth>
         {elegibleWallets.length > 1 &&
-          elegibleWallets.map((walletAddress, index) => (
+          elegibleWallets.map((elegibleWallet, index) => (
             <>
               <ContainerBox
-                key={walletAddress}
+                key={elegibleWallet.address}
                 justifyContent="space-between"
                 alignItems="center"
-                onClick={() => setWalletToSign(walletAddress)}
+                onClick={() => setWalletToSign(elegibleWallet)}
                 style={{ cursor: 'pointer' }}
                 fullWidth
               >
                 <ContainerBox gap={2} alignItems="center">
-                  <Radio checked={walletAddress === walletToSign} />
+                  <Radio checked={elegibleWallet === walletToSign} />
                   <DividerBorder2 orientation="vertical" flexItem />
                   <Typography variant="bodyRegular" color={({ palette }) => colors[palette.mode].typography.typo3}>
-                    <Address address={walletAddress} trimAddress showDetailsOnHover />
+                    <Address address={elegibleWallet.address} trimAddress showDetailsOnHover />
                   </Typography>
                 </ContainerBox>
                 <CheckCircleOutlineIcon
@@ -262,7 +292,7 @@ export const NeedsSignatureCase = ({
   );
 };
 
-export const OwnershipConfirmedCase = () => (
+export const OwnershipConfirmedCase = ({ elegibleAndOwnedAddress }: { elegibleAndOwnedAddress?: ViemAddress }) => (
   <>
     <TitleContainer>
       <StyledTitle>
@@ -278,7 +308,7 @@ export const OwnershipConfirmedCase = () => (
         />
       </StyledDescription>
     </TitleContainer>
-    <ClaimEarnButton />
+    <ClaimEarnButton elegibleAndOwnedAddress={elegibleAndOwnedAddress} />
   </>
 );
 
@@ -298,6 +328,6 @@ export const CodeSuccessfullyClaimed = () => (
         />
       </StyledDescription>
     </TitleContainer>
-    <ClaimEarnButton />
+    <ClaimEarnButton hasAlreadyClaimed />
   </>
 );
