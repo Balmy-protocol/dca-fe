@@ -91,10 +91,12 @@ const StatusWithSuccessAnimation: ElegibilityConfirmationStatus[] = [
 const ElegibilityConfirmation = () => {
   const { fetchElegibilityAchievements, elegibilityStatus, setElegibilityStatus, elegibleWallets } =
     useElegibilityCriteria();
-  const wallets = useWallets().map((wallet) => wallet.address);
+  const wallets = useWallets();
   const prevWallets = usePrevious(wallets);
   React.useEffect(() => {
-    if (!isEqual(prevWallets, wallets)) {
+    const walletAddresses = wallets.map((wallet) => wallet.address);
+    const prevWalletsAddresses = prevWallets?.map((wallet) => wallet.address);
+    if (!isEqual(walletAddresses, prevWalletsAddresses)) {
       void fetchElegibilityAchievements();
     }
   }, [wallets]);
