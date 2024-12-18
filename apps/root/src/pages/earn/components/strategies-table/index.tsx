@@ -26,7 +26,7 @@ import {
   Hidden,
   SortIcon,
   colors,
-  ShieldTickIcon,
+  ActiveTiersIcons,
 } from 'ui-library';
 import styled from 'styled-components';
 import { useAppDispatch } from '@state/hooks';
@@ -83,10 +83,10 @@ const StyledTableRow = styled(TableRow)<{ $condition?: StrategyConditionType }>`
 `;
 
 interface StyledTierBadgeProps {
-  CurrentTierBadge: React.ComponentType;
+  CurrentTierBadge: React.ElementType;
 }
 const StyledTierBadge = styled(({ CurrentTierBadge, ...props }: StyledTierBadgeProps) => (
-  <CurrentTierBadge {...props} />
+  <CurrentTierBadge {...props} size="1.5rem" />
 ))`
   position: absolute;
   z-index: 1;
@@ -237,8 +237,11 @@ const Row = <T extends StrategiesTableVariants>({
   // TODO: remove this once we have a real locked strategy
   const isLocked = !!strategy.id;
 
-  const condition = isLocked ? StrategyConditionType.LOCKED : isPromoted ? StrategyConditionType.PROMOTED : undefined;
+  // TODO: get necessary tier level from BE
+  const necessaryTierLevel = 3;
 
+  const condition = isLocked ? StrategyConditionType.LOCKED : isPromoted ? StrategyConditionType.PROMOTED : undefined;
+  const TierIcon = ActiveTiersIcons[necessaryTierLevel];
   return (
     <StyledTableRow
       $condition={condition}
@@ -253,10 +256,7 @@ const Row = <T extends StrategiesTableVariants>({
         <Hidden {...column.hiddenProps} key={`${strategy.id}-${column.key}`}>
           <StyledBodyTableCell key={`${strategy.id}-${column.key}`} $hasCondition={!!condition && i === 0}>
             {condition === StrategyConditionType.PROMOTED && i === 0 && <PromotedFlag />}
-            {condition === StrategyConditionType.LOCKED && i === 0 && (
-              // TODO: Replace with the necessary tier badge
-              <StyledTierBadge CurrentTierBadge={ShieldTickIcon} />
-            )}
+            {condition === StrategyConditionType.LOCKED && i === 0 && <StyledTierBadge CurrentTierBadge={TierIcon} />}
             {renderBodyCell(column.renderCell(rowData, showBalances))}
           </StyledBodyTableCell>
         </Hidden>

@@ -12,7 +12,7 @@ import {
   InfoCircleIcon,
   SkeletonProps,
   DividerBorder2,
-  ShieldTickIcon,
+  ActiveTiersIcons,
 } from 'ui-library';
 import { SPACING } from 'ui-library/src/theme/constants';
 
@@ -67,7 +67,7 @@ const StyledDataCardsContainer = styled(ContainerBox).attrs({
 const DataCard = ({ title, content, info, variant, isLocked }: DataCardProps) => (
   <StyledDataCardBox
     alignItems="center"
-    justifyContent="center"
+    justifyContent={variant === DataCardVariants.Details ? 'center' : undefined}
     flexDirection="column"
     gap={1}
     flex={1}
@@ -89,6 +89,9 @@ const DataCard = ({ title, content, info, variant, isLocked }: DataCardProps) =>
     <Typography
       variant={variant === DataCardVariants.Details ? 'h5Bold' : 'bodyBold'}
       color={({ palette: { mode } }) => colors[mode].typography.typo1}
+      display="flex"
+      alignItems="center"
+      flex={variant !== DataCardVariants.Details ? 1 : undefined}
     >
       {content}
     </Typography>
@@ -116,9 +119,14 @@ const DataCards = ({ strategy, dataCardsGap = 4, variant = DataCardVariants.Deta
   const intl = useIntl();
   const loading = !strategy;
 
+  // TODO: get necessary tier level from BE
+  const necessaryTierLevel = 3;
+
+  const TierIcon = ActiveTiersIcons[necessaryTierLevel];
+
   return (
     <StyledDataCardsContainer $isDetails={variant === DataCardVariants.Details}>
-      <ContainerBox alignItems="center" justifyContent="space-evenly" gap={dataCardsGap}>
+      <ContainerBox justifyContent="space-evenly" gap={dataCardsGap}>
         <DataCard
           title={<FormattedMessage defaultMessage="APY" description="earn.strategy-details.vault-data.apy" />}
           content={loading ? <SkeletonDataCard /> : `${formatUsdAmount({ amount: strategy.farm.apy, intl })}%`}
@@ -138,8 +146,7 @@ const DataCards = ({ strategy, dataCardsGap = 4, variant = DataCardVariants.Deta
                 description="earn.strategy-details.vault-data.required-tier"
               />
             }
-            // TODO: Replace with the necessary tier badge
-            content={loading ? <SkeletonDataCard /> : <ShieldTickIcon />}
+            content={loading ? <SkeletonDataCard /> : <TierIcon size="1.5rem" />}
             info={
               <FormattedMessage
                 defaultMessage="The minimum tier required to access this vault."
