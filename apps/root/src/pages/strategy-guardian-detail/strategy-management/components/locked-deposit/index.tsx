@@ -6,7 +6,17 @@ import { useTotalTokenBalance } from '@state/balances/hooks';
 import { useEarnManagementState } from '@state/earn-management/hooks';
 import { DisplayStrategy } from 'common-types';
 import { FormattedMessage } from 'react-intl';
-import { colors, ContainerBox, DividerBorder1, InfoCircleIcon, ShieldTickIcon, Tooltip, Typography } from 'ui-library';
+import {
+  ActiveTiersIcons,
+  colors,
+  ContainerBox,
+  DividerBorder1,
+  InfoCircleIcon,
+  Tooltip,
+  Typography,
+} from 'ui-library';
+import useTierLevel from '@hooks/tiers/useTierLevel';
+import ProgressionRequeriments from '@pages/tier-view/current-tier/progression-requeriments';
 
 const AvailableBalanceProjection = ({ strategy }: { strategy?: DisplayStrategy }) => {
   const { asset } = useEarnManagementState();
@@ -80,17 +90,16 @@ const AvailableBalanceProjection = ({ strategy }: { strategy?: DisplayStrategy }
 };
 
 const LockedDeposit = ({ strategy }: { strategy?: DisplayStrategy }) => {
-  // TODO: get current tier level
-  const currentTierLevel = 2;
+  const { tierLevel, progress } = useTierLevel();
   // TODO: get necessary tier level
   const necessaryTierLevel = 3;
-  // TODO: get remaining percent
-  const remainingPercent = 35;
+
+  const TierIcon = ActiveTiersIcons[necessaryTierLevel];
+
   return (
     <ContainerBox flexDirection="column" gap={8}>
       <ContainerBox gap={6} alignItems="center">
-        {/* TODO: Replace with correct icon */}
-        <ShieldTickIcon sx={{ width: 60, height: 60 }} />
+        <TierIcon size="4.8125rem" />
         <ContainerBox flexDirection="column" gap={1}>
           <Typography variant="h3Bold">
             <FormattedMessage
@@ -102,21 +111,25 @@ const LockedDeposit = ({ strategy }: { strategy?: DisplayStrategy }) => {
           <Typography variant="h5Bold">
             <FormattedMessage
               description="earn.strategy-management.locked-deposit.subtitle"
-              defaultMessage="{remainingPercent}% to Tier {necessaryTierLevel}"
-              values={{ remainingPercent, necessaryTierLevel }}
+              defaultMessage="{percentage}% to Tier {nextTier}"
+              values={{ percentage: progress, nextTier: tierLevel + 1 }}
             />
           </Typography>
         </ContainerBox>
       </ContainerBox>
       <ContainerBox flexDirection="column" gap={4}>
-        {/* // TODO: Complete with the LEVEL UP component */}
         <Typography variant="bodySmallRegular" color={({ palette }) => colors[palette.mode].typography.typo2}>
           <FormattedMessage
             description="earn.strategy-management.locked-deposit.description"
             defaultMessage="This strategy is exclusively available for Tier {necessaryTierLevel} and above. You're currently at Tier {currentTierLevel}. <b>Meet the progression requirements below to access this vault and enjoy premium benefits.</b>"
-            values={{ currentTierLevel, necessaryTierLevel, b: (chunks: React.ReactNode) => <b>{chunks}</b> }}
+            values={{
+              currentTierLevel: tierLevel,
+              necessaryTierLevel,
+              b: (chunks: React.ReactNode) => <b>{chunks}</b>,
+            }}
           />
         </Typography>
+        <ProgressionRequeriments />
       </ContainerBox>
       <AvailableBalanceProjection strategy={strategy} />
     </ContainerBox>
