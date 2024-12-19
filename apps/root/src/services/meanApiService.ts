@@ -34,7 +34,7 @@ import { getProtocolToken, getWrappedProtocolToken } from '@common/mocks/tokens'
 import { Address, PublicClient, getContract } from 'viem';
 import { SavedCustomConfig } from '@state/base-types';
 
-type AccountWithConfig = Account & {
+export type AccountWithConfig = Account & {
   config: Partial<SavedCustomConfig>;
   earn?: EarnEarlyAccess;
   referrals: AccountId[];
