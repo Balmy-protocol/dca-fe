@@ -9,6 +9,8 @@ import {
   OptionsMenu,
   ChevronDownIcon,
   Typography,
+  SPACING,
+  InfoCircleIcon,
 } from 'ui-library';
 import UnlinkWalletModal from '../unlink-wallet-modal';
 import EditWalletLabelModal from '../edit-label-modal';
@@ -17,6 +19,35 @@ import useWalletSelectorState from './useWalletSelectorState';
 import { FormattedMessage } from 'react-intl';
 import NetWorthNumber from '../networth-number';
 import styled from 'styled-components';
+import { VerifyWalletModal } from './verify-wallet-modal';
+import useWallet from '@hooks/useWallet';
+import { useThemeMode } from '@state/config/hooks';
+
+const PendingVerificationPill = ({ onClick }: { onClick: () => void }) => {
+  const mode = useThemeMode();
+  return (
+    <ContainerBox
+      gap={1}
+      alignItems="center"
+      style={{
+        border: `1.5px solid ${colors[mode].semantic.informative.primary}`,
+        padding: `${SPACING(1)} ${SPACING(2)}`,
+        borderRadius: `${SPACING(30)}`,
+        cursor: 'pointer',
+      }}
+      alignSelf="start"
+      onClick={onClick}
+    >
+      <InfoCircleIcon sx={{ color: colors[mode].semantic.informative.primary, transform: 'rotate(180deg)' }} />
+      <Typography variant="bodyExtraSmall">
+        <FormattedMessage
+          defaultMessage="Pending verification"
+          description="wallet-selector.pending-verification-pill"
+        />
+      </Typography>
+    </ContainerBox>
+  );
+};
 
 const StyledNavSelectedOptionLabelContainer = styled(ContainerBox)`
   ${({ theme: { spacing } }) => `
@@ -50,7 +81,11 @@ const WalletSelectorNavVariant = ({
     menuOptions,
     onConnectWallet,
     wallets,
+    openVerifyOwnershipModal,
+    onCloseVerifyOwnershipModal,
+    onOpenVerifyOwnershipModal,
   } = useWalletSelectorState({ options, showWalletCounter: true });
+  const selectedWalletObject = useWallet(options.selectedWalletOption || '');
 
   const navToggleHandler = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -90,6 +125,11 @@ const WalletSelectorNavVariant = ({
 
   return (
     <>
+      <VerifyWalletModal
+        open={openVerifyOwnershipModal}
+        onClose={onCloseVerifyOwnershipModal}
+        walletAddress={selectedWallet?.address}
+      />
       <EditWalletLabelModal walletToEdit={selectedWallet} open={openEditLabelModal} onCancel={onCloseEditLabelModal} />
       <UnlinkWalletModal
         walletToRemove={selectedWallet}
@@ -98,6 +138,9 @@ const WalletSelectorNavVariant = ({
         onCancel={onCloseUnlinkModal}
       />
       <OptionsMenu options={menuOptions} mainDisplay={optionsMenuMainDisplay} size={size} fullWidth />
+      {selectedWalletObject && !selectedWalletObject.isOwner && (
+        <PendingVerificationPill onClick={() => onOpenVerifyOwnershipModal(selectedWalletObject)} />
+      )}
     </>
   );
 };
@@ -114,6 +157,8 @@ const WalletSelectorMainVariant = ({ options, size }: WalletSelectorMainProps) =
     menuOptions,
     onConnectWallet,
     wallets,
+    openVerifyOwnershipModal,
+    onCloseVerifyOwnershipModal,
   } = useWalletSelectorState({ options });
 
   if (!wallets.length) {
@@ -126,6 +171,11 @@ const WalletSelectorMainVariant = ({ options, size }: WalletSelectorMainProps) =
 
   return (
     <>
+      <VerifyWalletModal
+        open={openVerifyOwnershipModal}
+        onClose={onCloseVerifyOwnershipModal}
+        walletAddress={selectedWallet?.address}
+      />
       <EditWalletLabelModal walletToEdit={selectedWallet} open={openEditLabelModal} onCancel={onCloseEditLabelModal} />
       <UnlinkWalletModal
         walletToRemove={selectedWallet}

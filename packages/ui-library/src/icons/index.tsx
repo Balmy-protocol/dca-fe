@@ -138,6 +138,8 @@ import TrendUpIcon from './trend-up';
 import InformationIcon from './information';
 import PersonOutlineRoundedIcon from './person-outline-rounded';
 import ShieldTickIcon from './shield-tick';
+import SuccessOutlineIcon from './successOutline';
+import PenAddIcon from './pen-add';
 import {
   TierLevel0Flat,
   TierLevel0Active,
@@ -321,4 +323,6 @@ export {
   TierMedalStarIcon,
   TierTicketDiscountIcon,
   TickSquareIcon,
+  SuccessOutlineIcon,
+  PenAddIcon,
 };
