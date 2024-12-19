@@ -1,5 +1,5 @@
 import useTierLevel from '@hooks/tiers/useTierLevel';
-import { AchievementKeys } from '@services/tierService';
+import { AchievementKeys } from '@types';
 import React from 'react';
 import { defineMessage, FormattedMessage, MessageDescriptor, useIntl } from 'react-intl';
 import { ContainerBox, Typography, Profile2UsersIcon, CheckCircleOutlineIcon, colors, Button } from 'ui-library';
@@ -35,7 +35,7 @@ const ProgressionRequeriments = () => {
       return {
         key: achievementKey,
         message: intl.formatMessage(message, {
-          missing: missing[achievementKey as AchievementKeys],
+          missing: missing[achievementKey as AchievementKeys].current,
           b: (chunks) => <b>{chunks}</b>,
         }),
       };
@@ -52,7 +52,7 @@ const ProgressionRequeriments = () => {
           )}
           <Typography variant="bodySmallRegular" color={({ palette }) => colors[palette.mode].typography.typo3}>
             {intl.formatMessage(MESSAGES_BY_MISSING_ACHIEVEMENTS[AchievementKeys.REFERRALS], {
-              missing: missingReferrals,
+              missing: missingReferrals.current,
               b: (chunks) => <b>{chunks}</b>,
             })}
           </Typography>
