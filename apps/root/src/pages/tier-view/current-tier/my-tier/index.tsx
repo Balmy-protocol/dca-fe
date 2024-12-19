@@ -12,8 +12,7 @@ import {
   Profile2UsersIcon,
   CheckCircleOutlineIcon,
 } from 'ui-library';
-import { AchievementKeys } from '@services/tierService';
-
+import { AchievementKeys } from '@types';
 const StyledMyTierCard = styled(ContainerBox).attrs({ gap: 6, flex: 1 })`
   ${({ theme: { palette, spacing } }) => `
     padding: ${spacing(6)};
@@ -71,7 +70,7 @@ const MyTier = () => {
       return {
         key: achievementKey,
         message: intl.formatMessage(message, {
-          missing: missing[achievementKey as AchievementKeys],
+          missing: missing[achievementKey as AchievementKeys].required,
           b: (chunks) => <b>{chunks}</b>,
         }),
       };
@@ -135,7 +134,7 @@ const MyTier = () => {
                 )}
                 <Typography variant="bodySmallRegular" color={({ palette }) => colors[palette.mode].typography.typo3}>
                   {intl.formatMessage(MESSAGES_BY_MISSING_ACHIEVEMENTS[AchievementKeys.REFERRALS], {
-                    missing: missingReferrals,
+                    missing: missingReferrals.required,
                     b: (chunks) => <b>{chunks}</b>,
                   })}
                 </Typography>
