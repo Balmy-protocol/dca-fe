@@ -42,6 +42,7 @@ export enum StrategyColumnKeys {
   PLATFORM_USER_BALANCE = 'platformUserBalance',
   SINGLE_WALLET = 'singleWallet',
   MIGRATE = 'migrate',
+  NEEDS_TIER = 'needsTier',
 }
 
 const StyledWalletsPlusIndicator = styled(ContainerBox)`
@@ -170,6 +171,15 @@ export const strategyColumnConfigs: StrategyColumnConfig<StrategiesTableVariants
     label: <></>,
     renderCell: () => <></>,
     getOrderValue: (data) => (PROMOTED_STRATEGIES_IDS.includes(data.id) ? 1 : 0),
+    hiddenProps: {
+      xsUp: true,
+    },
+  },
+  {
+    key: StrategyColumnKeys.NEEDS_TIER,
+    label: <></>,
+    renderCell: () => <></>,
+    getOrderValue: (data) => data.needsTier ?? 0,
     hiddenProps: {
       xsUp: true,
     },

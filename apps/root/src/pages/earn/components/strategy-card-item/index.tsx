@@ -1,5 +1,5 @@
 import React from 'react';
-import { Strategy } from 'common-types';
+import { Strategy, StrategyConditionType } from 'common-types';
 import styled from 'styled-components';
 import { Button, ContainerBox, Typography, colors, Card, Skeleton } from 'ui-library';
 import DataCards, { DataCardVariants } from '@pages/strategy-guardian-detail/vault-data/components/data-cards';
@@ -13,6 +13,7 @@ import PromotedFlag from '../strategies-table/components/promoted-flag';
 interface SugestedStrategyCardProps {
   strategy: Strategy;
   variant?: DataCardVariants;
+  tierLevel: number;
 }
 
 const StyledLink = styled(Link)`
@@ -24,29 +25,40 @@ const StyledLink = styled(Link)`
   `}
 `;
 
-const StyledCard = styled(Card).attrs({ variant: 'outlined' })<{ $isPromoted?: boolean }>`
-  ${({ theme: { palette, spacing }, $isPromoted }) => `
+const StyledCard = styled(Card).attrs({ variant: 'outlined' })<{ $condition?: StrategyConditionType }>`
+  ${({ theme: { palette, spacing }, $condition }) => `
       padding: ${spacing(6)};
       box-shadow: ${colors[palette.mode].dropShadow.dropShadow300};
       display: flex;
       flex-direction: column;
       gap: ${spacing(4)};
       ${
-        $isPromoted &&
+        $condition === StrategyConditionType.PROMOTED &&
         `
-        overflow: visible;
-        position: relative;
-        outline-color: ${colors[palette.mode].semantic.success.darker};
-        outline-width: 1.5px;
-      `
+          overflow: visible;
+          position: relative;
+          outline-color: ${colors[palette.mode].semantic.success.darker};
+          outline-width: 1.5px;
+        `
+      }
+      ${
+        $condition === StrategyConditionType.LOCKED &&
+        `
+          position: relative;
+          outline-color: ${colors[palette.mode].accentPrimary};
+          outline-width: 1.5px;
+        `
       }
     `}
 `;
 
-const StrategyCardItem = ({ strategy, variant }: SugestedStrategyCardProps) => {
+const StrategyCardItem = ({ strategy, variant, tierLevel }: SugestedStrategyCardProps) => {
   const isPromoted = PROMOTED_STRATEGIES_IDS.includes(strategy.id);
+  const isLocked = Boolean(strategy.needsTier && strategy.needsTier > tierLevel);
+  const condition = isLocked ? StrategyConditionType.LOCKED : isPromoted ? StrategyConditionType.PROMOTED : undefined;
+
   return (
-    <StyledCard $isPromoted={isPromoted}>
+    <StyledCard $condition={condition}>
       <ContainerBox justifyContent="space-between" alignItems="center">
         <ContainerBox gap={2} alignItems="center">
           <TokenIconWithNetwork token={strategy.asset} />
@@ -67,13 +79,18 @@ const StrategyCardItem = ({ strategy, variant }: SugestedStrategyCardProps) => {
           {strategy.farm.name}
         </Typography>
       </ContainerBox>
-      <DataCards strategy={strategy} dataCardsGap={2} variant={variant} />
+      <DataCards
+        strategy={strategy}
+        dataCardsGap={2}
+        variant={variant}
+        isLocked={condition === StrategyConditionType.LOCKED}
+      />
       <StyledLink to={`/earn/vaults/${strategy.network.chainId}/${strategy.id}`}>
         <Typography variant="bodyBold" color={({ palette }) => colors[palette.mode].accentPrimary}>
           <FormattedMessage description="earn.strategy-card.button" defaultMessage="View Vault" />
         </Typography>
       </StyledLink>
-      {isPromoted && <PromotedFlag isCard />}
+      {condition === StrategyConditionType.PROMOTED && <PromotedFlag isCard />}
     </StyledCard>
   );
 };
