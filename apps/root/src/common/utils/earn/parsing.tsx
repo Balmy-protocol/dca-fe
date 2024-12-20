@@ -300,6 +300,37 @@ export const getStrategyFromTableObject = <T extends StrategiesTableVariants>(
   return strategy as RowClickParamValue<T>;
 };
 
+export const getNeedsTierFromTableObject = <T extends StrategiesTableVariants>(
+  tableStrategy: TableStrategy<T>,
+  variant: T
+): number | undefined => {
+  if (variant === StrategiesTableVariants.ALL_STRATEGIES) {
+    const strategy = getStrategyFromTableObject<StrategiesTableVariants.ALL_STRATEGIES>(
+      tableStrategy as TableStrategy<StrategiesTableVariants.ALL_STRATEGIES>,
+      variant
+    );
+    return strategy.needsTier;
+  } else if (variant === StrategiesTableVariants.USER_STRATEGIES) {
+    const strategy = getStrategyFromTableObject<StrategiesTableVariants.USER_STRATEGIES>(
+      tableStrategy as TableStrategy<StrategiesTableVariants.USER_STRATEGIES>,
+      variant
+    );
+    return strategy.needsTier;
+  } else if (variant === StrategiesTableVariants.MIGRATION_OPTIONS) {
+    const farmWithAvailableDepositTokens = getStrategyFromTableObject<StrategiesTableVariants.MIGRATION_OPTIONS>(
+      tableStrategy as TableStrategy<StrategiesTableVariants.MIGRATION_OPTIONS>,
+      variant
+    );
+    // TODO: Implement this in migration modal (BLY-3658)
+    const needsTierLevels = farmWithAvailableDepositTokens.strategies.map((s) => s.needsTier);
+    if (needsTierLevels.some((tier) => tier === undefined)) {
+      return undefined;
+    }
+    return Math.min(...needsTierLevels.filter((tier): tier is number => tier !== undefined));
+  }
+  return undefined;
+};
+
 export enum StrategyReturnPeriods {
   DAY = 'day',
   WEEK = 'week',

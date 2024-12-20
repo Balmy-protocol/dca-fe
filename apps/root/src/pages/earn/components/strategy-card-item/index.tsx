@@ -13,6 +13,7 @@ import PromotedFlag from '../strategies-table/components/promoted-flag';
 interface SugestedStrategyCardProps {
   strategy: Strategy;
   variant?: DataCardVariants;
+  tierLevel: number;
 }
 
 const StyledLink = styled(Link)`
@@ -51,10 +52,9 @@ const StyledCard = styled(Card).attrs({ variant: 'outlined' })<{ $condition?: St
     `}
 `;
 
-const StrategyCardItem = ({ strategy, variant }: SugestedStrategyCardProps) => {
+const StrategyCardItem = ({ strategy, variant, tierLevel }: SugestedStrategyCardProps) => {
   const isPromoted = PROMOTED_STRATEGIES_IDS.includes(strategy.id);
-  // TODO: Remove this once we have a way to check if a strategy is locked
-  const isLocked = !!strategy.id;
+  const isLocked = Boolean(strategy.needsTier && strategy.needsTier > tierLevel);
   const condition = isLocked ? StrategyConditionType.LOCKED : isPromoted ? StrategyConditionType.PROMOTED : undefined;
 
   return (

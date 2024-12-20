@@ -34,12 +34,17 @@ import { StrategyColumnConfig, StrategyColumnKeys } from './components/columns';
 import { setOrderBy } from '@state/strategies-filters/actions';
 import { StrategiesTableVariants } from '@state/strategies-filters/reducer';
 import { useStrategiesFilters } from '@state/strategies-filters/hooks';
-import { getStrategyFromTableObject, RowClickParamValue } from '@common/utils/earn/parsing';
+import {
+  getNeedsTierFromTableObject,
+  getStrategyFromTableObject,
+  RowClickParamValue,
+} from '@common/utils/earn/parsing';
 import EmptyPortfolio from './components/empty-portfolio';
 import TotalFooter from './components/total-footer';
 import { FarmWithAvailableDepositTokens } from '@hooks/earn/useAvailableDepositTokens';
 import { PROMOTED_STRATEGIES_IDS } from '@constants/earn';
 import PromotedFlag from './components/promoted-flag';
+import useTierLevel from '@hooks/tiers/useTierLevel';
 
 export type StrategyWithWalletBalance = Strategy & {
   walletBalance?: AmountsOfToken;
@@ -217,6 +222,7 @@ interface RowProps<T extends StrategiesTableVariants> {
   variant: T;
   showBalances?: boolean;
   showEndChevron?: boolean;
+  tierLevel: number;
 }
 
 const renderBodyCell = (cell: React.ReactNode | string) =>
@@ -229,19 +235,18 @@ const Row = <T extends StrategiesTableVariants>({
   variant,
   showBalances = true,
   showEndChevron = true,
+  tierLevel,
 }: RowProps<T>) => {
   const [hovered, setHovered] = React.useState(false);
 
   const strategy = getStrategyFromTableObject(rowData, variant);
+  const needsTier = getNeedsTierFromTableObject(rowData, variant);
   const isPromoted = PROMOTED_STRATEGIES_IDS.includes(strategy.id as StrategyId);
-  // TODO: remove this once we have a real locked strategy
-  const isLocked = !!strategy.id;
-
-  // TODO: get necessary tier level from BE
-  const necessaryTierLevel = 3;
+  const isLocked = Boolean(needsTier && tierLevel < needsTier);
 
   const condition = isLocked ? StrategyConditionType.LOCKED : isPromoted ? StrategyConditionType.PROMOTED : undefined;
-  const TierIcon = ActiveTiersIcons[necessaryTierLevel];
+  // If TierIcon is rendered, needsTier is defined
+  const TierIcon = ActiveTiersIcons[needsTier || 0];
   return (
     <StyledTableRow
       $condition={condition}
@@ -314,6 +319,7 @@ const StrategiesTable = <T extends StrategiesTableVariants>({
   showPagination = true,
   showEndChevron = true,
 }: StrategiesTableProps<T>) => {
+  const { tierLevel } = useTierLevel();
   // Keeps the table height consistent
   const emptyRows = createEmptyRows(rowsPerPage - visibleRows.length);
 
@@ -355,6 +361,7 @@ const StrategiesTable = <T extends StrategiesTableVariants>({
                   variant={variant}
                   showBalances={showBalances}
                   showEndChevron={showEndChevron}
+                  tierLevel={tierLevel}
                 />
               ))}
               {emptyRows}
