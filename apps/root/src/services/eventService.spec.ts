@@ -42,7 +42,6 @@ describe('Event Service', () => {
       isAuth: false,
       type: WalletType.external,
       isOwner: false,
-      achievements: [],
     });
     setConfigMock = jest.fn();
     trackMock = jest.fn();

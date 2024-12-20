@@ -1,7 +1,8 @@
-import { AccountId, EarnInviteCode, Address, Achievement, User, AchievementKeys } from '@types';
+import { AccountId, EarnInviteCode, User, AchievementKeys, Achievement, Address, ApiAchievement } from '@types';
 import { EventsManager } from './eventsManager';
 import Web3Service from './web3Service';
 import MeanApiService from './meanApiService';
+import { parseAchievement } from '@common/utils/tiers';
 
 export const LAST_LOGIN_KEY = 'last_logged_in_with';
 export const WALLET_SIGNATURE_KEY = 'wallet_auth_signature';
@@ -153,8 +154,27 @@ export default class TierService extends EventsManager<TierServiceData> {
     return this.referrals;
   }
 
-  setAchievements(achievements: Record<Address, Achievement[]>) {
-    this.achievements = achievements;
+  setAchievements(wallets: Address[], achievements: Record<Address, ApiAchievement[]>, twitterShare: boolean) {
+    const baseAchievements = wallets.reduce<Record<Address, Achievement[]>>(
+      (acc, address) => {
+        // eslint-disable-next-line no-param-reassign
+        acc[address] = [];
+        return acc;
+      },
+      {} as Record<Address, Achievement[]>
+    );
+
+    const achievementsByWallet = Object.fromEntries(
+      Object.entries(baseAchievements).map(([address]) => {
+        const walletAchievements = (achievements[address as Address] || []).map(parseAchievement);
+        if (twitterShare) {
+          walletAchievements.push({ id: AchievementKeys.TWEET, achieved: 1 });
+        }
+        return [address, walletAchievements];
+      })
+    );
+
+    this.achievements = achievementsByWallet;
   }
 
   getAchievements() {
@@ -166,7 +186,8 @@ export default class TierService extends EventsManager<TierServiceData> {
 
     for (const wallet of user.wallets) {
       if (countOwnedWallets && !wallet.isOwner) continue; // Only include achievements from owned wallets
-      for (const achievement of wallet.achievements) {
+      const walletAchievements = this.achievements[wallet.address] || [];
+      for (const achievement of walletAchievements) {
         const key = achievement.id;
         const value = Number(achievement.achieved) || 0;
         totalAchievements[key] = (totalAchievements[key] || 0) + value;
@@ -271,7 +292,7 @@ export default class TierService extends EventsManager<TierServiceData> {
               .filter(
                 (wallet) =>
                   !wallet.isOwner &&
-                  wallet.achievements.some(
+                  this.achievements[wallet.address]?.some(
                     (achievement) => achievement.id === requirement.id && Number(achievement.achieved) > 0
                   )
               )
@@ -389,8 +410,13 @@ export default class TierService extends EventsManager<TierServiceData> {
     const accounts = await this.meanApiService.getAccounts({ signature });
     const account = accounts.accounts[0];
 
-    this.setReferrals(account.referrals || []);
+    this.setReferrals(account.earn?.referrals || []);
     this.setInviteCodes(account.earn?.inviteCodes || []);
+    this.setAchievements(
+      account.wallets.map((wallet) => wallet.address),
+      account.earn?.achievements || {},
+      account.earn?.twitterShare || false
+    );
     this.calculateAndSetUserTier();
   }
 

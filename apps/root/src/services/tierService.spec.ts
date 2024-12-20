@@ -16,7 +16,6 @@ const createTestWallet = (props: Partial<Wallet>): Wallet => ({
   label: 'Test Wallet',
   isAuth: false,
   isOwner: true,
-  achievements: [],
   ...props,
 });
 
@@ -45,16 +44,22 @@ describe('Tier Service', () => {
           createTestWallet({
             address: '0x1',
             isOwner: true,
-            achievements: [{ id: AchievementKeys.SWAP_VOLUME, achieved: '1000' }],
           }),
           createTestWallet({
             address: '0x2',
             isOwner: false,
-            achievements: [{ id: AchievementKeys.SWAP_VOLUME, achieved: '500' }],
           }),
         ],
       } as User;
 
+      tierService.setAchievements(
+        ['0x1', '0x2'],
+        {
+          '0x1': [{ id: AchievementKeys.SWAP_VOLUME, achieved: 1000 }],
+          '0x2': [{ id: AchievementKeys.SWAP_VOLUME, achieved: 500 }],
+        },
+        false
+      );
       tierService.setReferrals(['0x123', '0x456']); // 2 referrals
 
       const result = tierService.calculateTotalAchievements(user);
@@ -70,18 +75,23 @@ describe('Tier Service', () => {
           createTestWallet({
             address: '0x1',
             isOwner: true,
-            achievements: [{ id: AchievementKeys.SWAP_VOLUME, achieved: '1000' }],
           }),
           createTestWallet({
             address: '0x2',
             isOwner: false,
-            achievements: [{ id: AchievementKeys.SWAP_VOLUME, achieved: '500' }],
           }),
         ],
       } as User;
 
       tierService.setReferrals(['0x123', '0x456', '0x789', '0x101', '0x102']); // 5 referrals
-
+      tierService.setAchievements(
+        ['0x1', '0x2'],
+        {
+          '0x1': [{ id: AchievementKeys.SWAP_VOLUME, achieved: 1000 }],
+          '0x2': [{ id: AchievementKeys.SWAP_VOLUME, achieved: 500 }],
+        },
+        false
+      );
       const result = tierService.calculateTotalAchievements(user, false);
       expect(result).toEqual({
         [AchievementKeys.REFERRALS]: 5,
@@ -97,13 +107,13 @@ describe('Tier Service', () => {
           createTestWallet({
             address: '0x1',
             isOwner: true,
-            achievements: [],
           }),
         ],
       } as User;
 
       tierService.setReferrals([]); // 0 referrals
 
+      tierService.setAchievements(['0x1'], {}, false);
       const result = tierService.calculateUserTier(user);
       expect(result).toBe(0);
     });
@@ -114,13 +124,18 @@ describe('Tier Service', () => {
           createTestWallet({
             address: '0x1',
             isOwner: true,
-            achievements: [{ id: AchievementKeys.SWAP_VOLUME, achieved: '500' }],
           }),
         ],
       } as User;
 
       tierService.setReferrals([]); // Tier 1 can be reached with just swap volume
-
+      tierService.setAchievements(
+        ['0x1'],
+        {
+          '0x1': [{ id: AchievementKeys.SWAP_VOLUME, achieved: 500 }],
+        },
+        false
+      );
       const result = tierService.calculateUserTier(user);
       expect(result).toBe(1);
     });
@@ -129,15 +144,15 @@ describe('Tier Service', () => {
       const user: User = {
         wallets: [
           createTestWallet({
-            address: '0x1',
+            address: '0xaddress',
             isOwner: true,
-            achievements: [{ id: AchievementKeys.TWEET, achieved: '1' }],
           }),
         ],
       } as User;
 
       tierService.setReferrals(['0x1', '0x2', '0x3']); // 3 referrals
 
+      tierService.setAchievements(['0xaddress'], {}, true);
       const result = tierService.calculateUserTier(user);
       expect(result).toBe(2);
     });
@@ -148,13 +163,18 @@ describe('Tier Service', () => {
           createTestWallet({
             address: '0x1',
             isOwner: true,
-            achievements: [{ id: AchievementKeys.SWAP_VOLUME, achieved: '1000' }],
           }),
         ],
       } as User;
 
       tierService.setReferrals(['0x1', '0x2', '0x3']); // 3 referrals
-
+      tierService.setAchievements(
+        ['0x1'],
+        {
+          '0x1': [{ id: AchievementKeys.SWAP_VOLUME, achieved: 1000 }],
+        },
+        false
+      );
       const result = tierService.calculateUserTier(user);
       expect(result).toBe(2);
     });
@@ -165,13 +185,18 @@ describe('Tier Service', () => {
           createTestWallet({
             address: '0x1',
             isOwner: true,
-            achievements: [{ id: AchievementKeys.SWAP_VOLUME, achieved: '2000' }],
           }),
         ],
       } as User;
 
       tierService.setReferrals(['0x1', '0x2', '0x3', '0x4', '0x5']); // 5 referrals
-
+      tierService.setAchievements(
+        ['0x1'],
+        {
+          '0x1': [{ id: AchievementKeys.SWAP_VOLUME, achieved: 2000 }],
+        },
+        false
+      );
       const result = tierService.calculateUserTier(user);
       expect(result).toBe(3);
     });
@@ -182,12 +207,18 @@ describe('Tier Service', () => {
           createTestWallet({
             address: '0x1',
             isOwner: true,
-            achievements: [{ id: AchievementKeys.MIGRATED_VOLUME, achieved: '2000' }],
           }),
         ],
       } as User;
 
       tierService.setReferrals(['0x1', '0x2', '0x3', '0x4', '0x5']); // 5 referrals
+      tierService.setAchievements(
+        ['0x1'],
+        {
+          '0x1': [{ id: AchievementKeys.MIGRATED_VOLUME, achieved: 2000 }],
+        },
+        false
+      );
 
       const result = tierService.calculateUserTier(user);
       expect(result).toBe(3);
@@ -202,7 +233,6 @@ describe('Tier Service', () => {
             createTestWallet({
               address: '0x1',
               isOwner: true,
-              achievements: [{ id: AchievementKeys.SWAP_VOLUME, achieved: '500' }],
             }),
           ],
         } as User,
@@ -210,6 +240,13 @@ describe('Tier Service', () => {
 
       web3Service.accountService = mockAccountService;
       tierService.setReferrals(['0x1', '0x2']); // 2 referrals
+      tierService.setAchievements(
+        ['0x1'],
+        {
+          '0x1': [{ id: AchievementKeys.SWAP_VOLUME, achieved: 500 }],
+        },
+        false
+      );
     });
 
     it('should return empty objects when no user is set', () => {
@@ -246,17 +283,23 @@ describe('Tier Service', () => {
             createTestWallet({
               address: '0x1',
               isOwner: true,
-              achievements: [{ id: AchievementKeys.SWAP_VOLUME, achieved: '500' }],
             }),
             createTestWallet({
               address: '0x2',
               isOwner: false,
-              achievements: [{ id: AchievementKeys.TWEET, achieved: '1' }],
             }),
           ],
         } as User,
       } as AccountService;
 
+      tierService.setAchievements(
+        ['0x1', '0x2'],
+        {
+          '0x1': [{ id: AchievementKeys.SWAP_VOLUME, achieved: 200 }],
+          '0x2': [{ id: AchievementKeys.SWAP_VOLUME, achieved: 1000 }],
+        },
+        false
+      );
       web3Service.accountService = mockAccountService;
       tierService.setReferrals(['0x1', '0x2', '0x3']); // 3 referrals (meets the AND condition)
       tierService.setUserTier(1);
@@ -265,13 +308,13 @@ describe('Tier Service', () => {
 
       // For Tier 2, we need either SWAP_VOLUME >= 1000 OR TWEET >= 1
       expect(result.missing).toEqual({
-        [AchievementKeys.SWAP_VOLUME]: { current: 500, required: 1000 },
+        [AchievementKeys.SWAP_VOLUME]: { current: 200, required: 1000 },
         [AchievementKeys.TWEET]: { current: 0, required: 1 },
       });
       expect(result.details).toEqual({
         [AchievementKeys.REFERRALS]: { current: 3, required: 3 },
-        [AchievementKeys.SWAP_VOLUME]: { current: 500, required: 1000 },
-        [AchievementKeys.TWEET]: { current: 1, required: 1 },
+        [AchievementKeys.SWAP_VOLUME]: { current: 1200, required: 1000 },
+        [AchievementKeys.TWEET]: { current: 0, required: 1 },
       });
       expect(result.walletsToVerify).toEqual(['0x2']);
     });
@@ -285,7 +328,6 @@ describe('Tier Service', () => {
             createTestWallet({
               address: '0x1',
               isOwner: true,
-              achievements: [{ id: AchievementKeys.SWAP_VOLUME, achieved: '500' }],
             }),
           ],
         } as User,
@@ -293,7 +335,13 @@ describe('Tier Service', () => {
 
       web3Service.accountService = mockAccountService;
       tierService.setReferrals(['0x123', '0x456']); // 2 referrals
-
+      tierService.setAchievements(
+        ['0x1'],
+        {
+          '0x1': [{ id: AchievementKeys.SWAP_VOLUME, achieved: 500 }],
+        },
+        false
+      );
       tierService.setUserTier(1);
       const result = tierService.getProgressPercentageToNextTier();
 
@@ -320,7 +368,6 @@ describe('Tier Service', () => {
             createTestWallet({
               address: '0x1',
               isOwner: true,
-              achievements: [],
             }),
           ],
         } as User,
@@ -328,7 +375,7 @@ describe('Tier Service', () => {
 
       web3Service.accountService = mockAccountService;
       tierService.setReferrals([]); // 0 referrals
-
+      tierService.setAchievements(['0x1'], {}, false);
       tierService.setUserTier(0);
       const result = tierService.getProgressPercentageToNextTier();
 
@@ -350,10 +397,19 @@ describe('Tier Service', () => {
       const mockAccounts = {
         accounts: [
           {
-            referrals: ['0x123'],
             earn: {
+              referrals: ['0x123'],
               inviteCodes: ['CODE1'],
+              achievements: {
+                '0x1': [{ id: AchievementKeys.SWAP_VOLUME, achieved: 1000 }],
+              },
             },
+            wallets: [
+              createTestWallet({
+                address: '0x1',
+                isOwner: true,
+              }),
+            ],
           },
         ],
       };
@@ -369,6 +425,9 @@ describe('Tier Service', () => {
 
       expect(tierService.getReferrals()).toEqual(['0x123']);
       expect(tierService.getInviteCodes()).toEqual(['CODE1']);
+      expect(tierService.getAchievements()).toEqual({
+        '0x1': [{ id: AchievementKeys.SWAP_VOLUME, achieved: 1000 }],
+      });
     });
 
     it('should not update when no signature is available', async () => {
