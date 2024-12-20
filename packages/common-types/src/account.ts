@@ -45,8 +45,16 @@ export interface AccountLabelsAndContactList {
   contacts: ContactList;
 }
 
+// Mapping of achievement IDs to specific requirements
+export enum AchievementKeys {
+  SWAP_VOLUME = 'agg-swaps',
+  TWEET = 'tweet_shared',
+  MIGRATED_VOLUME = 'migrated_volume',
+  REFERRALS = 'referrals',
+}
+
 export type Achievement = {
-  id: string;
+  id: AchievementKeys;
   achieved: string | number;
 };
 

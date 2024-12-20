@@ -35,7 +35,7 @@ import { Address, PublicClient, getContract } from 'viem';
 import { SavedCustomConfig } from '@state/base-types';
 import { ElegibilityAchievementsResponse } from '@hooks/earn/useElegibilityCriteria';
 
-type AccountWithConfig = Account & {
+export type AccountWithConfig = Account & {
   config: Partial<SavedCustomConfig>;
   earn?: EarnEarlyAccess;
   referrals: AccountId[];
