@@ -1,4 +1,4 @@
-import { NetworkStruct, TokenListId, Token, AccountId } from '.';
+import { NetworkStruct, TokenListId, Token, AccountId, Achievement, Address } from '.';
 import { AmountsOfToken, Timestamp } from '@balmy/sdk';
 import {
   Strategy as SdkBaseStrategy,
@@ -177,6 +177,7 @@ export type EarnInviteCode = { code: string; claimedBy?: AccountId };
 export type EarnEarlyAccess = {
   earlyAccess: boolean;
   inviteCodes: EarnInviteCode[];
-  // tier: { achievements: string[]; level: number };
-  // referrals: { accountId: string; ...more }[];
+  referrals: AccountId[];
+  twitterShare: boolean;
+  achievements: Record<Address, Achievement[]>;
 };

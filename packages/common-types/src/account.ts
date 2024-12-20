@@ -21,7 +21,6 @@ export type Wallet = {
   isAuth: boolean;
   ens?: string | null;
   isOwner: boolean;
-  achievements: Achievement[];
 };
 
 export enum UserStatus {
@@ -53,9 +52,14 @@ export enum AchievementKeys {
   REFERRALS = 'referrals',
 }
 
+export type ApiAchievement = {
+  id: AchievementKeys;
+  achieved: boolean | number;
+};
+
 export type Achievement = {
   id: AchievementKeys;
-  achieved: string | number;
+  achieved: number;
 };
 
 export type AccountId = string;
