@@ -91,6 +91,7 @@ const useWalletSelectorState = ({ options, showWalletCounter }: WalletSelectorBa
     selectedWalletOption || activeWallet?.address || find(wallets, { isAuth: true })?.address || '';
 
   const allWalletsVerified = wallets.every((wallet) => wallet.isOwner);
+  const isSelectedWalletVerified = wallets.find((wallet) => wallet.address === selectedOptionValue)?.isOwner;
 
   const onClickWalletItem = (newWallet: WalletOptionValues) => {
     trackEvent('Wallet selector - Changed active wallet');
@@ -482,7 +483,10 @@ const useWalletSelectorState = ({ options, showWalletCounter }: WalletSelectorBa
         ) : null}
       </ContainerBox>
     ) : (
-      <Address address={selectedOptionValue} trimAddress />
+      <ContainerBox alignItems="center" gap={1}>
+        <Address address={selectedOptionValue} trimAddress />
+        {isSelectedWalletVerified && <SuccessOutlineIcon />}
+      </ContainerBox>
     );
 
   return React.useMemo(
