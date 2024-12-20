@@ -89,12 +89,10 @@ const AvailableBalanceProjection = ({ strategy }: { strategy?: DisplayStrategy }
   );
 };
 
-const LockedDeposit = ({ strategy }: { strategy?: DisplayStrategy }) => {
+const LockedDeposit = ({ strategy, needsTier }: { strategy?: DisplayStrategy; needsTier: number }) => {
   const { tierLevel, progress } = useTierLevel();
-  // TODO: get necessary tier level
-  const necessaryTierLevel = 3;
 
-  const TierIcon = ActiveTiersIcons[necessaryTierLevel];
+  const TierIcon = ActiveTiersIcons[needsTier];
 
   return (
     <ContainerBox flexDirection="column" gap={8}>
@@ -105,7 +103,7 @@ const LockedDeposit = ({ strategy }: { strategy?: DisplayStrategy }) => {
             <FormattedMessage
               description="earn.strategy-management.locked-deposit.title"
               defaultMessage="Reach Tier {necessaryTierLevel} to Unlock This Vault"
-              values={{ necessaryTierLevel }}
+              values={{ necessaryTierLevel: needsTier }}
             />
           </Typography>
           <Typography variant="h5Bold">
@@ -124,7 +122,7 @@ const LockedDeposit = ({ strategy }: { strategy?: DisplayStrategy }) => {
             defaultMessage="This strategy is exclusively available for Tier {necessaryTierLevel} and above. You're currently at Tier {currentTierLevel}. <b>Meet the progression requirements below to access this vault and enjoy premium benefits.</b>"
             values={{
               currentTierLevel: tierLevel,
-              necessaryTierLevel,
+              necessaryTierLevel: needsTier,
               b: (chunks: React.ReactNode) => <b>{chunks}</b>,
             }}
           />

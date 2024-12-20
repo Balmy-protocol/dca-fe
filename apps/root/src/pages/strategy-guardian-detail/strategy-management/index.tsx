@@ -11,6 +11,7 @@ import DelayWithdrawWarning from './components/delay-withdraw-warning';
 import { WithdrawType } from 'common-types';
 import { getDelayedWithdrawals } from '@common/utils/earn/parsing';
 import LockedDeposit from './components/locked-deposit';
+import useTierLevel from '@hooks/tiers/useTierLevel';
 
 const StyledBackgroundPaper = styled(BackgroundPaper).attrs({ variant: 'outlined', elevation: 0 })`
   ${({ theme: { spacing } }) => `
@@ -42,9 +43,9 @@ const StrategyManagement = ({ chainId, strategyGuardianId }: StrategyManagementP
   const strategy = useStrategyDetails({ chainId, strategyGuardianId });
   const [height, setHeight] = React.useState<number | undefined>(undefined);
   const dispatch = useAppDispatch();
+  const { tierLevel } = useTierLevel();
 
-  // TODO: Calculate permission based on tier
-  const isLockedDeposit = true;
+  const needsTier = strategy?.needsTier;
 
   const delayedWithdrawalsCount = React.useMemo(
     () =>
@@ -63,8 +64,8 @@ const StrategyManagement = ({ chainId, strategyGuardianId }: StrategyManagementP
 
   return (
     <StyledBackgroundPaper sx={{ height: height }}>
-      {isLockedDeposit ? (
-        <LockedDeposit strategy={strategy} />
+      {needsTier && needsTier > tierLevel ? (
+        <LockedDeposit strategy={strategy} needsTier={needsTier} />
       ) : (
         <>
           <Typography variant="h4Bold">{strategy?.farm.name || <Skeleton width="6ch" variant="text" />}</Typography>
