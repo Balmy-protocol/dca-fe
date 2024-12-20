@@ -119,10 +119,8 @@ const DataCards = ({ strategy, dataCardsGap = 4, variant = DataCardVariants.Deta
   const intl = useIntl();
   const loading = !strategy;
 
-  // TODO: get necessary tier level from BE
-  const necessaryTierLevel = 3;
-
-  const TierIcon = ActiveTiersIcons[necessaryTierLevel];
+  // TierIcon should be defined at this point
+  const TierIcon = ActiveTiersIcons[strategy?.needsTier || 0];
 
   return (
     <StyledDataCardsContainer $isDetails={variant === DataCardVariants.Details}>

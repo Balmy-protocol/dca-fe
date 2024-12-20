@@ -25,9 +25,8 @@ import { compact, find, isUndefined } from 'lodash';
 import { NETWORKS } from '@constants';
 import { defineMessage, useIntl } from 'react-intl';
 import { isSameToken, parseNumberUsdPriceToBigInt, parseUsdPrice, toToken } from '../currency';
-import { StrategyColumnConfig, StrategyColumnKeys } from '@pages/earn/components/strategies-table/components/columns';
 import { TableStrategy } from '@pages/earn/components/strategies-table';
-import { ColumnOrder, StrategiesTableVariants } from '@state/strategies-filters/reducer';
+import { StrategiesTableVariants } from '@state/strategies-filters/reducer';
 import { Address, formatUnits, parseUnits } from 'viem';
 import { FarmWithAvailableDepositTokens } from '@hooks/earn/useAvailableDepositTokens';
 import { nowInSeconds } from '../time';
@@ -232,49 +231,6 @@ export const parseUserStrategies = ({
     })
   );
 };
-
-export function getComparator<Key extends StrategyColumnKeys, Variant extends StrategiesTableVariants>({
-  columns,
-  primaryOrder,
-  secondaryOrder,
-}: {
-  columns: StrategyColumnConfig<Variant>[];
-  primaryOrder: { order: ColumnOrder; column: Key };
-  secondaryOrder?: { order: ColumnOrder; column: Key };
-}): (a: TableStrategy<Variant>, b: TableStrategy<Variant>) => number {
-  return (a, b) => {
-    const column = columns.find((config) => config.key === primaryOrder.column);
-    if (column && column.getOrderValue) {
-      const aValue = column.getOrderValue(a);
-      const bValue = column.getOrderValue(b);
-      if (typeof aValue === 'string' && typeof bValue === 'string') {
-        return primaryOrder.order === 'asc' ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue);
-      } else if (typeof aValue === 'number' && typeof bValue === 'number') {
-        return primaryOrder.order === 'asc' ? aValue - bValue : bValue - aValue;
-      }
-    }
-
-    if (!secondaryOrder) {
-      return primaryOrder.order === 'asc' ? 1 : -1;
-    }
-
-    // Secondary sorting criteria
-    const secondaryColumn = columns.find((config) => config.key === secondaryOrder.column);
-    if (secondaryColumn && secondaryColumn.getOrderValue) {
-      const aSecondaryValue = secondaryColumn.getOrderValue(a);
-      const bSecondaryValue = secondaryColumn.getOrderValue(b);
-      if (typeof aSecondaryValue === 'string' && typeof bSecondaryValue === 'string') {
-        return secondaryOrder.order === 'asc'
-          ? aSecondaryValue.localeCompare(bSecondaryValue)
-          : bSecondaryValue.localeCompare(aSecondaryValue);
-      } else if (typeof aSecondaryValue === 'number' && typeof bSecondaryValue === 'number') {
-        return secondaryOrder.order === 'asc' ? aSecondaryValue - bSecondaryValue : bSecondaryValue - aSecondaryValue;
-      }
-    }
-
-    return secondaryOrder.order === 'asc' ? 1 : -1;
-  };
-}
 
 export type RowClickParamValue<T extends StrategiesTableVariants> = T extends StrategiesTableVariants.ALL_STRATEGIES
   ? Strategy

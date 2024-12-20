@@ -3,10 +3,10 @@ import { useStrategiesFilters } from '@state/strategies-filters/hooks';
 import { getIsSameOrTokenEquivalent } from '@common/utils/currency';
 import { searchByStrategyData } from '@common/utils/earn/search';
 import { StrategiesTableVariants } from '@state/strategies-filters/reducer';
-import { getComparator } from '@common/utils/earn/parsing';
 import { EarnPosition } from 'common-types';
 import { StrategyColumnConfig } from '@pages/earn/components/strategies-table/components/columns';
 import { StrategyWithWalletBalance } from '@pages/earn/components/strategies-table';
+import { getComparator } from '@common/utils/earn/sort';
 
 const isEarnPosition = (
   obj: StrategyWithWalletBalance | EarnPosition[],
@@ -64,6 +64,8 @@ export default function useFilteredStrategies<V extends StrategiesTableVariants>
         columns,
         primaryOrder: filtersApplied.orderBy,
         secondaryOrder: filtersApplied.secondaryOrderBy,
+        tertiaryOrder: filtersApplied.tertiaryOrderBy,
+        quarterOrder: filtersApplied.quarterOrderBy,
       }) as (a: StrategyWithWalletBalance | EarnPosition[], b: StrategyWithWalletBalance | EarnPosition[]) => number
     );
 

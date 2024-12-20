@@ -43,6 +43,10 @@ export type StrategiesFiltersState = Record<
       column: StrategyColumnKeys;
       order: ColumnOrder;
     };
+    quarterOrderBy?: {
+      column: StrategyColumnKeys;
+      order: ColumnOrder;
+    };
   }
 >;
 
@@ -60,14 +64,18 @@ export const initialState: StrategiesFiltersState = {
   [StrategiesTableVariants.ALL_STRATEGIES]: {
     ...initialFiltersBase,
     orderBy: {
-      column: StrategyColumnKeys.IS_PROMOTED,
+      column: StrategyColumnKeys.NEEDS_TIER,
       order: 'desc' as ColumnOrder,
     },
     secondaryOrderBy: {
-      column: StrategyColumnKeys.WALLET_BALANCE,
+      column: StrategyColumnKeys.IS_PROMOTED,
       order: 'desc' as ColumnOrder,
     },
     tertiaryOrderBy: {
+      column: StrategyColumnKeys.WALLET_BALANCE,
+      order: 'desc' as ColumnOrder,
+    },
+    quarterOrderBy: {
       column: StrategyColumnKeys.TVL,
       order: 'desc' as ColumnOrder,
     },
