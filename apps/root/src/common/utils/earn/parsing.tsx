@@ -32,6 +32,7 @@ import { Address, formatUnits, parseUnits } from 'viem';
 import { FarmWithAvailableDepositTokens } from '@hooks/earn/useAvailableDepositTokens';
 import { nowInSeconds } from '../time';
 import { findClosestTimestamp } from '@common/components/earn/action-graph-components';
+import { createEmptyEarnPosition } from '@common/mocks/earn';
 
 export const sdkStrategyTokenToToken = (
   sdkToken: SdkStrategyToken,
@@ -550,6 +551,23 @@ export function parseUserStrategiesFinancialData(userPositions: EarnPosition[] =
     monthlyEarnings,
     totalMonthlyEarnings,
   };
+}
+
+export function generateEstimatedUserPosition({
+  token,
+  owner,
+  amount,
+  strategy,
+}: {
+  token: Token;
+  owner: Address;
+  amount: AmountsOfToken;
+  strategy: DisplayStrategy;
+}): EarnPosition {
+  // Create a mock position with the token balance
+  const mockPosition = createEmptyEarnPosition(strategy, owner, token);
+  mockPosition.balances[0].amount = amount;
+  return mockPosition;
 }
 
 export function calculateUserStrategiesBalances(userPositions: EarnPosition[] = []): EarnPosition['balances'] {
