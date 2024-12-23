@@ -758,7 +758,6 @@ describe('Account Service', () => {
             labels: {},
             config: {},
             contacts: [],
-            referrals: [],
             wallets: [
               {
                 address: '0xaddress',
@@ -777,7 +776,6 @@ describe('Account Service', () => {
             label: 'Work user label',
             labels: {},
             contacts: [],
-            referrals: [],
             config: {},
             wallets: [
               {
