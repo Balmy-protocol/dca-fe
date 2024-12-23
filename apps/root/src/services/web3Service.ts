@@ -185,7 +185,8 @@ export default class Web3Service {
       this.sdkService,
       this.accountService,
       this.providerService,
-      this.contractService
+      this.contractService,
+      this.meanApiService
     );
     this.labelService = new LabelService(
       this.meanApiService,

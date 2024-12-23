@@ -33,7 +33,7 @@ import { EarnService } from './earnService';
 import ProviderService from './providerService';
 import ContractService from './contractService';
 import { toToken } from '@common/utils/currency';
-
+import MeanApiService from './meanApiService';
 jest.mock('./sdkService');
 jest.mock('./accountService');
 jest.mock('./providerService');
@@ -42,7 +42,7 @@ const MockedSdkService = jest.mocked(SdkService, { shallow: false });
 const MockedAccountService = jest.mocked(AccountService, { shallow: false });
 const MockedProviderService = jest.mocked(ProviderService, { shallow: false });
 const MockedContractService = jest.mocked(ContractService, { shallow: false });
-
+const MockedMeanApiService = jest.mocked(MeanApiService, { shallow: false });
 const now = 1724101777;
 const nowInMillis = 1724101777000;
 
@@ -238,6 +238,7 @@ describe('Earn Service', () => {
   let accountService: jest.MockedObject<AccountService>;
   let providerService: jest.MockedObject<ProviderService>;
   let contractService: jest.MockedObject<ContractService>;
+  let meanApiService: jest.MockedObject<MeanApiService>;
   let earnService: EarnService;
 
   afterAll(() => {
@@ -251,10 +252,10 @@ describe('Earn Service', () => {
     accountService = createMockInstance(MockedAccountService);
     providerService = createMockInstance(MockedProviderService);
     contractService = createMockInstance(MockedContractService);
-
+    meanApiService = createMockInstance(MockedMeanApiService);
     contractService.getEarnVaultAddress = jest.fn().mockReturnValue('0xvault');
     contractService.getEarnCompanionAddress = jest.fn().mockReturnValue('0xcompanion');
-    earnService = new EarnService(sdkService, accountService, providerService, contractService);
+    earnService = new EarnService(sdkService, accountService, providerService, contractService, meanApiService);
 
     earnService.allStrategies = [createStrategyMock({})];
   });
