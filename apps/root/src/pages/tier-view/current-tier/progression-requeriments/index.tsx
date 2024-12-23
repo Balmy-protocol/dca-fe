@@ -1,8 +1,10 @@
+import { isSingleRequirement } from '@common/utils/tiers';
 import useTierLevel from '@hooks/tiers/useTierLevel';
-import { AchievementKeys } from '@types';
+import { TIER_REQUIREMENTS } from '@services/tierService';
+import { AchievementKeys, TierConditionalRequirement, TierSingleRequirement } from '@types';
 import React from 'react';
 import { defineMessage, FormattedMessage, MessageDescriptor, useIntl } from 'react-intl';
-import { ContainerBox, Typography, Profile2UsersIcon, CheckCircleOutlineIcon, colors, Button } from 'ui-library';
+import { ContainerBox, Typography, CheckCircleOutlineIcon, colors, Button } from 'ui-library';
 
 const MESSAGES_BY_MISSING_ACHIEVEMENTS: Record<AchievementKeys, MessageDescriptor> = {
   [AchievementKeys.SWAP_VOLUME]: defineMessage({
@@ -23,48 +25,101 @@ const MESSAGES_BY_MISSING_ACHIEVEMENTS: Record<AchievementKeys, MessageDescripto
   }),
 };
 
+const OR_INTL_MESSAGE = defineMessage({
+  description: 'tier-view.current-tier.my-tier.tier-progress.or-message',
+  defaultMessage: '{req1} or {req2}',
+});
+
+const generateProgressMessages = (
+  currentTierLevel: number,
+  // missing: Record<string, { current: number; required: number }>,
+  details: Record<string, { current: number; required: number }>,
+  intl: ReturnType<typeof useIntl>
+): { message: ReturnType<typeof intl.formatMessage>; keys: AchievementKeys[] }[] => {
+  const nextTier = TIER_REQUIREMENTS.find((tier) => tier.level === currentTierLevel + 1);
+  if (!nextTier) return [];
+
+  const messages: { message: ReturnType<typeof intl.formatMessage>; keys: AchievementKeys[] }[] = [];
+
+  const formatSingleRequirement = (requirement: TierSingleRequirement): ReturnType<typeof intl.formatMessage> => {
+    const { id } = requirement;
+    const current = details[id]?.current || 0;
+    const required = details[id]?.required || 0;
+    const remaining = current > required ? required : required - current;
+
+    return intl.formatMessage(MESSAGES_BY_MISSING_ACHIEVEMENTS[id], {
+      missing: remaining,
+      b: (chunks) => <b>{chunks}</b>,
+    });
+  };
+
+  const formatRequirements = (
+    requirement: TierSingleRequirement | TierConditionalRequirement
+  ): { message: ReturnType<typeof intl.formatMessage>; keys: AchievementKeys[] }[] => {
+    if (isSingleRequirement(requirement)) {
+      if (details[requirement.id]) {
+        return [{ message: formatSingleRequirement(requirement), keys: [requirement.id] }];
+      }
+      return [];
+    }
+
+    if (requirement.type === 'AND') {
+      return requirement.requirements.flatMap((req) => formatRequirements(req));
+    }
+
+    if (requirement.type === 'OR') {
+      const missingRequirements = requirement.requirements.filter((req) => isSingleRequirement(req) && details[req.id]);
+
+      if (missingRequirements.length > 0) {
+        const keys = missingRequirements.map((req) => (req as TierSingleRequirement).id);
+        const formattedRequirements = missingRequirements.map((req) =>
+          formatSingleRequirement(req as TierSingleRequirement)
+        );
+        const lastMessage = formattedRequirements.pop();
+        const formattedRequirementsString = formattedRequirements.join(', ');
+        return [
+          {
+            message: intl.formatMessage(OR_INTL_MESSAGE, { req1: formattedRequirementsString, req2: lastMessage }),
+            keys,
+          },
+        ];
+      }
+    }
+
+    return [];
+  };
+
+  nextTier.requirements.forEach((requirement) => {
+    messages.push(...formatRequirements(requirement));
+  });
+
+  return messages;
+};
+
 const ProgressionRequeriments = () => {
-  const { missing, details } = useTierLevel();
+  const { missing, details, tierLevel } = useTierLevel();
   const intl = useIntl();
 
-  const missingReferrals = missing[AchievementKeys.REFERRALS];
-  const missingMessages = Object.entries(details)
-    .filter(([key]) => (key as AchievementKeys) !== AchievementKeys.REFERRALS)
-    .map(([achievementKey]) => {
-      const message = MESSAGES_BY_MISSING_ACHIEVEMENTS[achievementKey as AchievementKeys];
-      return {
-        key: achievementKey,
-        message: intl.formatMessage(message, {
-          missing: missing[achievementKey as AchievementKeys].current,
-          b: (chunks) => <b>{chunks}</b>,
-        }),
-      };
-    });
+  const missingMessages = generateProgressMessages(tierLevel, details, intl);
 
   return (
     <ContainerBox gap={1} justifyContent="space-between">
       <ContainerBox gap={1} flexDirection="column">
-        <ContainerBox gap={1} alignItems="center">
-          {Number(missingReferrals) > 0 ? (
-            <Profile2UsersIcon sx={{ color: ({ palette }) => colors[palette.mode].typography.typo3 }} />
-          ) : (
-            <CheckCircleOutlineIcon color="success" />
-          )}
-          <Typography variant="bodySmallRegular" color={({ palette }) => colors[palette.mode].typography.typo3}>
-            {intl.formatMessage(MESSAGES_BY_MISSING_ACHIEVEMENTS[AchievementKeys.REFERRALS], {
-              missing: missingReferrals.current,
-              b: (chunks) => <b>{chunks}</b>,
-            })}
-          </Typography>
-        </ContainerBox>
         {missingMessages.map((message, index) => (
           <ContainerBox key={index} gap={1} alignItems="center">
-            {missing[message.key as AchievementKeys] ? (
+            {message.keys.some((key) => missing[key as AchievementKeys]) ? (
               <CheckCircleOutlineIcon sx={{ color: ({ palette }) => colors[palette.mode].typography.typo3 }} />
             ) : (
               <CheckCircleOutlineIcon color="success" />
             )}
-            <Typography variant="bodySmallRegular" color={({ palette }) => colors[palette.mode].typography.typo3}>
+            <Typography
+              variant="bodySmallRegular"
+              color={({ palette }) =>
+                message.keys.some((key) => missing[key as AchievementKeys])
+                  ? colors[palette.mode].typography.typo3
+                  : colors[palette.mode].semantic.success.darker
+              }
+            >
               {message.message}
             </Typography>
           </ContainerBox>

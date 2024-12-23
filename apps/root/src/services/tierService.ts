@@ -1,8 +1,19 @@
-import { AccountId, EarnInviteCode, User, AchievementKeys, Achievement, Address, ApiAchievement } from '@types';
+import {
+  AccountId,
+  EarnInviteCode,
+  User,
+  AchievementKeys,
+  Achievement,
+  Address,
+  ApiAchievement,
+  TierSingleRequirement,
+  TierConditionalRequirement,
+  TierRequirements,
+} from '@types';
 import { EventsManager } from './eventsManager';
 import Web3Service from './web3Service';
 import MeanApiService from './meanApiService';
-import { parseAchievement } from '@common/utils/tiers';
+import { isSingleRequirement, parseAchievement } from '@common/utils/tiers';
 
 export const LAST_LOGIN_KEY = 'last_logged_in_with';
 export const WALLET_SIGNATURE_KEY = 'wallet_auth_signature';
@@ -16,23 +27,8 @@ export interface TierServiceData {
 
 const initialState: TierServiceData = { tier: 0, inviteCodes: [], referrals: [], achievements: {} };
 
-interface TierSingleRequirement {
-  id: AchievementKeys;
-  value: number | boolean;
-}
-
-interface TierConditionalRequirement {
-  type: 'AND' | 'OR';
-  requirements: (TierSingleRequirement | TierConditionalRequirement)[];
-}
-
-interface TierRequirements {
-  level: number;
-  requirements: (TierSingleRequirement | TierConditionalRequirement)[];
-}
-
 // Tier definitions with requirements
-const TIER_REQUIREMENTS: TierRequirements[] = [
+export const TIER_REQUIREMENTS: TierRequirements[] = [
   {
     level: 3,
     requirements: [
@@ -200,13 +196,6 @@ export default class TierService extends EventsManager<TierServiceData> {
     return totalAchievements;
   }
 
-  // Helper to determine if a requirement is a single requirement
-  isSingleRequirement(
-    requirement: TierSingleRequirement | TierConditionalRequirement
-  ): requirement is TierSingleRequirement {
-    return (requirement as TierSingleRequirement).id !== undefined;
-  }
-
   calculateUserTier(user: User): number {
     const totalAchievements = this.calculateTotalAchievements(user, true); // Owned wallets only
 
@@ -221,11 +210,11 @@ export default class TierService extends EventsManager<TierServiceData> {
     const evaluateConditionalRequirement = (requirement: TierConditionalRequirement): boolean => {
       if (requirement.type === 'AND') {
         return requirement.requirements.every((req) =>
-          this.isSingleRequirement(req) ? evaluateSingleRequirement(req) : evaluateConditionalRequirement(req)
+          isSingleRequirement(req) ? evaluateSingleRequirement(req) : evaluateConditionalRequirement(req)
         );
       } else if (requirement.type === 'OR') {
         return requirement.requirements.some((req) =>
-          this.isSingleRequirement(req) ? evaluateSingleRequirement(req) : evaluateConditionalRequirement(req)
+          isSingleRequirement(req) ? evaluateSingleRequirement(req) : evaluateConditionalRequirement(req)
         );
       }
       return false;
@@ -233,7 +222,7 @@ export default class TierService extends EventsManager<TierServiceData> {
 
     for (const tier of TIER_REQUIREMENTS.sort((a, b) => b.level - a.level)) {
       const meetsRequirements = tier.requirements.every((requirement) =>
-        this.isSingleRequirement(requirement)
+        isSingleRequirement(requirement)
           ? evaluateSingleRequirement(requirement)
           : evaluateConditionalRequirement(requirement)
       );
@@ -307,19 +296,19 @@ export default class TierService extends EventsManager<TierServiceData> {
     const evaluateConditionalRequirement = (requirement: TierConditionalRequirement): boolean => {
       if (requirement.type === 'AND') {
         const results = requirement.requirements.map((req) =>
-          this.isSingleRequirement(req) ? evaluateSingleRequirement(req) : evaluateConditionalRequirement(req)
+          isSingleRequirement(req) ? evaluateSingleRequirement(req) : evaluateConditionalRequirement(req)
         );
         return results.every((result) => result);
       } else if (requirement.type === 'OR') {
         // Always evaluate all requirements to populate details and missing
         const results = requirement.requirements.map((req) =>
-          this.isSingleRequirement(req) ? evaluateSingleRequirement(req) : evaluateConditionalRequirement(req)
+          isSingleRequirement(req) ? evaluateSingleRequirement(req) : evaluateConditionalRequirement(req)
         );
 
         // If any requirement is met, we can remove its alternatives from missing
         if (results.some((result) => result)) {
           requirement.requirements.forEach((req) => {
-            if (this.isSingleRequirement(req)) {
+            if (isSingleRequirement(req)) {
               delete missing[req.id];
             }
           });
@@ -331,7 +320,7 @@ export default class TierService extends EventsManager<TierServiceData> {
     };
 
     nextTier.requirements.forEach((requirement) => {
-      if (this.isSingleRequirement(requirement)) {
+      if (isSingleRequirement(requirement)) {
         evaluateSingleRequirement(requirement);
       } else {
         evaluateConditionalRequirement(requirement);
@@ -373,7 +362,7 @@ export default class TierService extends EventsManager<TierServiceData> {
     let totalRequirements = 0;
 
     const calculateRequirementProgress = (requirement: TierSingleRequirement | TierConditionalRequirement): number => {
-      if (this.isSingleRequirement(requirement)) {
+      if (isSingleRequirement(requirement)) {
         const current = totalAchievements[requirement.id] || 0;
         const required = requirement.value as number;
         return Math.min(current / required, 1);
