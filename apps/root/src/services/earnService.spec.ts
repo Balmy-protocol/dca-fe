@@ -450,7 +450,6 @@ describe('Earn Service', () => {
           type: WalletType.embedded,
           isAuth: true,
           isOwner: true,
-          achievements: [],
         },
         {
           address: '0xwallet-2',
@@ -458,7 +457,6 @@ describe('Earn Service', () => {
           type: WalletType.embedded,
           isAuth: true,
           isOwner: true,
-          achievements: [],
         },
       ]);
     });

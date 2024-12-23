@@ -86,7 +86,6 @@ describe('Account Service', () => {
       status: WalletStatus.connected,
       isAuth: true,
       isOwner: true,
-      achievements: [],
     };
 
     accounts = [
@@ -100,13 +99,11 @@ describe('Account Service', () => {
             address: '0xaddress',
             isAuth: true,
             isOwner: true,
-            achievements: [],
           },
           {
             address: '0xsecondaddress',
             isAuth: false,
             isOwner: false,
-            achievements: [],
           },
         ],
       },
@@ -120,7 +117,6 @@ describe('Account Service', () => {
             address: '0xaddress',
             isAuth: true,
             isOwner: true,
-            achievements: [],
           },
         ],
       },
@@ -540,7 +536,6 @@ describe('Account Service', () => {
           address: '0xThirdAddress',
           isAuth: true,
           isOwner: true,
-          achievements: [],
         });
       });
     });
@@ -565,14 +560,12 @@ describe('Account Service', () => {
             status: WalletStatus.connected,
             isAuth: false,
             isOwner: false,
-            achievements: [],
           })
         );
         expect(accountService.accounts[0].wallets[2]).toEqual({
           address: '0xThirdAddress',
           isAuth: false,
           isOwner: false,
-          achievements: [],
         });
       });
     });
@@ -617,7 +610,6 @@ describe('Account Service', () => {
           status: WalletStatus.disconnected,
           type: WalletType.external,
           isOwner: true,
-          achievements: [],
         }
       );
       expect(accountService.accounts[2]).toEqual({
@@ -632,7 +624,6 @@ describe('Account Service', () => {
             status: WalletStatus.disconnected,
             type: WalletType.external,
             isOwner: true,
-            achievements: [],
           },
         ],
       });
@@ -642,7 +633,6 @@ describe('Account Service', () => {
         status: WalletStatus.disconnected,
         type: WalletType.external,
         isOwner: true,
-        achievements: [],
       });
     });
   });
@@ -705,19 +695,16 @@ describe('Account Service', () => {
               label: 'User label',
               labels: {},
               contacts: [],
-              referrals: [],
               wallets: [
                 {
                   address: '0xaddress',
                   isAuth: true,
                   isOwner: true,
-                  achievements: [],
                 },
                 {
                   address: '0xsecondaddress',
                   isAuth: false,
                   isOwner: false,
-                  achievements: [],
                 },
               ],
               config: {},
@@ -728,13 +715,11 @@ describe('Account Service', () => {
               labels: {},
               contacts: [],
               config: {},
-              referrals: [],
               wallets: [
                 {
                   address: '0xaddress',
                   isAuth: true,
                   isOwner: true,
-                  achievements: [],
                 },
               ],
             },
@@ -773,19 +758,16 @@ describe('Account Service', () => {
             labels: {},
             config: {},
             contacts: [],
-            referrals: [],
             wallets: [
               {
                 address: '0xaddress',
                 isAuth: true,
                 isOwner: true,
-                achievements: [],
               },
               {
                 address: '0xsecondaddress',
                 isAuth: false,
                 isOwner: false,
-                achievements: [],
               },
             ],
           },
@@ -794,14 +776,12 @@ describe('Account Service', () => {
             label: 'Work user label',
             labels: {},
             contacts: [],
-            referrals: [],
             config: {},
             wallets: [
               {
                 address: '0xaddress',
                 isAuth: true,
                 isOwner: true,
-                achievements: [],
               },
             ],
           },
@@ -836,7 +816,6 @@ describe('Account Service', () => {
             type: WalletType.external,
             status: WalletStatus.connected,
             isOwner: false,
-            achievements: [],
           },
         });
       });

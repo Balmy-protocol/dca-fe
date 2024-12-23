@@ -1,7 +1,7 @@
 import { Token } from './tokens';
 import { AccountLabels } from './accountLabels';
 import { PriceResult } from '@balmy/sdk';
-import { Address, AmountOfToken, ChainId, TokenAddress, PreparedTransactionRequest, Achievement } from '.';
+import { Address, AmountOfToken, ChainId, TokenAddress, PreparedTransactionRequest } from '.';
 import { TransactionApiEvent } from './accountHistory';
 import { TransactionRequest } from 'viem';
 
@@ -185,7 +185,7 @@ export interface AccountLabelsAndContactListResponse {
   contacts: { wallet: string }[];
 }
 
-export type ApiWallet = { address: Address; isAuth: boolean; isOwner: boolean; achievements: Achievement[] };
+export type ApiWallet = { address: Address; isAuth: boolean; isOwner: boolean };
 export type ApiNewWallet = { address: Address } & ApiWalletAdminConfig;
 export type ApiWalletAdminConfig = { isAuth: true; signature: string; expiration: string } | { isAuth: false };
 

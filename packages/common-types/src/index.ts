@@ -22,6 +22,7 @@ export * from './accountLabels';
 export * from './accountHistory';
 export * from './providerInfo';
 export * from './earn';
+export * from './tiers';
 
 export type SetStateCallback<T> = React.Dispatch<React.SetStateAction<T>>;
 

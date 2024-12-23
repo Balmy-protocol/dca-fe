@@ -11,7 +11,6 @@ export const toWallet = (wallet: ToWalletParameter): Wallet => {
     type: WalletType.external,
     isAuth: false,
     isOwner: false,
-    achievements: [],
   };
 
   const lowerCasedAddress = (wallet.address?.toLowerCase() || baseWallet.address) as Address;

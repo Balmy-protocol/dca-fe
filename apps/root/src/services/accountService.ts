@@ -303,10 +303,7 @@ export default class AccountService extends EventsManager<AccountServiceData> {
 
     if (accountIndex !== -1) {
       const accounts = [...this.accounts];
-      accounts[accountIndex].wallets = [
-        ...this.accounts[accountIndex].wallets,
-        { address, isAuth, isOwner: isAuth, achievements: [] },
-      ];
+      accounts[accountIndex].wallets = [...this.accounts[accountIndex].wallets, { address, isAuth, isOwner: isAuth }];
       this.accounts = accounts;
     } else {
       throw new Error('tried to link a wallet to a user that was not set');
@@ -377,7 +374,6 @@ export default class AccountService extends EventsManager<AccountServiceData> {
             ...foundWallet,
             isAuth: accountWallet.isAuth,
             isOwner: accountWallet.isOwner,
-            achievements: accountWallet.achievements || [],
           };
         }
 
@@ -386,7 +382,6 @@ export default class AccountService extends EventsManager<AccountServiceData> {
           isAuth: accountWallet.isAuth,
           status: WalletStatus.disconnected,
           isOwner: accountWallet.isOwner,
-          achievements: accountWallet.achievements || [],
         });
       });
 
@@ -410,12 +405,14 @@ export default class AccountService extends EventsManager<AccountServiceData> {
         this.earlyAccessEnabled = earn.earlyAccess;
       }
 
-      const referrals = accounts[0].referrals;
-
       if (earn?.inviteCodes) {
-        // TODO: REMOVE [] WHEN BE RETURNS THE CORRECT DATA
-        this.tierService.setReferrals(referrals || []);
+        this.tierService.setReferrals(earn.referrals);
         this.tierService.setInviteCodes(earn.inviteCodes);
+        this.tierService.setAchievements(
+          parsedWallets.map((parsedWallet) => parsedWallet.address),
+          earn.achievements,
+          earn.twitterShare
+        );
         this.tierService.calculateAndSetUserTier();
       }
 
@@ -452,7 +449,6 @@ export default class AccountService extends EventsManager<AccountServiceData> {
       type: WalletType.external,
       status: WalletStatus.disconnected,
       isOwner: true,
-      achievements: [],
     };
 
     const newAccount: Account = {
@@ -460,7 +456,7 @@ export default class AccountService extends EventsManager<AccountServiceData> {
       label,
       labels: {},
       contacts: [],
-      wallets: [{ ...walletToSet, achievements: [] }],
+      wallets: [{ ...walletToSet }],
     };
 
     this.accounts = [...this.accounts, newAccount];
