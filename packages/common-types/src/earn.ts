@@ -181,3 +181,8 @@ export type EarnEarlyAccess = {
   twitterShare: boolean;
   achievements: Record<Address, Achievement[]>;
 };
+
+export enum StrategyConditionType {
+  PROMOTED = 'PROMOTED',
+  LOCKED = 'LOCKED',
+}

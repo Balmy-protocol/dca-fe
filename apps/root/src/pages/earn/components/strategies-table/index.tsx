@@ -1,5 +1,12 @@
 import React from 'react';
-import { AmountsOfToken, EarnPosition, SetStateCallback, Strategy, StrategyId } from 'common-types';
+import {
+  AmountsOfToken,
+  EarnPosition,
+  SetStateCallback,
+  Strategy,
+  StrategyConditionType,
+  StrategyId,
+} from 'common-types';
 import {
   BackgroundPaper,
   ContainerBox,
@@ -19,6 +26,7 @@ import {
   Hidden,
   SortIcon,
   colors,
+  ActiveTiersIcons,
 } from 'ui-library';
 import styled from 'styled-components';
 import { useAppDispatch } from '@state/hooks';
@@ -26,12 +34,17 @@ import { StrategyColumnConfig, StrategyColumnKeys } from './components/columns';
 import { setOrderBy } from '@state/strategies-filters/actions';
 import { StrategiesTableVariants } from '@state/strategies-filters/reducer';
 import { useStrategiesFilters } from '@state/strategies-filters/hooks';
-import { getStrategyFromTableObject, RowClickParamValue } from '@common/utils/earn/parsing';
+import {
+  getNeedsTierFromTableObject,
+  getStrategyFromTableObject,
+  RowClickParamValue,
+} from '@common/utils/earn/parsing';
 import EmptyPortfolio from './components/empty-portfolio';
 import TotalFooter from './components/total-footer';
 import { FarmWithAvailableDepositTokens } from '@hooks/earn/useAvailableDepositTokens';
 import { PROMOTED_STRATEGIES_IDS } from '@constants/earn';
 import PromotedFlag from './components/promoted-flag';
+import useTierLevel from '@hooks/tiers/useTierLevel';
 
 export type StrategyWithWalletBalance = Strategy & {
   walletBalance?: AmountsOfToken;
@@ -59,13 +72,32 @@ const StyledBackgroundPaper = styled(BackgroundPaper).attrs({ variant: 'outlined
   position: relative;
 `;
 
-const StyledTableRow = styled(TableRow)<{ $isPromoted?: boolean }>`
-  ${({ theme: { palette, spacing }, $isPromoted }) =>
-    $isPromoted &&
+const StyledTableRow = styled(TableRow)<{ $condition?: StrategyConditionType }>`
+  ${({ theme: { palette, spacing }, $condition }) =>
+    $condition === StrategyConditionType.PROMOTED &&
     `
     box-shadow: 0px 0px 0px 1.5px ${colors[palette.mode].semantic.success.darker};
     border-radius: ${spacing(2)};
   `}
+  ${({ theme: { palette, spacing }, $condition }) =>
+    $condition === StrategyConditionType.LOCKED &&
+    `
+    box-shadow: 0px 0px 0px 1.5px ${colors[palette.mode].border.accent};
+    border-radius: ${spacing(2)};
+  `}
+`;
+
+interface StyledTierBadgeProps {
+  CurrentTierBadge: React.ElementType;
+}
+const StyledTierBadge = styled(({ CurrentTierBadge, ...props }: StyledTierBadgeProps) => (
+  <CurrentTierBadge {...props} size="1.5rem" />
+))`
+  position: absolute;
+  z-index: 1;
+  top: 50%;
+  left: 0;
+  transform: translate(-50%, -50%);
 `;
 
 const StyledTableEnd = styled(TableCell)`
@@ -82,12 +114,12 @@ const StyledNavContainer = styled(ContainerBox)`
   margin: 0 auto;
 `;
 
-const StyledBodyTableCell = styled(TableCell)<{ $isPromoted?: boolean }>`
-  ${({ theme: { spacing }, $isPromoted }) => `
+const StyledBodyTableCell = styled(TableCell)<{ $hasCondition?: boolean }>`
+  ${({ theme: { spacing }, $hasCondition }) => `
   height: ${spacing(14.5)};
   padding-top: ${spacing(0.5)};
   padding-bottom: ${spacing(0.5)};
-  ${$isPromoted && `position: relative;`}
+  ${$hasCondition && `position: relative;`}
 `}
 `;
 
@@ -190,6 +222,7 @@ interface RowProps<T extends StrategiesTableVariants> {
   variant: T;
   showBalances?: boolean;
   showEndChevron?: boolean;
+  tierLevel: number;
 }
 
 const renderBodyCell = (cell: React.ReactNode | string) =>
@@ -202,14 +235,21 @@ const Row = <T extends StrategiesTableVariants>({
   variant,
   showBalances = true,
   showEndChevron = true,
+  tierLevel,
 }: RowProps<T>) => {
   const [hovered, setHovered] = React.useState(false);
 
   const strategy = getStrategyFromTableObject(rowData, variant);
+  const needsTier = getNeedsTierFromTableObject(rowData, variant);
   const isPromoted = PROMOTED_STRATEGIES_IDS.includes(strategy.id as StrategyId);
+  const isLocked = Boolean(needsTier && tierLevel < needsTier);
+
+  const condition = isLocked ? StrategyConditionType.LOCKED : isPromoted ? StrategyConditionType.PROMOTED : undefined;
+  // If TierIcon is rendered, needsTier is defined
+  const TierIcon = ActiveTiersIcons[needsTier || 0];
   return (
     <StyledTableRow
-      $isPromoted={isPromoted}
+      $condition={condition}
       key={strategy.id}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
@@ -219,23 +259,23 @@ const Row = <T extends StrategiesTableVariants>({
     >
       {columns.map((column, i) => (
         <Hidden {...column.hiddenProps} key={`${strategy.id}-${column.key}`}>
-          <StyledBodyTableCell key={`${strategy.id}-${column.key}`} $isPromoted={isPromoted && i === 0}>
-            {isPromoted && i === 0 && <PromotedFlag />}
+          <StyledBodyTableCell key={`${strategy.id}-${column.key}`} $hasCondition={!!condition && i === 0}>
+            {condition === StrategyConditionType.PROMOTED && i === 0 && <PromotedFlag />}
+            {condition === StrategyConditionType.LOCKED && i === 0 && <StyledTierBadge CurrentTierBadge={TierIcon} />}
             {renderBodyCell(column.renderCell(rowData, showBalances))}
           </StyledBodyTableCell>
         </Hidden>
       ))}
-            {showEndChevron && (
-
-      <StyledTableEnd size="small">
-        <StyledNavContainer alignItems="center">
-          <DividerBorder2 orientation="vertical" />
-          <AnimatedChevronRightIcon
-            $hovered={hovered}
-            sx={({ palette }) => ({ color: colors[palette.mode].accentPrimary })}
-          />
-        </StyledNavContainer>
-      </StyledTableEnd>
+      {showEndChevron && (
+        <StyledTableEnd size="small">
+          <StyledNavContainer alignItems="center">
+            <DividerBorder2 orientation="vertical" />
+            <AnimatedChevronRightIcon
+              $hovered={hovered}
+              sx={({ palette }) => ({ color: colors[palette.mode].accentPrimary })}
+            />
+          </StyledNavContainer>
+        </StyledTableEnd>
       )}
     </StyledTableRow>
   );
@@ -279,6 +319,7 @@ const StrategiesTable = <T extends StrategiesTableVariants>({
   showPagination = true,
   showEndChevron = true,
 }: StrategiesTableProps<T>) => {
+  const { tierLevel } = useTierLevel();
   // Keeps the table height consistent
   const emptyRows = createEmptyRows(rowsPerPage - visibleRows.length);
 
@@ -320,6 +361,7 @@ const StrategiesTable = <T extends StrategiesTableVariants>({
                   variant={variant}
                   showBalances={showBalances}
                   showEndChevron={showEndChevron}
+                  tierLevel={tierLevel}
                 />
               ))}
               {emptyRows}
