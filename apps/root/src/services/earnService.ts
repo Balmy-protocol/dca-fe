@@ -19,6 +19,7 @@ import {
   WithdrawType,
   EarnPositionWithdrewAction,
   EarnPositionDelayedWithdrawalClaimedAction,
+  AccountId,
 } from 'common-types';
 import { EventsManager } from './eventsManager';
 import SdkService from './sdkService';
@@ -26,18 +27,19 @@ import { NETWORKS } from '@constants';
 import { IntervalSetActions } from '@constants/timing';
 import AccountService from './accountService';
 import compact from 'lodash/compact';
-import { Address, formatUnits, Hex, maxUint256 } from 'viem';
+import { Address, encodePacked, formatUnits, Hex, maxUint256 } from 'viem';
 import { parseSignatureValues } from '@common/utils/signatures';
 import { getNewEarnPositionFromTxTypeData } from '@common/utils/transactions';
 import { parseUsdPrice, parseNumberUsdPriceToBigInt, toToken, isSameToken } from '@common/utils/currency';
 import { nowInSeconds } from '@common/utils/time';
 import ProviderService from './providerService';
-import { PermitData } from '@balmy/sdk';
+import { calculateDeadline, PermitData } from '@balmy/sdk';
 import { EarnPermissionData } from '@balmy/sdk/dist/services/earn/types';
 import ContractService from './contractService';
 import { mapPermission } from '@balmy/sdk/dist/services/earn/earn-service';
 import { getWrappedProtocolToken } from '@common/mocks/tokens';
 import { orderBy, uniqBy } from 'lodash';
+import MeanApiService from './meanApiService';
 
 export interface EarnServiceData {
   allStrategies: SavedSdkStrategy[];
@@ -84,11 +86,14 @@ export class EarnService extends EventsManager<EarnServiceData> {
 
   contractService: ContractService;
 
+  meanApiService: MeanApiService;
+
   constructor(
     sdkService: SdkService,
     accountService: AccountService,
     providerService: ProviderService,
-    contractService: ContractService
+    contractService: ContractService,
+    meanApiService: MeanApiService
   ) {
     super(defaultEarnServiceData);
 
@@ -96,6 +101,7 @@ export class EarnService extends EventsManager<EarnServiceData> {
     this.accountService = accountService;
     this.providerService = providerService;
     this.contractService = contractService;
+    this.meanApiService = meanApiService;
   }
 
   get allStrategies(): SavedSdkStrategy[] {
@@ -728,6 +734,15 @@ export class EarnService extends EventsManager<EarnServiceData> {
       });
     }
 
+    const account = this.accountService.getUser()!;
+    const strategyValidationData = await this.generateCreationData({
+      tosSignature,
+      accountId: account.id,
+      strategyId: strategy.id,
+      address: user,
+      needsAPI: (strategy?.needsTier ?? 0) > 0,
+    });
+
     const tx = await this.sdkService.buildEarnCreatePositionTx({
       chainId: strategy.farm.chainId,
       strategyId: strategy.id,
@@ -735,7 +750,7 @@ export class EarnService extends EventsManager<EarnServiceData> {
       // We dont operate with smart wallets so we always need this
       permissions,
       deposit,
-      strategyValidationData: tosSignature,
+      strategyValidationData,
       caller: user,
     });
 
@@ -743,6 +758,49 @@ export class EarnService extends EventsManager<EarnServiceData> {
       ...tx,
       from: user,
       chainId: strategy.farm.chainId,
+    });
+  }
+
+  private async generateCreationData({
+    tosSignature,
+    accountId,
+    strategyId,
+    address,
+    needsAPI,
+    deadline,
+  }: {
+    tosSignature?: Hex;
+    accountId: string;
+    strategyId: StrategyId;
+    address: Address;
+    needsAPI?: boolean;
+    deadline?: number;
+  }): Promise<Hex> {
+    const apiSignature = needsAPI
+      ? (await this.getApiSignature({ accountId, strategyId, address, deadline: deadline ?? calculateDeadline('1d') }))
+          .signature
+      : '0x';
+    return encodePacked(['bytes[]'], [[tosSignature ?? '0x', apiSignature]]);
+  }
+
+  private async getApiSignature({
+    accountId,
+    strategyId,
+    address,
+    deadline,
+  }: {
+    accountId: AccountId;
+    strategyId: StrategyId;
+    address: Address;
+    deadline: number;
+  }) {
+    const signature = await this.accountService.getWalletVerifyingSignature({});
+    return this.meanApiService.getEarnStrategySignature({
+      signature,
+      accountId,
+      strategyId,
+      toValidate: address,
+      deadline,
     });
   }
 

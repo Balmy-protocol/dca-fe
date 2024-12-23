@@ -26,12 +26,13 @@ import {
   TokenListId,
   User,
   EarnEarlyAccess,
+  StrategyId,
 } from '@types';
 import { CLAIM_ABIS } from '@constants/campaigns';
 
 // MOCKS
 import { getProtocolToken, getWrappedProtocolToken } from '@common/mocks/tokens';
-import { Address, PublicClient, getContract } from 'viem';
+import { Address, Hex, PublicClient, getContract } from 'viem';
 import { SavedCustomConfig } from '@state/base-types';
 import { ElegibilityAchievementsResponse } from '@hooks/earn/useElegibilityCriteria';
 
@@ -617,6 +618,31 @@ export default class MeanApiService {
       signature,
       params: {
         addresses,
+      },
+    });
+  }
+
+  async getEarnStrategySignature({
+    signature,
+    accountId,
+    strategyId,
+    toValidate,
+    deadline,
+  }: {
+    signature: WalletSignature;
+    accountId: string;
+    strategyId: StrategyId;
+    toValidate: Address;
+    deadline: number;
+  }) {
+    return this.authorizedRequest<{ signature: Hex }>({
+      method: 'GET',
+      url: `${MEAN_API_URL}/v1/accounts/${accountId}/earn/strategies/signature`,
+      signature,
+      params: {
+        strategyId,
+        toValidate,
+        deadline,
       },
     });
   }
