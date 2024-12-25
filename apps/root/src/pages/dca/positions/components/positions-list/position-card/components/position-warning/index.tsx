@@ -64,6 +64,17 @@ const PositionWarning = ({ position }: PositionWarningProps) => {
     );
   }
 
+  if ((!!position.from.underlyingTokens.length || !!position.to.underlyingTokens.length) && position.chainId === 1) {
+    message = (
+      <>
+        <FormattedMessage
+          description="positionEulerHack1"
+          defaultMessage="Euler has experienced a security incident and your funds may be eligible for recovery. Please join our Discord and contact us through the #support channel for assistance with the recovery process."
+        />
+      </>
+    );
+  }
+
   if (
     AAVE_FROZEN_TOKENS.includes(position.yields.to?.tokenAddress.toLowerCase() || '') ||
     AAVE_FROZEN_TOKENS.includes(position.yields.from?.tokenAddress.toLowerCase() || '')
