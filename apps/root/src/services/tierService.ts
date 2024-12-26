@@ -238,7 +238,7 @@ export default class TierService extends EventsManager<TierServiceData> {
   calculateMissingForNextTier(): {
     missing: Record<string, { current: number; required: number }>;
     details: Record<string, { current: number; required: number }>;
-    walletsToVerify: string[];
+    walletsToVerify: Address[];
   } {
     const user = this.web3Service.accountService.user;
     if (!user) return { missing: {}, details: {}, walletsToVerify: [] };
@@ -254,7 +254,7 @@ export default class TierService extends EventsManager<TierServiceData> {
 
     const missing: Record<string, { current: number; required: number }> = {};
     const details: Record<string, { current: number; required: number }> = {};
-    const walletsToVerify: string[] = [];
+    const walletsToVerify: Address[] = [];
 
     const evaluateSingleRequirement = (requirement: TierSingleRequirement): boolean => {
       const currentOwned = totalAchievementsOwned[requirement.id] || 0;
@@ -334,6 +334,7 @@ export default class TierService extends EventsManager<TierServiceData> {
     progress: number;
     missing: Record<string, { current: number; required: number }>;
     details: Record<string, { current: number; required: number }>;
+    walletsToVerify: Address[];
   } {
     const user = this.web3Service.accountService.user;
     if (!user) {
@@ -341,6 +342,7 @@ export default class TierService extends EventsManager<TierServiceData> {
         progress: 0,
         missing: {},
         details: {},
+        walletsToVerify: [],
       };
     }
 
@@ -351,13 +353,14 @@ export default class TierService extends EventsManager<TierServiceData> {
         progress: 100,
         missing: {},
         details: {},
+        walletsToVerify: [],
       };
     }
 
-    const { missing, details } = this.calculateMissingForNextTier();
+    const { missing, details, walletsToVerify } = this.calculateMissingForNextTier();
 
     // Calculate progress based on all requirements for next tier
-    const totalAchievements = this.calculateTotalAchievements(user, true);
+    const totalAchievements = this.calculateTotalAchievements(user, false);
     let totalProgress = 0;
     let totalRequirements = 0;
 
@@ -390,6 +393,7 @@ export default class TierService extends EventsManager<TierServiceData> {
       progress: Math.min(progress, 100),
       missing,
       details,
+      walletsToVerify,
     };
   }
 
