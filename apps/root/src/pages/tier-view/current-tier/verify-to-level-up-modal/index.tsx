@@ -113,9 +113,10 @@ const SingleWalletStep = ({
         >
           <FormattedMessage
             description="tier-view.verify-to-level-up-modal.single-wallet.subtitle"
-            defaultMessage="You're one step away from unlocking your next tier! <b>All your Guardian benefits plus:</b>"
+            defaultMessage="You're one step away from unlocking your next tier! <b>All your {previousTier} benefits plus:</b>"
             values={{
               b: (chunks: React.ReactNode) => <b>{chunks}</b>,
+              previousTier: intl.formatMessage(TIER_LEVEL_OPTIONS[currentTierLevel].title),
             }}
           />
         </Typography>
