@@ -198,7 +198,7 @@ const Modal: React.FC<ModalProps> = ({
         <ContainerBox
           flexDirection={actionsAlignment === 'vertical' ? 'column' : 'row'}
           gap={4}
-          justify-content="center"
+          justifyContent="center"
           alignItems="center"
         >
           {showCloseButton && actionsAlignment === 'horizontal' && (

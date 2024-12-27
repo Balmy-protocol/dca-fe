@@ -53,6 +53,7 @@ import GuardianListSubscribeModal from '../guardian-list-subscribe-modal';
 import EarnGainAccessModal from '../earn-gain-access-modal';
 import useEarnAccess from '@hooks/useEarnAccess';
 import TierPill from '../tier-pill';
+import LevelUpModal from '@common/components/level-up-modal';
 
 const helpOptions = [
   {
@@ -285,10 +286,14 @@ const Navigation = ({ children }: React.PropsWithChildren) => {
   return (
     <>
       {isEarnEnabled ? (
-        <EarnGainAccessModal isOpen={showEarnModal} onClose={() => setShowEarnModal(false)} />
+        <>
+          <LevelUpModal />
+          <EarnGainAccessModal isOpen={showEarnModal} onClose={() => setShowEarnModal(false)} />
+        </>
       ) : (
         <GuardianListSubscribeModal isOpen={showEarnModal} onClose={() => setShowEarnModal(false)} />
       )}
+
       <NavigationUI
         extraHeaderTools={<TierPill />}
         headerContent={
