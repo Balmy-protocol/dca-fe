@@ -2,8 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { BackgroundPaper, Grid } from 'ui-library';
 import { Position, PositionWithHistory } from '@types';
-import Sticky from 'react-stickynode';
-
+import Sticky from 'balmy-fork-react-stickynode';
 import useCurrentBreakpoint from '@hooks/useCurrentBreakpoint';
 import GraphContainer from '@pages/position-detail/components/graph-container';
 import PositionTimelineControls, { TimelineMessageMap } from '@common/components/timeline-controls';
