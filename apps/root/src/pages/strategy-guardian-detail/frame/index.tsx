@@ -9,7 +9,7 @@ import { changeRoute } from '@state/tabs/actions';
 import { EARN_PORTFOLIO, EARN_ROUTE } from '@constants/routes';
 import EarnFAQ from '@pages/earn/components/faq';
 import VaultDataFrame from '@pages/strategy-guardian-detail/data-frame';
-import Sticky from 'react-stickynode';
+import Sticky from 'balmy-fork-react-stickynode';
 import styled from 'styled-components';
 import useCurrentBreakpoint from '@hooks/useCurrentBreakpoint';
 import useEarnService from '@hooks/earn/useEarnService';
