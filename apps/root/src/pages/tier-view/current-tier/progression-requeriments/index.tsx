@@ -108,10 +108,9 @@ const generateProgressMessages = (
 };
 
 const ProgressionRequeriments = () => {
-  const { missing, details, tierLevel } = useTierLevel();
+  const { details, tierLevel } = useTierLevel();
   const intl = useIntl();
 
-  console.log(missing, details, tierLevel);
   const missingMessages = generateProgressMessages(tierLevel, details, intl);
   const completedKeys = Object.keys(details || {}).filter(
     (key) => (details?.[key as AchievementKeys]?.current ?? 0) >= (details?.[key as AchievementKeys]?.required ?? 0)
