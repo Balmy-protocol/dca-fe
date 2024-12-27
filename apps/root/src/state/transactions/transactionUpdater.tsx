@@ -38,6 +38,7 @@ import { parseUsdPrice } from '@common/utils/currency';
 import useEarnService from '@hooks/earn/useEarnService';
 import useHasFetchedUserStrategies from '@hooks/earn/useHasFetchedUserStrategies';
 import { getSdkEarnPositionId } from '@common/utils/earn/parsing';
+import useTierService from '@hooks/tiers/useTierService';
 
 export default function Updater(): null {
   const transactionService = useTransactionService();
@@ -50,6 +51,7 @@ export default function Updater(): null {
   const wallets = useWallets();
   const dcaIndexingBlocks = useDcaIndexingBlocks();
   const hasFetchedUserStrategies = useHasFetchedUserStrategies();
+  const tierService = useTierService();
   // const earnIndexingBlocks = useEarnIndexingBlocks();
 
   const dispatch = useAppDispatch();
@@ -428,6 +430,8 @@ export default function Updater(): null {
             } catch (e) {
               console.error('Unable to fetch gas price for rootstock', e);
             }
+
+            tierService.updateAchievements(tx);
 
             dispatch(
               finalizeTransaction({

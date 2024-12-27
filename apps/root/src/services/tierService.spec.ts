@@ -2,8 +2,18 @@ import { createMockInstance } from '@common/utils/tests';
 import TierService from './tierService';
 import Web3Service from './web3Service';
 import MeanApiService, { AccountWithConfig } from './meanApiService';
-import { AchievementKeys, User, Wallet, WalletType, WalletStatus } from '@types';
+import {
+  AchievementKeys,
+  User,
+  Wallet,
+  WalletType,
+  WalletStatus,
+  Address,
+  TransactionTypes,
+  TransactionDetails,
+} from '@types';
 import AccountService from './accountService';
+import { IntervalSetActions } from '@constants/timing';
 
 const MockedWeb3Service = jest.mocked(Web3Service, { shallow: true });
 const MockedMeanApiService = jest.mocked(MeanApiService, { shallow: true });
@@ -18,6 +28,8 @@ const createTestWallet = (props: Partial<Wallet>): Wallet => ({
   isOwner: true,
   ...props,
 });
+
+const mockedTodayMilis = 1642439808 * 1000;
 
 describe('Tier Service', () => {
   let tierService: TierService;
@@ -240,13 +252,6 @@ describe('Tier Service', () => {
 
       web3Service.accountService = mockAccountService;
       tierService.setReferrals(['0x1', '0x2']); // 2 referrals
-      tierService.setAchievements(
-        ['0x1'],
-        {
-          '0x1': [{ id: AchievementKeys.SWAP_VOLUME, achieved: 500 }],
-        },
-        false
-      );
     });
 
     it('should return empty objects when no user is set', () => {
@@ -261,6 +266,13 @@ describe('Tier Service', () => {
 
     it('should calculate missing requirements for next tier', () => {
       tierService.setUserTier(1); // Current tier
+      tierService.setAchievements(
+        ['0x1'],
+        {
+          '0x1': [{ id: AchievementKeys.SWAP_VOLUME, achieved: 500 }],
+        },
+        false
+      );
       const result = tierService.calculateMissingForNextTier();
 
       expect(result.missing).toEqual({
@@ -440,6 +452,330 @@ describe('Tier Service', () => {
       await tierService.pollUser();
 
       expect(meanApiService.getAccounts).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('setAchievements', () => {
+    beforeEach(() => {
+      const mockedToday = new Date(mockedTodayMilis);
+      jest.useFakeTimers();
+      jest.setSystemTime(mockedToday);
+    });
+
+    afterEach(() => {
+      jest.useRealTimers();
+    });
+
+    it('should set new achievements for wallets', () => {
+      const wallets = ['0x1', '0x2'] as Address[];
+      const achievements = {
+        '0x1': [{ id: AchievementKeys.SWAP_VOLUME, achieved: 1000 }],
+        '0x2': [{ id: AchievementKeys.SWAP_VOLUME, achieved: 500 }],
+      };
+
+      tierService.setAchievements(wallets, achievements, false);
+
+      expect(tierService.achievements).toEqual({
+        '0x1': [
+          {
+            achievement: { id: AchievementKeys.SWAP_VOLUME, achieved: 1000 },
+            lastUpdated: mockedTodayMilis,
+          },
+        ],
+        '0x2': [
+          {
+            achievement: { id: AchievementKeys.SWAP_VOLUME, achieved: 500 },
+            lastUpdated: mockedTodayMilis,
+          },
+        ],
+      });
+    });
+
+    it('should preserve existing achievements if update interval has not passed', () => {
+      // First set initial achievements
+      const initialAchievements = {
+        '0x1': [{ id: AchievementKeys.SWAP_VOLUME, achieved: 1000 }],
+      };
+      tierService.setAchievements(['0x1'], initialAchievements, false);
+
+      // Advance time but not enough to trigger update
+      jest.advanceTimersByTime(IntervalSetActions.tierAchievementSpoilage - 1000);
+
+      // Try to update with new value
+      const newAchievements = {
+        '0x1': [{ id: AchievementKeys.SWAP_VOLUME, achieved: 500 }],
+      };
+      tierService.setAchievements(['0x1'], newAchievements, false);
+
+      expect(tierService.achievements).toEqual({
+        '0x1': [
+          {
+            achievement: { id: AchievementKeys.SWAP_VOLUME, achieved: 1000 },
+            lastUpdated: mockedTodayMilis,
+          },
+        ],
+      });
+    });
+
+    it('should update existing achievements if update interval has not passed but new value is higher', () => {
+      // First set initial achievements
+      const initialAchievements = {
+        '0x1': [{ id: AchievementKeys.SWAP_VOLUME, achieved: 500 }],
+      };
+      tierService.setAchievements(['0x1'], initialAchievements, false);
+
+      // Advance time but not enough to trigger update
+      jest.advanceTimersByTime(IntervalSetActions.tierAchievementSpoilage - 1000);
+
+      // Try to update with new value
+      const newAchievements = {
+        '0x1': [{ id: AchievementKeys.SWAP_VOLUME, achieved: 1000 }],
+      };
+      tierService.setAchievements(['0x1'], newAchievements, false);
+
+      expect(tierService.achievements).toEqual({
+        '0x1': [
+          {
+            achievement: { id: AchievementKeys.SWAP_VOLUME, achieved: 1000 },
+            lastUpdated: mockedTodayMilis + IntervalSetActions.tierAchievementSpoilage - 1000,
+          },
+        ],
+      });
+    });
+
+    it('should update achievements if update interval has passed', () => {
+      // Set initial achievements
+      const initialAchievements = {
+        '0x1': [{ id: AchievementKeys.SWAP_VOLUME, achieved: 1000 }],
+      };
+      tierService.setAchievements(['0x1'], initialAchievements, false);
+
+      // Advance time past the update interval
+      jest.advanceTimersByTime(IntervalSetActions.tierAchievementSpoilage + 1000);
+
+      // Update with new achievements
+      const newAchievements = {
+        '0x1': [{ id: AchievementKeys.SWAP_VOLUME, achieved: 500 }],
+      };
+      tierService.setAchievements(['0x1'], newAchievements, false);
+
+      expect(tierService.achievements).toEqual({
+        '0x1': [
+          {
+            achievement: { id: AchievementKeys.SWAP_VOLUME, achieved: 500 },
+            lastUpdated: mockedTodayMilis + IntervalSetActions.tierAchievementSpoilage + 1000,
+          },
+        ],
+      });
+    });
+
+    it('should add twitter achievement when twitterShare is true', () => {
+      const wallets = ['0x1'] as Address[];
+      const achievements = {
+        '0x1': [{ id: AchievementKeys.SWAP_VOLUME, achieved: 1000 }],
+      };
+
+      tierService.setAchievements(wallets, achievements, true);
+
+      expect(tierService.achievements).toEqual({
+        '0x1': [
+          {
+            achievement: { id: AchievementKeys.SWAP_VOLUME, achieved: 1000 },
+            lastUpdated: mockedTodayMilis,
+          },
+          {
+            achievement: { id: AchievementKeys.TWEET, achieved: 1 },
+            lastUpdated: mockedTodayMilis,
+          },
+        ],
+      });
+    });
+
+    it('should handle empty achievements', () => {
+      const wallets = ['0x1', '0x2'] as Address[];
+      const achievements = {};
+
+      tierService.setAchievements(wallets, achievements, false);
+
+      expect(tierService.achievements).toEqual({
+        '0x1': [],
+        '0x2': [],
+      });
+    });
+  });
+
+  describe('updateAchievements', () => {
+    beforeEach(() => {
+      const mockedToday = new Date(mockedTodayMilis);
+      jest.useFakeTimers();
+      jest.setSystemTime(mockedToday);
+
+      // Set up user in web3Service
+      web3Service.accountService = {
+        user: {
+          wallets: [
+            createTestWallet({
+              address: '0xwallet',
+              isOwner: true,
+            }),
+          ],
+        } as User,
+      } as AccountService;
+    });
+
+    afterEach(() => {
+      jest.useRealTimers();
+    });
+
+    describe('swap transactions', () => {
+      it('should update swap volume achievement for existing achievement', () => {
+        // Set initial achievements
+        tierService.achievements = {
+          '0xwallet': [
+            {
+              achievement: { id: AchievementKeys.SWAP_VOLUME, achieved: 1000 },
+              lastUpdated: mockedTodayMilis,
+            },
+          ],
+        };
+
+        const transaction = {
+          type: TransactionTypes.swap,
+          from: '0xwallet',
+          typeData: {
+            amountFromUsd: 500,
+          },
+        } as TransactionDetails;
+
+        tierService.updateAchievements(transaction);
+
+        expect(tierService.achievements).toEqual({
+          '0xwallet': [
+            {
+              achievement: { id: AchievementKeys.SWAP_VOLUME, achieved: 1500 },
+              lastUpdated: mockedTodayMilis,
+            },
+          ],
+        });
+      });
+
+      it('should create new swap volume achievement if none exists', () => {
+        // Start with empty achievements for the wallet
+        tierService.achievements = {
+          '0xwallet': [],
+        };
+
+        const transaction = {
+          type: TransactionTypes.swap,
+          from: '0xwallet',
+          typeData: {
+            amountToUsd: 500,
+          },
+        } as TransactionDetails;
+
+        tierService.updateAchievements(transaction);
+
+        expect(tierService.achievements).toEqual({
+          '0xwallet': [
+            {
+              achievement: { id: AchievementKeys.SWAP_VOLUME, achieved: 500 },
+              lastUpdated: mockedTodayMilis,
+            },
+          ],
+        });
+      });
+
+      it('should use amountToUsd if amountFromUsd is not available', () => {
+        tierService.achievements = {
+          '0xwallet': [
+            {
+              achievement: { id: AchievementKeys.SWAP_VOLUME, achieved: 1000 },
+              lastUpdated: mockedTodayMilis,
+            },
+          ],
+        };
+
+        const transaction = {
+          type: TransactionTypes.swap,
+          from: '0xwallet',
+          typeData: {
+            amountToUsd: 500,
+          },
+        } as TransactionDetails;
+
+        tierService.updateAchievements(transaction);
+
+        expect(tierService.achievements).toEqual({
+          '0xwallet': [
+            {
+              achievement: { id: AchievementKeys.SWAP_VOLUME, achieved: 1500 },
+              lastUpdated: mockedTodayMilis,
+            },
+          ],
+        });
+      });
+
+      it('should not update achievements when USD amount is not available', () => {
+        tierService.achievements = {
+          '0xwallet': [
+            {
+              achievement: { id: AchievementKeys.SWAP_VOLUME, achieved: 1000 },
+              lastUpdated: mockedTodayMilis,
+            },
+          ],
+        };
+
+        const transaction = {
+          type: TransactionTypes.swap,
+          from: '0xwallet',
+          typeData: {},
+        } as TransactionDetails;
+
+        tierService.updateAchievements(transaction);
+
+        expect(tierService.achievements).toEqual({
+          '0xwallet': [
+            {
+              achievement: { id: AchievementKeys.SWAP_VOLUME, achieved: 1000 },
+              lastUpdated: mockedTodayMilis,
+            },
+          ],
+        });
+      });
+    });
+
+    describe('other transaction types', () => {
+      it('should not update achievements for non-swap transactions', () => {
+        tierService.achievements = {
+          '0xwallet': [
+            {
+              achievement: { id: AchievementKeys.SWAP_VOLUME, achieved: 1000 },
+              lastUpdated: mockedTodayMilis,
+            },
+          ],
+        };
+
+        for (const type in TransactionTypes) {
+          const transaction = {
+            type,
+            from: '0xwallet',
+            typeData: {
+              amountFromUsd: 500,
+            },
+          } as unknown as TransactionDetails;
+
+          tierService.updateAchievements(transaction);
+        }
+
+        expect(tierService.achievements).toEqual({
+          '0xwallet': [
+            {
+              achievement: { id: AchievementKeys.SWAP_VOLUME, achieved: 1000 },
+              lastUpdated: mockedTodayMilis,
+            },
+          ],
+        });
+      });
     });
   });
 });
