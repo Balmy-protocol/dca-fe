@@ -50,7 +50,7 @@ export const VerifyWalletModal = ({ open, onClose, walletAddress }: VerifyWallet
   };
 
   const onSwitchWallet = () => {
-    trackEvent('Aggregator - Reconnect wallet');
+    trackEvent('Verify wallet modal - Switch wallet');
 
     openConnectModal(WalletActionType.reconnect);
   };

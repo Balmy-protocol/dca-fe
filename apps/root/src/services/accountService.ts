@@ -742,6 +742,13 @@ export default class AccountService extends EventsManager<AccountServiceData> {
       expiration,
     });
 
+    this.setWalletOwnership(wallet);
+  }
+
+  setWalletOwnership(wallet: Address) {
+    const user = this.getUser();
+    if (!user) return;
+
     const updatedWallets = user.wallets.map((userWallet) =>
       userWallet.address === wallet ? { ...userWallet, isOwner: true } : userWallet
     );
@@ -760,6 +767,8 @@ export default class AccountService extends EventsManager<AccountServiceData> {
     } else {
       throw new Error('tried to link a wallet to a user that was not set');
     }
+
+    this.tierService.calculateAndSetUserTier();
   }
 
   async claimEarnEarlyAccess(elegibleAndOwnedAddress: Address) {

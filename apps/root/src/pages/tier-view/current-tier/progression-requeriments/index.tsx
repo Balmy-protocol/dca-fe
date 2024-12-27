@@ -27,7 +27,7 @@ const MESSAGES_BY_MISSING_ACHIEVEMENTS: Record<AchievementKeys, MessageDescripto
 
 const OR_INTL_MESSAGE = defineMessage({
   description: 'tier-view.current-tier.my-tier.tier-progress.or-message',
-  defaultMessage: '{req1} or {req2}',
+  defaultMessage: 'or',
 });
 
 const generateProgressMessages = (
@@ -75,14 +75,25 @@ const generateProgressMessages = (
         const formattedRequirements = missingRequirements.map((req) =>
           formatSingleRequirement(req as TierSingleRequirement)
         );
-        const lastMessage = formattedRequirements.pop();
-        const formattedRequirementsString = formattedRequirements.join(', ');
-        return [
-          {
-            message: intl.formatMessage(OR_INTL_MESSAGE, { req1: formattedRequirementsString, req2: lastMessage }),
-            keys,
-          },
-        ];
+        if (formattedRequirements.length > 1) {
+          const lastMessage = formattedRequirements.pop();
+          return [
+            {
+              message: (
+                <>
+                  {formattedRequirements}
+                  {` `}
+                  <FormattedMessage {...OR_INTL_MESSAGE} />
+                  {` `}
+                  {lastMessage}
+                </>
+              ),
+              keys,
+            },
+          ];
+        } else {
+          return [{ message: formattedRequirements[0], keys }];
+        }
       }
     }
 
@@ -97,17 +108,19 @@ const generateProgressMessages = (
 };
 
 const ProgressionRequeriments = () => {
-  const { missing, details, tierLevel } = useTierLevel();
+  const { details, tierLevel } = useTierLevel();
   const intl = useIntl();
 
   const missingMessages = generateProgressMessages(tierLevel, details, intl);
-
+  const completedKeys = Object.keys(details || {}).filter(
+    (key) => (details?.[key as AchievementKeys]?.current ?? 0) >= (details?.[key as AchievementKeys]?.required ?? 0)
+  );
   return (
     <ContainerBox gap={1} justifyContent="space-between">
       <ContainerBox gap={1} flexDirection="column">
         {missingMessages.map((message, index) => (
           <ContainerBox key={index} gap={1} alignItems="center">
-            {message.keys.some((key) => missing[key as AchievementKeys]) ? (
+            {message.keys.every((key) => !completedKeys.includes(key)) ? (
               <CheckCircleOutlineIcon sx={{ color: ({ palette }) => colors[palette.mode].typography.typo3 }} />
             ) : (
               <CheckCircleOutlineIcon color="success" />
@@ -115,7 +128,7 @@ const ProgressionRequeriments = () => {
             <Typography
               variant="bodySmallRegular"
               color={({ palette }) =>
-                message.keys.some((key) => missing[key as AchievementKeys])
+                message.keys.every((key) => !completedKeys.includes(key))
                   ? colors[palette.mode].typography.typo3
                   : colors[palette.mode].semantic.success.darker
               }

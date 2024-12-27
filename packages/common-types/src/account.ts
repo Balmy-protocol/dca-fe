@@ -48,7 +48,7 @@ export interface AccountLabelsAndContactList {
 export enum AchievementKeys {
   SWAP_VOLUME = 'agg-swaps',
   TWEET = 'tweet_shared',
-  MIGRATED_VOLUME = 'migrated_volume',
+  MIGRATED_VOLUME = 'migrations',
   REFERRALS = 'referrals',
 }
 

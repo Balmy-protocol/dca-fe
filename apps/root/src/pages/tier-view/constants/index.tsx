@@ -33,6 +33,11 @@ export type TierReward = {
   comingSoon: boolean;
 };
 
+export type TierLevelReward = {
+  description: MessageDescriptor;
+  icon: React.ReactNode;
+};
+
 export const TIER_REWARDS: Record<number, TierReward[]> = {
   0: [
     {
@@ -286,6 +291,124 @@ export const TIER_REWARDS: Record<number, TierReward[]> = {
       icon: <TierTicketDiscountIcon fontSize="large" />,
       badge: undefined,
       comingSoon: true,
+    },
+  ],
+};
+
+export const TIER_LEVEL_UP_REWARDS: Record<number, TierLevelReward[]> = {
+  0: [
+    {
+      description: defineMessage({
+        description: 'tier-view.verify-to-level-up-modal.rewards.tier-0.reward-1.description',
+        defaultMessage: 'Guardian security',
+      }),
+      icon: <TierGiftIcon fontSize="large" />,
+    },
+    {
+      description: defineMessage({
+        description: 'tier-view.verify-to-level-up-modal.rewards.tier-0.reward-2.description',
+        defaultMessage: 'Yield tracking',
+      }),
+      icon: <TierTicketDiscountIcon fontSize="large" />,
+    },
+    {
+      description: defineMessage({
+        description: 'tier-view.verify-to-level-up-modal.rewards.tier-0.reward-3.description',
+        defaultMessage: 'Realtime monitoring',
+      }),
+      icon: <TierChartIcon fontSize="large" />,
+    },
+    {
+      description: defineMessage({
+        description: 'tier-view.verify-to-level-up-modal.rewards.tier-0.reward-4.description',
+        defaultMessage: 'Pioneer Guardian NFT',
+      }),
+      icon: <TierMedalStarIcon fontSize="large" />,
+    },
+  ],
+  1: [
+    {
+      description: defineMessage({
+        description: 'tier-view.verify-to-level-up-modal.rewards.tier-1.reward-2.description',
+        defaultMessage: 'Exclusive monthly raffles',
+      }),
+      icon: <TierTicketDiscountIcon fontSize="large" />,
+    },
+    {
+      description: defineMessage({
+        description: 'tier-view.verify-to-level-up-modal.rewards.tier-1.reward-3.description',
+        defaultMessage: 'Reduction on performance fees',
+      }),
+      icon: <TierChartIcon fontSize="large" />,
+    },
+    {
+      description: defineMessage({
+        description: 'tier-view.verify-to-level-up-modal.rewards.tier-1.reward-4.description',
+        defaultMessage: 'Guardian NFT',
+      }),
+      icon: <TierMedalStarIcon fontSize="large" />,
+    },
+  ],
+  2: [
+    {
+      description: defineMessage({
+        description: 'tier-view.verify-to-level-up-modal.rewards.tier-2.reward-2.description',
+        defaultMessage: 'Lower fees',
+      }),
+      icon: <TierTicketDiscountIcon fontSize="large" />,
+    },
+    {
+      description: defineMessage({
+        description: 'tier-view.verify-to-level-up-modal.rewards.tier-2.reward-3.description',
+        defaultMessage: 'Yield Strategies',
+      }),
+      icon: <TierChartIcon fontSize="large" />,
+    },
+    {
+      description: defineMessage({
+        description: 'tier-view.verify-to-level-up-modal.rewards.tier-2.reward-4.description',
+        defaultMessage: 'Expert NFT',
+      }),
+      icon: <TierMedalStarIcon fontSize="large" />,
+    },
+  ],
+  3: [
+    {
+      description: defineMessage({
+        description: 'tier-view.verify-to-level-up-modal.rewards.tier-3.reward-2.description',
+        defaultMessage: 'No fees',
+      }),
+      icon: <TierTicketDiscountIcon fontSize="large" />,
+    },
+    {
+      description: defineMessage({
+        description: 'tier-view.verify-to-level-up-modal.rewards.tier-3.reward-3.description',
+        defaultMessage: 'Yield Strategies',
+      }),
+      icon: <TierChartIcon fontSize="large" />,
+    },
+    {
+      description: defineMessage({
+        description: 'tier-view.verify-to-level-up-modal.rewards.tier-3.reward-4.description',
+        defaultMessage: 'Master NFT',
+      }),
+      icon: <TierMedalStarIcon fontSize="large" />,
+    },
+  ],
+  4: [
+    {
+      description: defineMessage({
+        description: 'tier-view.verify-to-level-up-modal.rewards.tier-4.reward-1.description',
+        defaultMessage: 'Details classified',
+      }),
+      icon: <TierGiftIcon fontSize="large" />,
+    },
+    {
+      description: defineMessage({
+        description: 'tier-view.verify-to-level-up-modal.rewards.tier-4.reward-2.description',
+        defaultMessage: 'More info coming soon',
+      }),
+      icon: <TierTicketDiscountIcon fontSize="large" />,
     },
   ],
 };
