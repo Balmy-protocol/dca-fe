@@ -8,7 +8,7 @@ import { IconButton } from '../iconbutton';
 import { Breakpoint } from '../breakpoint';
 import { CloseIcon } from '../../icons';
 import { Button, ButtonProps } from '../button';
-import { FormattedMessage } from 'react-intl';
+import { defineMessage, FormattedMessage, MessageDescriptor, useIntl } from 'react-intl';
 import { colors } from '../../theme';
 import { ForegroundPaper } from '../foreground-paper';
 import { ContainerBox } from '../container-box';
@@ -79,10 +79,12 @@ const StyledCloseIconButton = styled(IconButton)`
   `}
 `;
 
+const DEFAULT_CLOSE_MESSAGE = defineMessage({ defaultMessage: 'Close', description: 'modal.close' });
 export interface ModalProps extends PropsWithChildren {
   open: boolean;
   onClose?: () => void;
   showCloseIcon?: boolean;
+  closeMessage?: MessageDescriptor;
   showCloseButton?: boolean;
   maxWidth?: Breakpoint;
   customMaxWidth?: string;
@@ -121,11 +123,14 @@ const Modal: React.FC<ModalProps> = ({
   headerButton,
   actionsAlignment = 'vertical',
   extraActions,
+  closeMessage,
 }) => {
   const {
     palette: { mode },
     spacing,
   } = useTheme();
+
+  const intl = useIntl();
 
   const handleClose = () => {
     if (onClose && (showCloseButton || showCloseIcon || closeOnBackdrop)) {
@@ -230,7 +235,7 @@ const Modal: React.FC<ModalProps> = ({
           )}
           {showCloseButton && actionsAlignment === 'vertical' && (
             <Button onClick={onClose} variant="contained" size="large" sx={{ width: '100%' }}>
-              <FormattedMessage description="Close" defaultMessage="Close" />
+              {intl.formatMessage(closeMessage || DEFAULT_CLOSE_MESSAGE)}
             </Button>
           )}
           {extraActions}

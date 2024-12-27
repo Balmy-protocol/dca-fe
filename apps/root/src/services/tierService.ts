@@ -236,8 +236,8 @@ export default class TierService extends EventsManager<TierServiceData> {
   }
 
   calculateMissingForNextTier(): {
-    missing: Record<string, { current: number; required: number }>;
-    details: Record<string, { current: number; required: number }>;
+    missing: Partial<Record<AchievementKeys, { current: number; required: number }>>;
+    details: Partial<Record<AchievementKeys, { current: number; required: number }>>;
     walletsToVerify: Address[];
   } {
     const user = this.web3Service.accountService.user;
@@ -252,8 +252,8 @@ export default class TierService extends EventsManager<TierServiceData> {
       return { missing: {}, details: {}, walletsToVerify: [] };
     }
 
-    const missing: Record<string, { current: number; required: number }> = {};
-    const details: Record<string, { current: number; required: number }> = {};
+    const missing: Partial<Record<AchievementKeys, { current: number; required: number }>> = {};
+    const details: Partial<Record<AchievementKeys, { current: number; required: number }>> = {};
     const walletsToVerify: Address[] = [];
 
     const evaluateSingleRequirement = (requirement: TierSingleRequirement): boolean => {
@@ -332,8 +332,8 @@ export default class TierService extends EventsManager<TierServiceData> {
 
   getProgressPercentageToNextTier(): {
     progress: number;
-    missing: Record<string, { current: number; required: number }>;
-    details: Record<string, { current: number; required: number }>;
+    missing: Partial<Record<AchievementKeys, { current: number; required: number }>>;
+    details: Partial<Record<AchievementKeys, { current: number; required: number }>>;
     walletsToVerify: Address[];
   } {
     const user = this.web3Service.accountService.user;

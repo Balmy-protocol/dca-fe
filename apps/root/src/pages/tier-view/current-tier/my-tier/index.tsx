@@ -13,6 +13,7 @@ import {
   Button,
 } from 'ui-library';
 import ProgressionRequeriments from '../progression-requeriments';
+import VerifyToLevelUpModal from '../verify-to-level-up-modal';
 
 const StyledMyTierCard = styled(ContainerBox).attrs({ gap: 6, flex: 1 })`
   ${({ theme: { palette, spacing } }) => `
@@ -65,7 +66,7 @@ const StyledOverlayedTierIcon = styled(ContainerBox).attrs({ alignItems: 'center
     right: ${spacing(-7)};
   `}
 `;
-const LeveledMyTierCard = ({ tierLevel }: { tierLevel: number }) => {
+const LeveledMyTierCard = ({ tierLevel, onVerify }: { tierLevel: number; onVerify: () => void }) => {
   const nextTierLevel = tierLevel + 1;
   const TierIcon = ActiveTiersIcons[tierLevel];
   const NextTierIcon = ActiveTiersIcons[nextTierLevel];
@@ -79,13 +80,13 @@ const LeveledMyTierCard = ({ tierLevel }: { tierLevel: number }) => {
           <NextTierIcon size="4.8125rem" />
         </StyledOverlayedTierIcon>
       </StyledClaimYourTierIconContainer>
-      <ContainerBox gap={1} flexDirection="column">
+      <ContainerBox gap={1} flexDirection="column" flex={1}>
         <Typography variant="h1Bold" color={({ palette }) => colors[palette.mode].typography.typo1}>
           <FormattedMessage
             description="tier-view.current-tier.my-tier.level-up.title"
             defaultMessage="Claim your <span>Tier {tierLevel}</span>"
             values={{
-              tierLevel,
+              tierLevel: nextTierLevel,
               span: (chunks) => <StyledTierLevelSpan>{chunks}</StyledTierLevelSpan>,
             }}
           />
@@ -103,6 +104,7 @@ const LeveledMyTierCard = ({ tierLevel }: { tierLevel: number }) => {
             color="primary"
             onMouseEnter={() => setHovered(true)}
             onMouseLeave={() => setHovered(false)}
+            onClick={onVerify}
           >
             <FormattedMessage
               description="tier-view.current-tier.my-tier.level-up.button"
@@ -152,56 +154,59 @@ const NonLeveledMyTierCard = ({ tierLevel, progress }: { tierLevel: number; prog
 
 const MyTier = () => {
   const { tierLevel, progress, walletsToVerify } = useTierLevel();
-
+  const [openVerifyToLevelUpModal, setOpenVerifyToLevelUpModal] = React.useState(false);
   const canLevelUp = progress >= 100;
   const needsToVerifyWallets = walletsToVerify.length > 0 && canLevelUp;
   return (
-    <Grid container spacing={6}>
-      {/* current tier */}
-      <Grid item xs={12} md={6}>
-        <StyledMyTierCard>
-          {needsToVerifyWallets ? (
-            <LeveledMyTierCard tierLevel={tierLevel} />
-          ) : (
-            <NonLeveledMyTierCard tierLevel={tierLevel} progress={progress} />
-          )}
-        </StyledMyTierCard>
-      </Grid>
-
-      {/* tier progress */}
-      <Grid item xs={12} md={6}>
-        <StyledTierProgressCard>
-          <ContainerBox gap={1} justifyContent="space-between" alignItems="center">
-            <Typography variant="h5Bold" color={({ palette }) => colors[palette.mode].typography.typo1}>
-              <FormattedMessage
-                description="tier-view.current-tier.my-tier.tier-progress.title"
-                defaultMessage="Reach Tier {tierLevel} and unlock all its benefits!"
-                values={{
-                  tierLevel: tierLevel + 1,
-                }}
-              />
-            </Typography>
-            {needsToVerifyWallets && (
-              <StyledTierProgressNeedsToVerifyContainer>
-                <InfoCircleIcon
-                  sx={({ palette }) => ({
-                    color: colors[palette.mode].semantic.informative.primary,
-                    transform: 'rotate(180deg)',
-                  })}
-                />
-                <Typography variant="bodyExtraSmall" color={({ palette }) => colors[palette.mode].typography.typo2}>
-                  <FormattedMessage
-                    description="tier-view.current-tier.my-tier.tier-progress.verify-wallets"
-                    defaultMessage="Verify wallet(s)"
-                  />
-                </Typography>
-              </StyledTierProgressNeedsToVerifyContainer>
+    <>
+      <VerifyToLevelUpModal isOpen={openVerifyToLevelUpModal} onClose={() => setOpenVerifyToLevelUpModal(false)} />
+      <Grid container spacing={6}>
+        {/* current tier */}
+        <Grid item xs={12} md={6}>
+          <StyledMyTierCard>
+            {needsToVerifyWallets ? (
+              <LeveledMyTierCard tierLevel={tierLevel} onVerify={() => setOpenVerifyToLevelUpModal(true)} />
+            ) : (
+              <NonLeveledMyTierCard tierLevel={tierLevel} progress={progress} />
             )}
-          </ContainerBox>
-          <ProgressionRequeriments />
-        </StyledTierProgressCard>
+          </StyledMyTierCard>
+        </Grid>
+
+        {/* tier progress */}
+        <Grid item xs={12} md={6}>
+          <StyledTierProgressCard>
+            <ContainerBox gap={1} justifyContent="space-between" alignItems="center">
+              <Typography variant="h5Bold" color={({ palette }) => colors[palette.mode].typography.typo1}>
+                <FormattedMessage
+                  description="tier-view.current-tier.my-tier.tier-progress.title"
+                  defaultMessage="Reach Tier {tierLevel} and unlock all its benefits!"
+                  values={{
+                    tierLevel: tierLevel + 1,
+                  }}
+                />
+              </Typography>
+              {needsToVerifyWallets && (
+                <StyledTierProgressNeedsToVerifyContainer>
+                  <InfoCircleIcon
+                    sx={({ palette }) => ({
+                      color: colors[palette.mode].semantic.informative.primary,
+                      transform: 'rotate(180deg)',
+                    })}
+                  />
+                  <Typography variant="bodyExtraSmall" color={({ palette }) => colors[palette.mode].typography.typo2}>
+                    <FormattedMessage
+                      description="tier-view.current-tier.my-tier.tier-progress.verify-wallets"
+                      defaultMessage="Verify wallet(s)"
+                    />
+                  </Typography>
+                </StyledTierProgressNeedsToVerifyContainer>
+              )}
+            </ContainerBox>
+            <ProgressionRequeriments />
+          </StyledTierProgressCard>
+        </Grid>
       </Grid>
-    </Grid>
+    </>
   );
 };
 

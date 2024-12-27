@@ -113,9 +113,8 @@ const ProgressionRequeriments = () => {
 
   console.log(missing, details, tierLevel);
   const missingMessages = generateProgressMessages(tierLevel, details, intl);
-
-  const completedKeys = Object.keys(details).filter(
-    (key) => details[key as AchievementKeys]?.current >= details[key as AchievementKeys]?.required
+  const completedKeys = Object.keys(details || {}).filter(
+    (key) => (details?.[key as AchievementKeys]?.current ?? 0) >= (details?.[key as AchievementKeys]?.required ?? 0)
   );
   return (
     <ContainerBox gap={1} justifyContent="space-between">
