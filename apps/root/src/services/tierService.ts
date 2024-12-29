@@ -22,13 +22,13 @@ export const LAST_LOGIN_KEY = 'last_logged_in_with';
 export const WALLET_SIGNATURE_KEY = 'wallet_auth_signature';
 export const LATEST_SIGNATURE_VERSION = '1.0.2';
 export interface TierServiceData {
-  tier: number;
+  tier?: number;
   inviteCodes: EarnInviteCode[];
   referrals: AccountId[];
   achievements: Record<Address, { achievement: Achievement; lastUpdated: number }[]>;
 }
 
-const initialState: TierServiceData = { tier: 0, inviteCodes: [], referrals: [], achievements: {} };
+const initialState: TierServiceData = { tier: undefined, inviteCodes: [], referrals: [], achievements: {} };
 
 // Tier definitions with requirements
 export const TIER_REQUIREMENTS: TierRequirements[] = [
@@ -269,7 +269,7 @@ export default class TierService extends EventsManager<TierServiceData> {
     const user = this.web3Service.accountService.user;
     if (!user) return { missing: {}, details: {}, walletsToVerify: [] };
 
-    const currentTierLevel = this.tier;
+    const currentTierLevel = this.tier ?? 0;
     const totalAchievementsOwned = this.calculateTotalAchievements(user, true);
     const totalAchievementsAll = this.calculateTotalAchievements(user, false);
 
@@ -373,7 +373,7 @@ export default class TierService extends EventsManager<TierServiceData> {
       };
     }
 
-    const currentTierLevel = this.tier;
+    const currentTierLevel = this.tier ?? 0;
     const nextTier = TIER_REQUIREMENTS.find((tier) => tier.level === currentTierLevel + 1);
     if (!nextTier) {
       return {

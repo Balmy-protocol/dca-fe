@@ -479,6 +479,8 @@ describe('Account Service', () => {
       accountService.setWalletActionType(WalletActionType.link);
 
       walletClientService.getWalletClient = jest.fn().mockReturnValue(walletClientMock);
+      accountService.tierService.calculateAndSetUserTier = jest.fn();
+      accountService.tierService.pollUser = jest.fn().mockResolvedValue(true);
     });
 
     it('should thow if the connector is not existent', async () => {

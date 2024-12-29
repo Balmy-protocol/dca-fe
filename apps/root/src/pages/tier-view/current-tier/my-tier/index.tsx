@@ -165,9 +165,9 @@ const MyTier = () => {
         <Grid item xs={12} md={6}>
           <StyledMyTierCard>
             {needsToVerifyWallets ? (
-              <LeveledMyTierCard tierLevel={tierLevel} onVerify={() => setOpenVerifyToLevelUpModal(true)} />
+              <LeveledMyTierCard tierLevel={tierLevel ?? 0} onVerify={() => setOpenVerifyToLevelUpModal(true)} />
             ) : (
-              <NonLeveledMyTierCard tierLevel={tierLevel} progress={progress} />
+              <NonLeveledMyTierCard tierLevel={tierLevel ?? 0} progress={progress} />
             )}
           </StyledMyTierCard>
         </Grid>
@@ -181,7 +181,7 @@ const MyTier = () => {
                   description="tier-view.current-tier.my-tier.tier-progress.title"
                   defaultMessage="Reach Tier {tierLevel} and unlock all its benefits!"
                   values={{
-                    tierLevel: tierLevel + 1,
+                    tierLevel: (tierLevel ?? 0) + 1,
                   }}
                 />
               </Typography>

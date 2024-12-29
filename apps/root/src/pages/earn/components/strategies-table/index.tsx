@@ -361,7 +361,7 @@ const StrategiesTable = <T extends StrategiesTableVariants>({
                   variant={variant}
                   showBalances={showBalances}
                   showEndChevron={showEndChevron}
-                  tierLevel={tierLevel}
+                  tierLevel={tierLevel ?? 0}
                 />
               ))}
               {emptyRows}
