@@ -48,7 +48,7 @@ const generateProgressMessages = (
     const remaining = current > required ? required : required - current;
 
     return intl.formatMessage(MESSAGES_BY_MISSING_ACHIEVEMENTS[id], {
-      missing: remaining,
+      missing: remaining.toFixed(0),
       b: (chunks) => <b>{chunks}</b>,
     });
   };

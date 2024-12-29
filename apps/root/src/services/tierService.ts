@@ -176,9 +176,9 @@ export default class TierService extends EventsManager<TierServiceData> {
             (a) => a.achievement.id === achievement.id
           );
           const parsedAchievement = parseAchievement(achievement);
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
           if (
             currentAchievement &&
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
             Date.now() - currentAchievement.lastUpdated < IntervalSetActions.tierAchievementSpoilage &&
             currentAchievement.achievement.achieved > parsedAchievement.achieved
           ) {

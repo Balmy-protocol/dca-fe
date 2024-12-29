@@ -310,6 +310,13 @@ export default class AccountService extends EventsManager<AccountServiceData> {
     }
 
     this.setActiveWallet(address);
+
+    this.tierService
+      .pollUser()
+      .then(() => this.tierService.calculateAndSetUserTier())
+      .catch(() => {
+        console.error('Failed to poll user on link');
+      });
   }
 
   async logInUser(availableProvider?: AvailableProvider): Promise<void> {
@@ -462,6 +469,8 @@ export default class AccountService extends EventsManager<AccountServiceData> {
     this.accounts = [...this.accounts, newAccount];
 
     this.changeUser(newAccountId.accountId, signature, walletToSet);
+
+    this.tierService.calculateAndSetUserTier();
   }
 
   changeUser(userId: string, signature?: WalletSignature, signedInWallet?: Wallet) {
@@ -500,6 +509,8 @@ export default class AccountService extends EventsManager<AccountServiceData> {
         this.setActiveWallet(walletToSetAsActive);
       }
     }
+
+    this.tierService.calculateAndSetUserTier();
   }
 
   setActiveWallet(wallet: string) {
@@ -555,6 +566,8 @@ export default class AccountService extends EventsManager<AccountServiceData> {
     this.accounts = modifiedAccounts;
 
     this.setActiveWallet(otherAuthWallet.address);
+
+    this.tierService.calculateAndSetUserTier();
   }
 
   async getWalletVerifyingSignature({
