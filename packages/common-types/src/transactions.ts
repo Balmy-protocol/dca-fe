@@ -152,6 +152,8 @@ export interface SwapTypeData {
     transferTo?: string | null;
     swapContract: string;
     orderType: 'buy' | 'sell';
+    amountFromUsd?: number | null;
+    amountToUsd?: number | null;
   };
 }
 

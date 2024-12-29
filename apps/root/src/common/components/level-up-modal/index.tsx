@@ -8,6 +8,7 @@ import styled from 'styled-components';
 import { ActiveTiersIcons, colors, ContainerBox, Modal, ModalProps, Typography } from 'ui-library';
 import { maxUint256 } from 'viem';
 import confetti from 'canvas-confetti';
+import { isNil } from 'lodash';
 
 const StyledTierLevelSpan = styled(Typography).attrs({ variant: 'h3Bold' })`
   ${({ theme: { palette } }) => `
@@ -25,7 +26,7 @@ const LevelUpModal = ({}) => {
   const [isOpen, setIsOpen] = React.useState(false);
 
   React.useEffect(() => {
-    if (tierLevel !== previousTierLevel && tierLevel > (previousTierLevel ?? maxUint256)) {
+    if (tierLevel !== previousTierLevel && !isNil(tierLevel) && tierLevel > (previousTierLevel ?? maxUint256)) {
       setIsOpen(true);
       // give it a bit to render correctly
       setTimeout(() => {
@@ -67,6 +68,8 @@ const LevelUpModal = ({}) => {
     [intl]
   );
 
+  if (isNil(tierLevel)) return null;
+
   const tierName = TIER_LEVEL_OPTIONS[tierLevel].title;
   const TierIcon = ActiveTiersIcons[tierLevel];
 
@@ -89,7 +92,7 @@ const LevelUpModal = ({}) => {
           >
             <FormattedMessage
               description="level-up-modal.title"
-              defaultMessage="Verify ownership to unlock <span>Tier {tierLevel} · {tierName}</span>"
+              defaultMessage="Congratulations! You have reached <span>Tier {tierLevel} · {tierName}</span>"
               values={{
                 tierLevel,
                 tierName: intl.formatMessage(tierName),

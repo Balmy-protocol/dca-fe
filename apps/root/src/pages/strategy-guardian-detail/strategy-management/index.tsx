@@ -64,7 +64,7 @@ const StrategyManagement = ({ chainId, strategyGuardianId }: StrategyManagementP
 
   return (
     <StyledBackgroundPaper sx={{ height: height }}>
-      {needsTier && needsTier > tierLevel ? (
+      {needsTier && needsTier > (tierLevel ?? 0) ? (
         <LockedDeposit strategy={strategy} needsTier={needsTier} />
       ) : (
         <>

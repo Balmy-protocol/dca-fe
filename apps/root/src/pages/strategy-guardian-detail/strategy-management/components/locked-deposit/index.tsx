@@ -110,7 +110,7 @@ const LockedDeposit = ({ strategy, needsTier }: { strategy?: DisplayStrategy; ne
             <FormattedMessage
               description="earn.strategy-management.locked-deposit.subtitle"
               defaultMessage="{percentage}% to Tier {nextTier}"
-              values={{ percentage: progress, nextTier: tierLevel + 1 }}
+              values={{ percentage: progress, nextTier: (tierLevel ?? 0) + 1 }}
             />
           </Typography>
         </ContainerBox>

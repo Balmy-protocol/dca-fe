@@ -9,23 +9,26 @@ import {
   TierSingleRequirement,
   TierConditionalRequirement,
   TierRequirements,
+  TransactionDetails,
+  TransactionTypes,
 } from '@types';
 import { EventsManager } from './eventsManager';
 import Web3Service from './web3Service';
 import MeanApiService from './meanApiService';
 import { isSingleRequirement, parseAchievement } from '@common/utils/tiers';
+import { IntervalSetActions } from '@constants/timing';
 
 export const LAST_LOGIN_KEY = 'last_logged_in_with';
 export const WALLET_SIGNATURE_KEY = 'wallet_auth_signature';
 export const LATEST_SIGNATURE_VERSION = '1.0.2';
 export interface TierServiceData {
-  tier: number;
+  tier?: number;
   inviteCodes: EarnInviteCode[];
   referrals: AccountId[];
-  achievements: Record<Address, Achievement[]>;
+  achievements: Record<Address, { achievement: Achievement; lastUpdated: number }[]>;
 }
 
-const initialState: TierServiceData = { tier: 0, inviteCodes: [], referrals: [], achievements: {} };
+const initialState: TierServiceData = { tier: undefined, inviteCodes: [], referrals: [], achievements: {} };
 
 // Tier definitions with requirements
 export const TIER_REQUIREMENTS: TierRequirements[] = [
@@ -122,7 +125,7 @@ export default class TierService extends EventsManager<TierServiceData> {
     return this.serviceData.achievements;
   }
 
-  set achievements(achievements: Record<Address, Achievement[]>) {
+  set achievements(achievements: Record<Address, { achievement: Achievement; lastUpdated: number }[]>) {
     this.serviceData = { ...this.serviceData, achievements };
   }
 
@@ -151,20 +154,41 @@ export default class TierService extends EventsManager<TierServiceData> {
   }
 
   setAchievements(wallets: Address[], achievements: Record<Address, ApiAchievement[]>, twitterShare: boolean) {
-    const baseAchievements = wallets.reduce<Record<Address, Achievement[]>>(
+    const currentAchievements = { ...this.achievements };
+    const baseAchievements = wallets.reduce<Record<Address, { lastUpdated: number; achievement: Achievement }[]>>(
       (acc, address) => {
-        // eslint-disable-next-line no-param-reassign
-        acc[address] = [];
+        if (!acc[address]) {
+          // eslint-disable-next-line no-param-reassign
+          acc[address] = [];
+        }
         return acc;
       },
-      {} as Record<Address, Achievement[]>
+      currentAchievements
     );
 
     const achievementsByWallet = Object.fromEntries(
       Object.entries(baseAchievements).map(([address]) => {
-        const walletAchievements = (achievements[address as Address] || []).map(parseAchievement);
+        const walletAchievements = (achievements[address as Address] || []).map<{
+          achievement: Achievement;
+          lastUpdated: number;
+        }>((achievement) => {
+          const currentAchievement = currentAchievements[address as Address]?.find(
+            (a) => a.achievement.id === achievement.id
+          );
+          const parsedAchievement = parseAchievement(achievement);
+          if (
+            currentAchievement &&
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
+            Date.now() - currentAchievement.lastUpdated < IntervalSetActions.tierAchievementSpoilage &&
+            currentAchievement.achievement.achieved > parsedAchievement.achieved
+          ) {
+            // This can be bc we already confirm transactions for users, so indexer is going to be slower
+            return currentAchievement;
+          }
+          return { achievement: parsedAchievement, lastUpdated: Date.now() };
+        });
         if (twitterShare) {
-          walletAchievements.push({ id: AchievementKeys.TWEET, achieved: 1 });
+          walletAchievements.push({ achievement: { id: AchievementKeys.TWEET, achieved: 1 }, lastUpdated: Date.now() });
         }
         return [address, walletAchievements];
       })
@@ -174,7 +198,9 @@ export default class TierService extends EventsManager<TierServiceData> {
   }
 
   getAchievements() {
-    return this.achievements;
+    return Object.fromEntries(
+      Object.entries(this.achievements).map(([address, data]) => [address, data.map((a) => a.achievement)])
+    );
   }
 
   calculateTotalAchievements(user: User, countOwnedWallets: boolean = true): Record<string, number> {
@@ -184,8 +210,8 @@ export default class TierService extends EventsManager<TierServiceData> {
       if (countOwnedWallets && !wallet.isOwner) continue; // Only include achievements from owned wallets
       const walletAchievements = this.achievements[wallet.address] || [];
       for (const achievement of walletAchievements) {
-        const key = achievement.id;
-        const value = Number(achievement.achieved) || 0;
+        const key = achievement.achievement.id;
+        const value = Number(achievement.achievement.achieved) || 0;
         totalAchievements[key] = (totalAchievements[key] || 0) + value;
       }
     }
@@ -243,7 +269,7 @@ export default class TierService extends EventsManager<TierServiceData> {
     const user = this.web3Service.accountService.user;
     if (!user) return { missing: {}, details: {}, walletsToVerify: [] };
 
-    const currentTierLevel = this.tier;
+    const currentTierLevel = this.tier ?? 0;
     const totalAchievementsOwned = this.calculateTotalAchievements(user, true);
     const totalAchievementsAll = this.calculateTotalAchievements(user, false);
 
@@ -282,7 +308,8 @@ export default class TierService extends EventsManager<TierServiceData> {
                 (wallet) =>
                   !wallet.isOwner &&
                   this.achievements[wallet.address]?.some(
-                    (achievement) => achievement.id === requirement.id && Number(achievement.achieved) > 0
+                    (achievement) =>
+                      achievement.achievement.id === requirement.id && Number(achievement.achievement.achieved) > 0
                   )
               )
               .map((wallet) => wallet.address)
@@ -346,7 +373,7 @@ export default class TierService extends EventsManager<TierServiceData> {
       };
     }
 
-    const currentTierLevel = this.tier;
+    const currentTierLevel = this.tier ?? 0;
     const nextTier = TIER_REQUIREMENTS.find((tier) => tier.level === currentTierLevel + 1);
     if (!nextTier) {
       return {
@@ -418,5 +445,42 @@ export default class TierService extends EventsManager<TierServiceData> {
     if (!user) return;
     const level = this.calculateUserTier(user);
     this.setUserTier(level);
+  }
+
+  updateAchievements(transaction: TransactionDetails) {
+    if (transaction.type !== TransactionTypes.swap) return;
+    const allAchievements = { ...this.achievements };
+    const walletInvolved = transaction.from as Address;
+    const walletAchievements = allAchievements[walletInvolved];
+
+    switch (transaction.type) {
+      case TransactionTypes.swap:
+        const extraData = transaction.typeData;
+        const amountUsd = extraData.amountToUsd || extraData.amountFromUsd;
+
+        if (!amountUsd) return;
+        const swapVolumeAchievement = walletAchievements?.find(
+          (achievement) => achievement.achievement.id === AchievementKeys.SWAP_VOLUME
+        );
+        if (swapVolumeAchievement) {
+          swapVolumeAchievement.achievement.achieved = Number(swapVolumeAchievement.achievement.achieved) + amountUsd;
+          swapVolumeAchievement.lastUpdated = Date.now();
+        } else {
+          walletAchievements?.push({
+            achievement: { id: AchievementKeys.SWAP_VOLUME, achieved: amountUsd },
+            lastUpdated: Date.now(),
+          });
+        }
+
+        allAchievements[walletInvolved] = walletAchievements;
+
+        this.achievements = allAchievements;
+        break;
+      // ADD HANDLER FOR MIGRATE
+      default:
+        break;
+    }
+
+    this.calculateAndSetUserTier();
   }
 }

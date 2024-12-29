@@ -601,10 +601,10 @@ const VerifyToLevelUpModal = ({ isOpen, onClose }: VerifyToLevelUpModalProps) =>
     >
       <ContainerBox gap={6} flexDirection="column">
         {modalStep === ModalStep.singleWallet && (
-          <SingleWalletStep currentTierLevel={tierLevel} walletsToVerify={walletsToVerify} />
+          <SingleWalletStep currentTierLevel={tierLevel ?? 0} walletsToVerify={walletsToVerify} />
         )}
         {modalStep === ModalStep.multipleWallets && (
-          <MultipleWalletsStep currentTierLevel={tierLevel} missing={missing} />
+          <MultipleWalletsStep currentTierLevel={tierLevel ?? 0} missing={missing} />
         )}
       </ContainerBox>
     </Modal>

@@ -165,6 +165,8 @@ describe('Account Service', () => {
     beforeEach(() => {
       meanApiService.unlinkWallet.mockResolvedValue(true);
       accountService.getWalletVerifyingSignature = jest.fn().mockResolvedValue('signature');
+      accountService.tierService.calculateAndSetUserTier = jest.fn();
+      accountService.tierService.pollUser = jest.fn().mockResolvedValue(true);
     });
     it('should throw an error if the user does not exist', async () => {
       accountService.user = undefined;
@@ -477,6 +479,8 @@ describe('Account Service', () => {
       accountService.setWalletActionType(WalletActionType.link);
 
       walletClientService.getWalletClient = jest.fn().mockReturnValue(walletClientMock);
+      accountService.tierService.calculateAndSetUserTier = jest.fn();
+      accountService.tierService.pollUser = jest.fn().mockResolvedValue(true);
     });
 
     it('should thow if the connector is not existent', async () => {

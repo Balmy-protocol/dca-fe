@@ -48,7 +48,7 @@ const generateProgressMessages = (
     const remaining = current > required ? required : required - current;
 
     return intl.formatMessage(MESSAGES_BY_MISSING_ACHIEVEMENTS[id], {
-      missing: remaining,
+      missing: remaining.toFixed(0),
       b: (chunks) => <b>{chunks}</b>,
     });
   };
@@ -111,7 +111,7 @@ const ProgressionRequeriments = () => {
   const { details, tierLevel } = useTierLevel();
   const intl = useIntl();
 
-  const missingMessages = generateProgressMessages(tierLevel, details, intl);
+  const missingMessages = generateProgressMessages(tierLevel ?? 0, details, intl);
   const completedKeys = Object.keys(details || {}).filter(
     (key) => (details?.[key as AchievementKeys]?.current ?? 0) >= (details?.[key as AchievementKeys]?.required ?? 0)
   );

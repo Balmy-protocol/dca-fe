@@ -112,7 +112,11 @@ const TierPill = () => {
       onMouseLeave={() => setHovered(false)}
       $needsToVerifyWallets={needsToVerifyWallets}
     >
-      {needsToVerifyWallets ? <LeveledTierPill tierLevel={tierLevel} /> : <NonLeveledTierPill tierLevel={tierLevel} />}
+      {needsToVerifyWallets ? (
+        <LeveledTierPill tierLevel={tierLevel ?? 0} />
+      ) : (
+        <NonLeveledTierPill tierLevel={tierLevel ?? 0} />
+      )}
       <StyledTierPillChevronContainer>
         <AnimatedChevronRightIcon $hovered={hovered} />
       </StyledTierPillChevronContainer>

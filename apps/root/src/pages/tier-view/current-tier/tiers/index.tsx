@@ -108,8 +108,8 @@ const TierRewardBox = ({ reward: { title, description, icon, badge, comingSoon }
 };
 const Tiers = () => {
   const intl = useIntl();
-  const [tierLevelView, setTierLevelView] = React.useState<number>();
   const { tierLevel } = useTierLevel();
+  const [tierLevelView, setTierLevelView] = React.useState<number>(tierLevel ?? 0);
 
   return (
     <ContainerBox gap={6} flexDirection="column">

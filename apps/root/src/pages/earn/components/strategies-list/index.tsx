@@ -57,7 +57,7 @@ const StrategiesList = <T extends ValidVariants>({
               <StrategyCardItem
                 strategy={getStrategyFromTableObject(tableStrategy, variant as ValidVariants)}
                 variant={DataCardVariants.Home}
-                tierLevel={tierLevel}
+                tierLevel={tierLevel ?? 0}
               />
             </Grid>
           ))}
