@@ -1,6 +1,6 @@
 import { isSingleRequirement } from '@common/utils/tiers';
 import useTierLevel from '@hooks/tiers/useTierLevel';
-import { TIER_REQUIREMENTS } from '@services/tierService';
+import { TIER_REQUIREMENTS } from '@pages/tier-view/constants';
 import { AchievementKeys, TierConditionalRequirement, TierSingleRequirement } from '@types';
 import React from 'react';
 import { defineMessage, FormattedMessage, MessageDescriptor, useIntl } from 'react-intl';
@@ -107,7 +107,7 @@ const generateProgressMessages = (
   return messages;
 };
 
-const ProgressionRequeriments = () => {
+const ProgressionRequeriments = ({ onOpenHowToLevelUp }: { onOpenHowToLevelUp: () => void }) => {
   const { details, tierLevel } = useTierLevel();
   const intl = useIntl();
 
@@ -116,35 +116,37 @@ const ProgressionRequeriments = () => {
     (key) => (details?.[key as AchievementKeys]?.current ?? 0) >= (details?.[key as AchievementKeys]?.required ?? 0)
   );
   return (
-    <ContainerBox gap={1} justifyContent="space-between">
-      <ContainerBox gap={1} flexDirection="column">
-        {missingMessages.map((message, index) => (
-          <ContainerBox key={index} gap={1} alignItems="center">
-            {message.keys.every((key) => !completedKeys.includes(key)) ? (
-              <CheckCircleOutlineIcon sx={{ color: ({ palette }) => colors[palette.mode].typography.typo3 }} />
-            ) : (
-              <CheckCircleOutlineIcon color="success" />
-            )}
-            <Typography
-              variant="bodySmallRegular"
-              color={({ palette }) =>
-                message.keys.every((key) => !completedKeys.includes(key))
-                  ? colors[palette.mode].typography.typo3
-                  : colors[palette.mode].semantic.success.darker
-              }
-            >
-              {message.message}
-            </Typography>
-          </ContainerBox>
-        ))}
+    <>
+      <ContainerBox gap={1} justifyContent="space-between">
+        <ContainerBox gap={1} flexDirection="column">
+          {missingMessages.map((message, index) => (
+            <ContainerBox key={index} gap={1} alignItems="center">
+              {message.keys.every((key) => !completedKeys.includes(key)) ? (
+                <CheckCircleOutlineIcon sx={{ color: ({ palette }) => colors[palette.mode].typography.typo3 }} />
+              ) : (
+                <CheckCircleOutlineIcon color="success" />
+              )}
+              <Typography
+                variant="bodySmallRegular"
+                color={({ palette }) =>
+                  message.keys.every((key) => !completedKeys.includes(key))
+                    ? colors[palette.mode].typography.typo3
+                    : colors[palette.mode].semantic.success.darker
+                }
+              >
+                {message.message}
+              </Typography>
+            </ContainerBox>
+          ))}
+        </ContainerBox>
+        <Button variant="text" size="small" sx={{ alignSelf: 'flex-end' }} onClick={onOpenHowToLevelUp}>
+          <FormattedMessage
+            description="tier-view.current-tier.my-tier.tier-progress.button"
+            defaultMessage="How to level up?"
+          />
+        </Button>
       </ContainerBox>
-      <Button variant="text" size="small" sx={{ alignSelf: 'flex-end' }}>
-        <FormattedMessage
-          description="tier-view.current-tier.my-tier.tier-progress.button"
-          defaultMessage="How to level up?"
-        />
-      </Button>
-    </ContainerBox>
+    </>
   );
 };
 

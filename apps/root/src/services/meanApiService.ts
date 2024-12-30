@@ -646,4 +646,12 @@ export default class MeanApiService {
       },
     });
   }
+
+  async updateTwitterShare({ signature, accountId }: { signature: WalletSignature; accountId: string }) {
+    return this.authorizedRequest<{ signature: Hex }>({
+      method: 'GET',
+      url: `${MEAN_API_URL}/v1/accounts/${accountId}/earn/achievements/claim/twitter-share`,
+      signature,
+    });
+  }
 }

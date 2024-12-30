@@ -14,6 +14,7 @@ import {
 } from 'ui-library';
 import ProgressionRequeriments from '../progression-requeriments';
 import VerifyToLevelUpModal from '../verify-to-level-up-modal';
+import HowToLevelUpModal from '../how-to-level-up-modal';
 
 const StyledMyTierCard = styled(ContainerBox).attrs({ gap: 6, flex: 1 })`
   ${({ theme: { palette, spacing } }) => `
@@ -155,11 +156,17 @@ const NonLeveledMyTierCard = ({ tierLevel, progress }: { tierLevel: number; prog
 const MyTier = () => {
   const { tierLevel, progress, walletsToVerify } = useTierLevel();
   const [openVerifyToLevelUpModal, setOpenVerifyToLevelUpModal] = React.useState(false);
+  const [isHowToLevelUpModalOpen, setIsHowToLevelUpModalOpen] = React.useState(false);
   const canLevelUp = progress >= 100;
   const needsToVerifyWallets = walletsToVerify.length > 0 && canLevelUp;
   return (
     <>
       <VerifyToLevelUpModal isOpen={openVerifyToLevelUpModal} onClose={() => setOpenVerifyToLevelUpModal(false)} />
+      <HowToLevelUpModal
+        isOpen={isHowToLevelUpModalOpen}
+        onClose={() => setIsHowToLevelUpModalOpen(false)}
+        onGoToVerifyWallets={() => setOpenVerifyToLevelUpModal(true)}
+      />
       <Grid container spacing={6}>
         {/* current tier */}
         <Grid item xs={12} md={6}>
@@ -202,7 +209,7 @@ const MyTier = () => {
                 </StyledTierProgressNeedsToVerifyContainer>
               )}
             </ContainerBox>
-            <ProgressionRequeriments />
+            <ProgressionRequeriments onOpenHowToLevelUp={() => setIsHowToLevelUpModalOpen(true)} />
           </StyledTierProgressCard>
         </Grid>
       </Grid>

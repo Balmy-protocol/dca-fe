@@ -8,7 +8,6 @@ import {
   ApiAchievement,
   TierSingleRequirement,
   TierConditionalRequirement,
-  TierRequirements,
   TransactionDetails,
   TransactionTypes,
 } from '@types';
@@ -17,6 +16,7 @@ import Web3Service from './web3Service';
 import MeanApiService from './meanApiService';
 import { isSingleRequirement, parseAchievement } from '@common/utils/tiers';
 import { IntervalSetActions } from '@constants/timing';
+import { TIER_REQUIREMENTS } from '@pages/tier-view/constants';
 
 export const LAST_LOGIN_KEY = 'last_logged_in_with';
 export const WALLET_SIGNATURE_KEY = 'wallet_auth_signature';
@@ -29,63 +29,6 @@ export interface TierServiceData {
 }
 
 const initialState: TierServiceData = { tier: undefined, inviteCodes: [], referrals: [], achievements: {} };
-
-// Tier definitions with requirements
-export const TIER_REQUIREMENTS: TierRequirements[] = [
-  {
-    level: 3,
-    requirements: [
-      {
-        type: 'AND',
-        requirements: [
-          { id: AchievementKeys.REFERRALS, value: 5 },
-          {
-            type: 'OR',
-            requirements: [
-              { id: AchievementKeys.SWAP_VOLUME, value: 2000 },
-              { id: AchievementKeys.MIGRATED_VOLUME, value: 2000 },
-            ],
-          },
-        ],
-      },
-    ],
-  },
-  {
-    level: 2,
-    requirements: [
-      {
-        type: 'AND',
-        requirements: [
-          { id: AchievementKeys.REFERRALS, value: 3 },
-          {
-            type: 'OR',
-            requirements: [
-              { id: AchievementKeys.SWAP_VOLUME, value: 1000 },
-              { id: AchievementKeys.TWEET, value: 1 },
-            ],
-          },
-        ],
-      },
-    ],
-  },
-  {
-    level: 1,
-    requirements: [
-      {
-        type: 'OR',
-        requirements: [
-          { id: AchievementKeys.REFERRALS, value: 1 },
-          { id: AchievementKeys.SWAP_VOLUME, value: 500 },
-        ],
-      },
-    ],
-  },
-  {
-    level: 0,
-    requirements: [],
-  },
-];
-
 export default class TierService extends EventsManager<TierServiceData> {
   web3Service: Web3Service;
 
@@ -480,6 +423,38 @@ export default class TierService extends EventsManager<TierServiceData> {
       default:
         break;
     }
+
+    this.calculateAndSetUserTier();
+  }
+
+  async updateTwitterShare() {
+    const user = this.web3Service.accountService.user;
+    if (!user) return;
+
+    const allAchievements = { ...this.achievements };
+    const wallets = Object.keys(allAchievements) as Address[];
+    wallets.forEach((wallet) => {
+      const walletAchievements = allAchievements[wallet];
+      const foundAchievementIndex = walletAchievements?.findIndex(
+        (achievement) => achievement.achievement.id === AchievementKeys.TWEET
+      );
+      if (foundAchievementIndex !== -1) {
+        allAchievements[wallet][foundAchievementIndex].achievement.achieved = 1;
+        allAchievements[wallet][foundAchievementIndex].lastUpdated = Date.now();
+      } else {
+        allAchievements[wallet].push({
+          achievement: { id: AchievementKeys.TWEET, achieved: 1 },
+          lastUpdated: Date.now(),
+        });
+      }
+    });
+
+    await this.meanApiService.updateTwitterShare({
+      signature: await this.web3Service.accountService.getWalletVerifyingSignature({}),
+      accountId: user.id,
+    });
+
+    this.achievements = allAchievements;
 
     this.calculateAndSetUserTier();
   }
