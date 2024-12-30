@@ -41,6 +41,7 @@ import { useTransactionAdder } from '@state/transactions/hooks';
 import useEarnService from '@hooks/earn/useEarnService';
 import { PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import useContractService from '@hooks/useContractService';
+import { parseNumberUsdPriceToBigInt, parseUsdPrice } from '@common/utils/currency';
 
 interface UseEarnDepositActionParams {
   strategy?: DisplayStrategy;
@@ -146,6 +147,13 @@ const useEarnDepositActions = ({ strategy }: UseEarnDepositActionParams) => {
           strategy: strategy.id,
           amount: assetAmountInUnits,
           assetPrice: asset.price,
+          amountInUsd: parseUsdPrice(
+            asset,
+            parseUnits(assetAmountInUnits, asset.decimals),
+            parseNumberUsdPriceToBigInt(asset.price)
+          ),
+          isDeposit: !hasPosition,
+          isIncrease: hasPosition,
         });
       } catch {}
 
@@ -462,7 +470,7 @@ const useEarnDepositActions = ({ strategy }: UseEarnDepositActionParams) => {
       }
     } catch (e) {
       if (shouldTrackError(e as Error)) {
-        trackEvent('EARN - Sign ToS error', {
+        trackEvent('Earn - Sign ToS error', {
           fromSteps: !!transactionsToExecute?.length,
         });
         // eslint-disable-next-line no-void, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
@@ -572,7 +580,7 @@ const useEarnDepositActions = ({ strategy }: UseEarnDepositActionParams) => {
       }
     } catch (e) {
       if (shouldTrackError(e as Error)) {
-        trackEvent('EARN - Sign companion error', {
+        trackEvent('Eearn - Sign companion error', {
           fromSteps: !!transactionsToExecute?.length,
         });
         // eslint-disable-next-line no-void, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call

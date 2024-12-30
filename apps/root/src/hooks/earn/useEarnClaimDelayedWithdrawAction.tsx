@@ -74,6 +74,7 @@ const useEarnClaimDelayedWithdrawAction = () => {
         trackEvent(`Earn - Claim delayed withdraw submitted`, {
           token: claimToken.token.symbol,
           strategy: strategy.id,
+          amountUsd: claimToken.ready.amountInUSD,
         });
 
         addTransaction(result, typeData);
