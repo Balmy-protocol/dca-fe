@@ -1,6 +1,7 @@
 import { defineMessage, MessageDescriptor } from 'react-intl';
 import React from 'react';
 import { TierGiftIcon, TierTicketDiscountIcon, TierChartIcon, TierMedalStarIcon } from 'ui-library';
+import { TierRequirements, AchievementKeys } from 'common-types';
 
 export const TIER_LEVEL_OPTIONS = [
   {
@@ -412,3 +413,59 @@ export const TIER_LEVEL_UP_REWARDS: Record<number, TierLevelReward[]> = {
     },
   ],
 };
+
+// Tier definitions with requirements
+export const TIER_REQUIREMENTS: TierRequirements[] = [
+  {
+    level: 3,
+    requirements: [
+      {
+        type: 'AND',
+        requirements: [
+          { id: AchievementKeys.REFERRALS, value: 5 },
+          {
+            type: 'OR',
+            requirements: [
+              { id: AchievementKeys.SWAP_VOLUME, value: 2000 },
+              { id: AchievementKeys.MIGRATED_VOLUME, value: 2000 },
+            ],
+          },
+        ],
+      },
+    ],
+  },
+  {
+    level: 2,
+    requirements: [
+      {
+        type: 'AND',
+        requirements: [
+          { id: AchievementKeys.REFERRALS, value: 3 },
+          {
+            type: 'OR',
+            requirements: [
+              { id: AchievementKeys.SWAP_VOLUME, value: 1000 },
+              { id: AchievementKeys.TWEET, value: 1 },
+            ],
+          },
+        ],
+      },
+    ],
+  },
+  {
+    level: 1,
+    requirements: [
+      {
+        type: 'OR',
+        requirements: [
+          { id: AchievementKeys.REFERRALS, value: 1 },
+          { id: AchievementKeys.SWAP_VOLUME, value: 500 },
+        ],
+      },
+    ],
+  },
+  {
+    level: 0,
+    requirements: [],
+  },
+];
