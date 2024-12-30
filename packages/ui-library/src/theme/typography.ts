@@ -124,6 +124,10 @@ export const buildTypographyVariant = (mode: PaletteMode): TypographyOptions => 
     ...baseBodyTypography(mode),
     fontWeight: 600,
   },
+  bodyBoldNormalLineHeight: {
+    ...baseBodyTypography(mode),
+    fontWeight: 700,
+  },
   bodyBold: {
     ...baseBodyTypography(mode),
     fontWeight: 700,

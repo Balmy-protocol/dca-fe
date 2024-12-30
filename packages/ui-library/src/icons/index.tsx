@@ -140,6 +140,7 @@ import PersonOutlineRoundedIcon from './person-outline-rounded';
 import ShieldTickIcon from './shield-tick';
 import SuccessOutlineIcon from './successOutline';
 import PenAddIcon from './pen-add';
+import TagUserIcon from './tag-user';
 import {
   TierLevel0Flat,
   TierLevel0Active,
@@ -325,4 +326,5 @@ export {
   TickSquareIcon,
   SuccessOutlineIcon,
   PenAddIcon,
+  TagUserIcon,
 };
