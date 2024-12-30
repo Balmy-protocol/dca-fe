@@ -17,6 +17,8 @@ import {
 } from 'ui-library';
 import useTierLevel from '@hooks/tiers/useTierLevel';
 import ProgressionRequeriments from '@pages/tier-view/current-tier/progression-requeriments';
+import HowToLevelUpModal from '@pages/tier-view/current-tier/how-to-level-up-modal';
+import VerifyToLevelUpModal from '@pages/tier-view/current-tier/verify-to-level-up-modal';
 
 const AvailableBalanceProjection = ({ strategy }: { strategy?: DisplayStrategy }) => {
   const { asset } = useEarnManagementState();
@@ -91,46 +93,55 @@ const AvailableBalanceProjection = ({ strategy }: { strategy?: DisplayStrategy }
 
 const LockedDeposit = ({ strategy, needsTier }: { strategy?: DisplayStrategy; needsTier: number }) => {
   const { tierLevel, progress } = useTierLevel();
-
+  const [isHowToLevelUpModalOpen, setIsHowToLevelUpModalOpen] = React.useState(false);
+  const [isVerifyToLevelUpModalOpen, setIsVerifyToLevelUpModalOpen] = React.useState(false);
   const TierIcon = ActiveTiersIcons[needsTier];
 
   return (
-    <ContainerBox flexDirection="column" gap={8}>
-      <ContainerBox gap={6} alignItems="center">
-        <TierIcon size="4.8125rem" />
-        <ContainerBox flexDirection="column" gap={1}>
-          <Typography variant="h3Bold">
-            <FormattedMessage
-              description="earn.strategy-management.locked-deposit.title"
-              defaultMessage="Reach Tier {necessaryTierLevel} to Unlock This Vault"
-              values={{ necessaryTierLevel: needsTier }}
-            />
-          </Typography>
-          <Typography variant="h5Bold">
-            <FormattedMessage
-              description="earn.strategy-management.locked-deposit.subtitle"
-              defaultMessage="{percentage}% to Tier {nextTier}"
-              values={{ percentage: progress, nextTier: (tierLevel ?? 0) + 1 }}
-            />
-          </Typography>
+    <>
+      <HowToLevelUpModal
+        isOpen={isHowToLevelUpModalOpen}
+        onClose={() => setIsHowToLevelUpModalOpen(false)}
+        onGoToVerifyWallets={() => setIsVerifyToLevelUpModalOpen(true)}
+      />
+      <VerifyToLevelUpModal isOpen={isVerifyToLevelUpModalOpen} onClose={() => setIsVerifyToLevelUpModalOpen(false)} />
+      <ContainerBox flexDirection="column" gap={8}>
+        <ContainerBox gap={6} alignItems="center">
+          <TierIcon size="4.8125rem" />
+          <ContainerBox flexDirection="column" gap={1}>
+            <Typography variant="h3Bold">
+              <FormattedMessage
+                description="earn.strategy-management.locked-deposit.title"
+                defaultMessage="Reach Tier {necessaryTierLevel} to Unlock This Vault"
+                values={{ necessaryTierLevel: needsTier }}
+              />
+            </Typography>
+            <Typography variant="h5Bold">
+              <FormattedMessage
+                description="earn.strategy-management.locked-deposit.subtitle"
+                defaultMessage="{percentage}% to Tier {nextTier}"
+                values={{ percentage: progress, nextTier: (tierLevel ?? 0) + 1 }}
+              />
+            </Typography>
+          </ContainerBox>
         </ContainerBox>
+        <ContainerBox flexDirection="column" gap={4}>
+          <Typography variant="bodySmallRegular" color={({ palette }) => colors[palette.mode].typography.typo2}>
+            <FormattedMessage
+              description="earn.strategy-management.locked-deposit.description"
+              defaultMessage="This strategy is exclusively available for Tier {necessaryTierLevel} and above. You're currently at Tier {currentTierLevel}. <b>Meet the progression requirements below to access this vault and enjoy premium benefits.</b>"
+              values={{
+                currentTierLevel: tierLevel,
+                necessaryTierLevel: needsTier,
+                b: (chunks: React.ReactNode) => <b>{chunks}</b>,
+              }}
+            />
+          </Typography>
+          <ProgressionRequeriments onOpenHowToLevelUp={() => setIsHowToLevelUpModalOpen(true)} />
+        </ContainerBox>
+        <AvailableBalanceProjection strategy={strategy} />
       </ContainerBox>
-      <ContainerBox flexDirection="column" gap={4}>
-        <Typography variant="bodySmallRegular" color={({ palette }) => colors[palette.mode].typography.typo2}>
-          <FormattedMessage
-            description="earn.strategy-management.locked-deposit.description"
-            defaultMessage="This strategy is exclusively available for Tier {necessaryTierLevel} and above. You're currently at Tier {currentTierLevel}. <b>Meet the progression requirements below to access this vault and enjoy premium benefits.</b>"
-            values={{
-              currentTierLevel: tierLevel,
-              necessaryTierLevel: needsTier,
-              b: (chunks: React.ReactNode) => <b>{chunks}</b>,
-            }}
-          />
-        </Typography>
-        <ProgressionRequeriments />
-      </ContainerBox>
-      <AvailableBalanceProjection strategy={strategy} />
-    </ContainerBox>
+    </>
   );
 };
 
