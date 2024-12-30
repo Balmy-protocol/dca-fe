@@ -22,7 +22,7 @@ import useTransactionModal from '@hooks/useTransactionModal';
 import { useTransactionAdder } from '@state/transactions/hooks';
 import useEarnService from '@hooks/earn/useEarnService';
 import { getProtocolToken, getWrappedProtocolToken } from '@common/mocks/tokens';
-import { isSameToken } from '@common/utils/currency';
+import { isSameToken, parseUsdPrice, parseNumberUsdPriceToBigInt } from '@common/utils/currency';
 import { TransactionAction, TransactionAction as TransactionStep } from '@common/components/transaction-steps';
 import { find, findIndex } from 'lodash';
 import { TRANSACTION_ACTION_APPROVE_COMPANION_SIGN_EARN, TRANSACTION_ACTION_EARN_WITHDRAW } from '@constants';
@@ -138,7 +138,7 @@ const useEarnWithdrawActions = ({ strategy }: UseEarnWithdrawActionsParams) => {
       }
     } catch (e) {
       if (shouldTrackError(e as Error)) {
-        trackEvent('EARN - Sign companion error', {
+        trackEvent('Earn - Sign companion error', {
           fromSteps: !!transactionsToExecute?.length,
         });
         // eslint-disable-next-line no-void, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
@@ -260,6 +260,11 @@ const useEarnWithdrawActions = ({ strategy }: UseEarnWithdrawActionsParams) => {
           amount: withdraw.amount.toString(),
         }));
 
+        const amountInUsd = parsedTokensToWithdraw.reduce((acc, withdraw) => {
+          return (
+            acc + parseUsdPrice(withdraw.token, withdraw.amount, parseNumberUsdPriceToBigInt(withdraw.token.price ?? 0))
+          );
+        }, 0);
         const typeData: EarnWithdrawTypeData = {
           type: TransactionTypes.earnWithdraw,
           typeData: {
@@ -275,6 +280,8 @@ const useEarnWithdrawActions = ({ strategy }: UseEarnWithdrawActionsParams) => {
           strategy: strategy.id,
           amount: assetAmountInUnits,
           withdrawRewards,
+          amountInUsd,
+          withdrawType: assetWithdrawType,
         });
 
         addTransaction(result, typeData);
