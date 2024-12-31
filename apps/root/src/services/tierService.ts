@@ -17,6 +17,7 @@ import MeanApiService from './meanApiService';
 import { isSingleRequirement, parseAchievement } from '@common/utils/tiers';
 import { IntervalSetActions } from '@constants/timing';
 import { TIER_REQUIREMENTS } from '@pages/tier-view/constants';
+import { SUPERCHAIN_CHAIN_IDS } from '@constants/addresses';
 
 export const LAST_LOGIN_KEY = 'last_logged_in_with';
 export const WALLET_SIGNATURE_KEY = 'wallet_auth_signature';
@@ -398,6 +399,8 @@ export default class TierService extends EventsManager<TierServiceData> {
 
     switch (transaction.type) {
       case TransactionTypes.swap:
+        // Only count swaps on superchains
+        if (!SUPERCHAIN_CHAIN_IDS.includes(transaction.chainId)) return;
         const extraData = transaction.typeData;
         const amountUsd = extraData.amountToUsd || extraData.amountFromUsd;
 

@@ -692,3 +692,10 @@ export const getTokenAddressForPriceFetching = (chainId: number, address: Addres
 };
 
 export const BALMY_FEES_LOGO_URL = 'https://ipfs.io/ipfs/Qmd2GuuoqECL2wDpjWCKfSNUPYCCWGhrYVf8fjtyeyWWBV';
+
+export const SUPERCHAIN_CHAIN_IDS = [
+  Chains.OPTIMISM.chainId,
+  Chains.BASE.chainId,
+  Chains.MODE.chainId,
+  Chains.ETHEREUM_SEPOLIA.chainId,
+];
