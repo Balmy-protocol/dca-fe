@@ -9,7 +9,7 @@ import {
 } from 'common-types';
 import { defineMessage, useIntl } from 'react-intl';
 import { totalSupplyThreshold } from '../parsing';
-import { formatCurrencyAmount, formatUsdAmount, toSignificantFromBigDecimal } from '../currency';
+import { formatCurrencyAmount, formatUsdAmount } from '../currency';
 import { getIsDelayedWithdraw } from 'ui-library';
 
 export const getTransactionTitle = (tx: TransactionEvent) => {
@@ -301,9 +301,12 @@ export const getTransactionUsdValue = (txEvent: TransactionEvent, intl: ReturnTy
       amountInUsd = formatUsdAmount({ amount: txEvent.data.assetsDepositedAmount.amountInUSD, intl });
       break;
     case TransactionEventTypes.EARN_WITHDRAW:
-      amountInUsd = txEvent.data.withdrawn
-        .reduce((acc, withdrawn) => acc + Number(withdrawn.amount.amountInUSD || 0), 0)
-        .toString();
+      amountInUsd = formatUsdAmount({
+        amount: txEvent.data.withdrawn
+          .reduce((acc, withdrawn) => acc + Number(withdrawn.amount.amountInUSD || 0), 0)
+          .toString(),
+        intl,
+      });
       break;
     case TransactionEventTypes.EARN_SPECIAL_WITHDRAW:
       const specialWithdrawData = txEvent.data.tokens[0];
@@ -314,7 +317,7 @@ export const getTransactionUsdValue = (txEvent: TransactionEvent, intl: ReturnTy
       break;
   }
 
-  return amountInUsd ? toSignificantFromBigDecimal(amountInUsd.toString(), 2) : '-';
+  return amountInUsd ? amountInUsd : '-';
 };
 
 export const getTransactionTokenValuePrice = (tx: TransactionEvent) => {

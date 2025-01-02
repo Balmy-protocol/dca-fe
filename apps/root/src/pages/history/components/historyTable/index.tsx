@@ -659,6 +659,7 @@ const HistoryTable = ({ search, tokens, height, solid }: HistoryTableProps) => {
       }, []);
     }, [unitsByChainPercentages]);
 
+  console.log(filteredEvents);
   return (
     <ContainerBox flexDirection="column" flex={1} gap={6}>
       {!isSomeWalletIndexed && !!wallets.length && hasLoadedEvents && (
