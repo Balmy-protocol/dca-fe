@@ -18,6 +18,7 @@ import {
   Zoom,
 } from 'ui-library';
 import { CodeSuccessfullyClaimed } from '../elegibility-confirmation/use-cases';
+import { useSearchParams } from 'react-router-dom';
 
 const StyledBackgroundPaper = styled(BackgroundPaper).attrs({
   variant: 'outlined',
@@ -33,7 +34,9 @@ const ClaimCodeForm = () => {
   const intl = useIntl();
   const user = useUser();
   const accountService = useAccountService();
-  const [accessCode, setAccessCode] = React.useState('');
+  const [searchParams] = useSearchParams();
+  const inviteCode = searchParams.get('inviteCode');
+  const [accessCode, setAccessCode] = React.useState(inviteCode || '');
   const [validationState, setValidationState] = React.useState<{
     isSuccess: boolean;
     error: boolean;

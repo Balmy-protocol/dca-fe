@@ -21,7 +21,9 @@ import {
   Table,
   useSnackbar,
   Zoom,
+  QrCodeIcon,
 } from 'ui-library';
+import ShareQRModal from '../share-qr-modal';
 
 const StyledReferralTable = styled(ContainerBox).attrs({ gap: 6, flexDirection: 'column', flex: 1 })`
   ${({ theme: { palette, spacing } }) => `
@@ -64,17 +66,25 @@ const ReferralEndCell = ({
   isReferralActive,
   claimedBy,
   onCopy,
+  onShare,
 }: {
   isReferralActive: boolean;
   claimedBy: InviteCodeWithReferralStatus['claimedBy'];
   onCopy: () => void;
+  onShare: () => void;
 }) => {
   if (!claimedBy) {
     return (
-      <ContentCopyIcon
-        sx={({ palette }) => ({ cursor: 'pointer', color: colors[palette.mode].typography.typo4 })}
-        onClick={onCopy}
-      />
+      <ContainerBox gap={1} alignItems="center">
+        <ContentCopyIcon
+          sx={({ palette }) => ({ cursor: 'pointer', color: colors[palette.mode].typography.typo4 })}
+          onClick={onCopy}
+        />
+        <QrCodeIcon
+          sx={({ palette }) => ({ cursor: 'pointer', color: colors[palette.mode].typography.typo4 })}
+          onClick={onShare}
+        />
+      </ContainerBox>
     );
   }
 
@@ -147,8 +157,10 @@ const ReferralStatusCell = ({
 
 const ReferralsBodyItem = ({
   inviteCode: { code, claimedBy, isReferralActive },
+  onShare,
 }: {
   inviteCode: InviteCodeWithReferralStatus;
+  onShare: (code: string) => void;
 }) => {
   const intl = useIntl();
   const snackbar = useSnackbar();
@@ -206,7 +218,12 @@ const ReferralsBodyItem = ({
         </Typography>
       </TableCell> */}
       <StyledTableEnd>
-        <ReferralEndCell isReferralActive={isReferralActive} claimedBy={claimedBy} onCopy={onCopy} />
+        <ReferralEndCell
+          isReferralActive={isReferralActive}
+          claimedBy={claimedBy}
+          onCopy={onCopy}
+          onShare={() => onShare(code)}
+        />
       </StyledTableEnd>
     </>
   );
@@ -219,40 +236,55 @@ const ReferralsTable = () => {
   const availableInviteCodes =
     totalInviteCodes - inviteCodes.filter((inviteCode) => inviteCode.isReferralActive).length;
 
+  const [isShareQRModalOpen, setIsShareQRModalOpen] = React.useState(false);
+  const [inviteCodeToShare, setInviteCodeToShare] = React.useState<string | null>(null);
+
+  const onShare = (code: string) => {
+    setInviteCodeToShare(code);
+    setIsShareQRModalOpen(true);
+  };
+
   return (
-    <StyledReferralTable>
-      <ContainerBox gap={2}>
-        <ContainerBox gap={2} alignItems="center">
-          <Typography variant="h6Bold">
-            <FormattedMessage description="tier-view.referrals.table.title" defaultMessage="Referrals" />
-          </Typography>
-          <Typography variant="bodyBold">·</Typography>
-          <Typography variant="bodyRegular">
-            <FormattedMessage
-              description="tier-view.referrals.table.description"
-              defaultMessage="{availableReferrals} of {totalReferrals} left"
-              values={{ availableReferrals: availableInviteCodes, totalReferrals: totalInviteCodes }}
-            />
-          </Typography>
+    <>
+      <ShareQRModal
+        isOpen={isShareQRModalOpen}
+        onClose={() => setIsShareQRModalOpen(false)}
+        inviteCode={inviteCodeToShare}
+      />
+      <StyledReferralTable>
+        <ContainerBox gap={2}>
+          <ContainerBox gap={2} alignItems="center">
+            <Typography variant="h6Bold">
+              <FormattedMessage description="tier-view.referrals.table.title" defaultMessage="Referrals" />
+            </Typography>
+            <Typography variant="bodyBold">·</Typography>
+            <Typography variant="bodyRegular">
+              <FormattedMessage
+                description="tier-view.referrals.table.description"
+                defaultMessage="{availableReferrals} of {totalReferrals} left"
+                values={{ availableReferrals: availableInviteCodes, totalReferrals: totalInviteCodes }}
+              />
+            </Typography>
+          </ContainerBox>
         </ContainerBox>
-      </ContainerBox>
-      <ContainerBox flex={1}>
-        <TableContainer>
-          <Table sx={{ tableLayout: 'auto' }}>
-            <TableHead>
-              <ReferralsTableHeader />
-            </TableHead>
-            <TableBody>
-              {inviteCodes.map((inviteCode) => (
-                <TableRow key={inviteCode.code}>
-                  <ReferralsBodyItem inviteCode={inviteCode} />
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </ContainerBox>
-    </StyledReferralTable>
+        <ContainerBox flex={1}>
+          <TableContainer>
+            <Table sx={{ tableLayout: 'auto' }}>
+              <TableHead>
+                <ReferralsTableHeader />
+              </TableHead>
+              <TableBody>
+                {inviteCodes.map((inviteCode) => (
+                  <TableRow key={inviteCode.code}>
+                    <ReferralsBodyItem inviteCode={inviteCode} onShare={onShare} />
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </ContainerBox>
+      </StyledReferralTable>
+    </>
   );
 };
 
