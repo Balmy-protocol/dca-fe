@@ -141,6 +141,7 @@ import ShieldTickIcon from './shield-tick';
 import SuccessOutlineIcon from './successOutline';
 import PenAddIcon from './pen-add';
 import TagUserIcon from './tag-user';
+import QrCodeIcon from '@mui/icons-material/QrCode';
 import {
   TierLevel0Flat,
   TierLevel0Active,
@@ -327,4 +328,5 @@ export {
   SuccessOutlineIcon,
   PenAddIcon,
   TagUserIcon,
+  QrCodeIcon,
 };
