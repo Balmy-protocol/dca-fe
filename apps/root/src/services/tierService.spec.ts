@@ -14,6 +14,7 @@ import {
 } from '@types';
 import AccountService from './accountService';
 import { IntervalSetActions } from '@constants/timing';
+import { Chains } from '@balmy/sdk';
 
 const MockedWeb3Service = jest.mocked(Web3Service, { shallow: true });
 const MockedMeanApiService = jest.mocked(MeanApiService, { shallow: true });
@@ -628,6 +629,38 @@ describe('Tier Service', () => {
     });
 
     describe('swap transactions', () => {
+      it('should NOT update swap volume achievement for existing achievement if the chain is not superchain', () => {
+        // Set initial achievements
+        tierService.achievements = {
+          '0xwallet': [
+            {
+              achievement: { id: AchievementKeys.SWAP_VOLUME, achieved: 1000 },
+              lastUpdated: mockedTodayMilis,
+            },
+          ],
+        };
+
+        const transaction = {
+          type: TransactionTypes.swap,
+          from: '0xwallet',
+          chainId: Chains.POLYGON.chainId,
+          typeData: {
+            amountFromUsd: 500,
+          },
+        } as TransactionDetails;
+
+        tierService.updateAchievements(transaction);
+
+        expect(tierService.achievements).toEqual({
+          '0xwallet': [
+            {
+              achievement: { id: AchievementKeys.SWAP_VOLUME, achieved: 1000 },
+              lastUpdated: mockedTodayMilis,
+            },
+          ],
+        });
+      });
+
       it('should update swap volume achievement for existing achievement', () => {
         // Set initial achievements
         tierService.achievements = {
@@ -642,6 +675,7 @@ describe('Tier Service', () => {
         const transaction = {
           type: TransactionTypes.swap,
           from: '0xwallet',
+          chainId: Chains.BASE.chainId,
           typeData: {
             amountFromUsd: 500,
           },
@@ -671,6 +705,7 @@ describe('Tier Service', () => {
           typeData: {
             amountToUsd: 500,
           },
+          chainId: Chains.BASE.chainId,
         } as TransactionDetails;
 
         tierService.updateAchievements(transaction);
@@ -701,6 +736,7 @@ describe('Tier Service', () => {
           typeData: {
             amountToUsd: 500,
           },
+          chainId: Chains.BASE.chainId,
         } as TransactionDetails;
 
         tierService.updateAchievements(transaction);
@@ -729,6 +765,7 @@ describe('Tier Service', () => {
           type: TransactionTypes.swap,
           from: '0xwallet',
           typeData: {},
+          chainId: Chains.BASE.chainId,
         } as TransactionDetails;
 
         tierService.updateAchievements(transaction);
@@ -762,6 +799,7 @@ describe('Tier Service', () => {
             typeData: {
               amountFromUsd: 500,
             },
+            chainId: Chains.BASE.chainId,
           } as unknown as TransactionDetails;
 
           tierService.updateAchievements(transaction);
