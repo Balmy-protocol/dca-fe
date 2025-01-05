@@ -35,7 +35,7 @@ function useAnalytics() {
   );
 
   const incrementProperty = React.useCallback(
-    (properties: Record<string, number>) => {
+    (properties: Record<string, any>) => {
       eventService.incrementProperty(properties);
     },
     [eventService]
@@ -49,7 +49,7 @@ function useAnalytics() {
   );
 
   const unionProperty = React.useCallback(
-    (properties: Record<string, any[]>) => {
+    (properties: Record<string, any>) => {
       eventService.unionProperty(properties);
     },
     [eventService]

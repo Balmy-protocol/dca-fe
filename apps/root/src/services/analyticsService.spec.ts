@@ -139,10 +139,18 @@ describe('Analytics Service', () => {
   });
 
   describe('setPeopleProperty', () => {
-    test('should set people properties in mixpanel', () => {
-      const properties = { prop1: 'value1' };
+    test('should flatten and set people properties in mixpanel', () => {
+      const properties = {
+        user: {
+          details: { name: 'John' },
+          active: true,
+        },
+      };
       analyticsService.setPeopleProperty(properties);
-      expect(peopleSetMock).toHaveBeenCalledWith(properties);
+      expect(peopleSetMock).toHaveBeenCalledWith({
+        'user.details.name': 'John',
+        'user.active': true,
+      });
     });
 
     test('should handle errors gracefully', () => {
@@ -155,10 +163,18 @@ describe('Analytics Service', () => {
   });
 
   describe('setOnceProperty', () => {
-    test('should set one-time properties in mixpanel', () => {
-      const properties = { prop1: 'value1' };
+    test('should flatten and set one-time properties in mixpanel', () => {
+      const properties = {
+        profile: {
+          info: { age: 25 },
+          verified: true,
+        },
+      };
       analyticsService.setOnceProperty(properties);
-      expect(peopleSetOnceMock).toHaveBeenCalledWith(properties);
+      expect(peopleSetOnceMock).toHaveBeenCalledWith({
+        'profile.info.age': 25,
+        'profile.verified': true,
+      });
     });
 
     test('should handle errors gracefully', () => {
@@ -191,10 +207,18 @@ describe('Analytics Service', () => {
   });
 
   describe('incrementProperty', () => {
-    test('should increment properties in mixpanel', () => {
-      const properties = { prop1: 1 };
+    test('should flatten and increment properties in mixpanel', () => {
+      const properties = {
+        stats: {
+          visits: 1,
+          actions: 5,
+        },
+      };
       analyticsService.incrementProperty(properties);
-      expect(peopleIncrementMock).toHaveBeenCalledWith(properties);
+      expect(peopleIncrementMock).toHaveBeenCalledWith({
+        'stats.visits': 1,
+        'stats.actions': 5,
+      });
     });
 
     test('should handle errors gracefully', () => {
@@ -207,10 +231,18 @@ describe('Analytics Service', () => {
   });
 
   describe('appendProperty', () => {
-    test('should append to properties in mixpanel', () => {
-      const properties = { prop1: 'value1' };
+    test('should flatten and append to properties in mixpanel', () => {
+      const properties = {
+        history: {
+          actions: 'login',
+          details: { timestamp: '2024-01-01' },
+        },
+      };
       analyticsService.appendProperty(properties);
-      expect(peopleAppendMock).toHaveBeenCalledWith(properties);
+      expect(peopleAppendMock).toHaveBeenCalledWith({
+        'history.actions': 'login',
+        'history.details.timestamp': '2024-01-01',
+      });
     });
 
     test('should handle errors gracefully', () => {
@@ -223,10 +255,18 @@ describe('Analytics Service', () => {
   });
 
   describe('unionProperty', () => {
-    test('should union properties in mixpanel', () => {
-      const properties = { prop1: ['value1'] };
+    test('should flatten and union properties in mixpanel', () => {
+      const properties = {
+        tags: {
+          categories: ['A', 'B'],
+          labels: { primary: ['main'] },
+        },
+      };
       analyticsService.unionProperty(properties);
-      expect(peopleUnionMock).toHaveBeenCalledWith(properties);
+      expect(peopleUnionMock).toHaveBeenCalledWith({
+        'tags.categories': ['A', 'B'],
+        'tags.labels.primary': ['main'],
+      });
     });
 
     test('should handle errors gracefully', () => {

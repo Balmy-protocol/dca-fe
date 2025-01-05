@@ -65,15 +65,29 @@ export default class EventService {
     return Promise.resolve();
   }
 
+  private flattenObject(obj: Record<string, any>, prefix = ''): Record<string, any> {
+    return Object.keys(obj).reduce((acc: Record<string, any>, key) => {
+      const pre = prefix.length ? `${prefix}.` : '';
+
+      if (typeof obj[key] === 'object' && obj[key] !== null && !Array.isArray(obj[key])) {
+        Object.assign(acc, this.flattenObject(obj[key], `${pre}${key}`));
+      } else {
+        acc[`${pre}${key}`] = obj[key];
+      }
+
+      return acc;
+    }, {});
+  }
+
   setPeopleProperty(properties: Record<string, any>) {
     try {
-      this.mixpanel.people.set(properties);
+      this.mixpanel.people.set(this.flattenObject(properties));
     } catch (error) {}
   }
 
   setOnceProperty(properties: Record<string, any>) {
     try {
-      this.mixpanel.people.set_once(properties);
+      this.mixpanel.people.set_once(this.flattenObject(properties));
     } catch (error) {}
   }
 
@@ -83,21 +97,21 @@ export default class EventService {
     } catch (error) {}
   }
 
-  incrementProperty(properties: Record<string, number>) {
+  incrementProperty(properties: Record<string, any>) {
     try {
-      this.mixpanel.people.increment(properties);
+      this.mixpanel.people.increment(this.flattenObject(properties));
     } catch (error) {}
   }
 
   appendProperty(properties: Record<string, any>) {
     try {
-      this.mixpanel.people.append(properties);
+      this.mixpanel.people.append(this.flattenObject(properties));
     } catch (error) {}
   }
 
-  unionProperty(properties: Record<string, any[]>) {
+  unionProperty(properties: Record<string, any>) {
     try {
-      this.mixpanel.people.union(properties);
+      this.mixpanel.people.union(this.flattenObject(properties));
     } catch (error) {}
   }
 }
