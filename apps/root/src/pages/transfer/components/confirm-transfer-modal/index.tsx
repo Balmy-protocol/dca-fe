@@ -130,7 +130,6 @@ const ConfirmTransferModal = ({
         amountInUsd: parsedAmountsOfToken.amountInUSD,
         amount: parsedAmountsOfToken.amountInUnits,
       });
-
       setPeopleProperty({
         general: {
           last_product_used: 'transfer',
