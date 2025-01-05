@@ -2,7 +2,7 @@ import useOpenConnectModal from '@hooks/useOpenConnectModal';
 import useUser from '@hooks/useUser';
 import { WalletActionType } from '@services/accountService';
 import useAccountService from '@hooks/useAccountService';
-import useTrackEvent from '@hooks/useTrackEvent';
+import useAnalytics from '@hooks/useAnalytics';
 import confetti from 'canvas-confetti';
 import React from 'react';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
@@ -48,7 +48,7 @@ const ClaimCodeForm = () => {
     helperText: '',
     isLoading: false,
   });
-  const trackEvent = useTrackEvent();
+  const { trackEvent } = useAnalytics();
 
   const openConnectWalletModal = useOpenConnectModal();
 

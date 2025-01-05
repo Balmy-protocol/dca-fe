@@ -5,7 +5,7 @@ import { ALL_WALLETS, WalletOptionValues, WalletSelectorVariants } from '@common
 import Activity from '../components/activity';
 import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
-import useTrackEvent from '@hooks/useTrackEvent';
+import useAnalytics from '@hooks/useAnalytics';
 import { useAppDispatch } from '@state/hooks';
 import { changeRoute } from '@state/tabs/actions';
 import { DASHBOARD_ROUTE } from '@constants/routes';
@@ -65,7 +65,7 @@ const StyledNonIndexedContainer = styled(ContainerBox).attrs({ gap: 2, alignItem
 const HomeFrame = () => {
   const [selectedWalletOption, setSelectedWalletOption] = React.useState<WalletOptionValues>(ALL_WALLETS);
   const dispatch = useAppDispatch();
-  const trackEvent = useTrackEvent();
+  const { trackEvent } = useAnalytics();
   const replaceHistory = useReplaceHistory();
   const { userHasPositions } = useUserHasPositions();
   const userHasEarnPositions = useUserHasEarnPositions();

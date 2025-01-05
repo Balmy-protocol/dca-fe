@@ -14,7 +14,7 @@ import DcaLanding from './components/landing';
 import { getAllChains } from '@balmy/sdk';
 import { identifyNetwork } from '@common/utils/parsing';
 import useReplaceHistory from '@hooks/useReplaceHistory';
-import useTrackEvent from '@hooks/useTrackEvent';
+import useAnalytics from '@hooks/useAnalytics';
 import useCurrentNetwork from '@hooks/useCurrentNetwork';
 
 const SwapContainer = () => {
@@ -23,7 +23,7 @@ const SwapContainer = () => {
   const currentNetwork = useCurrentNetwork();
   const selectedNetwork = useSelectedNetwork();
   const replaceHistory = useReplaceHistory();
-  const trackEvent = useTrackEvent();
+  const { trackEvent } = useAnalytics();
   const { from: fromParam, to: toParam, chainId } = useParams<{ from: string; to: string; chainId: string }>();
   const defaultNetworkParam = React.useMemo(() => {
     const networks = getAllChains();

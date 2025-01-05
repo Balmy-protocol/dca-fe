@@ -2,7 +2,7 @@ import { createMockInstance } from '@common/utils/tests';
 import md5 from 'md5';
 import { MEAN_PROXY_PANEL_URL } from '@constants';
 import mixpanel, { Mixpanel } from 'mixpanel-browser';
-import EventService from './eventService';
+import AnalyticsService from './analyticsService';
 import ProviderService from './providerService';
 import AccountService from './accountService';
 import { NetworkStruct, UserStatus, WalletStatus, WalletType } from '@types';
@@ -17,8 +17,8 @@ const MockedAccountService = jest.mocked(AccountService, { shallow: true });
 const MockedMd5 = jest.mocked(md5, { shallow: true });
 const MockedMixpanelBrowser = jest.mocked(mixpanel, { shallow: true });
 
-describe('Event Service', () => {
-  let eventService: EventService;
+describe('Analytics Service', () => {
+  let analyticsService: AnalyticsService;
   let providerService: jest.MockedObject<ProviderService>;
   let accountService: jest.MockedObject<AccountService>;
   let setConfigMock: jest.Mock;
@@ -76,7 +76,7 @@ describe('Event Service', () => {
     process.env = {
       MIXPANEL_TOKEN: 'MIXPANEL_TOKEN',
     };
-    eventService = new EventService(providerService, accountService);
+    analyticsService = new AnalyticsService(providerService, accountService);
   });
 
   afterEach(() => {
@@ -99,7 +99,7 @@ describe('Event Service', () => {
 
   describe('trackEvent', () => {
     test('it should call mixpanel to track the event and expand all data', async () => {
-      await eventService.trackEvent('Action to track', { someProp: 'someValue' });
+      await analyticsService.trackEvent('Action to track', { someProp: 'someValue' });
       expect(trackMock).toHaveBeenCalledTimes(1);
       expect(trackMock).toHaveBeenCalledWith('Action to track', {
         chainId: 10,
@@ -114,7 +114,7 @@ describe('Event Service', () => {
       trackMock.mockImplementation(() => {
         throw new Error('error tracking');
       });
-      await eventService.trackEvent('Action to track', { someProp: 'someValue' });
+      await analyticsService.trackEvent('Action to track', { someProp: 'someValue' });
       expect(trackMock).toHaveBeenCalledTimes(1);
       expect(trackMock).toHaveBeenCalledWith('Action to track', {
         chainId: 10,
@@ -128,12 +128,12 @@ describe('Event Service', () => {
 
   describe('identifyUser', () => {
     test('should identify user in mixpanel and hotjar when userId is provided', () => {
-      eventService.identifyUser('testUser');
+      analyticsService.identifyUser('testUser');
       expect(identifyMock).toHaveBeenCalledWith('testUser');
     });
 
     test('should not identify user when userId is not provided', () => {
-      eventService.identifyUser();
+      analyticsService.identifyUser();
       expect(identifyMock).not.toHaveBeenCalled();
     });
   });
@@ -141,7 +141,7 @@ describe('Event Service', () => {
   describe('setPeopleProperty', () => {
     test('should set people properties in mixpanel', () => {
       const properties = { prop1: 'value1' };
-      eventService.setPeopleProperty(properties);
+      analyticsService.setPeopleProperty(properties);
       expect(peopleSetMock).toHaveBeenCalledWith(properties);
     });
 
@@ -149,7 +149,7 @@ describe('Event Service', () => {
       peopleSetMock.mockImplementation(() => {
         throw new Error('error setting property');
       });
-      eventService.setPeopleProperty({ prop1: 'value1' });
+      analyticsService.setPeopleProperty({ prop1: 'value1' });
       expect(peopleSetMock).toHaveBeenCalled();
     });
   });
@@ -157,7 +157,7 @@ describe('Event Service', () => {
   describe('setOnceProperty', () => {
     test('should set one-time properties in mixpanel', () => {
       const properties = { prop1: 'value1' };
-      eventService.setOnceProperty(properties);
+      analyticsService.setOnceProperty(properties);
       expect(peopleSetOnceMock).toHaveBeenCalledWith(properties);
     });
 
@@ -165,19 +165,19 @@ describe('Event Service', () => {
       peopleSetOnceMock.mockImplementation(() => {
         throw new Error('error setting property');
       });
-      eventService.setOnceProperty({ prop1: 'value1' });
+      analyticsService.setOnceProperty({ prop1: 'value1' });
       expect(peopleSetOnceMock).toHaveBeenCalled();
     });
   });
 
   describe('unsetProperty', () => {
     test('should unset single property in mixpanel', () => {
-      eventService.unsetProperty('prop1');
+      analyticsService.unsetProperty('prop1');
       expect(peopleUnsetMock).toHaveBeenCalledWith('prop1');
     });
 
     test('should unset multiple properties in mixpanel', () => {
-      eventService.unsetProperty(['prop1', 'prop2']);
+      analyticsService.unsetProperty(['prop1', 'prop2']);
       expect(peopleUnsetMock).toHaveBeenCalledWith(['prop1', 'prop2']);
     });
 
@@ -185,7 +185,7 @@ describe('Event Service', () => {
       peopleUnsetMock.mockImplementation(() => {
         throw new Error('error unsetting property');
       });
-      eventService.unsetProperty('prop1');
+      analyticsService.unsetProperty('prop1');
       expect(peopleUnsetMock).toHaveBeenCalled();
     });
   });
@@ -193,7 +193,7 @@ describe('Event Service', () => {
   describe('incrementProperty', () => {
     test('should increment properties in mixpanel', () => {
       const properties = { prop1: 1 };
-      eventService.incrementProperty(properties);
+      analyticsService.incrementProperty(properties);
       expect(peopleIncrementMock).toHaveBeenCalledWith(properties);
     });
 
@@ -201,7 +201,7 @@ describe('Event Service', () => {
       peopleIncrementMock.mockImplementation(() => {
         throw new Error('error incrementing property');
       });
-      eventService.incrementProperty({ prop1: 1 });
+      analyticsService.incrementProperty({ prop1: 1 });
       expect(peopleIncrementMock).toHaveBeenCalled();
     });
   });
@@ -209,7 +209,7 @@ describe('Event Service', () => {
   describe('appendProperty', () => {
     test('should append to properties in mixpanel', () => {
       const properties = { prop1: 'value1' };
-      eventService.appendProperty(properties);
+      analyticsService.appendProperty(properties);
       expect(peopleAppendMock).toHaveBeenCalledWith(properties);
     });
 
@@ -217,7 +217,7 @@ describe('Event Service', () => {
       peopleAppendMock.mockImplementation(() => {
         throw new Error('error appending property');
       });
-      eventService.appendProperty({ prop1: 'value1' });
+      analyticsService.appendProperty({ prop1: 'value1' });
       expect(peopleAppendMock).toHaveBeenCalled();
     });
   });
@@ -225,7 +225,7 @@ describe('Event Service', () => {
   describe('unionProperty', () => {
     test('should union properties in mixpanel', () => {
       const properties = { prop1: ['value1'] };
-      eventService.unionProperty(properties);
+      analyticsService.unionProperty(properties);
       expect(peopleUnionMock).toHaveBeenCalledWith(properties);
     });
 
@@ -233,7 +233,7 @@ describe('Event Service', () => {
       peopleUnionMock.mockImplementation(() => {
         throw new Error('error union-ing property');
       });
-      eventService.unionProperty({ prop1: ['value1'] });
+      analyticsService.unionProperty({ prop1: ['value1'] });
       expect(peopleUnionMock).toHaveBeenCalled();
     });
   });

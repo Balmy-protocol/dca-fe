@@ -48,7 +48,7 @@ import usePositionService from '@hooks/usePositionService';
 import useRawUsdPrice from '@hooks/useUsdRawPrice';
 import useErrorService from '@hooks/useErrorService';
 import { deserializeError, shouldTrackError } from '@common/utils/errors';
-import useTrackEvent from '@hooks/useTrackEvent';
+import useAnalytics from '@hooks/useAnalytics';
 import useReplaceHistory from '@hooks/useReplaceHistory';
 import useLoadedAsSafeApp from '@hooks/useLoadedAsSafeApp';
 import { useAppDispatch } from '@state/hooks';
@@ -109,7 +109,7 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
   const contractService = useContractService();
   const availablePairs = useAvailablePairs(currentNetwork.chainId);
   const errorService = useErrorService();
-  const trackEvent = useTrackEvent();
+  const { trackEvent } = useAnalytics();
   const permit2Service = usePermit2Service();
   const [shouldShowSteps, setShouldShowSteps] = React.useState(false);
   const [transactionsToExecute, setTransactionsToExecute] = React.useState<TransactionStep[]>([]);

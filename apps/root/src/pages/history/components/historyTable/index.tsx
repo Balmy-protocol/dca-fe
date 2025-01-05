@@ -57,7 +57,7 @@ import ComposedTokenIcon from '@common/components/composed-token-icon';
 import { filterEvents } from '@common/utils/transaction-history/search';
 import useStoredLabels from '@hooks/useStoredLabels';
 import useIsSomeWalletIndexed from '@hooks/useIsSomeWalletIndexed';
-import useTrackEvent from '@hooks/useTrackEvent';
+import useAnalytics from '@hooks/useAnalytics';
 import usePushToHistory from '@hooks/usePushToHistory';
 import useStoredTransactionHistory from '@hooks/useStoredTransactionHistory';
 import { getGhTokenListLogoUrl } from '@constants';
@@ -550,7 +550,7 @@ const HistoryTable = ({ search, tokens, height, solid }: HistoryTableProps) => {
   const themeMode = useThemeMode();
   const intl = useIntl();
   const labels = useStoredLabels();
-  const trackEvent = useTrackEvent();
+  const { trackEvent } = useAnalytics();
   const { isSomeWalletIndexed, hasLoadedEvents, unitsByChainPercentages } = useIsSomeWalletIndexed();
   const pushToHistory = usePushToHistory();
   const initialFetchedRef = React.useRef(false);

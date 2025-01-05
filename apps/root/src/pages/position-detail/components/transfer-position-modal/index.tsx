@@ -7,7 +7,7 @@ import { useTransactionAdder } from '@state/transactions/hooks';
 import usePositionService from '@hooks/usePositionService';
 import useErrorService from '@hooks/useErrorService';
 import { deserializeError, shouldTrackError } from '@common/utils/errors';
-import useTrackEvent from '@hooks/useTrackEvent';
+import useAnalytics from '@hooks/useAnalytics';
 import { Address } from 'viem';
 import { trimAddress } from '@common/utils/parsing';
 
@@ -27,7 +27,7 @@ const TransferPositionModal = ({ position, open, onCancel }: TransferPositionMod
   const errorService = useErrorService();
   const addTransaction = useTransactionAdder();
   const intl = useIntl();
-  const trackEvent = useTrackEvent();
+  const { trackEvent } = useAnalytics();
 
   const validator = (nextValue: string) => {
     // sanitize value

@@ -31,7 +31,7 @@ import NFTModal from '../view-nft-modal';
 
 import useSupportsSigning from '@hooks/useSupportsSigning';
 import useWalletNetwork from '@hooks/useWalletNetwork';
-import useTrackEvent from '@hooks/useTrackEvent';
+import useAnalytics from '@hooks/useAnalytics';
 import { useTransactionAdder } from '@state/transactions/hooks';
 import useTransactionModal from '@hooks/useTransactionModal';
 import useErrorService from '@hooks/useErrorService';
@@ -82,7 +82,7 @@ const PositionSummaryControls = ({ show, pendingTransaction, position, ownerWall
   const protocolToken = getProtocolToken(position.chainId);
   const hasSignSupport = useSupportsSigning();
   const connectedNetwork = useWalletNetwork(position.user);
-  const trackEvent = useTrackEvent();
+  const { trackEvent } = useAnalytics();
   const [showTerminateModal, setShowTerminateModal] = React.useState(false);
   const [showTransferModal, setShowTransferModal] = React.useState(false);
   const [showNFTModal, setShowNFTModal] = React.useState(false);

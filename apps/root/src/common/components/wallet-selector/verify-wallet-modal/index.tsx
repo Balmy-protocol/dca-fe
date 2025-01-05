@@ -5,7 +5,7 @@ import { defineMessage, useIntl } from 'react-intl';
 import { getDisplayWallet } from '@common/utils/parsing';
 import useAccountService from '@hooks/useAccountService';
 import useOpenConnectModal from '@hooks/useOpenConnectModal';
-import useTrackEvent from '@hooks/useTrackEvent';
+import useAnalytics from '@hooks/useAnalytics';
 import { WalletActionType } from '@services/accountService';
 import useWallet from '@hooks/useWallet';
 import { Address } from 'viem';
@@ -21,7 +21,7 @@ export const VerifyWalletModal = ({ open, onClose, walletAddress }: VerifyWallet
   const walletObject = useWallet(walletAddress || '');
   const walletDisplay = getDisplayWallet(walletObject);
 
-  const trackEvent = useTrackEvent();
+  const { trackEvent } = useAnalytics();
   const accountService = useAccountService();
   const { enqueueSnackbar } = useSnackbar();
 

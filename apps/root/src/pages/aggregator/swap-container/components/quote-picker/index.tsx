@@ -12,7 +12,7 @@ import { formatSwapDiffLabel } from '@common/utils/swap';
 import { useAggregatorState } from '@state/aggregator/hooks';
 import { useAggregatorSettingsState } from '@state/aggregator-settings/hooks';
 import { useAppDispatch } from '@state/hooks';
-import useTrackEvent from '@hooks/useTrackEvent';
+import useAnalytics from '@hooks/useAnalytics';
 import { setSelectedRoute } from '@state/aggregator/actions';
 
 const StyledContainer = styled(ForegroundPaper)`
@@ -132,7 +132,7 @@ interface QuotePickerProps {
 const QuotePicker = ({ quotes, isLoading, bestQuote, isBuyOrder }: QuotePickerProps) => {
   const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
   const dispatch = useAppDispatch();
-  const trackEvent = useTrackEvent();
+  const { trackEvent } = useAnalytics();
   const intl = useIntl();
   const { selectedRoute } = useAggregatorState();
 

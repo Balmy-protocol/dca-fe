@@ -48,7 +48,7 @@ import useCurrentNetwork from '@hooks/useCurrentNetwork';
 import { deserializeError, shouldTrackError } from '@common/utils/errors';
 import useErrorService from '@hooks/useErrorService';
 import useLoadedAsSafeApp from '@hooks/useLoadedAsSafeApp';
-import useTrackEvent from '@hooks/useTrackEvent';
+import useAnalytics from '@hooks/useAnalytics';
 import { resetForm, setFrom, setFromValue, setSelectedRoute, setTo, setToValue } from '@state/aggregator/actions';
 import useSelectedNetwork from '@hooks/useSelectedNetwork';
 import { useAggregatorState } from '@state/aggregator/hooks';
@@ -118,7 +118,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError, missingQ
   const simulationService = useSimulationService();
   const actualCurrentNetwork = useCurrentNetwork();
   const loadedAsSafeApp = useLoadedAsSafeApp();
-  const trackEvent = useTrackEvent();
+  const { trackEvent } = useAnalytics();
   const replaceHistory = useReplaceHistory();
   const [selectingSelection, setSelectingSelection] = React.useState<'from' | 'to'>('from');
   const permit2Service = usePermit2Service();

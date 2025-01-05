@@ -44,7 +44,7 @@ import { timeoutPromise } from '@balmy/sdk';
 import { Duration } from 'luxon';
 import useOpenConnectModal from '@hooks/useOpenConnectModal';
 import useIsLoggingUser from '@hooks/useIsLoggingUser';
-import useTrackEvent from '@hooks/useTrackEvent';
+import useAnalytics from '@hooks/useAnalytics';
 import { useShowBalances } from '@state/config/hooks';
 import TokenIconMultichain from '../token-icon-multichain';
 import useAccountService from '@hooks/useAccountService';
@@ -282,7 +282,7 @@ const Portfolio = ({ selectedWalletOption }: PortfolioProps) => {
   const user = useUser();
   const [isRefreshDisabled, setIsRefreshDisabled] = React.useState(false);
   const isLoggingUser = useIsLoggingUser();
-  const trackEvent = useTrackEvent();
+  const { trackEvent } = useAnalytics();
   const intl = useIntl();
   const showBalances = useShowBalances();
   const pushToHistory = usePushToHistory();

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { SvgIcon, colors, ContainerBox, Typography } from 'ui-library';
-import useTrackEvent from '@hooks/useTrackEvent';
+import useAnalytics from '@hooks/useAnalytics';
 import { useThemeMode } from '@state/config/hooks';
 import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
@@ -57,7 +57,7 @@ const CustomRefresherIcon = ({ fill, disabled }: { fill: number; disabled: boole
 const QuoteRefresher = ({ isLoading, refreshQuotes, disableRefreshQuotes }: QuoteRefresherProps) => {
   const [timer, setTimer] = React.useState(TIMER_FOR_RESET);
   const inactiveTimeRef = React.useRef<number | null>(null);
-  const trackEvent = useTrackEvent();
+  const { trackEvent } = useAnalytics();
 
   const onRefreshRoute = () => {
     setTimer(TIMER_FOR_RESET);

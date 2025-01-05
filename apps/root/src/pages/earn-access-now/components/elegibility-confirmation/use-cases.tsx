@@ -14,7 +14,7 @@ import CenteredLoadingIndicator from '@common/components/centered-loading-indica
 import styled from 'styled-components';
 import useOpenConnectModal from '@hooks/useOpenConnectModal';
 import { WalletActionType } from '@services/accountService';
-import useTrackEvent from '@hooks/useTrackEvent';
+import useAnalytics from '@hooks/useAnalytics';
 import usePushToHistory from '@hooks/usePushToHistory';
 import { EARN_ROUTE } from '@constants/routes';
 import Address from '@common/components/address';
@@ -62,7 +62,7 @@ const ClaimEarnButton = ({
   const pushToHistory = usePushToHistory();
   const accountService = useAccountService();
   const [isLoading, setIsLoading] = React.useState(false);
-  const trackEvent = useTrackEvent();
+  const { trackEvent } = useAnalytics();
 
   const onEnterEarnNow = async () => {
     setIsLoading(true);
@@ -107,7 +107,7 @@ export const LoadingCase = () => (
 
 export const NotEligibleStatus = () => {
   const openConnectWalletModal = useOpenConnectModal();
-  const trackEvent = useTrackEvent();
+  const { trackEvent } = useAnalytics();
 
   const onConnectWallet = React.useCallback(() => {
     openConnectWalletModal(WalletActionType.link);
@@ -174,7 +174,7 @@ export const NeedsSignatureCase = ({
   const [walletToSign, setWalletToSign] = React.useState<Wallet | undefined>();
   const wallet = useWallet(walletToSign?.address || '');
   const openConnectWalletModal = useOpenConnectModal();
-  const trackEvent = useTrackEvent();
+  const { trackEvent } = useAnalytics();
   const accountService = useAccountService();
 
   const isWalletConnected = wallet?.status === WalletStatus.connected;

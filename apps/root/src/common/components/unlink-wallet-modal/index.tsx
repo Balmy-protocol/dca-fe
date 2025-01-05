@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
 import { Typography, ContainerBox, colors, Modal } from 'ui-library';
-import useTrackEvent from '@hooks/useTrackEvent';
+import useAnalytics from '@hooks/useAnalytics';
 import { Wallet } from 'common-types';
 
 const StyledContactItem = styled(ContainerBox).attrs(() => ({ justifyContent: 'space-between', alignItems: 'center' }))`
@@ -25,7 +25,7 @@ interface UnlinkWalletModalProps {
 }
 
 const UnlinkWalletModal = ({ onUnlinkWallet, open, onCancel, walletToRemove }: UnlinkWalletModalProps) => {
-  const trackEvent = useTrackEvent();
+  const { trackEvent } = useAnalytics();
   const handleUnlinkWallet = () => {
     onUnlinkWallet();
     trackEvent('Home - Unlink wallet');

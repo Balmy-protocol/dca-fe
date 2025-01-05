@@ -6,7 +6,7 @@ import { useAppDispatch } from '@state/hooks';
 import { setTransferTo } from '@state/aggregator/actions';
 import { buildEtherscanAddress } from '@common/utils/etherscan';
 import useCurrentNetwork from '@hooks/useCurrentNetwork';
-import useTrackEvent from '@hooks/useTrackEvent';
+import useAnalytics from '@hooks/useAnalytics';
 import useValidateAddress from '@hooks/useValidateAddress';
 
 const StyledWalletContainer = styled.div`
@@ -27,7 +27,7 @@ const TransferToModal = ({ transferTo, open, onCancel }: TransferToModalProps) =
   const [validateCheckbox, setValidateCheckbox] = React.useState(false);
   const currentNetwork = useCurrentNetwork();
   const intl = useIntl();
-  const trackEvent = useTrackEvent();
+  const { trackEvent } = useAnalytics();
   const {
     validationResult: { isValidAddress: isValidRecipient, errorMessage },
     address: toAddress,

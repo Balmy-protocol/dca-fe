@@ -5,14 +5,14 @@ import { Address } from 'viem';
 import { useCustomTokens } from '@state/token-lists/hooks';
 import { getTokenListId } from '@common/utils/parsing';
 import useSelectedNetwork from './useSelectedNetwork';
-import useTrackEvent from './useTrackEvent';
+import useAnalytics from './useAnalytics';
 
 function useAddCustomTokenToList() {
   const dispatch = useAppDispatch();
   const [isLoadingCustomToken, setIsLoadingCustomToken] = React.useState(false);
   const customTokens = useCustomTokens();
   const selectedNetwork = useSelectedNetwork();
-  const trackEvent = useTrackEvent();
+  const { trackEvent } = useAnalytics();
 
   const addCustomTokenToList = React.useCallback(
     async (tokenAddress: Address, chainId: number) => {

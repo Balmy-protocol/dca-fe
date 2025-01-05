@@ -24,7 +24,7 @@ import { useAggregatorSettingsState } from '@state/aggregator-settings/hooks';
 import { useAggregatorState } from '@state/aggregator/hooks';
 import { setSelectedRoute } from '@state/aggregator/actions';
 import { useAppDispatch } from '@state/hooks';
-import useTrackEvent from '@hooks/useTrackEvent';
+import useAnalytics from '@hooks/useAnalytics';
 import { useThemeMode } from '@state/config/hooks';
 
 const DarkChip = withStyles(Chip, () => ({
@@ -201,7 +201,7 @@ const SwapQuote = ({ quote, isSelected, bestQuote, disabled }: SwapQuotesProps) 
   const { showTransactionCost: showTransactionCostConfig, sorting } = useAggregatorSettingsState();
   const { from, to, isBuyOrder, selectedRoute } = useAggregatorState();
   const dispatch = useAppDispatch();
-  const trackEvent = useTrackEvent();
+  const { trackEvent } = useAnalytics();
   const mode = useThemeMode();
   const intl = useIntl();
 

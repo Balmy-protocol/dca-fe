@@ -5,7 +5,7 @@ import React from 'react';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 import { ContainerBox, Typography } from 'ui-library';
-import useTrackEvent from '@hooks/useTrackEvent';
+import useAnalytics from '@hooks/useAnalytics';
 import usePushToHistory from '@hooks/usePushToHistory';
 import { EARN_ROUTE } from '@constants/routes';
 
@@ -30,7 +30,7 @@ const StyledBannerContainer = styled(ContainerBox).attrs({
 const EarnBanner = () => {
   const [showEarnModal, setShowEarnModal] = React.useState(false);
   const { isEarnEnabled, hasEarnAccess } = useEarnAccess();
-  const trackEvent = useTrackEvent();
+  const { trackEvent } = useAnalytics();
   const pushToHistory = usePushToHistory();
 
   const handleClick = () => {

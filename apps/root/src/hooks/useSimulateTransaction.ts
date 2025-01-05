@@ -4,7 +4,7 @@ import { BlowfishResponse, SwapOption } from '@types';
 import debounce from 'lodash/debounce';
 import usePrevious from '@hooks/usePrevious';
 import useSimulationService from './useSimulationService';
-import useTrackEvent from './useTrackEvent';
+import useAnalytics from './useAnalytics';
 
 export const ALL_SWAP_OPTIONS_FAILED = 'all swap options failed';
 
@@ -24,7 +24,7 @@ function useSimulateTransaction(
   const prevTxData = usePrevious(txData);
   const prevResult = usePrevious(result);
   const prevForceProviderSimulation = usePrevious(forceProviderSimulation);
-  const trackEvent = useTrackEvent();
+  const { trackEvent } = useAnalytics();
 
   const debouncedCall = React.useCallback(
     debounce(

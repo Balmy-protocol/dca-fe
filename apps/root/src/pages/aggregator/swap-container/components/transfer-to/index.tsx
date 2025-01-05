@@ -4,7 +4,7 @@ import { Typography, IconButton, EditIcon, ForegroundPaper, ContainerBox, CloseI
 import { FormattedMessage } from 'react-intl';
 import { useAppDispatch } from '@hooks/state';
 import { setTransferTo } from '@state/aggregator/actions';
-import useTrackEvent from '@hooks/useTrackEvent';
+import useAnalytics from '@hooks/useAnalytics';
 import Address from '@common/components/address';
 
 const StyledTransferToContainer = styled(ForegroundPaper).attrs({ variant: 'outlined' })`
@@ -31,7 +31,7 @@ interface TransferToProps {
 
 const TransferTo = ({ transferTo, onOpenTransferTo, showControls }: TransferToProps) => {
   const dispatch = useAppDispatch();
-  const trackEvent = useTrackEvent();
+  const { trackEvent } = useAnalytics();
 
   const onRemoveAddress = () => {
     dispatch(setTransferTo(null));

@@ -6,7 +6,7 @@ import usePushToHistory from '@hooks/usePushToHistory';
 import { useAppDispatch } from '@state/hooks';
 import { changeRoute } from '@state/tabs/actions';
 import { DCA_CREATE_ROUTE } from '@constants/routes';
-import useTrackEvent from '@hooks/useTrackEvent';
+import useAnalytics from '@hooks/useAnalytics';
 
 const StyledContainer = styled(ContainerBox)`
   ${({
@@ -26,7 +26,7 @@ const StyledContainer = styled(ContainerBox)`
 const CreatePositionBox = () => {
   const pushToHistory = usePushToHistory();
   const dispatch = useAppDispatch();
-  const trackEvent = useTrackEvent();
+  const { trackEvent } = useAnalytics();
 
   const onClick = React.useCallback(() => {
     dispatch(changeRoute(DCA_CREATE_ROUTE.key));

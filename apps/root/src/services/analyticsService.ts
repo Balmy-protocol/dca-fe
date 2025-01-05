@@ -44,7 +44,7 @@ export default class EventService {
 
     try {
       network = await this.providerService.getNetwork();
-    } catch {}
+    } catch (error) {}
 
     const foundNetwork = find(NETWORKS, { chainId: network?.chainId });
     const userId = this.accountService.getUser()?.id;
@@ -60,8 +60,7 @@ export default class EventService {
         activeWallet,
         ...(extraData || {}),
       });
-      // eslint-disable-next-line no-empty
-    } catch {}
+    } catch (error) {}
 
     return Promise.resolve();
   }
@@ -69,48 +68,36 @@ export default class EventService {
   setPeopleProperty(properties: Record<string, any>) {
     try {
       this.mixpanel.people.set(properties);
-    } catch (error) {
-      console.error('Error setting people property', error);
-    }
+    } catch (error) {}
   }
 
   setOnceProperty(properties: Record<string, any>) {
     try {
       this.mixpanel.people.set_once(properties);
-    } catch (error) {
-      console.error('Error setting one-time people property', error);
-    }
+    } catch (error) {}
   }
 
   unsetProperty(propertyName: string | string[]) {
     try {
       this.mixpanel.people.unset(propertyName);
-    } catch (error) {
-      console.error('Error unsetting people property', error);
-    }
+    } catch (error) {}
   }
 
   incrementProperty(properties: Record<string, number>) {
     try {
       this.mixpanel.people.increment(properties);
-    } catch (error) {
-      console.error('Error incrementing people property', error);
-    }
+    } catch (error) {}
   }
 
   appendProperty(properties: Record<string, any>) {
     try {
       this.mixpanel.people.append(properties);
-    } catch (error) {
-      console.error('Error appending to people property', error);
-    }
+    } catch (error) {}
   }
 
   unionProperty(properties: Record<string, any[]>) {
     try {
       this.mixpanel.people.union(properties);
-    } catch (error) {
-      console.error('Error union-ing people property', error);
-    }
+    } catch (error) {}
   }
 }

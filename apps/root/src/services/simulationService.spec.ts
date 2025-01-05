@@ -8,7 +8,7 @@ import MeanApiService from './meanApiService';
 import ProviderService from './providerService';
 import ContractService from './contractService';
 import SdkService from './sdkService';
-import EventService from './eventService';
+import EventService from './analyticsService';
 import WalletService from './walletService';
 
 jest.mock('./providerService');

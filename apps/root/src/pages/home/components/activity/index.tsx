@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import TokenIconWithNetwork from '@common/components/token-icon-with-network';
 import usePushToHistory from '@hooks/usePushToHistory';
-import useTrackEvent from '@hooks/useTrackEvent';
+import useAnalytics from '@hooks/useAnalytics';
 import useTransactionsHistory from '@hooks/useTransactionsHistory';
 import { useAppDispatch } from '@state/hooks';
 import { changeRoute } from '@state/tabs/actions';
@@ -259,7 +259,7 @@ interface ActivityProps {
 }
 
 const Activity = ({ selectedWalletOption }: ActivityProps) => {
-  const trackEvent = useTrackEvent();
+  const { trackEvent } = useAnalytics();
   const dispatch = useAppDispatch();
   const pushToHistory = usePushToHistory();
   const showBalances = useShowBalances();

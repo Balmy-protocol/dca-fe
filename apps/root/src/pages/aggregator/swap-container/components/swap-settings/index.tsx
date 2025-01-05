@@ -49,7 +49,7 @@ import {
   TimeoutKey,
 } from '@constants/aggregator';
 import useSdkDexes from '@hooks/useSdkSources';
-import useTrackEvent from '@hooks/useTrackEvent';
+import useAnalytics from '@hooks/useAnalytics';
 import SlippageInput from './components/slippage-input';
 import { capitalize } from 'lodash';
 import { SetStateCallback } from 'common-types';
@@ -134,7 +134,7 @@ const SwapSettings = ({ shouldShow, onClose, setShouldShowFirstStep }: SwapSetti
   const { slippage, gasSpeed, disabledDexes, isPermit2Enabled, sourceTimeout, sorting } = useAggregatorSettingsState();
   const dispatch = useAppDispatch();
   const dexes = useSdkDexes();
-  const trackEvent = useTrackEvent();
+  const { trackEvent } = useAnalytics();
   const intl = useIntl();
 
   const gasOptions = GAS_KEYS.map((key) => ({ value: key, text: intl.formatMessage(GAS_LABELS_BY_KEY[key]) }));

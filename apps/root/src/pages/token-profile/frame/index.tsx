@@ -1,5 +1,5 @@
 import React from 'react';
-import useTrackEvent from '@hooks/useTrackEvent';
+import useAnalytics from '@hooks/useAnalytics';
 import { BackControl, colors, ContainerBox, Grid, StyledNonFormContainer, Typography } from 'ui-library';
 import { DASHBOARD_ROUTE, TOKEN_PROFILE_ROUTE } from '@constants/routes';
 import { useParams } from 'react-router-dom';
@@ -21,7 +21,7 @@ import { changeRoute } from '@state/tabs/actions';
 const TokenProfileFrame = () => {
   const pushToHistory = usePushToHistory();
   const dispatch = useAppDispatch();
-  const trackEvent = useTrackEvent();
+  const { trackEvent } = useAnalytics();
   const intl = useIntl();
   const { tokenListId } = useParams<{ tokenListId: string }>();
   const [tokenChain, tokenAddress] = (tokenListId || '').split('-');

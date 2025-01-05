@@ -17,7 +17,7 @@ import SdkService from './sdkService';
 import ErrorService from './errorService';
 import SimulationService from './simulationService';
 import SafeService from './safeService';
-import EventService from './eventService';
+import EventService from './analyticsService';
 import CampaignService from './campaignService';
 import Permit2Service from './permit2Service';
 import AccountService, { WalletActionType } from './accountService';

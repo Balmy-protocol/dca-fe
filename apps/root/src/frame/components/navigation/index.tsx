@@ -46,7 +46,7 @@ import { useThemeMode, useUseUnlimitedApproval } from '@state/config/hooks';
 import useSelectedLanguage from '@hooks/useSelectedLanguage';
 import { SUPPORTED_LANGUAGES_STRING, SupportedLanguages } from '@constants/lang';
 import useChangeLanguage from '@hooks/useChangeLanguage';
-import useTrackEvent from '@hooks/useTrackEvent';
+import useAnalytics from '@hooks/useAnalytics';
 import NetWorth, { NetWorthVariants } from '@common/components/net-worth';
 import { WalletOptionValues, ALL_WALLETS, WalletSelectorVariants } from '@common/components/wallet-selector/types';
 import GuardianListSubscribeModal from '../guardian-list-subscribe-modal';
@@ -120,7 +120,7 @@ const Navigation = ({ children }: React.PropsWithChildren) => {
   const snackbar = useSnackbar();
   const selectedLanguage = useSelectedLanguage();
   const changeLanguage = useChangeLanguage();
-  const trackEvent = useTrackEvent();
+  const { trackEvent } = useAnalytics();
   const useUnlimitedApproval = useUseUnlimitedApproval();
   const [selectedWalletOption, setSelectedWalletOption] = React.useState<WalletOptionValues>(ALL_WALLETS);
   const [showEarnModal, setShowEarnModal] = React.useState(false);

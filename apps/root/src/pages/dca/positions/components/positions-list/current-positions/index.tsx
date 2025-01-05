@@ -22,7 +22,7 @@ import TerminateModal from '@common/components/terminate-modal';
 import { deserializeError, shouldTrackError } from '@common/utils/errors';
 import { OpenPosition, PositionCardSkeleton } from '../position-card';
 import CreatePositionBox from './components/create-position-box';
-import useTrackEvent from '@hooks/useTrackEvent';
+import useAnalytics from '@hooks/useAnalytics';
 
 const StyledGridItem = styled(Grid)`
   display: flex;
@@ -55,7 +55,7 @@ const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
   const [showTerminateModal, setShowTerminateModal] = React.useState(false);
   const [selectedPosition, setSelectedPosition] = React.useState(EmptyPosition);
   const dispatch = useAppDispatch();
-  const trackEvent = useTrackEvent();
+  const { trackEvent } = useAnalytics();
 
   const onCancelModifySettingsModal = React.useCallback(() => {
     setShowModifyRateSettingsModal(false);

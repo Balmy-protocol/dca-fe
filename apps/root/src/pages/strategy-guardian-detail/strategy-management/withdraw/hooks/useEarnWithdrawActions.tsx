@@ -13,7 +13,7 @@ import {
 } from 'common-types';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import { Hash, parseUnits } from 'viem';
-import useTrackEvent from '@hooks/useTrackEvent';
+import useAnalytics from '@hooks/useAnalytics';
 import useActiveWallet from '@hooks/useActiveWallet';
 import { shouldTrackError } from '@common/utils/errors';
 import useErrorService from '@hooks/useErrorService';
@@ -35,7 +35,7 @@ const useEarnWithdrawActions = ({ strategy }: UseEarnWithdrawActionsParams) => {
   const intl = useIntl();
   const asset = strategy?.asset;
   const activeWallet = useActiveWallet();
-  const trackEvent = useTrackEvent();
+  const { trackEvent } = useAnalytics();
   const errorService = useErrorService();
   const earnService = useEarnService();
   const [currentTransaction, setCurrentTransaction] = React.useState<{ hash: Hash; chainId: number } | undefined>();

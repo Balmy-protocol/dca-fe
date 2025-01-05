@@ -16,7 +16,7 @@ import AboutEarnGuardian from '../components/about-earn-guardian';
 import EarnEarlyAccessFAQ from '../faq';
 import { useAppDispatch } from '@state/hooks';
 import { changeRoute } from '@state/tabs/actions';
-import useTrackEvent from '@hooks/useTrackEvent';
+import useAnalytics from '@hooks/useAnalytics';
 import { EARN_ACCESS_NOW_ROUTE } from '@constants/routes';
 import ElegibilityConfirmation from '../components/elegibility-confirmation';
 
@@ -28,7 +28,7 @@ const StyledTitleSpan = styled('span')`
 
 const EarnAccessNowFrame = () => {
   const dispatch = useAppDispatch();
-  const trackEvent = useTrackEvent();
+  const { trackEvent } = useAnalytics();
   const [isCheckingEligibility, setIsCheckingEligibility] = React.useState(false);
 
   React.useEffect(() => {

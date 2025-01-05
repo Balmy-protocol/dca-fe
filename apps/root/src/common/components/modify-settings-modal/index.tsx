@@ -62,7 +62,7 @@ import useWalletService from '@hooks/useWalletService';
 import useErrorService from '@hooks/useErrorService';
 import { deserializeError, shouldTrackError } from '@common/utils/errors';
 import useLoadedAsSafeApp from '@hooks/useLoadedAsSafeApp';
-import useTrackEvent from '@hooks/useTrackEvent';
+import useAnalytics from '@hooks/useAnalytics';
 import usePermit2Service from '@hooks/usePermit2Service';
 import useSpecificAllowance from '@hooks/useSpecificAllowance';
 import useDcaAllowanceTarget from '@hooks/useDcaAllowanceTarget';
@@ -129,7 +129,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
   const hasConfirmedApproval = useHasPendingApproval(fromToUse, position.user, fromHasYield, allowanceTarget);
   const realBalance = (balance && BigInt(balance.amount) + remainingLiquidity) || remainingLiquidity;
   const hasYield = !!from.underlyingTokens.length;
-  const trackEvent = useTrackEvent();
+  const { trackEvent } = useAnalytics();
   const usdPrice = parseNumberUsdPriceToBigInt(from.price);
   const rateUsdPrice = parseUsdPrice(from, (rate !== '' && parseUnits(rate, from?.decimals)) || null, usdPrice);
   const remainingLiquidityDifference = abs(

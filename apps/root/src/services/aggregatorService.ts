@@ -21,7 +21,7 @@ import ProviderService from './providerService';
 import SdkService from './sdkService';
 import SafeService from './safeService';
 import SimulationService from './simulationService';
-import EventService from './eventService';
+import EventService from './analyticsService';
 import { EstimatedQuoteResponseWithTx } from '@balmy/sdk';
 
 export default class AggregatorService {

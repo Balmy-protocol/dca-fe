@@ -1,7 +1,7 @@
 import React from 'react';
 import { DelayedWithdrawalPositions, EarnClaimDelayedWithdrawTypeData, TransactionTypes } from 'common-types';
 import { FormattedMessage, useIntl } from 'react-intl';
-import useTrackEvent from '@hooks/useTrackEvent';
+import useAnalytics from '@hooks/useAnalytics';
 import { shouldTrackError } from '@common/utils/errors';
 import useErrorService from '@hooks/useErrorService';
 import { Typography } from 'ui-library';
@@ -12,7 +12,7 @@ import { formatCurrencyAmount, isSameToken } from '@common/utils/currency';
 import { getProtocolToken, getWrappedProtocolToken } from '@common/mocks/tokens';
 
 const useEarnClaimDelayedWithdrawAction = () => {
-  const trackEvent = useTrackEvent();
+  const { trackEvent } = useAnalytics();
   const errorService = useErrorService();
   const earnService = useEarnService();
   const addTransaction = useTransactionAdder();

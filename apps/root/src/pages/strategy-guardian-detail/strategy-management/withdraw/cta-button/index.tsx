@@ -13,7 +13,7 @@ import useActiveWallet from '@hooks/useActiveWallet';
 import useOpenConnectModal from '@hooks/useOpenConnectModal';
 import useWallets from '@hooks/useWallets';
 import { getDisplayWallet } from '@common/utils/parsing';
-import useTrackEvent from '@hooks/useTrackEvent';
+import useAnalytics from '@hooks/useAnalytics';
 import { useEarnManagementState } from '@state/earn-management/hooks';
 import useHasFetchedUserStrategies from '@hooks/earn/useHasFetchedUserStrategies';
 import { isSameToken } from '@common/utils/currency';
@@ -49,7 +49,7 @@ const EarnWithdrawCTAButton = ({
   const reconnectingWallet = activeWallet || find(wallets, { isAuth: true });
   const reconnectingWalletDisplay = getDisplayWallet(reconnectingWallet);
   const openConnectModal = useOpenConnectModal();
-  const trackEvent = useTrackEvent();
+  const { trackEvent } = useAnalytics();
   const contractService = useContractService();
   const position = strategy?.userPositions?.find((userPosition) => userPosition.owner === activeWallet?.address);
 
