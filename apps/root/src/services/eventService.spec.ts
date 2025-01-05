@@ -23,6 +23,13 @@ describe('Event Service', () => {
   let accountService: jest.MockedObject<AccountService>;
   let setConfigMock: jest.Mock;
   let trackMock: jest.Mock;
+  let peopleSetMock: jest.Mock;
+  let peopleSetOnceMock: jest.Mock;
+  let peopleUnsetMock: jest.Mock;
+  let peopleIncrementMock: jest.Mock;
+  let peopleAppendMock: jest.Mock;
+  let peopleUnionMock: jest.Mock;
+  let identifyMock: jest.Mock;
 
   beforeEach(() => {
     MockedMd5.mockImplementation((value: string) => `md5-${value}`);
@@ -45,13 +52,27 @@ describe('Event Service', () => {
     });
     setConfigMock = jest.fn();
     trackMock = jest.fn();
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
+    peopleSetMock = jest.fn();
+    peopleSetOnceMock = jest.fn();
+    peopleUnsetMock = jest.fn();
+    peopleIncrementMock = jest.fn();
+    peopleAppendMock = jest.fn();
+    peopleUnionMock = jest.fn();
+    identifyMock = jest.fn();
+
     MockedMixpanelBrowser.init.mockReturnValue({
       set_config: setConfigMock,
       track: trackMock,
-      identify: jest.fn(),
-    } as unknown as Mixpanel);
+      identify: identifyMock,
+      people: {
+        set: peopleSetMock,
+        set_once: peopleSetOnceMock,
+        unset: peopleUnsetMock,
+        increment: peopleIncrementMock,
+        append: peopleAppendMock,
+        union: peopleUnionMock,
+      },
+    } as unknown as ReturnType<typeof mixpanel.init>);
     process.env = {
       MIXPANEL_TOKEN: 'MIXPANEL_TOKEN',
     };
@@ -102,6 +123,118 @@ describe('Event Service', () => {
         distinct_id: 'wallet:userId',
         activeWallet: '0xactive',
       });
+    });
+  });
+
+  describe('identifyUser', () => {
+    test('should identify user in mixpanel and hotjar when userId is provided', () => {
+      eventService.identifyUser('testUser');
+      expect(identifyMock).toHaveBeenCalledWith('testUser');
+    });
+
+    test('should not identify user when userId is not provided', () => {
+      eventService.identifyUser();
+      expect(identifyMock).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('setPeopleProperty', () => {
+    test('should set people properties in mixpanel', () => {
+      const properties = { prop1: 'value1' };
+      eventService.setPeopleProperty(properties);
+      expect(peopleSetMock).toHaveBeenCalledWith(properties);
+    });
+
+    test('should handle errors gracefully', () => {
+      peopleSetMock.mockImplementation(() => {
+        throw new Error('error setting property');
+      });
+      eventService.setPeopleProperty({ prop1: 'value1' });
+      expect(peopleSetMock).toHaveBeenCalled();
+    });
+  });
+
+  describe('setOnceProperty', () => {
+    test('should set one-time properties in mixpanel', () => {
+      const properties = { prop1: 'value1' };
+      eventService.setOnceProperty(properties);
+      expect(peopleSetOnceMock).toHaveBeenCalledWith(properties);
+    });
+
+    test('should handle errors gracefully', () => {
+      peopleSetOnceMock.mockImplementation(() => {
+        throw new Error('error setting property');
+      });
+      eventService.setOnceProperty({ prop1: 'value1' });
+      expect(peopleSetOnceMock).toHaveBeenCalled();
+    });
+  });
+
+  describe('unsetProperty', () => {
+    test('should unset single property in mixpanel', () => {
+      eventService.unsetProperty('prop1');
+      expect(peopleUnsetMock).toHaveBeenCalledWith('prop1');
+    });
+
+    test('should unset multiple properties in mixpanel', () => {
+      eventService.unsetProperty(['prop1', 'prop2']);
+      expect(peopleUnsetMock).toHaveBeenCalledWith(['prop1', 'prop2']);
+    });
+
+    test('should handle errors gracefully', () => {
+      peopleUnsetMock.mockImplementation(() => {
+        throw new Error('error unsetting property');
+      });
+      eventService.unsetProperty('prop1');
+      expect(peopleUnsetMock).toHaveBeenCalled();
+    });
+  });
+
+  describe('incrementProperty', () => {
+    test('should increment properties in mixpanel', () => {
+      const properties = { prop1: 1 };
+      eventService.incrementProperty(properties);
+      expect(peopleIncrementMock).toHaveBeenCalledWith(properties);
+    });
+
+    test('should handle errors gracefully', () => {
+      peopleIncrementMock.mockImplementation(() => {
+        throw new Error('error incrementing property');
+      });
+      eventService.incrementProperty({ prop1: 1 });
+      expect(peopleIncrementMock).toHaveBeenCalled();
+    });
+  });
+
+  describe('appendProperty', () => {
+    test('should append to properties in mixpanel', () => {
+      const properties = { prop1: 'value1' };
+      eventService.appendProperty(properties);
+      expect(peopleAppendMock).toHaveBeenCalledWith(properties);
+    });
+
+    test('should handle errors gracefully', () => {
+      peopleAppendMock.mockImplementation(() => {
+        throw new Error('error appending property');
+      });
+      eventService.appendProperty({ prop1: 'value1' });
+      expect(peopleAppendMock).toHaveBeenCalled();
+    });
+  });
+
+  describe('unionProperty', () => {
+    test('should union properties in mixpanel', () => {
+      const properties = { prop1: ['value1'] };
+      eventService.unionProperty(properties);
+      expect(peopleUnionMock).toHaveBeenCalledWith(properties);
+    });
+
+    test('should handle errors gracefully', () => {
+      peopleUnionMock.mockImplementation(() => {
+        throw new Error('error union-ing property');
+      });
+      eventService.unionProperty({ prop1: ['value1'] });
+      expect(peopleUnionMock).toHaveBeenCalled();
     });
   });
 });

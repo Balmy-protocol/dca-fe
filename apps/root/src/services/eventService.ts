@@ -65,4 +65,52 @@ export default class EventService {
 
     return Promise.resolve();
   }
+
+  setPeopleProperty(properties: Record<string, any>) {
+    try {
+      this.mixpanel.people.set(properties);
+    } catch (error) {
+      console.error('Error setting people property', error);
+    }
+  }
+
+  setOnceProperty(properties: Record<string, any>) {
+    try {
+      this.mixpanel.people.set_once(properties);
+    } catch (error) {
+      console.error('Error setting one-time people property', error);
+    }
+  }
+
+  unsetProperty(propertyName: string | string[]) {
+    try {
+      this.mixpanel.people.unset(propertyName);
+    } catch (error) {
+      console.error('Error unsetting people property', error);
+    }
+  }
+
+  incrementProperty(properties: Record<string, number>) {
+    try {
+      this.mixpanel.people.increment(properties);
+    } catch (error) {
+      console.error('Error incrementing people property', error);
+    }
+  }
+
+  appendProperty(properties: Record<string, any>) {
+    try {
+      this.mixpanel.people.append(properties);
+    } catch (error) {
+      console.error('Error appending to people property', error);
+    }
+  }
+
+  unionProperty(properties: Record<string, any[]>) {
+    try {
+      this.mixpanel.people.union(properties);
+    } catch (error) {
+      console.error('Error union-ing people property', error);
+    }
+  }
 }
