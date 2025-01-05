@@ -54,7 +54,7 @@ const TerminateModal = ({ position, open, onCancel }: TerminateModalProps) => {
     position.to.address === protocolToken.address || position.to.address === wrappedProtocolToken.address;
   const swappedOrLiquidity = protocolIsFrom ? remainingLiquidity : toWithdraw;
   const hasSignSupport = useSupportsSigning();
-  const { trackEvent } = useAnalytics();
+  const { trackEvent, setPeopleProperty, incrementProperty } = useAnalytics();
 
   const protocolBalance = hasWrappedOrProtocol ? swappedOrLiquidity.amount : 0n;
   let fromSymbol = position.from.symbol;
@@ -149,11 +149,26 @@ const TerminateModal = ({ position, open, onCancel }: TerminateModalProps) => {
           />
         ),
       });
+
       trackEvent('DCA - Terminate position submitted', {
         terminateWithUnwrap,
         toWidthdraw: position.toWithdraw.amountInUSD,
         remainingSwaps: position.remainingSwaps,
         remainingLiquidity: position.remainingLiquidity.amountInUSD,
+      });
+      setPeopleProperty({
+        general: {
+          last_product_used: 'dca',
+          last_network_used: 'network', // TODO ASK FIBO HOW TO GET CHAIN NAME
+        },
+      });
+      incrementProperty({
+        general: {
+          total_volume_all_time_usd: -(position.remainingLiquidity.amountInUSD ?? 0),
+        },
+        dca: {
+          total_invested_usd: -(position.remainingLiquidity.amountInUSD ?? 0),
+        },
       });
     } catch (e) {
       // User rejecting transaction
