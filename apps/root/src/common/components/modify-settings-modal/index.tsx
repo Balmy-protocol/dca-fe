@@ -335,6 +335,23 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
         ),
       });
       trackEvent('DCA - Modify position submitted', { isIncreasingPosition, useWrappedProtocolToken });
+
+      setPeopleProperty({
+        general: {
+          last_product_used: 'dca',
+          last_network_used: find(NETWORKS, { chainId: position.chainId })?.name || 'unknown',
+        },
+      });
+      const usdValueDiff = formatUnits(remainingLiquidityDifference * usdPrice, fromToUse.decimals + 18);
+
+      incrementProperty({
+        general: {
+          total_volume_all_time_usd: isIncreasingPosition ? Number(usdValueDiff) : -Number(usdValueDiff),
+        },
+        dca: {
+          total_invested_usd: isIncreasingPosition ? Number(usdValueDiff) : -Number(usdValueDiff),
+        },
+      });
     } catch (e) {
       // User rejecting transaction
       // eslint-disable-next-line no-void, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
@@ -409,16 +426,18 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
       setPeopleProperty({
         general: {
           last_product_used: 'dca',
-          last_network_used: 'network', // TODO: ASK FIBO HOW TO GET CHAIN NAME
+          last_network_used: find(NETWORKS, { chainId: position.chainId })?.name || 'unknown',
         },
       });
 
+      const usdValueDiff = formatUnits(remainingLiquidityDifference * usdPrice, fromToUse.decimals + 18);
+
       incrementProperty({
         general: {
-          total_volume_all_time_usd: isIncreasingPosition ? 1 : -1, // TODO: ASK FIBO WHERE TO GET THE USD VALUE OF THE DIFF
+          total_volume_all_time_usd: isIncreasingPosition ? Number(usdValueDiff) : -Number(usdValueDiff),
         },
         dca: {
-          total_invested_usd: isIncreasingPosition ? 1 : -1, // TODO: ASK FIBO WHERE TO GET THE USD VALUE OF THE DIFF
+          total_invested_usd: isIncreasingPosition ? Number(usdValueDiff) : -Number(usdValueDiff),
         },
       });
 

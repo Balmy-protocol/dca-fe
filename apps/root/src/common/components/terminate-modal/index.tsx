@@ -5,7 +5,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import useTransactionModal from '@hooks/useTransactionModal';
 import { Typography, FormControlLabel, FormGroup, Checkbox, Modal } from 'ui-library';
 import { useTransactionAdder } from '@state/transactions/hooks';
-import { PERMISSIONS } from '@constants';
+import { NETWORKS, PERMISSIONS } from '@constants';
 import { getProtocolToken, getWrappedProtocolToken } from '@common/mocks/tokens';
 
 import useSupportsSigning from '@hooks/useSupportsSigning';
@@ -14,6 +14,7 @@ import useErrorService from '@hooks/useErrorService';
 import { deserializeError, shouldTrackError } from '@common/utils/errors';
 import useAnalytics from '@hooks/useAnalytics';
 import { formatCurrencyAmount } from '@common/utils/currency';
+import find from 'lodash/find';
 
 interface TerminateModalProps {
   position: Position;
@@ -159,7 +160,7 @@ const TerminateModal = ({ position, open, onCancel }: TerminateModalProps) => {
       setPeopleProperty({
         general: {
           last_product_used: 'dca',
-          last_network_used: 'network', // TODO ASK FIBO HOW TO GET CHAIN NAME
+          last_network_used: find(NETWORKS, { chainId: position.chainId })?.name || 'unknown',
         },
       });
       incrementProperty({

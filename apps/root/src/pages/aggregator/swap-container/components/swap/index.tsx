@@ -433,10 +433,13 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError, missingQ
           type: selectedRoute.type,
           isPermit2Enabled,
         });
+
+        const networkUsed = find(NETWORKS, { chainId: selectedRoute.chainId })?.name || 'unknown';
+
         setPeopleProperty({
           general: {
             last_product_used: 'swap',
-            last_network_used: 'network', // TODO ASK FIBO HOW TO GET CHAIN NAME
+            last_network_used: networkUsed,
           },
         });
         incrementProperty({
@@ -450,13 +453,13 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError, missingQ
         });
         unionProperty({
           general: {
-            networks_used: 'network', // TODO ASK FIBO HOW TO GET CHAIN NAME
+            networks_used: networkUsed,
             products_used: 'swap',
             tokens_used: [from.symbol, to.symbol],
             pair_used: `${from.symbol}-${to.symbol}`,
           },
           swap: {
-            networks_used: 'network', // TODO ASK FIBO HOW TO GET CHAIN NAME
+            networks_used: networkUsed,
             tokens_used: [from.symbol, to.symbol],
             pair_used: `${from.symbol}-${to.symbol}`,
           },
