@@ -129,7 +129,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
   const hasConfirmedApproval = useHasPendingApproval(fromToUse, position.user, fromHasYield, allowanceTarget);
   const realBalance = (balance && BigInt(balance.amount) + remainingLiquidity) || remainingLiquidity;
   const hasYield = !!from.underlyingTokens.length;
-  const { trackEvent } = useAnalytics();
+  const { trackEvent, setPeopleProperty, incrementProperty } = useAnalytics();
   const usdPrice = parseNumberUsdPriceToBigInt(from.price);
   const rateUsdPrice = parseUsdPrice(from, (rate !== '' && parseUnits(rate, from?.decimals)) || null, usdPrice);
   const remainingLiquidityDifference = abs(
@@ -403,7 +403,24 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
         frequencyValue,
         useWrappedProtocolToken
       );
+
       trackEvent('DCA - Safe modify position submitted', { isIncreasingPosition, useWrappedProtocolToken });
+
+      setPeopleProperty({
+        general: {
+          last_product_used: 'dca',
+          last_network_used: 'network', // TODO: ASK FIBO HOW TO GET CHAIN NAME
+        },
+      });
+
+      incrementProperty({
+        general: {
+          total_volume_all_time_usd: isIncreasingPosition ? 1 : -1, // TODO: ASK FIBO WHERE TO GET THE USD VALUE OF THE DIFF
+        },
+        dca: {
+          total_invested_usd: isIncreasingPosition ? 1 : -1, // TODO: ASK FIBO WHERE TO GET THE USD VALUE OF THE DIFF
+        },
+      });
 
       addTransaction(
         { hash: result.safeTxHash as Address, from: position.user, chainId: position.chainId },
