@@ -377,10 +377,11 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
         yieldTo: toYield?.name,
         fromUsdValue: parsedAmountInUSD,
       });
+      const networkUsed = find(NETWORKS, { chainId: result.chainId })?.name || 'unknown';
       setPeopleProperty({
         general: {
           last_product_used: 'dca',
-          last_network_used: currentNetwork.name,
+          last_network_used: networkUsed,
         },
       });
       incrementProperty({
@@ -394,13 +395,13 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
       });
       unionProperty({
         general: {
-          networks_used: currentNetwork.name,
+          networks_used: networkUsed,
           products_used: 'dca',
           tokens_used: [from.symbol, to.symbol],
           pair_used: `${from.symbol}-${to.symbol}`,
         },
         dca: {
-          networks_used: currentNetwork.name,
+          networks_used: networkUsed,
           tokens_used: [from.symbol, to.symbol],
           pair_used: `${from.symbol}-${to.symbol}`,
         },
