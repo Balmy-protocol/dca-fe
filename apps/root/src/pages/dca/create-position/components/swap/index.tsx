@@ -109,7 +109,7 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
   const contractService = useContractService();
   const availablePairs = useAvailablePairs(currentNetwork.chainId);
   const errorService = useErrorService();
-  const { trackEvent } = useAnalytics();
+  const { trackEvent, setPeopleProperty, incrementProperty, unionProperty } = useAnalytics();
   const permit2Service = usePermit2Service();
   const [shouldShowSteps, setShouldShowSteps] = React.useState(false);
   const [transactionsToExecute, setTransactionsToExecute] = React.useState<TransactionStep[]>([]);
@@ -364,18 +364,47 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
         shouldEnableYield ? toYield?.tokenAddress : undefined,
         signature
       );
-      try {
-        trackEvent('DCA - Create position submitted', {
-          from: from.symbol,
-          to: to.symbol,
-          fromValue,
-          frequencyType,
-          frequencyValue,
-          yieldFrom: fromYield?.name,
-          yieldTo: toYield?.name,
-          fromUsdValue: parseUsdPrice(from, parseUnits(fromValue, from.decimals), usdPrice),
-        });
-      } catch {}
+
+      const parsedAmountInUSD = parseUsdPrice(from, parseUnits(fromValue, from.decimals), usdPrice);
+
+      trackEvent('DCA - Create position submitted', {
+        from: from.symbol,
+        to: to.symbol,
+        fromValue,
+        frequencyType,
+        frequencyValue,
+        yieldFrom: fromYield?.name,
+        yieldTo: toYield?.name,
+        fromUsdValue: parsedAmountInUSD,
+      });
+      setPeopleProperty({
+        general: {
+          last_product_used: 'dca',
+          last_network_used: currentNetwork.name,
+        },
+      });
+      incrementProperty({
+        general: {
+          total_volume_all_time_usd: parsedAmountInUSD,
+        },
+        dca: {
+          total_invested_usd: parsedAmountInUSD,
+          total_positions: 1,
+        },
+      });
+      unionProperty({
+        general: {
+          networks_used: currentNetwork.name,
+          products_used: 'dca',
+          tokens_used: [from.symbol, to.symbol],
+          pair_used: `${from.symbol}-${to.symbol}`,
+        },
+        dca: {
+          networks_used: currentNetwork.name,
+          tokens_used: [from.symbol, to.symbol],
+          pair_used: `${from.symbol}-${to.symbol}`,
+        },
+      });
 
       addTransaction(result, {
         type: TransactionTypes.newPosition,
