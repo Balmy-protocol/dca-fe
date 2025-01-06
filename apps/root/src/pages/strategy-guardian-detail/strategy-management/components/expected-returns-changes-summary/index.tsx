@@ -77,7 +77,14 @@ const SummaryItem = ({
     {currentValue?.amount !== updatedValue?.amount && hasOriginalValue && hasNewValues && (
       <>
         <StyledArrowIcon />
-        <TokenAmount token={asset} amount={updatedValue} isLoading={isLoading} showIcon={false} maxDecimals={4} disableHiddenNumber />
+        <TokenAmount
+          token={asset}
+          amount={updatedValue}
+          isLoading={isLoading}
+          showIcon={false}
+          maxDecimals={4}
+          disableHiddenNumber
+        />
       </>
     )}
   </ContainerBox>
