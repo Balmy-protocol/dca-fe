@@ -296,6 +296,9 @@ const useEarnWithdrawActions = ({ strategy }: UseEarnWithdrawActionsParams) => {
             current_deposits_usd: -amountInUsd,
             withdraw_counts: 1,
           },
+          general: {
+            total_volume_all_time_usd: -amountInUsd,
+          },
         });
 
         addTransaction(result, typeData);
