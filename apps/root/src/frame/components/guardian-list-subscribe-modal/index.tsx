@@ -1,20 +1,26 @@
-import useMeanApiService from '@hooks/useMeanApiService';
-import useUser from '@hooks/useUser';
+import { generateCalendarLinks, LinkType } from '@common/utils/calendar/calendar';
+import useTrackEvent from '@hooks/useTrackEvent';
+import { DateTime } from 'luxon';
 import React from 'react';
-import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 import {
   colors,
   ContainerBox,
   Modal,
   SPACING,
-  TextField,
   Typography,
   BalmyLogoSmallDark,
-  ModalProps,
-  LinearProgress,
   DonutShape,
   CoinStar,
+  AppleIcon,
+  Button,
+  CalendarMonthIcon,
+  GCalendarIcon,
+  KeyboardArrowDownIcon,
+  OptionsMenuItems,
+  OptionsMenuOptionType,
+  OutlookIcon,
 } from 'ui-library';
 
 interface GuardianListSubscribeModalProps {
@@ -22,16 +28,9 @@ interface GuardianListSubscribeModalProps {
   onClose: () => void;
 }
 
-enum ModalStatus {
-  confirm = 'confirm',
-  loading = 'loading',
-  success = 'success',
-  error = 'error',
-}
-
-const StyledContainer = styled(ContainerBox).attrs({ gap: 6, flexDirection: 'column' })`
+const StyledContainer = styled(ContainerBox).attrs({ gap: 6, flexDirection: 'column', alignItems: 'center' })`
   ${({ theme: { spacing } }) => `
-    margin-top: ${spacing(7)};
+    margin-top: ${spacing(12)};
     padding-top: ${spacing(6)};
   `}
 `;
@@ -59,62 +58,36 @@ export const validateEmailAddress = (address: string) => {
   return validRegex.test(address);
 };
 
+const generateCalendarInfo = (intl: ReturnType<typeof useIntl>) => ({
+  timeZone: 'UTC',
+  name: intl.formatMessage({
+    defaultMessage: 'Earn Early Access Launch',
+    description: 'earn.subscribe.modal.calendar.name',
+  }),
+  description: intl.formatMessage({
+    defaultMessage: "It's time to reclaim your time and grow your crypto portfolio!",
+    description: 'earn.subscribe.modal.calendar.description',
+  }),
+  location: 'https://app.balmy.xyz',
+  startDate: DateTime.fromMillis(1736899199000).toISODate(),
+  endDate: DateTime.fromMillis(1736899199000).toISODate(),
+});
+
 const GuardianListSubscribeModal = ({ isOpen, onClose }: GuardianListSubscribeModalProps) => {
-  const [status, setStatus] = React.useState<ModalStatus>(ModalStatus.confirm);
   const intl = useIntl();
-  const [email, setEmail] = React.useState<string>('');
-  const [isSubmitted, setIsSubmitted] = React.useState<boolean>(false);
-  const user = useUser();
-  const meanApiService = useMeanApiService();
+  const [anchorWithdrawButton, setAnchorWithdrawButton] = React.useState<null | HTMLElement>(null);
+  const trackEvent = useTrackEvent();
 
-  React.useEffect(() => {
-    // reset the form when the modal is closed
-    if (!isOpen) {
-      setEmail('');
-      setIsSubmitted(false);
-      setStatus(ModalStatus.confirm);
-    }
-  }, [isOpen]);
-
-  const handleConfirm = React.useCallback(() => {
-    const sendConfirm = async () => {
-      setIsSubmitted(true);
-      if (!validateEmailAddress(email)) return;
-
-      try {
-        setStatus(ModalStatus.loading);
-        await meanApiService.subscribeEmailToMaillist(email, user?.id);
-        setStatus(ModalStatus.success);
-      } catch (e) {
-        setStatus(ModalStatus.error);
-      }
-    };
-
-    void sendConfirm();
-  }, [email, setStatus, setEmail, user]);
-
-  const actions = React.useMemo(
-    () =>
-      [
-        ...(status === ModalStatus.confirm || status === ModalStatus.error
-          ? [
-              {
-                label: intl.formatMessage(
-                  defineMessage({ description: 'earn.subscribe.modal.confirm', defaultMessage: 'Request Early Access' })
-                ),
-                onClick: handleConfirm,
-                variant: 'contained',
-              },
-            ]
-          : []),
-      ] as ModalProps['actions'],
-    [status, handleConfirm, intl]
-  );
-
-  const showErrorMessage = isSubmitted && !validateEmailAddress(email);
+  const onClick = (linkType: LinkType) => {
+    generateCalendarLinks(linkType, generateCalendarInfo(intl));
+    setAnchorWithdrawButton(null);
+    trackEvent('Earn - Subscribe to calendar', {
+      calendarType: linkType,
+    });
+  };
 
   return (
-    <Modal open={isOpen} onClose={onClose} showCloseIcon maxWidth="sm" actions={actions}>
+    <Modal open={isOpen} onClose={onClose} showCloseIcon maxWidth="sm">
       <StyledContainer>
         <StyledHeader>
           <StyledHeaderContent>
@@ -147,87 +120,56 @@ const GuardianListSubscribeModal = ({ isOpen, onClose }: GuardianListSubscribeMo
           color={({ palette: { mode } }) => colors[mode].typography.typo2}
         >
           <FormattedMessage
-            description="earn.subscribe.modal.description"
-            defaultMessage="<b>Be among the first to experience our new Earn feature</b>. Help us test, provide feedback, and shape the final product. By joining, you'll get early access, exclusive features, and the opportunity to influence how we develop Earn."
+            description="earn.subscribe.modal.description.closed"
+            defaultMessage="Thank you for your interest in Earn's beta program! While early access registration is now closed, we're excited to announce that all beta features will be launching on January 14th.{br}{br}Mark your calendar and get ready to experience the future of decentralized finance, designed with the security and simplicity you deserve.{br}{br}Launch Date: <b>January 14th, 2024</b>"
             values={{
+              br: <br />,
               b: (chunks) => <b>{chunks}</b>,
             }}
           />
         </Typography>
-        {(status === ModalStatus.confirm || status === ModalStatus.error) && (
-          <ContainerBox gap={1} flexDirection="column">
-            <Typography variant="bodySmallSemibold" color={({ palette: { mode } }) => colors[mode].typography.typo4}>
-              <FormattedMessage
-                description="earn.subscribe.modal.enter-email.label"
-                defaultMessage="Enter your email to participate"
-              />
-            </Typography>
-            <TextField
-              fullWidth
-              placeholder={intl.formatMessage(
-                defineMessage({
-                  defaultMessage: 'Your Email Address',
-                  description: 'earn.subscribe.modal.enter-email.input.placeholder',
-                })
-              )}
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              disabled={status !== ModalStatus.confirm}
-              error={showErrorMessage}
-              helperText={
-                showErrorMessage
-                  ? intl.formatMessage(
-                      defineMessage({
-                        description: 'earn.subscribe.modal.enter-email.input.error',
-                        defaultMessage: 'The email address is not valid',
-                      })
-                    )
-                  : undefined
-              }
-            />
-            <Typography variant="bodyExtraSmall" color={({ palette: { mode } }) => colors[mode].typography.typo2}>
-              <FormattedMessage
-                description="earn.subscribe.modal.disclaimer"
-                defaultMessage="Once you're in, you'll receive access, and we'll notify you as soon as it's ready."
-              />
-            </Typography>
-            {status === ModalStatus.error && (
-              <Typography
-                variant="bodySmallSemibold"
-                textAlign="center"
-                color={({ palette: { mode } }) => colors[mode].semantic.error.darker}
-              >
-                <FormattedMessage
-                  description="earn.subscribe.modal.error"
-                  defaultMessage="There was a problem subscribing you, please try again later"
-                />
-              </Typography>
-            )}
-          </ContainerBox>
-        )}
-        {status === ModalStatus.loading && (
-          <>
-            <Typography variant="bodyBold" textAlign="center">
-              <FormattedMessage
-                description="earn.subscribe.modal.loading"
-                defaultMessage="Subscribing you! Please wait..."
-              />
-            </Typography>
-            <LinearProgress variant="indeterminate" />
-          </>
-        )}
-        {status === ModalStatus.success && (
-          <Typography
-            variant="bodyBold"
-            textAlign="center"
-            color={({ palette: { mode } }) => colors[mode].semantic.success.darker}
-          >
-            <FormattedMessage
-              description="earn.subscribe.modal.success"
-              defaultMessage="Thank you! You're now on the list. We'll notify you as soon as it's ready."
-            />
-          </Typography>
-        )}
+        <Button
+          variant="contained"
+          onClick={(e) => setAnchorWithdrawButton(e.currentTarget)}
+          endIcon={<KeyboardArrowDownIcon />}
+          fullWidth
+          size="large"
+        >
+          <FormattedMessage
+            description="earn.subscribe.modal.calendar.add-to-calendar"
+            defaultMessage="Save the date!"
+          />
+        </Button>
+        <OptionsMenuItems
+          options={[
+            {
+              label: <FormattedMessage description="addToGoogle" defaultMessage="Google Calendar" />,
+              type: OptionsMenuOptionType.option,
+              Icon: GCalendarIcon,
+              onClick: () => onClick(LinkType.Google),
+            },
+            {
+              label: <FormattedMessage description="addToApple" defaultMessage="Apple" />,
+              Icon: AppleIcon,
+              type: OptionsMenuOptionType.option,
+              onClick: () => onClick(LinkType.Apple),
+            },
+            {
+              label: <FormattedMessage description="addToGoogle" defaultMessage="Outlook" />,
+              Icon: OutlookIcon,
+              type: OptionsMenuOptionType.option,
+              onClick: () => onClick(LinkType.OutlookCom),
+            },
+            {
+              label: <FormattedMessage description="addToIcal" defaultMessage="iCal File" />,
+              Icon: CalendarMonthIcon,
+              type: OptionsMenuOptionType.option,
+              onClick: () => onClick(LinkType.ICal),
+            },
+          ]}
+          anchorEl={anchorWithdrawButton}
+          handleClose={() => setAnchorWithdrawButton(null)}
+        />
       </StyledContainer>
     </Modal>
   );
