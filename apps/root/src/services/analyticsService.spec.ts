@@ -1,7 +1,7 @@
 import { createMockInstance } from '@common/utils/tests';
 import md5 from 'md5';
 import { MEAN_PROXY_PANEL_URL } from '@constants';
-import mixpanel, { Mixpanel } from 'mixpanel-browser';
+import mixpanel from 'mixpanel-browser';
 import AnalyticsService from './analyticsService';
 import ProviderService from './providerService';
 import AccountService from './accountService';

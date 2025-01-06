@@ -5,6 +5,14 @@ import find from 'lodash/find';
 import ProviderService from './providerService';
 import AccountService from './accountService';
 
+interface FlattenedRecord {
+  [key: string]: string | number | boolean | string[] | number[];
+}
+
+export interface AnalyticsData {
+  [key: string]: string | number | boolean | string[] | number[] | Record<string, unknown>;
+}
+
 export default class EventService {
   providerService: ProviderService;
 
@@ -65,27 +73,25 @@ export default class EventService {
     return Promise.resolve();
   }
 
-  private flattenObject(obj: Record<string, any>, prefix = ''): Record<string, any> {
-    return Object.keys(obj).reduce((acc: Record<string, any>, key) => {
+  private flattenObject(obj: AnalyticsData, prefix = ''): FlattenedRecord {
+    return Object.keys(obj).reduce((acc: FlattenedRecord, key) => {
       const pre = prefix.length ? `${prefix}.` : '';
 
       if (typeof obj[key] === 'object' && obj[key] !== null && !Array.isArray(obj[key])) {
-        Object.assign(acc, this.flattenObject(obj[key], `${pre}${key}`));
-      } else {
-        acc[`${pre}${key}`] = obj[key];
+        return { ...acc, ...this.flattenObject(obj[key] as AnalyticsData, `${pre}${key}`) };
       }
 
-      return acc;
+      return { ...acc, [`${pre}${key}`]: obj[key] as FlattenedRecord[string] };
     }, {});
   }
 
-  setPeopleProperty(properties: Record<string, any>) {
+  setPeopleProperty(properties: AnalyticsData) {
     try {
       this.mixpanel.people.set(this.flattenObject(properties));
     } catch (error) {}
   }
 
-  setOnceProperty(properties: Record<string, any>) {
+  setOnceProperty(properties: AnalyticsData) {
     try {
       this.mixpanel.people.set_once(this.flattenObject(properties));
     } catch (error) {}
@@ -97,19 +103,19 @@ export default class EventService {
     } catch (error) {}
   }
 
-  incrementProperty(properties: Record<string, any>) {
+  incrementProperty(properties: AnalyticsData) {
     try {
       this.mixpanel.people.increment(this.flattenObject(properties));
     } catch (error) {}
   }
 
-  appendProperty(properties: Record<string, any>) {
+  appendProperty(properties: AnalyticsData) {
     try {
       this.mixpanel.people.append(this.flattenObject(properties));
     } catch (error) {}
   }
 
-  unionProperty(properties: Record<string, any>) {
+  unionProperty(properties: AnalyticsData) {
     try {
       this.mixpanel.people.union(this.flattenObject(properties));
     } catch (error) {}

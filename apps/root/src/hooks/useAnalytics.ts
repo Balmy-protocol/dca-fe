@@ -1,5 +1,6 @@
 import React from 'react';
 import useEventService from './useEventService';
+import type { AnalyticsData } from '../services/analyticsService';
 
 function useAnalytics() {
   const eventService = useEventService();
@@ -14,14 +15,14 @@ function useAnalytics() {
   );
 
   const setPeopleProperty = React.useCallback(
-    (properties: Record<string, any>) => {
+    (properties: AnalyticsData) => {
       eventService.setPeopleProperty(properties);
     },
     [eventService]
   );
 
   const setOnceProperty = React.useCallback(
-    (properties: Record<string, any>) => {
+    (properties: AnalyticsData) => {
       eventService.setOnceProperty(properties);
     },
     [eventService]
@@ -35,21 +36,21 @@ function useAnalytics() {
   );
 
   const incrementProperty = React.useCallback(
-    (properties: Record<string, any>) => {
+    (properties: AnalyticsData) => {
       eventService.incrementProperty(properties);
     },
     [eventService]
   );
 
   const appendProperty = React.useCallback(
-    (properties: Record<string, any>) => {
+    (properties: AnalyticsData) => {
       eventService.appendProperty(properties);
     },
     [eventService]
   );
 
   const unionProperty = React.useCallback(
-    (properties: Record<string, any>) => {
+    (properties: AnalyticsData) => {
       eventService.unionProperty(properties);
     },
     [eventService]
