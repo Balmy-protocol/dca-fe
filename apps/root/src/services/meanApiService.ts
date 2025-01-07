@@ -633,7 +633,7 @@ export default class MeanApiService {
     accountId: string;
     strategyId: StrategyId;
     toValidate: Address;
-    deadline: number;
+    deadline: bigint;
   }) {
     return this.authorizedRequest<{ signature: Hex }>({
       method: 'GET',
@@ -642,7 +642,7 @@ export default class MeanApiService {
       params: {
         strategyId,
         toValidate,
-        deadline,
+        deadline: deadline.toString(),
       },
     });
   }
