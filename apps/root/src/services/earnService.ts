@@ -776,11 +776,16 @@ export class EarnService extends EventsManager<EarnServiceData> {
     needsAPI?: boolean;
     deadline?: number;
   }): Promise<Hex> {
-    const apiSignature = needsAPI
-      ? (await this.getApiSignature({ accountId, strategyId, address, deadline: deadline ?? calculateDeadline('1d') }))
-          .signature
-      : '0x';
-    return encodeAbiParameters(parseAbiParameters('bytes[]'), [[tosSignature ?? '0x', apiSignature]]);
+    const tosBytes = tosSignature ?? '0x';
+
+    let signatureBytes: Hex = '0x';
+    if (needsAPI) {
+      const actualDeadline = BigInt(deadline ?? calculateDeadline('1d'));
+      const { signature } = await this.getApiSignature({ accountId, strategyId, address, deadline: actualDeadline });
+      signatureBytes = encodeAbiParameters(parseAbiParameters('bytes, uint'), [signature, actualDeadline]);
+    }
+
+    return encodeAbiParameters(parseAbiParameters('bytes[]'), [[tosBytes, signatureBytes]]);
   }
 
   private async getApiSignature({
@@ -792,7 +797,7 @@ export class EarnService extends EventsManager<EarnServiceData> {
     accountId: AccountId;
     strategyId: StrategyId;
     address: Address;
-    deadline: number;
+    deadline: bigint;
   }) {
     const signature = await this.accountService.getWalletVerifyingSignature({});
     return this.meanApiService.getEarnStrategySignature({
