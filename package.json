@@ -20,8 +20,8 @@
     "downloadAndBuildTranslations": "yarn downloadTranslations:auth && yarn compile"
   },
   "dependencies": {
-    "@balmy/sdk": "npm:@koaj/earn-sdk@0.1.4",
-    "@koaj/earn-sdk": "0.1.4"
+    "@balmy/sdk": "npm:@koaj/earn-sdk@0.1.8",
+    "@koaj/earn-sdk": "0.1.8"
   },
   "devDependencies": {
     "@formatjs/cli": "^6.0.4",
@@ -36,7 +36,7 @@
     "turbo": "latest"
   },
   "resolutions": {
-    "@balmy/sdk": "npm:@koaj/earn-sdk@0.1.4"
+    "@balmy/sdk": "npm:@koaj/earn-sdk@0.1.8"
   },
   "name": "turbo-test",
   "packageManager": "yarn@1.22.17",
