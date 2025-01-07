@@ -27,7 +27,7 @@ import { NETWORKS } from '@constants';
 import { IntervalSetActions } from '@constants/timing';
 import AccountService from './accountService';
 import compact from 'lodash/compact';
-import { Address, encodePacked, formatUnits, Hex, maxUint256 } from 'viem';
+import { Address, encodeAbiParameters, formatUnits, Hex, maxUint256, parseAbiParameters } from 'viem';
 import { parseSignatureValues } from '@common/utils/signatures';
 import { getNewEarnPositionFromTxTypeData } from '@common/utils/transactions';
 import { parseUsdPrice, parseNumberUsdPriceToBigInt, toToken, isSameToken } from '@common/utils/currency';
@@ -780,7 +780,7 @@ export class EarnService extends EventsManager<EarnServiceData> {
       ? (await this.getApiSignature({ accountId, strategyId, address, deadline: deadline ?? calculateDeadline('1d') }))
           .signature
       : '0x';
-    return encodePacked(['bytes[]'], [[tosSignature ?? '0x', apiSignature]]);
+    return encodeAbiParameters(parseAbiParameters('bytes[]'), [[tosSignature ?? '0x', apiSignature]]);
   }
 
   private async getApiSignature({
