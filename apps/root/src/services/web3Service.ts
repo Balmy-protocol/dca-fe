@@ -17,7 +17,7 @@ import SdkService from './sdkService';
 import ErrorService from './errorService';
 import SimulationService from './simulationService';
 import SafeService from './safeService';
-import EventService from './analyticsService';
+import AnalyticsService from './analyticsService';
 import CampaignService from './campaignService';
 import Permit2Service from './permit2Service';
 import AccountService, { WalletActionType } from './accountService';
@@ -145,7 +145,7 @@ export default class Web3Service {
 
   errorService: ErrorService;
 
-  eventService: EventService;
+  analyticsService: AnalyticsService;
 
   simulationService: SimulationService;
 
@@ -203,7 +203,7 @@ export default class Web3Service {
       this.walletService,
       this.labelService
     );
-    this.eventService = new EventService(this.providerService, this.accountService);
+    this.analyticsService = new AnalyticsService(this.providerService, this.accountService);
     this.pairService = new PairService(this.sdkService);
     this.transactionService = new TransactionService(
       this.contractService,
@@ -242,7 +242,7 @@ export default class Web3Service {
       this.providerService,
       this.contractService,
       this.sdkService,
-      this.eventService,
+      this.analyticsService,
       this.walletService
     );
     this.campaignService = new CampaignService(
@@ -259,7 +259,7 @@ export default class Web3Service {
       this.providerService,
       this.safeService,
       this.simulationService,
-      this.eventService
+      this.analyticsService
     );
   }
 
@@ -339,8 +339,8 @@ export default class Web3Service {
     return this.pairService;
   }
 
-  getEventService() {
-    return this.eventService;
+  getAnalyticsService() {
+    return this.analyticsService;
   }
 
   getCampaignService() {

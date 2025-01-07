@@ -1,59 +1,59 @@
 import React from 'react';
-import useEventService from './useEventService';
+import useAnalyticsService from './useAnalyticsService';
 import type { AnalyticsData } from '../services/analyticsService';
 
 function useAnalytics() {
-  const eventService = useEventService();
+  const analyticsService = useAnalyticsService();
 
   const trackEvent = React.useCallback(
     (action: string, extraData?: Record<string | number, unknown>) => {
       try {
-        void eventService.trackEvent(action, extraData);
+        void analyticsService.trackEvent(action, extraData);
       } catch {}
     },
-    [eventService]
+    [analyticsService]
   );
 
   const setPeopleProperty = React.useCallback(
     (properties: AnalyticsData) => {
-      eventService.setPeopleProperty(properties);
+      analyticsService.setPeopleProperty(properties);
     },
-    [eventService]
+    [analyticsService]
   );
 
   const setOnceProperty = React.useCallback(
     (properties: AnalyticsData) => {
-      eventService.setOnceProperty(properties);
+      analyticsService.setOnceProperty(properties);
     },
-    [eventService]
+    [analyticsService]
   );
 
   const unsetProperty = React.useCallback(
     (propertyName: string | string[]) => {
-      eventService.unsetProperty(propertyName);
+      analyticsService.unsetProperty(propertyName);
     },
-    [eventService]
+    [analyticsService]
   );
 
   const incrementProperty = React.useCallback(
     (properties: AnalyticsData) => {
-      eventService.incrementProperty(properties);
+      analyticsService.incrementProperty(properties);
     },
-    [eventService]
+    [analyticsService]
   );
 
   const appendProperty = React.useCallback(
     (properties: AnalyticsData) => {
-      eventService.appendProperty(properties);
+      analyticsService.appendProperty(properties);
     },
-    [eventService]
+    [analyticsService]
   );
 
   const unionProperty = React.useCallback(
     (properties: AnalyticsData) => {
-      eventService.unionProperty(properties);
+      analyticsService.unionProperty(properties);
     },
-    [eventService]
+    [analyticsService]
   );
 
   return {

@@ -13,7 +13,7 @@ export interface AnalyticsData {
   [key: string]: string | number | boolean | string[] | number[] | Record<string, unknown>;
 }
 
-export default class EventService {
+export default class AnalyticsService {
   providerService: ProviderService;
 
   accountService: AccountService;
