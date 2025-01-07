@@ -1,5 +1,5 @@
 import { generateCalendarLinks, LinkType } from '@common/utils/calendar/calendar';
-import useTrackEvent from '@hooks/useTrackEvent';
+import useAnalytics from '@hooks/useAnalytics';
 import { DateTime } from 'luxon';
 import React from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -76,7 +76,7 @@ const generateCalendarInfo = (intl: ReturnType<typeof useIntl>) => ({
 const GuardianListSubscribeModal = ({ isOpen, onClose }: GuardianListSubscribeModalProps) => {
   const intl = useIntl();
   const [anchorWithdrawButton, setAnchorWithdrawButton] = React.useState<null | HTMLElement>(null);
-  const trackEvent = useTrackEvent();
+  const { trackEvent } = useAnalytics();
 
   const onClick = (linkType: LinkType) => {
     generateCalendarLinks(linkType, generateCalendarInfo(intl));
