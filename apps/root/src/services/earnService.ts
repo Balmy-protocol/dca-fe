@@ -621,9 +621,11 @@ export class EarnService extends EventsManager<EarnServiceData> {
     amount,
     permitSignature,
     permissionSignature,
+    asset,
   }: {
     earnPositionId: SdkEarnPositionId;
     amount: bigint;
+    asset: Token;
     permitSignature?: PermitData['permitData'] & { signature: Hex };
     permissionSignature?: EarnPermissionData['permitData'] & { signature: Hex };
   }) {
@@ -642,14 +644,14 @@ export class EarnService extends EventsManager<EarnServiceData> {
       ? {
           permitData: {
             amount,
-            token: strategy.farm.asset.address,
+            token: asset.address,
             nonce: permitSignature.nonce,
             deadline: BigInt(permitSignature.deadline),
           },
           signature: permitSignature.signature,
         }
       : {
-          token: strategy.farm.asset.address,
+          token: asset.address,
           amount: amount,
         };
 
@@ -681,12 +683,14 @@ export class EarnService extends EventsManager<EarnServiceData> {
     user,
     strategyId,
     amount,
+    asset,
     permitSignature,
     tosSignature,
   }: {
     strategyId: StrategyId;
     user: Address;
     amount: bigint;
+    asset: Token;
     permitSignature?: PermitData['permitData'] & { signature: Hex };
     tosSignature?: Hex;
   }) {
@@ -700,14 +704,14 @@ export class EarnService extends EventsManager<EarnServiceData> {
       ? {
           permitData: {
             amount,
-            token: strategy.farm.asset.address,
+            token: asset.address,
             nonce: permitSignature.nonce,
             deadline: BigInt(permitSignature.deadline),
           },
           signature: permitSignature.signature,
         }
       : {
-          token: strategy.farm.asset.address,
+          token: asset.address,
           amount: amount,
         };
 
@@ -1540,5 +1544,11 @@ export class EarnService extends EventsManager<EarnServiceData> {
     }
 
     this.userStrategies = userStrategies;
+  }
+
+  async transformVaultTokensToUnderlying(tokens: { token: Token; amount: bigint }[]) {
+    const response = await this.meanApiService.transformTokensToUnderlying(tokens);
+    const underlyingTokens = response.data.underlying;
+    return underlyingTokens;
   }
 }

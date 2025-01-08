@@ -17,12 +17,14 @@ const StyledOneClickMigrationCard = styled(ContainerBox).attrs(() => ({ gap: 2, 
     background-color: ${colors[mode].background.secondary};
     border: 1.5px solid ${colors[mode].semantic.informative.primary};
     border-radius: ${spacing(2)};
+    max-width: 532px;
+    align-self: center;
   `}
 `;
 
 const OneClickMigrationCard = () => {
   const mode = useThemeMode();
-  const tokensWithBalance = useAvailableDepositTokens();
+  const tokensWithBalance = useAvailableDepositTokens({ filterSmallValues: true });
   const [open, setOpen] = React.useState(false);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleOpenVaults = () => {

@@ -30,6 +30,9 @@ export const getImpactedTokensByTxType = (tx: TransactionDetails, positions: Pos
 
     case TransactionTypes.earnCreate:
     case TransactionTypes.earnIncrease:
+      if (tx.typeData.depositAsset) {
+        return [tx.typeData.asset, tx.typeData.depositAsset];
+      }
       return [tx.typeData.asset];
     case TransactionTypes.earnWithdraw:
       return tx.typeData.withdrawn.map((withdrawn) => withdrawn.token);

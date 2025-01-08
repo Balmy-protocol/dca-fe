@@ -1,7 +1,7 @@
 import { formatCurrencyAmount, formatUsdAmount } from '@common/utils/currency';
 import TokenIcon from '@common/components/token-icon';
 import { FarmWithAvailableDepositTokens } from '@hooks/earn/useAvailableDepositTokens';
-import { Strategy } from 'common-types';
+import { Strategy, Token } from 'common-types';
 import React from 'react';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
@@ -26,6 +26,7 @@ import {
 import { getLogoURL } from '@common/utils/urlParser';
 import { FeeItem } from '@pages/strategy-guardian-detail/vault-data/components/data-about';
 import { PROMOTED_STRATEGIES_IDS } from '@constants/earn';
+import { isNil } from 'lodash';
 
 const StyledTitleDataContainer = styled(ContainerBox).attrs({
   gap: 1,
@@ -159,7 +160,13 @@ const StrategyItem = ({ strategy, selected, onSelect }: StrategyItemProps) => {
   );
 };
 interface OneClickMigrationConfirmMigrationContentProps {
-  onGoToStrategy: (strategy: Strategy) => void;
+  onGoToStrategy: (
+    strategy: Strategy,
+    token: Token,
+    depositAmount: string,
+    underlyingAmount: string,
+    underlyingToken: Token
+  ) => void;
   onGoBack: () => void;
   selectedFarm: Nullable<FarmWithAvailableDepositTokens>;
 }
@@ -177,21 +184,60 @@ const OneClickMigrationConfirmMigrationContent = ({
     onGoBack();
   };
   const handleOnGoToStrategy = React.useCallback(() => {
-    if (!selectedStrategy) {
+    if (!selectedStrategy || !selectedFarm) {
       return;
     }
-    onGoToStrategy(selectedStrategy);
-  }, [onGoToStrategy, selectedStrategy]);
+    onGoToStrategy(
+      selectedStrategy,
+      selectedFarm.token,
+      selectedFarm.balance.amountInUnits.toString(),
+      selectedFarm.underlyingAmount.amountInUnits.toString(),
+      selectedFarm.underlying
+    );
+  }, [onGoToStrategy, selectedStrategy, selectedFarm]);
 
   if (!selectedFarm) {
     return null;
   }
 
-  React.useEffect(() => {
-    if (selectedFarm.strategies.length === 1) {
-      setSelectedStrategy(selectedFarm.strategies[0]);
-    }
+  const amountToMigrate = selectedFarm.underlyingAmount || selectedFarm.balance;
+  const tokenToMigrate = selectedFarm.underlying || selectedFarm.token;
+
+  const strategies = React.useMemo(() => {
+    const nonGuardianStrategies = selectedFarm.strategies.filter((strategy) => !strategy.guardian?.name);
+    const reducedFarms = selectedFarm.strategies
+      .filter((strategy) => !!strategy.guardian?.name)
+      .reduce<Record<string, Strategy>>((acc, strategy) => {
+        // This use case will not happen but typescript is not smart enough to know that
+        if (!strategy.guardian?.name) {
+          return acc;
+        }
+
+        if (acc[strategy.guardian.name]) {
+          const existingStrategy = acc[strategy.guardian.name];
+          const isStrategyGreaterTier =
+            (isNil(existingStrategy.needsTier) && !isNil(strategy.needsTier)) ||
+            Number(strategy.needsTier) > Number(existingStrategy.needsTier);
+          // If the strategy has a higher APY, we want to keep it
+          if (existingStrategy.farm.apy < strategy.farm.apy || isStrategyGreaterTier) {
+            // eslint-disable-next-line no-param-reassign
+            acc[strategy.guardian.name] = strategy;
+          }
+        } else {
+          // eslint-disable-next-line no-param-reassign
+          acc[strategy.guardian.name] = strategy;
+        }
+        return acc;
+      }, {});
+
+    return Object.values(reducedFarms).concat(nonGuardianStrategies);
   }, [selectedFarm]);
+
+  React.useEffect(() => {
+    if (strategies.length === 1) {
+      setSelectedStrategy(strategies[0]);
+    }
+  }, [strategies]);
 
   return (
     <ContainerBox flexDirection="column" gap={6}>
@@ -237,11 +283,11 @@ const OneClickMigrationConfirmMigrationContent = ({
               />
             </StyledTitleData>
             <ContainerBox gap={2} alignItems="center">
-              <TokenIcon token={selectedFarm.token} size={6} withShadow />
+              <TokenIcon token={tokenToMigrate} size={6} withShadow />
               <StyledTitleDataValue>
                 {formatCurrencyAmount({
-                  amount: selectedFarm.balance.amount,
-                  token: selectedFarm.token,
+                  amount: amountToMigrate.amount,
+                  token: tokenToMigrate,
                   intl,
                 })}
               </StyledTitleDataValue>
@@ -249,7 +295,7 @@ const OneClickMigrationConfirmMigrationContent = ({
                 ($
                 {formatUsdAmount({
                   intl,
-                  amount: selectedFarm.balance.amountInUSD,
+                  amount: amountToMigrate.amountInUSD,
                 })}
                 )
               </StyledTitleDataValue>
@@ -279,7 +325,7 @@ const OneClickMigrationConfirmMigrationContent = ({
         </Typography>
       </ContainerBox>
       <ContainerBox flexDirection="column" gap={2}>
-        {selectedFarm.strategies.map((strategy) => (
+        {strategies.map((strategy) => (
           <StrategyItem
             key={strategy.id}
             strategy={strategy}

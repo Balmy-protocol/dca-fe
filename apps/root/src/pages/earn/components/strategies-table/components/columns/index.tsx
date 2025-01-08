@@ -381,15 +381,15 @@ export const migrationOptionsColumnConfigs: StrategyColumnConfig<StrategiesTable
     label: <FormattedMessage description="earn.one-click-migration-modal.column.token" defaultMessage="Amount" />,
     renderCell: (data) => (
       <TokenAmount
-        token={data.token}
-        amount={data.balance}
+        token={data.underlying || data.token}
+        amount={data.underlyingAmount || data.balance}
         showIcon={false}
         amountTypographyVariant="bodySmallRegular"
         usdPriceTypographyVariant="labelRegular"
         gap={0.5}
       />
     ),
-    getOrderValue: (data) => Number(data.balance.amountInUSD),
+    getOrderValue: (data) => Number(data.underlyingAmount.amountInUSD) || Number(data.balance.amountInUSD),
   },
   {
     key: StrategyColumnKeys.SINGLE_WALLET,

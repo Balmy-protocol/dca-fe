@@ -99,6 +99,7 @@ export interface TransactionActionApproveTokenData {
   defaultApproval?: AllowanceType;
   help?: string;
   isPermit2Enabled?: boolean;
+  allowsExactApproval?: boolean;
 }
 
 export enum SignStatus {

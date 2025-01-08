@@ -144,7 +144,9 @@ const DataCards = ({ strategy, dataCardsGap = 4, variant = DataCardVariants.Deta
                 description="earn.strategy-details.vault-data.required-tier"
               />
             }
-            content={loading ? <SkeletonDataCard /> : <TierIcon size="1.5rem" />}
+            content={
+              loading ? <SkeletonDataCard /> : <TierIcon size={variant === DataCardVariants.Home ? '1.5rem' : '2rem'} />
+            }
             info={
               <FormattedMessage
                 defaultMessage="The minimum tier required to access this vault."

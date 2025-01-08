@@ -12,6 +12,7 @@ import { WithdrawType } from 'common-types';
 import { getDelayedWithdrawals } from '@common/utils/earn/parsing';
 import LockedDeposit from './components/locked-deposit';
 import useTierLevel from '@hooks/tiers/useTierLevel';
+import { useEarnManagementState } from '@state/earn-management/hooks';
 
 const StyledBackgroundPaper = styled(BackgroundPaper).attrs({ variant: 'outlined', elevation: 0 })`
   ${({ theme: { spacing } }) => `
@@ -46,6 +47,7 @@ const StrategyManagement = ({ chainId, strategyGuardianId }: StrategyManagementP
   const { tierLevel } = useTierLevel();
 
   const needsTier = strategy?.needsTier;
+  const { asset } = useEarnManagementState();
 
   const delayedWithdrawalsCount = React.useMemo(
     () =>
@@ -57,8 +59,8 @@ const StrategyManagement = ({ chainId, strategyGuardianId }: StrategyManagementP
   );
 
   React.useEffect(() => {
-    if (strategy?.asset) dispatch(setAsset(strategy.asset));
-  }, [strategy?.asset]);
+    if (strategy?.asset && !asset) dispatch(setAsset(strategy.asset));
+  }, [strategy?.asset?.address, asset]);
 
   const hasAssetDelayedWithdrawal = strategy?.asset.withdrawTypes.includes(WithdrawType.DELAYED);
 
