@@ -25,7 +25,7 @@ export type FarmWithAvailableDepositTokens = {
 
 export type FarmsWithAvailableDepositTokens = FarmWithAvailableDepositTokens[];
 
-const useAvailableDepositTokens = () => {
+const useAvailableDepositTokens = ({ filterSmallValues = false }: { filterSmallValues?: boolean } = {}) => {
   const strategies = useAllStrategies();
 
   const allBalances = useAllBalances();
@@ -68,7 +68,14 @@ const useAvailableDepositTokens = () => {
           return false;
         }
 
-        const walletBalances = Object.entries(tokenBalances.balances).filter(([, balance]) => balance > 0n);
+        const price = tokenBalances.price;
+        const walletBalances = Object.entries(tokenBalances.balances).filter(([, balance]) => {
+          if (filterSmallValues) {
+            const amountInUSD = parseUsdPrice(token, balance, parseNumberUsdPriceToBigInt(price));
+            return amountInUSD > 1;
+          }
+          return balance > 0n;
+        });
 
         return walletBalances.length > 0;
       })

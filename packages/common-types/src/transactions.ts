@@ -162,6 +162,8 @@ export interface EarnCreateTypeData {
   typeData: {
     asset: Token;
     assetAmount: string;
+    depositAsset?: Token;
+    depositAssetAmount?: string;
     positionId?: SdkEarnPositionId;
     strategyId: StrategyId;
     vault: Lowercase<Address>;
@@ -176,6 +178,8 @@ export interface EarnIncreaseTypeData {
     positionId: SdkEarnPositionId;
     strategyId: StrategyId;
     signedPermit: boolean;
+    depositAsset?: Token;
+    depositAssetAmount?: string;
   };
 }
 

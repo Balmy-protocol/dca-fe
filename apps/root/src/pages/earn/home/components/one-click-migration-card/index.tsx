@@ -24,7 +24,7 @@ const StyledOneClickMigrationCard = styled(ContainerBox).attrs(() => ({ gap: 2, 
 
 const OneClickMigrationCard = () => {
   const mode = useThemeMode();
-  const tokensWithBalance = useAvailableDepositTokens();
+  const tokensWithBalance = useAvailableDepositTokens({ filterSmallValues: true });
   const [open, setOpen] = React.useState(false);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleOpenVaults = () => {

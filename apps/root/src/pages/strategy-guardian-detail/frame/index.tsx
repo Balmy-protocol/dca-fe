@@ -44,7 +44,7 @@ const StrategyDetailFrame = () => {
 
   React.useEffect(() => {
     dispatch(changeRoute(EARN_PORTFOLIO.key));
-    // dispatch(resetEarnForm());
+    dispatch(resetEarnForm());
     trackEvent('Earn - Visit strategy detail page', { chainId });
   }, []);
 
