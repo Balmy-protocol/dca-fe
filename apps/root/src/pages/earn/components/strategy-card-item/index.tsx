@@ -90,7 +90,7 @@ const StrategyCardItem = ({ strategy, variant, tierLevel }: SugestedStrategyCard
           <FormattedMessage description="earn.strategy-card.button" defaultMessage="View Vault" />
         </Typography>
       </StyledLink>
-      {condition === StrategyConditionType.PROMOTED && <PromotedFlag isCard />}
+      {condition === StrategyConditionType.PROMOTED && <PromotedFlag isCard tier={strategy.needsTier} />}
     </StyledCard>
   );
 };

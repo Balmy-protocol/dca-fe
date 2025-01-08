@@ -89,13 +89,14 @@ const StyledTableRow = styled(TableRow)<{ $condition?: StrategyConditionType }>`
 
 interface StyledTierBadgeProps {
   CurrentTierBadge: React.ElementType;
+  isPromoted?: boolean;
 }
 const StyledTierBadge = styled(({ CurrentTierBadge, ...props }: StyledTierBadgeProps) => (
   <CurrentTierBadge {...props} size="1.5rem" />
 ))`
   position: absolute;
   z-index: 1;
-  top: 50%;
+  top: ${({ isPromoted }) => (isPromoted ? '65%' : '50%')};
   left: 0;
   transform: translate(-50%, -50%);
 `;
@@ -258,8 +259,8 @@ const Row = <T extends StrategiesTableVariants>({
       {columns.map((column, i) => (
         <Hidden {...column.hiddenProps} key={`${strategy.id}-${column.key}`}>
           <StyledBodyTableCell key={`${strategy.id}-${column.key}`} $hasCondition={!!condition && i === 0}>
-            {condition === StrategyConditionType.PROMOTED && i === 0 && <PromotedFlag />}
-            {condition === StrategyConditionType.LOCKED && i === 0 && <StyledTierBadge CurrentTierBadge={TierIcon} />}
+            {isPromoted && i === 0 && <PromotedFlag tier={needsTier} />}
+            {isLocked && i === 0 && <StyledTierBadge isPromoted={isPromoted} CurrentTierBadge={TierIcon} />}
             {renderBodyCell(column.renderCell(rowData, showBalances))}
           </StyledBodyTableCell>
         </Hidden>

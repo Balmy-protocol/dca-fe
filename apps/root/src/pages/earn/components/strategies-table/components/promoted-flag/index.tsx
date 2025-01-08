@@ -1,5 +1,5 @@
 import React from 'react';
-import { FormattedMessage } from 'react-intl';
+import { defineMessage, MessageDescriptor, useIntl } from 'react-intl';
 import styled from 'styled-components';
 import { baseColors, colors, ContainerBox, TrendUpIcon, Typography } from 'ui-library';
 
@@ -44,16 +44,40 @@ const TriangleBehindFlag = styled.div`
   `}
 `;
 
-const PromotedFlag = ({ isCard }: { isCard?: boolean }) => (
-  <StyledPromotedFlagContainer $isCard={isCard}>
-    <StyledPromotedFlag $isCard={isCard}>
-      <TrendUpIcon sx={{ color: baseColors.white, fontSize: isCard ? '1.125rem' : '0.75rem' }} />
-      <Typography variant={isCard ? 'bodySmallRegular' : 'bodyExtraExtraSmall'} color={baseColors.white}>
-        <FormattedMessage description="earn.strategies-table.promoted-flag" defaultMessage="Promoted" />
-      </Typography>
-    </StyledPromotedFlag>
-    <TriangleBehindFlag />
-  </StyledPromotedFlagContainer>
-);
+const PROMOTED_STRINGS: Record<number, MessageDescriptor> = {
+  1: defineMessage({
+    description: 'earn.strategies-table.promoted-flag.tier-1',
+    defaultMessage: '25% less fees',
+  }),
+  2: defineMessage({
+    description: 'earn.strategies-table.promoted-flag.tier-2',
+    defaultMessage: '50% less fees',
+  }),
+  3: defineMessage({
+    description: 'earn.strategies-table.promoted-flag.tier-3',
+    defaultMessage: 'ZERO fees',
+  }),
+};
+
+const DEFAULT_PROMOTED_MESSAGE = defineMessage({
+  id: 'earn.strategies-table.promoted-flag',
+  defaultMessage: 'Promoted',
+});
+
+const PromotedFlag = ({ isCard, tier }: { isCard?: boolean; tier?: number }) => {
+  const intl = useIntl();
+  const message = tier ? PROMOTED_STRINGS[tier] : DEFAULT_PROMOTED_MESSAGE;
+  return (
+    <StyledPromotedFlagContainer $isCard={isCard}>
+      <StyledPromotedFlag $isCard={isCard}>
+        <TrendUpIcon sx={{ color: baseColors.white, fontSize: isCard ? '1.125rem' : '0.75rem' }} />
+        <Typography variant={isCard ? 'bodySmallRegular' : 'bodyExtraExtraSmall'} color={baseColors.white}>
+          {intl.formatMessage(message)}
+        </Typography>
+      </StyledPromotedFlag>
+      <TriangleBehindFlag />
+    </StyledPromotedFlagContainer>
+  );
+};
 
 export default PromotedFlag;
