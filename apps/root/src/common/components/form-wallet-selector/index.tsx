@@ -1,5 +1,5 @@
 import useAccountService from '@hooks/useAccountService';
-import useTrackEvent from '@hooks/useTrackEvent';
+import useAnalytics from '@hooks/useAnalytics';
 import useWallets from '@hooks/useWallets';
 import React from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -63,7 +63,7 @@ interface FormWalletSelectorProps {
 }
 
 const FormWalletSelector = ({ filter, chipDescription, overrideUsdBalances }: FormWalletSelectorProps) => {
-  const trackEvent = useTrackEvent();
+  const { trackEvent } = useAnalytics();
   const accountService = useAccountService();
   const wallets = useWallets();
   const { isLoading, usdBalances } = useUsdBalances(filter);

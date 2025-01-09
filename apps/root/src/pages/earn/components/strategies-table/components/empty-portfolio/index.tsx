@@ -1,6 +1,6 @@
 import { EARN_ROUTE } from '@constants/routes';
 import usePushToHistory from '@hooks/usePushToHistory';
-import useTrackEvent from '@hooks/useTrackEvent';
+import useAnalytics from '@hooks/useAnalytics';
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
@@ -18,7 +18,7 @@ const StyledEmptyPortfolioContent = styled(ContainerBox).attrs({
 
 const EmptyPortfolio = ({ contained = false }: { contained?: boolean }) => {
   const pushToHistory = usePushToHistory();
-  const trackEvent = useTrackEvent();
+  const { trackEvent } = useAnalytics();
 
   const onExploreVaults = () => {
     pushToHistory(`/${EARN_ROUTE.key}`);

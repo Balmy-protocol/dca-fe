@@ -1,6 +1,6 @@
 import useTierLevel from '@hooks/tiers/useTierLevel';
 import usePrevious from '@hooks/usePrevious';
-import useTrackEvent from '@hooks/useTrackEvent';
+import useAnalytics from '@hooks/useAnalytics';
 import { TIER_LEVEL_OPTIONS, TIER_LEVEL_UP_REWARDS } from '@pages/tier-view/constants';
 import React from 'react';
 import { useIntl, defineMessage, FormattedMessage } from 'react-intl';
@@ -22,7 +22,7 @@ const LevelUpModal = ({}) => {
   const intl = useIntl();
   const { tierLevel } = useTierLevel();
   const previousTierLevel = usePrevious(tierLevel);
-  const trackEvent = useTrackEvent();
+  const { trackEvent } = useAnalytics();
   const [isOpen, setIsOpen] = React.useState(false);
 
   React.useEffect(() => {

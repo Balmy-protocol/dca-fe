@@ -23,7 +23,7 @@ import { getProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import useRawUsdPrice from '@hooks/useUsdRawPrice';
 import { formatCurrencyAmount, parseUsdPrice } from '@common/utils/currency';
 import { useAggregatorSettingsState } from '@state/aggregator-settings/hooks';
-import useTrackEvent from '@hooks/useTrackEvent';
+import useAnalytics from '@hooks/useAnalytics';
 import { useThemeMode } from '@state/config/hooks';
 import { isUndefined } from 'lodash';
 import useTransactionReceipt from '@hooks/useTransactionReceipt';
@@ -72,7 +72,7 @@ const TransactionConfirmation = ({
   const aggregatorService = useAggregatorService();
   const [fromPrice] = useRawUsdPrice(from);
   const [toPrice] = useRawUsdPrice(to);
-  const trackEvent = useTrackEvent();
+  const { trackEvent } = useAnalytics();
   const mode = useThemeMode();
   const receipt = useTransactionReceipt({ transaction, mergeTransactionsWithSameHash: true });
   // Transaction receipt will exist by the time the transaction is confirmed

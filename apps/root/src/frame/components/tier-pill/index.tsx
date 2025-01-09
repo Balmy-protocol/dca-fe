@@ -6,7 +6,7 @@ import { ActiveTiersIcons, AnimatedChevronRightIcon, colors, ContainerBox, Typog
 import { TIER_LEVEL_OPTIONS } from '@pages/tier-view/constants';
 import { FormattedMessage, useIntl } from 'react-intl';
 import usePushToHistory from '@hooks/usePushToHistory';
-import useTrackEvent from '@hooks/useTrackEvent';
+import useAnalytics from '@hooks/useAnalytics';
 
 const StyledTierPill = styled(ContainerBox).attrs({ gap: 2, alignItems: 'center' })<{ $needsToVerifyWallets: boolean }>`
   ${({
@@ -91,7 +91,7 @@ const TierPill = () => {
   const { hasEarnAccess } = useEarnAccess();
   const [hovered, setHovered] = React.useState(false);
   const pushToHistory = usePushToHistory();
-  const trackEvent = useTrackEvent();
+  const { trackEvent } = useAnalytics();
 
   if (!hasEarnAccess) {
     return null;

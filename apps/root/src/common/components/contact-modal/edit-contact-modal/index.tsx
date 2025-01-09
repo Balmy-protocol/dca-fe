@@ -6,7 +6,7 @@ import { ContactListActiveModal } from '..';
 import useStoredLabels from '@hooks/useStoredLabels';
 import useEditLabel from '@hooks/useEditLabel';
 import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
-import useTrackEvent from '@hooks/useTrackEvent';
+import useAnalytics from '@hooks/useAnalytics';
 
 interface AddContactModalProps {
   contact: Contact;
@@ -19,7 +19,7 @@ const EditContactModal = ({ contact, setActiveModal, goBack }: AddContactModalPr
   const [contactLabel, setContactLabel] = React.useState(storedLabels[contact.address]?.label || '');
   const { triggerUpdate, isLoading } = useEditLabel();
   const snackbar = useSnackbar();
-  const trackEvent = useTrackEvent();
+  const { trackEvent } = useAnalytics();
   const intl = useIntl();
 
   const onEditContact = async () => {

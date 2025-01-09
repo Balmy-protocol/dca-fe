@@ -16,7 +16,7 @@ import MeanApiService from './meanApiService';
 import ProviderService from './providerService';
 import ContractService from './contractService';
 import SdkService from './sdkService';
-import EventService from './eventService';
+import AnalyticsService from './analyticsService';
 import WalletService from './walletService';
 
 export default class SimulationService {
@@ -28,7 +28,7 @@ export default class SimulationService {
 
   sdkService: SdkService;
 
-  eventService: EventService;
+  analyticsService: AnalyticsService;
 
   walletService: WalletService;
 
@@ -37,14 +37,14 @@ export default class SimulationService {
     providerService: ProviderService,
     contractService: ContractService,
     sdkService: SdkService,
-    eventService: EventService,
+    analyticsService: AnalyticsService,
     walletService: WalletService
   ) {
     this.meanApiService = meanApiService;
     this.providerService = providerService;
     this.contractService = contractService;
     this.sdkService = sdkService;
-    this.eventService = eventService;
+    this.analyticsService = analyticsService;
     this.walletService = walletService;
   }
 
@@ -116,10 +116,10 @@ export default class SimulationService {
     newQuotes.forEach((quote) => {
       if ('failed' in quote) {
         // eslint-disable-next-line no-void
-        void this.eventService.trackEvent('Aggregator - Transaction simulation error', { source: quote.source.id });
+        void this.analyticsService.trackEvent('Aggregator - Transaction simulation error', { source: quote.source.id });
       } else {
         // eslint-disable-next-line no-void
-        void this.eventService.trackEvent('Aggregator - Transaction simulation successfull', {
+        void this.analyticsService.trackEvent('Aggregator - Transaction simulation successfull', {
           source: quote.source.id,
         });
       }
@@ -185,10 +185,10 @@ export default class SimulationService {
     newQuotes.forEach((quote) => {
       if ('failed' in quote) {
         // eslint-disable-next-line no-void
-        void this.eventService.trackEvent('Aggregator - Transaction simulation error', { source: quote.source.id });
+        void this.analyticsService.trackEvent('Aggregator - Transaction simulation error', { source: quote.source.id });
       } else {
         // eslint-disable-next-line no-void
-        void this.eventService.trackEvent('Aggregator - Transaction simulation successfull', {
+        void this.analyticsService.trackEvent('Aggregator - Transaction simulation successfull', {
           source: quote.source.id,
         });
       }

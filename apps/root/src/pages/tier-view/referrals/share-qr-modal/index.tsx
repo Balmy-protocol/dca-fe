@@ -1,4 +1,4 @@
-import useTrackEvent from '@hooks/useTrackEvent';
+import useAnalytics from '@hooks/useAnalytics';
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
@@ -20,7 +20,7 @@ const StyledImage = styled.img`
 `;
 
 const ShareQRModal = ({ isOpen, onClose, inviteCode }: ShareQRModalProps) => {
-  const trackEvent = useTrackEvent();
+  const { trackEvent } = useAnalytics();
   const [qrCodeDataUri, setQrCodeDataUri] = React.useState<string | null>(null);
   const mode = useThemeMode();
 

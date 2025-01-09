@@ -8,7 +8,7 @@ import { changeRoute } from '@state/tabs/actions';
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
 import { fetchPositionAndTokenPrices } from '@state/position-details/actions';
 import { usePositionDetails } from '@state/position-details/hooks';
-import useTrackEvent from '@hooks/useTrackEvent';
+import useAnalytics from '@hooks/useAnalytics';
 import usePushToHistory from '@hooks/usePushToHistory';
 import PositionNotFound from '../components/position-not-found';
 import PositionControls from '../components/position-summary-controls';
@@ -26,7 +26,7 @@ const PositionDetailFrame = () => {
   }>();
   const pushToHistory = usePushToHistory();
   const dispatch = useAppDispatch();
-  const trackEvent = useTrackEvent();
+  const { trackEvent } = useAnalytics();
   const intl = useIntl();
   const wallets = useWallets();
 

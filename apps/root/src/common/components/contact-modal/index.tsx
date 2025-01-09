@@ -22,7 +22,7 @@ import styled from 'styled-components';
 import useIsLoadingContactList from '@hooks/useIsLoadingContacts';
 import AddContactModal from './add-contact-modal';
 import EditContactModal from './edit-contact-modal';
-import useTrackEvent from '@hooks/useTrackEvent';
+import useAnalytics from '@hooks/useAnalytics';
 import useActiveWallet from '@hooks/useActiveWallet';
 
 const PARAGRAPH_MAX_WIDTH = '420px';
@@ -226,7 +226,7 @@ const ContactModal = ({
   const contactList = useStoredContactList();
   const [postContactStatus, setPostContactStatus] = React.useState<PostContactStatus>(PostContactStatus.NONE);
   const [editingContact, setEditingContact] = React.useState<Contact>();
-  const trackEvent = useTrackEvent();
+  const { trackEvent } = useAnalytics();
 
   const modalData = React.useMemo<
     Record<ContactListActiveModal, { title?: React.ReactElement; content: React.ReactElement }>

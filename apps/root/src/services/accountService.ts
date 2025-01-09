@@ -424,8 +424,8 @@ export default class AccountService extends EventsManager<AccountServiceData> {
       }
 
       try {
-        void this.web3Service.eventService.identifyUser(this.user.id);
-        void this.web3Service.eventService.trackEvent('User sign in', {
+        void this.web3Service.analyticsService.identifyUser(this.user.id);
+        void this.web3Service.analyticsService.trackEvent('User sign in', {
           with: wallet?.address,
         });
       } catch {}
@@ -434,8 +434,8 @@ export default class AccountService extends EventsManager<AccountServiceData> {
     } else {
       await this.createUser({ label: 'Personal', signature: storedSignature, wallet });
       try {
-        void this.web3Service.eventService.identifyUser(this.user?.id);
-        void this.web3Service.eventService.trackEvent('User sign up', {
+        void this.web3Service.analyticsService.identifyUser(this.user?.id);
+        void this.web3Service.analyticsService.trackEvent('User sign up', {
           with: wallet?.address,
         });
       } catch {}

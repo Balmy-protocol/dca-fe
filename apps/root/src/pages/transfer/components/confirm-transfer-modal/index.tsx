@@ -28,7 +28,7 @@ import { PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import { useTransactionAdder } from '@state/transactions/hooks';
 import { deserializeError, shouldTrackError } from '@common/utils/errors';
 import useErrorService from '@hooks/useErrorService';
-import useTrackEvent from '@hooks/useTrackEvent';
+import useAnalytics from '@hooks/useAnalytics';
 import useStoredContactList from '@hooks/useStoredContactList';
 import { trimAddress } from '@common/utils/parsing';
 
@@ -59,7 +59,7 @@ const ConfirmTransferModal = ({
   const [, setModalLoading, setModalError, setModalClosed] = useTransactionModal();
   const addTransaction = useTransactionAdder();
   const errorService = useErrorService();
-  const trackEvent = useTrackEvent();
+  const { trackEvent, trackTransfer } = useAnalytics();
   const contacts = useStoredContactList();
   const isRecipientContact = contacts.find(({ address }) => address.toLowerCase() === (recipient || '').toLowerCase());
 
@@ -129,6 +129,12 @@ const ConfirmTransferModal = ({
         isRecipientContact,
         amountInUsd: parsedAmountsOfToken.amountInUSD,
         amount: parsedAmountsOfToken.amountInUnits,
+      });
+
+      trackTransfer({
+        chainId: network.chainId,
+        asset: parsedToken,
+        amountInUsd: parsedAmountsOfToken.amountInUSD,
       });
 
       const transactionTypeData: TransferTokenTypeData = {

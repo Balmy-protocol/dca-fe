@@ -7,7 +7,7 @@ import { formatUnits, parseUnits } from 'viem';
 import useSelectedNetwork from '@hooks/useSelectedNetwork';
 import useIsPermit2Enabled from '@hooks/useIsPermit2Enabled';
 import { useAppDispatch } from '@hooks/state';
-import useTrackEvent from '@hooks/useTrackEvent';
+import useAnalytics from '@hooks/useAnalytics';
 import { setFromValue, setToValue } from '@state/aggregator/actions';
 import QuoteData from '../quote-data';
 import TransferTo from '../transfer-to';
@@ -85,7 +85,7 @@ const SwapFirstStep = ({
 }: SwapFirstStepProps) => {
   const intl = useIntl();
   const dispatch = useAppDispatch();
-  const trackEvent = useTrackEvent();
+  const { trackEvent } = useAnalytics();
   const [transactionWillFail, setTransactionWillFail] = React.useState(false);
   const prices = usePortfolioPrices(compact([from, to]));
 

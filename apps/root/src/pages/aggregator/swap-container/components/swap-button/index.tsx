@@ -20,7 +20,7 @@ import useActiveWallet from '@hooks/useActiveWallet';
 import useOpenConnectModal from '@hooks/useOpenConnectModal';
 import useWallets from '@hooks/useWallets';
 import { getDisplayWallet } from '@common/utils/parsing';
-import useTrackEvent from '@hooks/useTrackEvent';
+import useAnalytics from '@hooks/useAnalytics';
 import { WalletActionType } from '@services/accountService';
 
 interface SwapButtonProps {
@@ -63,7 +63,7 @@ const SwapButton = ({
   const reconnectingWallet = activeWallet || find(wallets, { isAuth: true });
   const reconnectingWalletDisplay = getDisplayWallet(reconnectingWallet);
   const openConnectModal = useOpenConnectModal();
-  const trackEvent = useTrackEvent();
+  const { trackEvent } = useAnalytics();
 
   const shouldDisableApproveButton =
     !from ||

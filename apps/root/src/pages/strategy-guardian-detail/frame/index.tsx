@@ -3,7 +3,7 @@ import { Grid, BackControl, ContainerBox } from 'ui-library';
 import { useParams, useLocation } from 'react-router-dom';
 import usePushToHistory from '@hooks/usePushToHistory';
 import { useAppDispatch } from '@state/hooks';
-import useTrackEvent from '@hooks/useTrackEvent';
+import useAnalytics from '@hooks/useAnalytics';
 import { defineMessage, useIntl } from 'react-intl';
 import { changeRoute } from '@state/tabs/actions';
 import { EARN_PORTFOLIO, EARN_ROUTE } from '@constants/routes';
@@ -35,7 +35,7 @@ const StrategyDetailFrame = () => {
   const pushToHistory = usePushToHistory();
   const earnService = useEarnService();
   const dispatch = useAppDispatch();
-  const trackEvent = useTrackEvent();
+  const { trackEvent } = useAnalytics();
   const intl = useIntl();
   const currentBreakpoint = useCurrentBreakpoint();
   const history = useLocation();

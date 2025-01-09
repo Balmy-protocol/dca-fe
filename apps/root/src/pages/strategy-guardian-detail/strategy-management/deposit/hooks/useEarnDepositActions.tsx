@@ -29,7 +29,7 @@ import {
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import findIndex from 'lodash/findIndex';
 import { Hash, parseUnits } from 'viem';
-import useTrackEvent from '@hooks/useTrackEvent';
+import useAnalytics from '@hooks/useAnalytics';
 import useActiveWallet from '@hooks/useActiveWallet';
 import usePermit2Service from '@hooks/usePermit2Service';
 import { shouldTrackError } from '@common/utils/errors';
@@ -51,7 +51,7 @@ const useEarnDepositActions = ({ strategy }: UseEarnDepositActionParams) => {
   const { asset: baseAsset, depositAsset, depositAmount, depositAssetAmount } = useEarnManagementState();
   const intl = useIntl();
   const activeWallet = useActiveWallet();
-  const trackEvent = useTrackEvent();
+  const { trackEvent, trackEarnDeposit } = useAnalytics();
   const errorService = useErrorService();
   const permit2Service = usePermit2Service();
   const walletService = useWalletService();
@@ -149,22 +149,33 @@ const useEarnDepositActions = ({ strategy }: UseEarnDepositActionParams) => {
         };
       }
 
-      try {
-        trackEvent(`Earn - ${hasPosition ? 'Increase' : 'Create'} position submitted`, {
-          asset: baseAsset.symbol,
-          strategy: strategy.id,
-          amount: depositAmount,
-          assetPrice: baseAsset.price,
-          amountInUsd: parseUsdPrice(
-            baseAsset,
-            parseUnits(depositAmount, baseAsset.decimals),
-            parseNumberUsdPriceToBigInt(baseAsset.price)
-          ),
-          isDeposit: !hasPosition,
-          isIncrease: hasPosition,
-          isMigration: baseAsset.address !== asset.address,
-        });
-      } catch {}
+      const parsedAmountInUSD = parseUsdPrice(
+        asset,
+        parseUnits(assetAmountInUnits, asset.decimals),
+        parseNumberUsdPriceToBigInt(asset.price)
+      );
+
+      trackEvent(`Earn - ${hasPosition ? 'Increase' : 'Create'} position submitted`, {
+        asset: baseAsset.symbol,
+        strategy: strategy.id,
+        amount: depositAmount,
+        assetPrice: baseAsset.price,
+        amountInUsd: parseUsdPrice(
+          baseAsset,
+          parseUnits(depositAmount, baseAsset.decimals),
+          parseNumberUsdPriceToBigInt(baseAsset.price)
+        ),
+        isDeposit: !hasPosition,
+        isIncrease: hasPosition,
+        isMigration: baseAsset.address !== asset.address,
+      });
+      trackEarnDeposit({
+        chainId: strategy.network.chainId,
+        asset,
+        strategy,
+        parsedAmountInUSD,
+        hasPosition: !!hasPosition,
+      });
 
       addTransaction(result, typeData);
 

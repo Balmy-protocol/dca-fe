@@ -5,7 +5,7 @@ import { StrategyColumnConfig } from '../strategies-table/components/columns';
 import StrategiesTable, { TableStrategy } from '../strategies-table';
 import StrategiesList from '../strategies-list';
 import usePushToHistory from '@hooks/usePushToHistory';
-import useTrackEvent from '@hooks/useTrackEvent';
+import useAnalytics from '@hooks/useAnalytics';
 import { useAppDispatch } from '@state/hooks';
 import { useTheme } from 'styled-components';
 import { Strategy } from 'common-types';
@@ -34,7 +34,7 @@ const StrategiesDisplayWrapper = <T extends StrategiesTableVariants>({
 }: StrategiesTableProps<T>) => {
   const [page, setPage] = React.useState(0);
   const pushToHistory = usePushToHistory();
-  const trackEvent = useTrackEvent();
+  const { trackEvent } = useAnalytics();
   const dispatch = useAppDispatch();
   const theme = useTheme();
 

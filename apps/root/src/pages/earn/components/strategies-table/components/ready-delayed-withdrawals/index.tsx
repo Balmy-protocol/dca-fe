@@ -20,7 +20,7 @@ import styled from 'styled-components';
 import { DelayWithdrawButtonIcon } from '../pending-delayed-withdrawals';
 import useOpenConnectModal from '@hooks/useOpenConnectModal';
 import { WalletActionType } from '@services/accountService';
-import useTrackEvent from '@hooks/useTrackEvent';
+import useAnalytics from '@hooks/useAnalytics';
 import useEarnClaimDelayedWithdrawAction from '@hooks/earn/useEarnClaimDelayedWithdrawAction';
 import { buildEtherscanTransaction } from '@common/utils/etherscan';
 import useEarnPositions from '@hooks/earn/useEarnPositions';
@@ -56,7 +56,7 @@ const ReadyDelayedWithdrawals = () => {
 
   const onClaimDelayedWithdraw = useEarnClaimDelayedWithdrawAction();
   const openConnectModal = useOpenConnectModal();
-  const trackEvent = useTrackEvent();
+  const { trackEvent } = useAnalytics();
   const showBalances = useShowBalances();
   const wallets = useWallets();
 

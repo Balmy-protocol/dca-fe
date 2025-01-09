@@ -4,7 +4,7 @@ import useTierLevel from '@hooks/tiers/useTierLevel';
 import useWalletAchievements from '@hooks/tiers/useWalletAchievements';
 import useAccountService from '@hooks/useAccountService';
 import useOpenConnectModal from '@hooks/useOpenConnectModal';
-import useTrackEvent from '@hooks/useTrackEvent';
+import useAnalytics from '@hooks/useAnalytics';
 import useWallets from '@hooks/useWallets';
 import { TIER_LEVEL_OPTIONS, TIER_LEVEL_UP_REWARDS } from '@pages/tier-view/constants';
 import { WalletActionType } from '@services/accountService';
@@ -378,7 +378,7 @@ const MultipleWalletsStep = ({
   const tierProgress = getTierProgress(missing);
   const accountService = useAccountService();
   const { enqueueSnackbar } = useSnackbar();
-  const trackEvent = useTrackEvent();
+  const { trackEvent } = useAnalytics();
   const openConnectModal = useOpenConnectModal();
 
   const onVerifyOwnership = React.useCallback(
@@ -498,7 +498,7 @@ const VerifyToLevelUpModal = ({ isOpen, onClose }: VerifyToLevelUpModalProps) =>
   const { enqueueSnackbar } = useSnackbar();
   const wallets = useWallets();
   const openConnectModal = useOpenConnectModal();
-  const trackEvent = useTrackEvent();
+  const { trackEvent } = useAnalytics();
   const [modalStep, setModalStep] = React.useState<ModalStep>(ModalStep.singleWallet);
 
   React.useEffect(() => {

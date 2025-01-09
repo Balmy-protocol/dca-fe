@@ -2,7 +2,7 @@ import { Chains } from '@balmy/sdk';
 import { NETWORKS } from '@constants';
 import { DCA_CREATE_ROUTE } from '@constants/routes';
 import usePushToHistory from '@hooks/usePushToHistory';
-import useTrackEvent from '@hooks/useTrackEvent';
+import useAnalytics from '@hooks/useAnalytics';
 import { useStoredNativeBalance } from '@state/balances/hooks';
 import { useAppDispatch } from '@state/hooks';
 import { changeRoute } from '@state/tabs/actions';
@@ -100,7 +100,7 @@ const NewsBanner = () => {
   const intl = useIntl();
   const dispatch = useAppDispatch();
   const pushToHistory = usePushToHistory();
-  const trackEvent = useTrackEvent();
+  const { trackEvent } = useAnalytics();
   const nativeBalances = useStoredNativeBalance(chainId);
 
   const text = intl.formatMessage(unformattedText);

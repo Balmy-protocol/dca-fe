@@ -4,7 +4,7 @@ import { FormattedMessage } from 'react-intl';
 import { Modal } from 'ui-library';
 import OneClickMigrationOptionsContent from './options-content';
 import usePushToHistory from '@hooks/usePushToHistory';
-import useTrackEvent from '@hooks/useTrackEvent';
+import useAnalytics from '@hooks/useAnalytics';
 import OneClickMigrationConfirmMigrationContent from './confirm-migration';
 import { Strategy, Token } from 'common-types';
 
@@ -22,7 +22,7 @@ const OneClickMigrationModal = ({ open, onClose }: OneClickMigrationModalProps) 
   const [step, setStep] = React.useState<OneClickMigrationModalStep>(OneClickMigrationModalStep.SELECT_VAULTS);
   const [selectedFarm, setSelectedFarm] = React.useState<FarmWithAvailableDepositTokens | null>(null);
   const pushToHistory = usePushToHistory();
-  const trackEvent = useTrackEvent();
+  const { trackEvent } = useAnalytics();
   const farms = useAvailableDepositTokens();
 
   const handleClose = React.useCallback(() => {

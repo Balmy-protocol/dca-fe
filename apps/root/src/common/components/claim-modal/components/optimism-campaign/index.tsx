@@ -16,7 +16,7 @@ import {
 } from 'ui-library';
 import ArrowRight from '@assets/svg/atom/arrow-right';
 import { FormattedMessage, useIntl } from 'react-intl';
-import useTrackEvent from '@hooks/useTrackEvent';
+import useAnalytics from '@hooks/useAnalytics';
 import useTransactionModal from '@hooks/useTransactionModal';
 import {
   useCampaignHasConfirmedTransaction,
@@ -96,7 +96,7 @@ interface ClaimItemProps {
 }
 
 const ClaimItem = ({ campaign }: ClaimItemProps) => {
-  const trackEvent = useTrackEvent();
+  const { trackEvent } = useAnalytics();
   const [, setModalLoading, setModalError, setModalClose] = useTransactionModal();
   const addTransaction = useTransactionAdder();
   const campaignService = useCampaignService();

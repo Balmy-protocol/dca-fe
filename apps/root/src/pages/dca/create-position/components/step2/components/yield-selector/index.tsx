@@ -13,7 +13,7 @@ import {
 } from 'ui-library';
 import { useCreatePositionState } from '@state/create-position/hooks';
 import { useAppDispatch } from '@state/hooks';
-import useTrackEvent from '@hooks/useTrackEvent';
+import useAnalytics from '@hooks/useAnalytics';
 import { setFromYield, setToYield } from '@state/create-position/actions';
 import { YieldOption, YieldOptions } from '@types';
 import YieldTokenSelector from '@common/components/yield-token-selector';
@@ -68,7 +68,7 @@ const YieldSelector = ({
   const { from, to, fromYield, toYield, frequencyType, frequencyValue, userHasChangedYieldOption } =
     useCreatePositionState();
   const dispatch = useAppDispatch();
-  const trackEvent = useTrackEvent();
+  const { trackEvent } = useAnalytics();
   const selectedNetwork = useSelectedNetwork();
   const intl = useIntl();
   const [isHelpExpanded, setHelpExpanded] = React.useState(false);

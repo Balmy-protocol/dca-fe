@@ -12,7 +12,7 @@ import { useNavigate } from 'react-router-dom';
 import { API_ERROR_MESSAGES, ApiErrorKeys } from '@constants';
 import useUser from '@hooks/useUser';
 import { UserStatus } from 'common-types';
-import useTrackEvent from '@hooks/useTrackEvent';
+import useAnalytics from '@hooks/useAnalytics';
 import usePositionService from '@hooks/usePositionService';
 import { processConfirmedTransactionsForDca, processConfirmedTransactionsForEarn } from '@state/transactions/actions';
 import useEarnService from '@hooks/earn/useEarnService';
@@ -32,7 +32,7 @@ const PromisesInitializer = () => {
   const fetchRef = React.useRef(true);
   const snackbar = useSnackbar();
   const navigate = useNavigate();
-  const trackEvent = useTrackEvent();
+  const { trackEvent } = useAnalytics();
   const { hasEarnAccess } = useEarnAccess();
 
   const handleError = React.useCallback(

@@ -11,7 +11,7 @@ import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/t
 import useWalletService from '@hooks/useWalletService';
 import { useAppDispatch } from '@state/hooks';
 import { setNetwork } from '@state/config/actions';
-import useTrackEvent from '@hooks/useTrackEvent';
+import useAnalytics from '@hooks/useAnalytics';
 import useOpenConnectModal from '@hooks/useOpenConnectModal';
 import { getDisplayWallet } from '@common/utils/parsing';
 import useDcaTokens from '@hooks/useDcaTokens';
@@ -60,7 +60,7 @@ const PositionCardButton = ({
   const dispatch = useAppDispatch();
   const isPending = !!pendingTransaction;
   const wrappedProtocolToken = getWrappedProtocolToken(positionNetwork.chainId);
-  const trackEvent = useTrackEvent();
+  const { trackEvent } = useAnalytics();
   const intl = useIntl();
 
   const onChangeNetwork = () => {

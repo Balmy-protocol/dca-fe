@@ -18,7 +18,7 @@ import { formatUsdAmount } from '@common/utils/currency';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 import usePushToHistory from '@hooks/usePushToHistory';
-import useTrackEvent from '@hooks/useTrackEvent';
+import useAnalytics from '@hooks/useAnalytics';
 import useEarnPositions from '@hooks/earn/useEarnPositions';
 import { getDelayedWithdrawals } from '@common/utils/earn/parsing';
 import { useShowBalances } from '@state/config/hooks';
@@ -69,7 +69,7 @@ const PendingDelayedWithdrawals = () => {
   const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
   const intl = useIntl();
   const pushToHistory = usePushToHistory();
-  const trackEvent = useTrackEvent();
+  const { trackEvent } = useAnalytics();
 
   const pendingOptions = React.useMemo(
     () =>

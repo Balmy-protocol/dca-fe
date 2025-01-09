@@ -9,7 +9,7 @@ import {
 } from 'ui-library';
 import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
 import { useCurrentRoute } from '@state/tabs/hooks';
-import useTrackEvent from '@hooks/useTrackEvent';
+import useAnalytics from '@hooks/useAnalytics';
 import CreatePosition from '../create-position';
 import Positions from '../positions';
 import { DCA_CREATE_ROUTE } from '@constants/routes';
@@ -25,7 +25,7 @@ interface DcaFrameProps {}
 
 const DcaFrame = ({}: DcaFrameProps) => {
   const currentRoute = useCurrentRoute();
-  const trackEvent = useTrackEvent();
+  const { trackEvent } = useAnalytics();
   const hasLoadedPairs = useHasFetchedPairs();
   const positionService = usePositionService();
   const user = useUser();

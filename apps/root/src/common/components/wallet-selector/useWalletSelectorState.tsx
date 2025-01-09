@@ -9,7 +9,7 @@ import useLabelService from '@hooks/useLabelService';
 import useOpenConnectModal from '@hooks/useOpenConnectModal';
 import usePositionService from '@hooks/usePositionService';
 import usePrevious from '@hooks/usePrevious';
-import useTrackEvent from '@hooks/useTrackEvent';
+import useAnalytics from '@hooks/useAnalytics';
 import useTransactionService from '@hooks/useTransactionService';
 import useWalletClientService from '@hooks/useWalletClientService';
 import useWallets from '@hooks/useWallets';
@@ -70,7 +70,7 @@ const useWalletSelectorState = ({ options, showWalletCounter }: WalletSelectorBa
   const intl = useIntl();
   const wallets = useWallets();
   const activeWallet = useActiveWallet();
-  const trackEvent = useTrackEvent();
+  const { trackEvent } = useAnalytics();
   const accountService = useAccountService();
   const labelService = useLabelService();
   const dispatch = useAppDispatch();
