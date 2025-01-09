@@ -167,6 +167,8 @@ export interface EarnCreateTypeData {
     positionId?: SdkEarnPositionId;
     strategyId: StrategyId;
     vault: Lowercase<Address>;
+    amountInUsd?: number;
+    isMigration: boolean;
   };
 }
 
@@ -180,6 +182,8 @@ export interface EarnIncreaseTypeData {
     signedPermit: boolean;
     depositAsset?: Token;
     depositAssetAmount?: string;
+    amountInUsd?: number;
+    isMigration: boolean;
   };
 }
 
