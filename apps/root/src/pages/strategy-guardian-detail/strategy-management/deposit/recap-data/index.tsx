@@ -8,7 +8,7 @@ import { AmountsOfToken } from 'common-types';
 import { parseUnits } from 'viem';
 import { formatCurrencyAmount, parseNumberUsdPriceToBigInt, parseUsdPrice } from '@common/utils/currency';
 import { EarnDepositRecapDataProps } from '@common/components/transaction-steps/recap-data';
-import { GuardianFeeType } from '@balmy/sdk/dist/services/earn/types';
+import { FeeType } from '@balmy/sdk/dist/services/earn/types';
 import { useEarnManagementState } from '@state/earn-management/hooks';
 import { isNil } from 'lodash';
 import useToken from '@hooks/useToken';
@@ -66,7 +66,7 @@ const EarnDepositRecapData = ({ strategy, assetAmount: assetAmountInUnits }: Ear
   const depositFeeAmount = calculateEarnFeeBigIntAmount({
     strategy,
     assetAmount: depositAmount,
-    feeType: GuardianFeeType.DEPOSIT,
+    feeType: FeeType.DEPOSIT,
   });
   if (depositFeeAmount) {
     feeAmounts = {

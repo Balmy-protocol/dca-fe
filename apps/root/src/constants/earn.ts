@@ -21,8 +21,6 @@ export const FEE_TYPE_STRING_MAP: Record<FeeType, ReturnType<typeof defineMessag
   }),
 };
 
-export const BALMY_FEES = [{ percentage: 0.2, type: FeeType.PERFORMANCE }];
-
 // export const EARN_AVAILABLE_CHAINS = [
 //   Chains.POLYGON.chainId,
 //   Chains.ETHEREUM.chainId,
