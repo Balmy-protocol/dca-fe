@@ -1,5 +1,5 @@
 import React from 'react';
-import { BALMY_FEES, FEE_TYPE_STRING_MAP } from '@constants/earn';
+import { FEE_TYPE_STRING_MAP } from '@constants/earn';
 import { DisplayStrategy, StrategyGuardian } from 'common-types';
 import {
   Accordion,
@@ -138,7 +138,7 @@ const DataAbout = ({ strategy }: DataAboutProps) => {
       </Grid>
       <Grid item xs={12}>
         <ContainerBox gap={8}>
-          {strategy?.guardian && (
+          {strategy?.guardian ? (
             <FeeContainer
               title={
                 <FormattedMessage
@@ -157,15 +157,19 @@ const DataAbout = ({ strategy }: DataAboutProps) => {
               isLoading={isLoading}
               icon={<TokenIcon token={emptyTokenWithLogoURI(strategy.guardian.logo)} size={5} />}
             />
+          ) : (
+            <FeeContainer
+              title={
+                <FormattedMessage
+                  defaultMessage="Strategy Fees"
+                  description="earn.strategy-details.vault-about.strategy-fee"
+                />
+              }
+              intl={intl}
+              fees={strategy?.fees}
+              icon={<TokenIcon token={emptyTokenWithLogoURI(BALMY_FEES_LOGO_URL)} size={5} />}
+            />
           )}
-          <FeeContainer
-            title={
-              <FormattedMessage defaultMessage="Balmy Fees" description="earn.strategy-details.vault-about.balmy-fee" />
-            }
-            intl={intl}
-            fees={BALMY_FEES}
-            icon={<TokenIcon token={emptyTokenWithLogoURI(BALMY_FEES_LOGO_URL)} size={5} />}
-          />
         </ContainerBox>
       </Grid>
     </Grid>
