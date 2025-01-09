@@ -134,7 +134,15 @@ const SwapSettings = ({ shouldShow, onClose, setShouldShowFirstStep }: SwapSetti
   const { slippage, gasSpeed, disabledDexes, isPermit2Enabled, sourceTimeout, sorting } = useAggregatorSettingsState();
   const dispatch = useAppDispatch();
   const dexes = useSdkDexes();
-  const { trackEvent, setPeopleProperty } = useAnalytics();
+  const {
+    trackEvent,
+    trackSlippageChanged,
+    trackGasSpeedChanged,
+    trackSourceTimeoutChanged,
+    trackPermit2Enabled,
+    trackDefaultSettingsChanged,
+    trackQuoteSortingChanged,
+  } = useAnalytics();
   const intl = useIntl();
 
   const gasOptions = GAS_KEYS.map((key) => ({ value: key, text: intl.formatMessage(GAS_LABELS_BY_KEY[key]) }));
@@ -146,50 +154,23 @@ const SwapSettings = ({ shouldShow, onClose, setShouldShowFirstStep }: SwapSetti
   const onSlippageChange = (newSlippage: string) => {
     dispatch(setSlippage(newSlippage));
     trackEvent('Aggregator - Set slippage', { slippage: newSlippage });
-    setPeopleProperty({
-      swap: {
-        settings: {
-          default_settings: false,
-          slippage: newSlippage,
-        },
-      },
-    });
+    trackSlippageChanged({ slippage: newSlippage });
   };
   const onGasSpeedChange = (newGasSpeed: GasKeys) => {
     dispatch(setGasSpeed(newGasSpeed));
     trackEvent('Aggregator - Set gas speed', { gasSpeed: newGasSpeed });
-    setPeopleProperty({
-      swap: {
-        settings: {
-          default_settings: false,
-          transaction_speed: newGasSpeed,
-        },
-      },
-    });
+    trackGasSpeedChanged({ gasSpeed: newGasSpeed });
   };
   const onSourceTimeoutChange = (newSourceTimeout: TimeoutKey) => {
     dispatch(setSourceTimeout(newSourceTimeout));
     trackEvent('Aggregator - Set source timeout speed', { sourceTimeout: newSourceTimeout });
-    setPeopleProperty({
-      swap: {
-        settings: {
-          default_settings: false,
-          quote_waiting_time: newSourceTimeout,
-        },
-      },
-    });
+    trackSourceTimeoutChanged({ sourceTimeout: newSourceTimeout });
   };
+
   const setQuoteSorting = (newSort: SwapSortOptions) => {
     dispatch(setSorting(newSort));
     trackEvent('Aggregator - Change selected sorting', { sort: newSort });
-    setPeopleProperty({
-      swap: {
-        settings: {
-          default_settings: false,
-          quote_sorting: newSort,
-        },
-      },
-    });
+    trackQuoteSortingChanged({ quoteSorting: newSort });
   };
   const handleToggleDex = (id: string) => {
     const newDisabledDexes = [...disabledDexes];
@@ -209,37 +190,17 @@ const SwapSettings = ({ shouldShow, onClose, setShouldShowFirstStep }: SwapSetti
 
     if (newPermitConfig) {
       trackEvent('Aggregator - Enable permit2');
-      setPeopleProperty({
-        swap: {
-          settings: {
-            default_settings: false,
-            universal_approval: true,
-          },
-        },
-      });
+      trackPermit2Enabled({ permit2Enabled: true });
     } else {
       trackEvent('Aggregator - Disable permit2');
-      setPeopleProperty({
-        swap: {
-          settings: {
-            default_settings: false,
-            universal_approval: false,
-          },
-        },
-      });
+      trackPermit2Enabled({ permit2Enabled: false });
     }
   };
 
   const onRestoreDefaults = () => {
     dispatch(restoreDefaults());
     trackEvent('Aggregator - Set default settings');
-    setPeopleProperty({
-      swap: {
-        settings: {
-          default_settings: true,
-        },
-      },
-    });
+    trackDefaultSettingsChanged({ defaultSettings: true });
   };
 
   const dexOptions: OptionsMenuOption[] = Object.keys(dexes).map((dexKey) => ({

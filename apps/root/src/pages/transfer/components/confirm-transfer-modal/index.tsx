@@ -59,7 +59,7 @@ const ConfirmTransferModal = ({
   const [, setModalLoading, setModalError, setModalClosed] = useTransactionModal();
   const addTransaction = useTransactionAdder();
   const errorService = useErrorService();
-  const { trackEvent, setPeopleProperty, unionProperty, incrementProperty } = useAnalytics();
+  const { trackEvent, trackTransfer } = useAnalytics();
   const contacts = useStoredContactList();
   const isRecipientContact = contacts.find(({ address }) => address.toLowerCase() === (recipient || '').toLowerCase());
 
@@ -130,31 +130,11 @@ const ConfirmTransferModal = ({
         amountInUsd: parsedAmountsOfToken.amountInUSD,
         amount: parsedAmountsOfToken.amountInUnits,
       });
-      setPeopleProperty({
-        general: {
-          last_product_used: 'transfer',
-          last_network_used: network.name,
-        },
-      });
-      incrementProperty({
-        general: {
-          total_volume_all_time_usd: parsedAmountsOfToken.amountInUSD,
-        },
-        transfer: {
-          total_volume_usd: parsedAmountsOfToken.amountInUSD,
-          count: 1,
-        },
-      });
-      unionProperty({
-        general: {
-          networks_used: network.name,
-          products_used: 'transfer',
-          tokens_used: [parsedToken.symbol],
-        },
-        transfer: {
-          networks_used: network.name,
-          tokens_used: [parsedToken.symbol],
-        },
+
+      trackTransfer({
+        chainId: network.chainId,
+        asset: parsedToken,
+        amountInUsd: parsedAmountsOfToken.amountInUSD,
       });
 
       const transactionTypeData: TransferTokenTypeData = {

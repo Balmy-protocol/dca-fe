@@ -129,7 +129,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
   const hasConfirmedApproval = useHasPendingApproval(fromToUse, position.user, fromHasYield, allowanceTarget);
   const realBalance = (balance && BigInt(balance.amount) + remainingLiquidity) || remainingLiquidity;
   const hasYield = !!from.underlyingTokens.length;
-  const { trackEvent, setPeopleProperty, incrementProperty } = useAnalytics();
+  const { trackEvent, trackPositionModified } = useAnalytics();
   const usdPrice = parseNumberUsdPriceToBigInt(from.price);
   const rateUsdPrice = parseUsdPrice(from, (rate !== '' && parseUnits(rate, from?.decimals)) || null, usdPrice);
   const remainingLiquidityDifference = abs(
@@ -336,21 +336,12 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
       });
       trackEvent('DCA - Modify position submitted', { isIncreasingPosition, useWrappedProtocolToken });
 
-      setPeopleProperty({
-        general: {
-          last_product_used: 'dca',
-          last_network_used: find(NETWORKS, { chainId: position.chainId })?.name || 'unknown',
-        },
-      });
-      const usdValueDiff = formatUnits(remainingLiquidityDifference * usdPrice, fromToUse.decimals + 18);
-
-      incrementProperty({
-        general: {
-          total_volume_all_time_usd: isIncreasingPosition ? Number(usdValueDiff) : -Number(usdValueDiff),
-        },
-        dca: {
-          total_invested_usd: isIncreasingPosition ? Number(usdValueDiff) : -Number(usdValueDiff),
-        },
+      trackPositionModified({
+        chainId: position.chainId,
+        remainingLiquidityDifference,
+        usdPrice,
+        isIncreasingPosition,
+        token: fromToUse,
       });
     } catch (e) {
       // User rejecting transaction
@@ -423,22 +414,12 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
 
       trackEvent('DCA - Safe modify position submitted', { isIncreasingPosition, useWrappedProtocolToken });
 
-      setPeopleProperty({
-        general: {
-          last_product_used: 'dca',
-          last_network_used: find(NETWORKS, { chainId: position.chainId })?.name || 'unknown',
-        },
-      });
-
-      const usdValueDiff = formatUnits(remainingLiquidityDifference * usdPrice, fromToUse.decimals + 18);
-
-      incrementProperty({
-        general: {
-          total_volume_all_time_usd: isIncreasingPosition ? Number(usdValueDiff) : -Number(usdValueDiff),
-        },
-        dca: {
-          total_invested_usd: isIncreasingPosition ? Number(usdValueDiff) : -Number(usdValueDiff),
-        },
+      trackPositionModified({
+        chainId: position.chainId,
+        remainingLiquidityDifference,
+        usdPrice,
+        isIncreasingPosition,
+        token: fromToUse,
       });
 
       addTransaction(

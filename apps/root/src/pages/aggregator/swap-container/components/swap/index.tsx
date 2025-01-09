@@ -118,7 +118,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError, missingQ
   const simulationService = useSimulationService();
   const actualCurrentNetwork = useCurrentNetwork();
   const loadedAsSafeApp = useLoadedAsSafeApp();
-  const { trackEvent, setPeopleProperty, incrementProperty, unionProperty } = useAnalytics();
+  const { trackEvent, trackSwap } = useAnalytics();
   const replaceHistory = useReplaceHistory();
   const [selectingSelection, setSelectingSelection] = React.useState<'from' | 'to'>('from');
   const permit2Service = usePermit2Service();
@@ -434,35 +434,11 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError, missingQ
           isPermit2Enabled,
         });
 
-        const networkUsed = find(NETWORKS, { chainId: selectedRoute.chainId })?.name || 'unknown';
-
-        setPeopleProperty({
-          general: {
-            last_product_used: 'swap',
-            last_network_used: networkUsed,
-          },
-        });
-        incrementProperty({
-          general: {
-            total_volume_all_time_usd: fromUsdValueToUse,
-          },
-          swap: {
-            total_volume_usd: fromUsdValueToUse,
-            count: 1,
-          },
-        });
-        unionProperty({
-          general: {
-            networks_used: networkUsed,
-            products_used: 'swap',
-            tokens_used: [from.symbol, to.symbol],
-            pair_used: `${from.symbol}-${to.symbol}`,
-          },
-          swap: {
-            networks_used: networkUsed,
-            tokens_used: [from.symbol, to.symbol],
-            pair_used: `${from.symbol}-${to.symbol}`,
-          },
+        trackSwap({
+          chainId: selectedRoute.chainId,
+          from,
+          to,
+          fromUsdValueToUse,
         });
       } catch (e) {
         console.error('Error tracking through mixpanel', e);
@@ -585,9 +561,6 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError, missingQ
     setModalLoading,
     to,
     trackEvent,
-    unionProperty,
-    setPeopleProperty,
-    incrementProperty,
     transactionsToExecute,
     transferTo,
     walletService,

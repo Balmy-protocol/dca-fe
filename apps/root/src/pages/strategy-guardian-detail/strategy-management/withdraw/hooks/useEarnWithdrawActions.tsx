@@ -35,7 +35,7 @@ const useEarnWithdrawActions = ({ strategy }: UseEarnWithdrawActionsParams) => {
   const intl = useIntl();
   const asset = strategy?.asset;
   const activeWallet = useActiveWallet();
-  const { trackEvent, setPeopleProperty, incrementProperty } = useAnalytics();
+  const { trackEvent, trackEarnWithdraw } = useAnalytics();
   const errorService = useErrorService();
   const earnService = useEarnService();
   const [currentTransaction, setCurrentTransaction] = React.useState<{ hash: Hash; chainId: number } | undefined>();
@@ -284,21 +284,9 @@ const useEarnWithdrawActions = ({ strategy }: UseEarnWithdrawActionsParams) => {
           withdrawType: assetWithdrawType,
         });
 
-        setPeopleProperty({
-          general: {
-            last_product_used: 'earn',
-            last_network_used: strategy.network.name,
-          },
-        });
-
-        incrementProperty({
-          earn: {
-            current_deposits_usd: -amountInUsd,
-            withdraw_counts: 1,
-          },
-          general: {
-            total_volume_all_time_usd: -amountInUsd,
-          },
+        trackEarnWithdraw({
+          chainId: strategy.network.chainId,
+          amountInUsd,
         });
 
         addTransaction(result, typeData);

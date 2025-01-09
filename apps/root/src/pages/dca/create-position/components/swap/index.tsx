@@ -109,7 +109,7 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
   const contractService = useContractService();
   const availablePairs = useAvailablePairs(currentNetwork.chainId);
   const errorService = useErrorService();
-  const { trackEvent, setPeopleProperty, incrementProperty, unionProperty } = useAnalytics();
+  const { trackEvent, trackDcaCreatePosition } = useAnalytics();
   const permit2Service = usePermit2Service();
   const [shouldShowSteps, setShouldShowSteps] = React.useState(false);
   const [transactionsToExecute, setTransactionsToExecute] = React.useState<TransactionStep[]>([]);
@@ -377,34 +377,12 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
         yieldTo: toYield?.name,
         fromUsdValue: parsedAmountInUSD,
       });
-      const networkUsed = find(NETWORKS, { chainId: result.chainId })?.name || 'unknown';
-      setPeopleProperty({
-        general: {
-          last_product_used: 'dca',
-          last_network_used: networkUsed,
-        },
-      });
-      incrementProperty({
-        general: {
-          total_volume_all_time_usd: parsedAmountInUSD,
-        },
-        dca: {
-          total_invested_usd: parsedAmountInUSD,
-          total_positions: 1,
-        },
-      });
-      unionProperty({
-        general: {
-          networks_used: networkUsed,
-          products_used: 'dca',
-          tokens_used: [from.symbol, to.symbol],
-          pair_used: `${from.symbol}-${to.symbol}`,
-        },
-        dca: {
-          networks_used: networkUsed,
-          tokens_used: [from.symbol, to.symbol],
-          pair_used: `${from.symbol}-${to.symbol}`,
-        },
+
+      trackDcaCreatePosition({
+        chainId: currentNetwork.chainId,
+        from,
+        to,
+        parsedAmountInUSD,
       });
 
       addTransaction(result, {

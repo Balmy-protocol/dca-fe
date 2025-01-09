@@ -5,7 +5,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import useTransactionModal from '@hooks/useTransactionModal';
 import { Typography, FormControlLabel, FormGroup, Checkbox, Modal } from 'ui-library';
 import { useTransactionAdder } from '@state/transactions/hooks';
-import { NETWORKS, PERMISSIONS } from '@constants';
+import { PERMISSIONS } from '@constants';
 import { getProtocolToken, getWrappedProtocolToken } from '@common/mocks/tokens';
 
 import useSupportsSigning from '@hooks/useSupportsSigning';
@@ -14,7 +14,6 @@ import useErrorService from '@hooks/useErrorService';
 import { deserializeError, shouldTrackError } from '@common/utils/errors';
 import useAnalytics from '@hooks/useAnalytics';
 import { formatCurrencyAmount } from '@common/utils/currency';
-import find from 'lodash/find';
 
 interface TerminateModalProps {
   position: Position;
@@ -55,7 +54,7 @@ const TerminateModal = ({ position, open, onCancel }: TerminateModalProps) => {
     position.to.address === protocolToken.address || position.to.address === wrappedProtocolToken.address;
   const swappedOrLiquidity = protocolIsFrom ? remainingLiquidity : toWithdraw;
   const hasSignSupport = useSupportsSigning();
-  const { trackEvent, setPeopleProperty, incrementProperty } = useAnalytics();
+  const { trackEvent, trackPositionTerminated } = useAnalytics();
 
   const protocolBalance = hasWrappedOrProtocol ? swappedOrLiquidity.amount : 0n;
   let fromSymbol = position.from.symbol;
@@ -157,19 +156,9 @@ const TerminateModal = ({ position, open, onCancel }: TerminateModalProps) => {
         remainingSwaps: position.remainingSwaps,
         remainingLiquidity: position.remainingLiquidity.amountInUSD,
       });
-      setPeopleProperty({
-        general: {
-          last_product_used: 'dca',
-          last_network_used: find(NETWORKS, { chainId: position.chainId })?.name || 'unknown',
-        },
-      });
-      incrementProperty({
-        general: {
-          total_volume_all_time_usd: -(position.remainingLiquidity.amountInUSD ?? 0),
-        },
-        dca: {
-          total_invested_usd: -(position.remainingLiquidity.amountInUSD ?? 0),
-        },
+      trackPositionTerminated({
+        chainId: position.chainId,
+        usdValueDiff: (position.remainingLiquidity.amountInUSD ?? 0).toString(),
       });
     } catch (e) {
       // User rejecting transaction

@@ -51,7 +51,7 @@ const useEarnDepositActions = ({ strategy }: UseEarnDepositActionParams) => {
   const { asset: baseAsset, depositAsset, depositAmount, depositAssetAmount } = useEarnManagementState();
   const intl = useIntl();
   const activeWallet = useActiveWallet();
-  const { trackEvent, setPeopleProperty, incrementProperty, unionProperty } = useAnalytics();
+  const { trackEvent, trackEarnDeposit } = useAnalytics();
   const errorService = useErrorService();
   const permit2Service = usePermit2Service();
   const walletService = useWalletService();
@@ -157,46 +157,24 @@ const useEarnDepositActions = ({ strategy }: UseEarnDepositActionParams) => {
 
       trackEvent(`Earn - ${hasPosition ? 'Increase' : 'Create'} position submitted`, {
         asset: baseAsset.symbol,
-          strategy: strategy.id,
-          amount: depositAmount,
-          assetPrice: baseAsset.price,
-          amountInUsd: parseUsdPrice(
-            baseAsset,
-            parseUnits(depositAmount, baseAsset.decimals),
-            parseNumberUsdPriceToBigInt(baseAsset.price)
-          ),
-          isDeposit: !hasPosition,
-          isIncrease: hasPosition,
-          isMigration: baseAsset.address !== asset.address,
+        strategy: strategy.id,
+        amount: depositAmount,
+        assetPrice: baseAsset.price,
+        amountInUsd: parseUsdPrice(
+          baseAsset,
+          parseUnits(depositAmount, baseAsset.decimals),
+          parseNumberUsdPriceToBigInt(baseAsset.price)
+        ),
+        isDeposit: !hasPosition,
+        isIncrease: hasPosition,
+        isMigration: baseAsset.address !== asset.address,
       });
-      setPeopleProperty({
-        general: {
-          last_product_used: 'earn',
-          last_network_used: strategy.network.name,
-        },
-      });
-      incrementProperty({
-        general: {
-          total_volume_all_time_usd: parsedAmountInUSD,
-        },
-        earn: {
-          total_deposits_usd: parsedAmountInUSD,
-          current_deposits_usd: parsedAmountInUSD,
-          deposits_count: !hasPosition ? 1 : 0,
-          increase_count: hasPosition ? 1 : 0,
-        },
-      });
-      unionProperty({
-        general: {
-          networks_used: strategy.network.name,
-          products_used: 'earn',
-          tokens_used: asset.symbol,
-        },
-        earn: {
-          networks_used: strategy.network.name,
-          protocols_used: [strategy.farm.name],
-          tokens_used: [asset.symbol],
-        },
+      trackEarnDeposit({
+        chainId: strategy.network.chainId,
+        asset,
+        strategy,
+        parsedAmountInUSD,
+        hasPosition: !!hasPosition,
       });
 
       addTransaction(result, typeData);
