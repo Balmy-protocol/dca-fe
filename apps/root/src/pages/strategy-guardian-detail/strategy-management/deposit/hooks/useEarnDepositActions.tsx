@@ -107,6 +107,12 @@ const useEarnDepositActions = ({ strategy }: UseEarnDepositActionParams) => {
         asset: baseAsset,
         assetAmount: parseUnits(depositAmount, baseAsset.decimals).toString(),
         strategyId: strategy.id,
+        amountInUsd: parseUsdPrice(
+          baseAsset,
+          parseUnits(depositAmount, baseAsset.decimals),
+          parseNumberUsdPriceToBigInt(baseAsset.price)
+        ),
+        isMigration: baseAsset.address !== asset.address,
         depositAsset,
         depositAssetAmount:
           depositAssetAmount && depositAsset

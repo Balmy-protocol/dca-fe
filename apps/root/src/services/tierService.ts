@@ -392,7 +392,12 @@ export default class TierService extends EventsManager<TierServiceData> {
   }
 
   updateAchievements(transaction: TransactionDetails) {
-    if (transaction.type !== TransactionTypes.swap) return;
+    if (
+      transaction.type !== TransactionTypes.swap &&
+      transaction.type !== TransactionTypes.earnCreate &&
+      transaction.type !== TransactionTypes.earnIncrease
+    )
+      return;
     const allAchievements = { ...this.achievements };
     const walletInvolved = transaction.from as Address;
     const walletAchievements = allAchievements[walletInvolved];
@@ -401,19 +406,20 @@ export default class TierService extends EventsManager<TierServiceData> {
       case TransactionTypes.swap:
         // Only count swaps on superchains
         if (!SUPERCHAIN_CHAIN_IDS.includes(transaction.chainId)) return;
-        const extraData = transaction.typeData;
-        const amountUsd = extraData.amountToUsd || extraData.amountFromUsd;
+        const swapExtraData = transaction.typeData;
+        const swapAmountUsd = swapExtraData.amountToUsd || swapExtraData.amountFromUsd;
 
-        if (!amountUsd) return;
+        if (!swapAmountUsd) return;
         const swapVolumeAchievement = walletAchievements?.find(
           (achievement) => achievement.achievement.id === AchievementKeys.SWAP_VOLUME
         );
         if (swapVolumeAchievement) {
-          swapVolumeAchievement.achievement.achieved = Number(swapVolumeAchievement.achievement.achieved) + amountUsd;
+          swapVolumeAchievement.achievement.achieved =
+            Number(swapVolumeAchievement.achievement.achieved) + swapAmountUsd;
           swapVolumeAchievement.lastUpdated = Date.now();
         } else {
           walletAchievements?.push({
-            achievement: { id: AchievementKeys.SWAP_VOLUME, achieved: amountUsd },
+            achievement: { id: AchievementKeys.SWAP_VOLUME, achieved: swapAmountUsd },
             lastUpdated: Date.now(),
           });
         }
@@ -422,7 +428,26 @@ export default class TierService extends EventsManager<TierServiceData> {
 
         this.achievements = allAchievements;
         break;
-      // ADD HANDLER FOR MIGRATE
+      case TransactionTypes.earnCreate:
+      case TransactionTypes.earnIncrease:
+        const earnExtraData = transaction.typeData;
+        const earnAmountUsd = earnExtraData.amountInUsd;
+        const isMigration = earnExtraData.isMigration;
+        if (!earnAmountUsd || !isMigration) return;
+        const earnVolumeAchievement = walletAchievements?.find(
+          (achievement) => achievement.achievement.id === AchievementKeys.MIGRATED_VOLUME
+        );
+        if (earnVolumeAchievement) {
+          earnVolumeAchievement.achievement.achieved =
+            Number(earnVolumeAchievement.achievement.achieved) + earnAmountUsd;
+          earnVolumeAchievement.lastUpdated = Date.now();
+        } else {
+          walletAchievements?.push({
+            achievement: { id: AchievementKeys.MIGRATED_VOLUME, achieved: earnAmountUsd },
+            lastUpdated: Date.now(),
+          });
+        }
+        break;
       default:
         break;
     }

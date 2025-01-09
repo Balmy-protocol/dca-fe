@@ -203,6 +203,8 @@ export default function Updater(): null {
               assetAmount: tx.typeData.assetAmount,
               strategyId: tx.typeData.strategyId,
               vault: tx.typeData.vault,
+              amountInUsd: tx.typeData.amountInUsd,
+              isMigration: tx.typeData.isMigration,
             } satisfies Partial<EarnCreateTypeData>['typeData'];
           }
           break;

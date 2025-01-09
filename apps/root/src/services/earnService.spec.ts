@@ -286,6 +286,8 @@ describe('Earn Service', () => {
             assetAmount: '1000000000000000000',
             strategyId: '0xvault' as SavedSdkStrategy['id'],
             vault: '0xvault' as Lowercase<Address>,
+            amountInUsd: 1,
+            isMigration: false,
           },
         };
 
@@ -399,6 +401,8 @@ describe('Earn Service', () => {
           assetAmount: '1000000000000000000',
           strategyId: '0xvault' as SavedSdkStrategy['id'],
           vault: '0xvault' as Lowercase<Address>,
+          amountInUsd: 1,
+          isMigration: false,
         },
       };
 
@@ -560,6 +564,8 @@ describe('Earn Service', () => {
               positionId: '10-0xvault-20' as SdkEarnPositionId,
               strategyId: '0xvault' as SavedSdkStrategy['id'],
               vault: '0xvault' as Lowercase<Address>,
+              amountInUsd: 1,
+              isMigration: false,
             } satisfies EarnCreateTypeData['typeData'],
           },
         },
@@ -643,6 +649,8 @@ describe('Earn Service', () => {
               positionId: '10-0xvault-10',
               strategyId: '0xvault' as SavedSdkStrategy['id'],
               signedPermit: true,
+              amountInUsd: 1,
+              isMigration: false,
             } satisfies EarnIncreaseTypeData['typeData'],
           },
         },
