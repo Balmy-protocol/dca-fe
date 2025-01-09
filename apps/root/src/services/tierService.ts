@@ -428,7 +428,6 @@ export default class TierService extends EventsManager<TierServiceData> {
 
         this.achievements = allAchievements;
         break;
-      // ADD HANDLER FOR MIGRATE
       case TransactionTypes.earnCreate:
       case TransactionTypes.earnIncrease:
         const earnExtraData = transaction.typeData;
