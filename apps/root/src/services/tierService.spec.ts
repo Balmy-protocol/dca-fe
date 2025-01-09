@@ -815,5 +815,159 @@ describe('Tier Service', () => {
         });
       });
     });
+
+    describe('migration transactions', () => {
+      it('should update migrated volume achievement for earn create transaction', () => {
+        // Set initial achievements
+        tierService.achievements = {
+          '0xwallet': [
+            {
+              achievement: { id: AchievementKeys.MIGRATED_VOLUME, achieved: 1000 },
+              lastUpdated: mockedTodayMilis,
+            },
+          ],
+        };
+
+        const transaction = {
+          type: TransactionTypes.earnCreate,
+          from: '0xwallet',
+          typeData: {
+            amountInUsd: 500,
+            isMigration: true,
+          },
+        } as TransactionDetails;
+
+        tierService.updateAchievements(transaction);
+
+        expect(tierService.achievements).toEqual({
+          '0xwallet': [
+            {
+              achievement: { id: AchievementKeys.MIGRATED_VOLUME, achieved: 1500 },
+              lastUpdated: mockedTodayMilis,
+            },
+          ],
+        });
+      });
+
+      it('should update migrated volume achievement for earn increase transaction', () => {
+        // Set initial achievements
+        tierService.achievements = {
+          '0xwallet': [
+            {
+              achievement: { id: AchievementKeys.MIGRATED_VOLUME, achieved: 1000 },
+              lastUpdated: mockedTodayMilis,
+            },
+          ],
+        };
+
+        const transaction = {
+          type: TransactionTypes.earnIncrease,
+          from: '0xwallet',
+          typeData: {
+            amountInUsd: 500,
+            isMigration: true,
+          },
+        } as TransactionDetails;
+
+        tierService.updateAchievements(transaction);
+
+        expect(tierService.achievements).toEqual({
+          '0xwallet': [
+            {
+              achievement: { id: AchievementKeys.MIGRATED_VOLUME, achieved: 1500 },
+              lastUpdated: mockedTodayMilis,
+            },
+          ],
+        });
+      });
+
+      it('should create new migrated volume achievement if none exists', () => {
+        // Start with empty achievements for the wallet
+        tierService.achievements = {
+          '0xwallet': [],
+        };
+
+        const transaction = {
+          type: TransactionTypes.earnCreate,
+          from: '0xwallet',
+          typeData: {
+            amountInUsd: 500,
+            isMigration: true,
+          },
+        } as TransactionDetails;
+
+        tierService.updateAchievements(transaction);
+
+        expect(tierService.achievements).toEqual({
+          '0xwallet': [
+            {
+              achievement: { id: AchievementKeys.MIGRATED_VOLUME, achieved: 500 },
+              lastUpdated: mockedTodayMilis,
+            },
+          ],
+        });
+      });
+
+      it('should not update achievements for non-migration earn transactions', () => {
+        tierService.achievements = {
+          '0xwallet': [
+            {
+              achievement: { id: AchievementKeys.MIGRATED_VOLUME, achieved: 1000 },
+              lastUpdated: mockedTodayMilis,
+            },
+          ],
+        };
+
+        const transaction = {
+          type: TransactionTypes.earnCreate,
+          from: '0xwallet',
+          typeData: {
+            amountInUsd: 500,
+            isMigration: false,
+          },
+        } as TransactionDetails;
+
+        tierService.updateAchievements(transaction);
+
+        expect(tierService.achievements).toEqual({
+          '0xwallet': [
+            {
+              achievement: { id: AchievementKeys.MIGRATED_VOLUME, achieved: 1000 },
+              lastUpdated: mockedTodayMilis,
+            },
+          ],
+        });
+      });
+
+      it('should not update achievements when USD amount is not available', () => {
+        tierService.achievements = {
+          '0xwallet': [
+            {
+              achievement: { id: AchievementKeys.MIGRATED_VOLUME, achieved: 1000 },
+              lastUpdated: mockedTodayMilis,
+            },
+          ],
+        };
+
+        const transaction = {
+          type: TransactionTypes.earnCreate,
+          from: '0xwallet',
+          typeData: {
+            isMigration: true,
+          },
+        } as TransactionDetails;
+
+        tierService.updateAchievements(transaction);
+
+        expect(tierService.achievements).toEqual({
+          '0xwallet': [
+            {
+              achievement: { id: AchievementKeys.MIGRATED_VOLUME, achieved: 1000 },
+              lastUpdated: mockedTodayMilis,
+            },
+          ],
+        });
+      });
+    });
   });
 });
