@@ -5,6 +5,7 @@ import {
   ActiveTiersIcons,
   ContainerBox,
   HiddenProps,
+  MovingStarIcon,
   Skeleton,
   StyledBodySmallRegularTypo2,
   Tooltip,
@@ -139,6 +140,26 @@ const StyledTierBadge = styled(({ CurrentTierBadge, ...props }: StyledTierBadgeP
   <CurrentTierBadge {...props} size="1.25rem" />
 ))``;
 
+const StyledMoreRewardsBadge = styled(ContainerBox).attrs({ alignItems: 'center', gap: 1 })`
+  ${({ theme: { spacing, palette } }) => `
+    padding: ${spacing(1)} ${spacing(1)};
+    border-radius: ${spacing(2)};
+    background-color: ${colors[palette.mode].background.tertiary};
+    border: 1px solid ${colors[palette.mode].semantic.success.darker};
+  `}
+`;
+
+const MoreRewardsBadge = () => {
+  return (
+    <StyledMoreRewardsBadge>
+      <MovingStarIcon sx={({ palette }) => ({ color: colors[palette.mode].semantic.success.darker })} />
+      <Typography variant="bodyExtraSmallBold" color={({ palette }) => colors[palette.mode].semantic.success.darker}>
+        <FormattedMessage description="earn.all-strategies-table.column.more-rewards" defaultMessage="Higher rewards" />
+      </Typography>
+    </StyledMoreRewardsBadge>
+  );
+};
+
 export const strategyColumnConfigs: StrategyColumnConfig<StrategiesTableVariants.ALL_STRATEGIES>[] = [
   {
     key: StrategyColumnKeys.VAULT_NAME,
@@ -212,7 +233,13 @@ export const strategyColumnConfigs: StrategyColumnConfig<StrategiesTableVariants
   {
     key: StrategyColumnKeys.REWARDS,
     label: <FormattedMessage description="earn.all-strategies-table.column.rewards" defaultMessage="Rewards" />,
-    renderCell: (data) => <ComposedTokenIcon tokens={data.rewards.tokens} size={4.5} />,
+    renderCell: (data) => (
+      <ContainerBox gap={2} alignItems="center">
+        <ComposedTokenIcon tokens={data.rewards.tokens} size={4.5} />
+        {/* Only tier 2 and above have more rewards */}
+        {data.needsTier && data.needsTier > 1 && <MoreRewardsBadge />}
+      </ContainerBox>
+    ),
   },
   {
     key: StrategyColumnKeys.CHAIN_NAME,
