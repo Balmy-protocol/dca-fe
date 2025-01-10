@@ -510,6 +510,9 @@ const parseEarnWithdrawApiEvent: ParseFunction<BaseApiEvent & EarnWithdrawApiEve
 
   if (!allTokensAreInTokenList) return null;
 
+  const withdrawnTokens = event.data.tokens.filter((withdrawnToken) => BigInt(withdrawnToken.withdrawn) > 0n);
+
+  if (withdrawnTokens.length === 0) return null;
   const parsedEvent: EarnWithdrawEvent = {
     type: TransactionEventTypes.EARN_WITHDRAW,
     unit: IndexerUnits.EARN,
