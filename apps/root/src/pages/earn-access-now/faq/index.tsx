@@ -58,6 +58,10 @@ const EarnFAQ = () => {
               <FormattedMessage
                 description="earn-access-now.faq.what-is-early-access-response"
                 defaultMessage="Earn Early Access is an exclusive program that gives you early access to our new Earn Guardian product. As an early access member, you'll be among the first to try out"
+                values={{
+                  b: (chunks) => <b>{chunks}</b>,
+                  br: () => <br />,
+                }}
               />
             </StyledAnswer>
             <ThumbsSatisfaction id="Earn - What is Earn Early Access?" onClickOption={onFeedbackClick} />
