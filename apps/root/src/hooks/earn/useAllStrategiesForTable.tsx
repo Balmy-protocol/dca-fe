@@ -6,13 +6,15 @@ import { TableStrategy } from '@pages/earn/components/strategies-table';
 import { formatUnits } from 'viem';
 import { isUndefined } from 'lodash';
 import { parseNumberUsdPriceToBigInt, parseUsdPrice } from '@common/utils/currency';
+import useTierLevel from '@hooks/tiers/useTierLevel';
 
 const variant = StrategiesTableVariants.ALL_STRATEGIES;
 
 export default function useAllStrategiesForTable(): TableStrategy<typeof variant>[] {
   const strategies = useAllStrategies();
   const allBalances = useAllBalances();
-  const strategiesWithWalletBalance = React.useMemo(
+  const { tierLevel } = useTierLevel();
+  const strategiesWithWalletBalanceAndTierLevel = React.useMemo(
     () =>
       strategies.map((strategy) => {
         const tokenInfo = allBalances.balances[strategy.network.chainId]?.balancesAndPrices[strategy.asset.address];
@@ -29,10 +31,11 @@ export default function useAllStrategiesForTable(): TableStrategy<typeof variant
               ? undefined
               : parseUsdPrice(strategy.asset, totalAmount, parseNumberUsdPriceToBigInt(price)).toFixed(2),
           },
+          tierLevel,
         };
       }),
     [strategies, allBalances.balances]
   );
 
-  return strategiesWithWalletBalance;
+  return strategiesWithWalletBalanceAndTierLevel;
 }

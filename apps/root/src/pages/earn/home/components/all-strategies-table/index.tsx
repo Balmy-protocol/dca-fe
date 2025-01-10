@@ -12,7 +12,12 @@ const AllStrategiesTable = () => {
   const hasFetchedAllStrategies = useHasFetchedAllStrategies();
   const strategies = useAllStrategiesForTable();
 
-  const filteredStrategies = useFilteredStrategies({ variant, strategies, columns: strategyColumnConfigs });
+  const filteredStrategies = useFilteredStrategies({
+    variant,
+    strategies,
+    columns: strategyColumnConfigs,
+    filterTierLevel: true,
+  });
 
   return (
     <StrategiesDisplayWrapper

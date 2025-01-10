@@ -190,6 +190,10 @@ export const colors = {
     donutShape: {
       mask: '#56FAD2',
     },
+    promoted: {
+      start: baseColors.aqua.aqua600,
+      stop: '#3c2956',
+    },
   },
   light: {
     semantic: {
@@ -290,6 +294,10 @@ export const colors = {
     },
     donutShape: {
       mask: '#9389EF',
+    },
+    promoted: {
+      start: baseColors.violet.violet500,
+      stop: '#f9f7fd',
     },
   },
 };

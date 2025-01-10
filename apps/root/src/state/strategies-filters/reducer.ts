@@ -64,21 +64,25 @@ export const initialState: StrategiesFiltersState = {
   [StrategiesTableVariants.ALL_STRATEGIES]: {
     ...initialFiltersBase,
     orderBy: {
-      column: StrategyColumnKeys.NEEDS_TIER,
+      column: StrategyColumnKeys.APY,
       order: 'desc' as ColumnOrder,
     },
     secondaryOrderBy: {
-      column: StrategyColumnKeys.IS_PROMOTED,
+      column: StrategyColumnKeys.NEEDS_TIER,
       order: 'desc' as ColumnOrder,
     },
-    tertiaryOrderBy: {
-      column: StrategyColumnKeys.WALLET_BALANCE,
-      order: 'desc' as ColumnOrder,
-    },
-    quarterOrderBy: {
-      column: StrategyColumnKeys.TVL,
-      order: 'desc' as ColumnOrder,
-    },
+    // orderBy: {
+    //   column: StrategyColumnKeys.NEEDS_TIER,
+    //   order: 'desc' as ColumnOrder,
+    // },
+    // tertiaryOrderBy: {
+    //   column: StrategyColumnKeys.WALLET_BALANCE,
+    //   order: 'desc' as ColumnOrder,
+    // },
+    // quarterOrderBy: {
+    //   column: StrategyColumnKeys.TVL,
+    //   order: 'desc' as ColumnOrder,
+    // },
   },
   [StrategiesTableVariants.USER_STRATEGIES]: {
     ...initialFiltersBase,
