@@ -56,7 +56,7 @@ const defaultEarnServiceData: EarnServiceData = {
   hasFetchedUserStrategies: false,
   userStrategies: [],
   strategiesParameters: {
-    farms: {},
+    protocols: [],
     guardians: {},
     tokens: {
       assets: {},
@@ -66,7 +66,7 @@ const defaultEarnServiceData: EarnServiceData = {
     yieldTypes: [],
   },
   earnPositionsParameters: {
-    farms: {},
+    protocols: [],
     guardians: {},
     tokens: {
       assets: {},
@@ -188,10 +188,9 @@ export class EarnService extends EventsManager<EarnServiceData> {
   processStrategyParameters(strategies: SdkStrategy[]) {
     const summarizedParameters = strategies.reduce<SummarizedSdkStrategyParameters>(
       (acc, strategy) => {
-        // Farms
-        if (!acc.farms[strategy.farm.id]) {
-          // eslint-disable-next-line no-param-reassign
-          acc.farms[strategy.farm.id] = strategy.farm;
+        // Protocols
+        if (!acc.protocols.find((protocol) => protocol === strategy.farm.name)) {
+          acc.protocols.push(strategy.farm.name);
         }
 
         // Guardians
@@ -234,7 +233,7 @@ export class EarnService extends EventsManager<EarnServiceData> {
         return acc;
       },
       {
-        farms: {},
+        protocols: [],
         guardians: {},
         tokens: {
           assets: {},

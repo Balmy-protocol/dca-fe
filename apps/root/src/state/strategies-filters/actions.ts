@@ -1,6 +1,6 @@
 import { StrategyColumnKeys } from '@pages/earn/components/strategies-table/components/columns';
 import { createAction } from '@reduxjs/toolkit';
-import { ChainId, FarmId, GuardianId, StrategyYieldType, Token } from 'common-types';
+import { ChainId, GuardianId, StrategyYieldType, Token } from 'common-types';
 import { ColumnOrder, StrategiesTableVariants } from './reducer';
 
 export const setAssetFilter = createAction<{ variant: StrategiesTableVariants; value: Token[] }>(
@@ -15,8 +15,8 @@ export const setRewardFilter = createAction<{ variant: StrategiesTableVariants; 
   'strategiesFilters/setRewardFilter'
 );
 
-export const setFarmFilter = createAction<{ variant: StrategiesTableVariants; value: FarmId[] }>(
-  'strategiesFilters/setFarmFilter'
+export const setProtocolFilter = createAction<{ variant: StrategiesTableVariants; value: string[] }>(
+  'strategiesFilters/setProtocolFilter'
 );
 
 export const setGuardianFilter = createAction<{ variant: StrategiesTableVariants; value: GuardianId[] }>(
