@@ -3,30 +3,34 @@ import { useStrategiesFilters } from '@state/strategies-filters/hooks';
 import { getIsSameOrTokenEquivalent } from '@common/utils/currency';
 import { searchByStrategyData } from '@common/utils/earn/search';
 import { StrategiesTableVariants } from '@state/strategies-filters/reducer';
-import { EarnPosition } from 'common-types';
+import { EarnPosition, FarmId } from 'common-types';
 import { StrategyColumnConfig } from '@pages/earn/components/strategies-table/components/columns';
-import { StrategyWithWalletBalance } from '@pages/earn/components/strategies-table';
+import { StrategyWithWalletBalanceAndTierLevel } from '@pages/earn/components/strategies-table';
 import { getComparator } from '@common/utils/earn/sort';
+import useTierLevel from '@hooks/tiers/useTierLevel';
 
 const isEarnPosition = (
-  obj: StrategyWithWalletBalance | EarnPosition[],
+  obj: StrategyWithWalletBalanceAndTierLevel | EarnPosition[],
   variant: StrategiesTableVariants
 ): obj is EarnPosition[] => variant === StrategiesTableVariants.USER_STRATEGIES;
 
 type VariantBasedReturnType<V> = V extends StrategiesTableVariants.ALL_STRATEGIES
-  ? StrategyWithWalletBalance[]
+  ? StrategyWithWalletBalanceAndTierLevel[]
   : EarnPosition[][];
 
 export default function useFilteredStrategies<V extends StrategiesTableVariants>({
   columns,
   strategies,
   variant,
+  filterTierLevel = false,
 }: {
   columns: StrategyColumnConfig<V>[];
-  strategies: StrategyWithWalletBalance[] | EarnPosition[][];
+  strategies: StrategyWithWalletBalanceAndTierLevel[] | EarnPosition[][];
   variant: V;
+  filterTierLevel?: boolean;
 }) {
   const filtersApplied = useStrategiesFilters(variant);
+  const { tierLevel } = useTierLevel();
 
   return React.useMemo(() => {
     const filteredStrategies = strategies.filter((strategyObj) => {
@@ -57,9 +61,50 @@ export default function useFilteredStrategies<V extends StrategiesTableVariants>
       return isAssetMatch && isRewardMatch && isNetworkMatch && isYieldTypeMatch && isProtocolMatch && isGuardiansMatch;
     });
 
-    const filteredStrategiesBySearch = filteredStrategies.filter((strategy) =>
+    let filteredStrategiesBySearch = filteredStrategies.filter((strategy) =>
       searchByStrategyData(isEarnPosition(strategy, variant) ? strategy[0].strategy : strategy, filtersApplied.search)
     );
+
+    if (variant === StrategiesTableVariants.ALL_STRATEGIES && filterTierLevel) {
+      const farmsByStrategy: Record<FarmId, StrategyWithWalletBalanceAndTierLevel[]> = {};
+
+      filteredStrategiesBySearch.forEach((strategy) => {
+        if (isEarnPosition(strategy, variant)) {
+          return;
+        }
+        const farmId = strategy.farm.id;
+        farmsByStrategy[farmId] = [...(farmsByStrategy[farmId] || []), strategy];
+      });
+
+      const farms = Object.keys(farmsByStrategy);
+
+      const filteredStrategiesByTierLevel: StrategyWithWalletBalanceAndTierLevel[] = [];
+      farms.forEach((farmId: FarmId) => {
+        const farmStrategies = farmsByStrategy[farmId];
+
+        // Now we fetch the strategy that matches the user tier level
+        const strategyTier = farmStrategies.find((strategy) => strategy.needsTier === tierLevel);
+        let tierToUseToFilter = strategyTier?.needsTier;
+
+        // If there is not strategy that matches the user tier level, we want to grab the first strategy that the user can access
+        if (!tierToUseToFilter) {
+          // Sort the strategies by tier level descending
+          const sortedByTier = farmStrategies.sort((a, b) => (b.needsTier ?? 0) - (a.needsTier ?? 0));
+          // Now I want to grab the first strategy that the user can access
+          const firstStrategy = sortedByTier.find((strategy) => (strategy.needsTier ?? 0) <= (tierLevel ?? 0));
+          tierToUseToFilter = firstStrategy?.needsTier ?? 0;
+        }
+
+        // Now we filter all strategies that are below the minAvailableTier
+        const filteredTierLevelStrategies = farmStrategies.filter(
+          (strategy) => (strategy.needsTier ?? 0) >= tierToUseToFilter
+        );
+        filteredStrategiesByTierLevel.push(...filteredTierLevelStrategies);
+      });
+
+      filteredStrategiesBySearch = filteredStrategiesByTierLevel;
+    }
+
     const sortedStrategies = filteredStrategiesBySearch.slice().sort(
       getComparator({
         columns,
@@ -67,9 +112,12 @@ export default function useFilteredStrategies<V extends StrategiesTableVariants>
         secondaryOrder: filtersApplied.secondaryOrderBy,
         tertiaryOrder: filtersApplied.tertiaryOrderBy,
         quarterOrder: filtersApplied.quarterOrderBy,
-      }) as (a: StrategyWithWalletBalance | EarnPosition[], b: StrategyWithWalletBalance | EarnPosition[]) => number
+      }) as (
+        a: StrategyWithWalletBalanceAndTierLevel | EarnPosition[],
+        b: StrategyWithWalletBalanceAndTierLevel | EarnPosition[]
+      ) => number
     );
 
     return sortedStrategies as VariantBasedReturnType<V>;
-  }, [strategies, filtersApplied, variant]);
+  }, [strategies, filtersApplied, variant, filterTierLevel, tierLevel]);
 }

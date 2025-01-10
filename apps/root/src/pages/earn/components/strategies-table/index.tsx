@@ -45,13 +45,15 @@ import { FarmWithAvailableDepositTokens } from '@hooks/earn/useAvailableDepositT
 import { PROMOTED_STRATEGIES_IDS } from '@constants/earn';
 import PromotedFlag from './components/promoted-flag';
 import { isNil } from 'lodash';
+import useTierLevel from '@hooks/tiers/useTierLevel';
 
-export type StrategyWithWalletBalance = Strategy & {
+export type StrategyWithWalletBalanceAndTierLevel = Strategy & {
   walletBalance?: AmountsOfToken;
+  tierLevel?: number;
 };
 
 export type TableStrategy<T extends StrategiesTableVariants> = T extends StrategiesTableVariants.ALL_STRATEGIES
-  ? StrategyWithWalletBalance
+  ? StrategyWithWalletBalanceAndTierLevel
   : T extends StrategiesTableVariants.USER_STRATEGIES
     ? EarnPosition[]
     : T extends StrategiesTableVariants.MIGRATION_OPTIONS
@@ -73,16 +75,9 @@ const StyledBackgroundPaper = styled(BackgroundPaper).attrs({ variant: 'outlined
 `;
 
 const StyledTableRow = styled(TableRow)<{ $condition?: StrategyConditionType }>`
-  ${({ theme: { palette, spacing }, $condition }) =>
-    $condition === StrategyConditionType.PROMOTED &&
+  ${({ theme: { spacing }, $condition }) =>
+    !isNil($condition) &&
     `
-    box-shadow: 0px 0px 0px 1.5px ${colors[palette.mode].semantic.success.darker};
-    border-radius: ${spacing(2)};
-  `}
-  ${({ theme: { palette, spacing }, $condition }) =>
-    $condition === StrategyConditionType.LOCKED &&
-    `
-    box-shadow: 0px 0px 0px 1.5px ${colors[palette.mode].border.accent};
     border-radius: ${spacing(2)};
   `}
 `;
@@ -115,12 +110,23 @@ const StyledNavContainer = styled(ContainerBox)`
   margin: 0 auto;
 `;
 
-const StyledBodyTableCell = styled(TableCell)<{ $hasCondition?: boolean }>`
-  ${({ theme: { spacing }, $hasCondition }) => `
+const StyledBodyTableCell = styled(TableCell)<{ $hasCondition?: boolean; $hovered?: boolean }>`
+  ${({
+    theme: {
+      spacing,
+      palette: { mode },
+    },
+    $hasCondition,
+    $hovered,
+  }) => `
   height: ${spacing(14.5)};
   padding-top: ${spacing(0.5)};
   padding-bottom: ${spacing(0.5)};
   ${$hasCondition && `position: relative;`}
+  background: linear-gradient(${$hovered ? colors[mode].background.tertiary : colors[mode].background.secondary}, ${$hovered ? colors[mode].background.tertiary : colors[mode].background.secondary}) padding-box,
+              linear-gradient(to right, ${colors[mode].promoted.start}, ${colors[mode].promoted.stop}) border-box;
+  border: 1px solid transparent;
+  border-right: 0px;
 `}
 `;
 
@@ -237,6 +243,7 @@ const Row = <T extends StrategiesTableVariants>({
   showEndChevron = true,
 }: RowProps<T>) => {
   const [hovered, setHovered] = React.useState(false);
+  const { tierLevel } = useTierLevel();
 
   const strategy = getStrategyFromTableObject(rowData, variant);
   const needsTier = getNeedsTierFromTableObject(rowData, variant);
@@ -246,6 +253,8 @@ const Row = <T extends StrategiesTableVariants>({
   const condition = isLocked ? StrategyConditionType.LOCKED : isPromoted ? StrategyConditionType.PROMOTED : undefined;
   // If TierIcon is rendered, needsTier is defined
   const TierIcon = ActiveTiersIcons[needsTier || 0];
+
+  const isSameTierLevel = !isNil(needsTier) && !isNil(tierLevel) && needsTier === tierLevel;
   return (
     <StyledTableRow
       $condition={condition}
@@ -258,9 +267,13 @@ const Row = <T extends StrategiesTableVariants>({
     >
       {columns.map((column, i) => (
         <Hidden {...column.hiddenProps} key={`${strategy.id}-${column.key}`}>
-          <StyledBodyTableCell key={`${strategy.id}-${column.key}`} $hasCondition={!!condition && i === 0}>
-            {isPromoted && i === 0 && <PromotedFlag tier={needsTier} />}
-            {isLocked && i === 0 && <StyledTierBadge isPromoted={isPromoted} CurrentTierBadge={TierIcon} />}
+          <StyledBodyTableCell
+            key={`${strategy.id}-${column.key}`}
+            $hasCondition={!!condition && !isSameTierLevel && i === 0}
+            $hovered={hovered}
+          >
+            {isLocked && !isSameTierLevel && i === 0 && <PromotedFlag tier={needsTier} />}
+            {isLocked && !isSameTierLevel && i === 0 && <StyledTierBadge isPromoted CurrentTierBadge={TierIcon} />}
             {renderBodyCell(column.renderCell(rowData, showBalances))}
           </StyledBodyTableCell>
         </Hidden>

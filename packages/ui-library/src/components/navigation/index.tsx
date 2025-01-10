@@ -350,8 +350,13 @@ const Navigation = ({
     setMobileOpen(!mobileOpen);
   };
 
+  const handleSectionClick = (section: Section, openInNewTab?: boolean) => {
+    onSectionClick(section, openInNewTab);
+    setMobileOpen(false);
+  };
+
   const drawerWidth = isDownLg ? drawerWidthSm : drawerWidthLg;
-  const drawerLinks = buildDrawer({ sections, selectedSection, onSectionClick });
+  const drawerLinks = buildDrawer({ sections, selectedSection, onSectionClick: handleSectionClick });
 
   const iconProps = { cursor: 'pointer', onClick: onClickBrandLogo, size: '110px' };
   const icon = mode === 'light' ? <BalmyLogoLight {...iconProps} /> : <BalmyLogoDark {...iconProps} />;
