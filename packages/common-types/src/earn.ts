@@ -52,7 +52,7 @@ export type FeeTypeType = StrategyGuardian['fees'][number]['type'];
 export type ApiGuardianFee = StrategyGuardian['fees'][number];
 
 export type SummarizedSdkStrategyParameters = {
-  farms: Record<FarmId, StrategyFarm>;
+  protocols: string[];
   guardians: Record<GuardianId, StrategyGuardian>;
   tokens: {
     assets: Record<TokenListId, SdkStrategyToken>;

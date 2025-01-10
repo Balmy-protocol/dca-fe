@@ -48,12 +48,13 @@ export default function useFilteredStrategies<V extends StrategiesTableVariants>
       const isYieldTypeMatch =
         filtersApplied.yieldTypes.length === 0 || filtersApplied.yieldTypes.includes(strategy.farm.type);
 
-      const isFarmMatch = filtersApplied.farms.length === 0 || filtersApplied.farms.includes(strategy.farm.id);
+      const isProtocolMatch =
+        filtersApplied.protocols.length === 0 || filtersApplied.protocols.includes(strategy.farm.name);
 
       const isGuardiansMatch =
         filtersApplied.guardians.length === 0 || filtersApplied.guardians.includes(strategy.guardian?.id || '');
 
-      return isAssetMatch && isRewardMatch && isNetworkMatch && isYieldTypeMatch && isFarmMatch && isGuardiansMatch;
+      return isAssetMatch && isRewardMatch && isNetworkMatch && isYieldTypeMatch && isProtocolMatch && isGuardiansMatch;
     });
 
     const filteredStrategiesBySearch = filteredStrategies.filter((strategy) =>
