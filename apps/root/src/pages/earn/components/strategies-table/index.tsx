@@ -269,7 +269,7 @@ const Row = <T extends StrategiesTableVariants>({
         <Hidden {...column.hiddenProps} key={`${strategy.id}-${column.key}`}>
           <StyledBodyTableCell
             key={`${strategy.id}-${column.key}`}
-            $hasCondition={!!condition && i === 0}
+            $hasCondition={!!condition && !isSameTierLevel && i === 0}
             $hovered={hovered}
           >
             {isLocked && !isSameTierLevel && i === 0 && <PromotedFlag tier={needsTier} />}
