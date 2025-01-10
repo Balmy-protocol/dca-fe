@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo } from 'react';
-import { Address, Transaction, toHex } from 'viem';
+import { Address, Transaction } from 'viem';
 import omit from 'lodash/omit';
 import values from 'lodash/values';
 import useBuildTransactionMessage from '@hooks/useBuildTransactionMessage';
@@ -153,11 +153,6 @@ export default function Updater(): null {
 
     try {
       switch (tx.type) {
-        case TransactionTypes.newPair:
-          extendedTypeData = {
-            id: toHex(tx.receipt.logs[tx.receipt.logs.length - 1].data),
-          };
-          break;
         case TransactionTypes.newPosition:
           const newPositionparsedLogPromise = transactionService.parseLog({
             logs: tx.receipt.logs,
