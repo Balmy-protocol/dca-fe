@@ -75,8 +75,14 @@ const tierRequirementsFormatter = (tier: TierRequirements, intl: IntlShape): str
   const formatSingleRequirement = (requirement: TierSingleRequirement): string => {
     const { id, value } = requirement;
 
+    let formattedValue = value.toString();
+
+    if (typeof value === 'number') {
+      formattedValue = value.toFixed(0);
+    }
+
     return intl.formatMessage(MESSAGES_BY_MISSING_ACHIEVEMENTS[id], {
-      value: value.toString(),
+      value: formattedValue,
     });
   };
 
@@ -189,7 +195,7 @@ const HowToLevelUpModalNextTierRequirementNumberAmount = ({
       <StyledProgressToNextTierProgressBar value={(currentValueToUse / required) * 100} sx={{ flex: 1 }} />
       <ContainerBox alignItems="center">
         <Typography variant="bodySmallSemibold" color={({ palette: { mode } }) => colors[mode].typography.typo2}>
-          ${currentValueToUse}
+          ${currentValueToUse.toFixed(0)}
         </Typography>
         <Typography variant="bodySmallSemibold" color={({ palette: { mode } }) => colors[mode].typography.typo5}>
           /{required}
