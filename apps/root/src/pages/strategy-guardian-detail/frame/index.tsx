@@ -17,7 +17,7 @@ import { identifyNetwork } from '@common/utils/parsing';
 import StrategyManagement from '../strategy-management';
 import { getAllChains } from '@balmy/sdk';
 import { StrategyId } from 'common-types';
-import { resetEarnForm } from '@state/earn-management/actions';
+import { fullyResetEarnForm } from '@state/earn-management/actions';
 
 const StyledFlexGridItem = styled(Grid)`
   display: flex;
@@ -44,7 +44,6 @@ const StrategyDetailFrame = () => {
 
   React.useEffect(() => {
     dispatch(changeRoute(EARN_PORTFOLIO.key));
-    dispatch(resetEarnForm());
     trackEvent('Earn - Visit strategy detail page', { chainId });
   }, []);
 
@@ -59,6 +58,7 @@ const StrategyDetailFrame = () => {
       dispatch(changeRoute(EARN_ROUTE.key));
       pushToHistory(`/${EARN_ROUTE.key}`);
     }
+    dispatch(fullyResetEarnForm());
   };
 
   React.useEffect(() => {

@@ -12,6 +12,8 @@ export const setWithdrawRewards = createAction<boolean>('earnPositionManagement/
 
 export const resetEarnForm = createAction('earnPositionManagement/resetEarnForm');
 
+export const fullyResetEarnForm = createAction('earnPositionManagement/fullyResetEarnForm');
+
 export const setDepositAssetAmount = createAction<string>('earnPositionManagement/setDepositAssetAmount');
 
 export const setDepositAsset = createAction<Token>('earnPositionManagement/setDepositAsset');
