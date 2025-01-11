@@ -306,7 +306,7 @@ describe('Earn Service', () => {
             id: '10-0xvault-0xhash' as SdkEarnPositionId,
             pendingTransaction: '0xhash',
             permissions: {
-              '0xcompanion': [EarnPermission.INCREASE],
+              '0xcompanion': [EarnPermission.INCREASE, EarnPermission.WITHDRAW],
             },
             balances: [
               {
@@ -492,7 +492,7 @@ describe('Earn Service', () => {
               ],
               createdAt: now,
               permissions: {
-                '0xcompanion': [EarnPermission.INCREASE],
+                '0xcompanion': [EarnPermission.INCREASE, EarnPermission.WITHDRAW],
               },
               history: [
                 {
