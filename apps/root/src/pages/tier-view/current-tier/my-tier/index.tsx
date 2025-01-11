@@ -15,13 +15,21 @@ import {
 import ProgressionRequeriments from '../progression-requeriments';
 import VerifyToLevelUpModal from '../verify-to-level-up-modal';
 import HowToLevelUpModal from '../how-to-level-up-modal';
+import { useIsEarnMobile } from '@hooks/earn/useIsEarnMobile';
 
-const StyledMyTierCard = styled(ContainerBox).attrs({ gap: 6, flex: 1 })`
-  ${({ theme: { palette, spacing } }) => `
+const StyledMyTierCard = styled(ContainerBox).attrs({ gap: 6, flex: 1 })<{ isMobile: boolean }>`
+  ${({ theme: { palette, spacing }, isMobile }) => `
     padding: ${spacing(6)};
     background-color: ${colors[palette.mode].background.quartery};
     border: 1px solid ${colors[palette.mode].border.border1};
     border-radius: ${spacing(4)};
+    ${
+      isMobile &&
+      `
+      padding: ${spacing(4)};
+    `
+    }
+    gap: ${isMobile ? spacing(4) : spacing(6)};
   `}
 `;
 
@@ -159,6 +167,8 @@ const MyTier = () => {
   const [isHowToLevelUpModalOpen, setIsHowToLevelUpModalOpen] = React.useState(false);
   const canLevelUp = progress >= 100;
   const needsToVerifyWallets = walletsToVerify.length > 0 && canLevelUp;
+  const isEarnMobile = useIsEarnMobile();
+
   return (
     <>
       <VerifyToLevelUpModal isOpen={openVerifyToLevelUpModal} onClose={() => setOpenVerifyToLevelUpModal(false)} />
@@ -170,7 +180,7 @@ const MyTier = () => {
       <Grid container spacing={6}>
         {/* current tier */}
         <Grid item xs={12} md={6}>
-          <StyledMyTierCard>
+          <StyledMyTierCard isMobile={isEarnMobile}>
             {needsToVerifyWallets ? (
               <LeveledMyTierCard tierLevel={tierLevel ?? 0} onVerify={() => setOpenVerifyToLevelUpModal(true)} />
             ) : (

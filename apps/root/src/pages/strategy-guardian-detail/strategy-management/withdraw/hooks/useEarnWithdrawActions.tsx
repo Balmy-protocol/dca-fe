@@ -21,7 +21,7 @@ import { Typography } from 'ui-library';
 import useTransactionModal from '@hooks/useTransactionModal';
 import { useTransactionAdder } from '@state/transactions/hooks';
 import useEarnService from '@hooks/earn/useEarnService';
-import { getProtocolToken, getWrappedProtocolToken } from '@common/mocks/tokens';
+// import { getProtocolToken, getWrappedProtocolToken } from '@common/mocks/tokens';
 import { isSameToken, parseUsdPrice, parseNumberUsdPriceToBigInt } from '@common/utils/currency';
 import { TransactionAction, TransactionAction as TransactionStep } from '@common/components/transaction-steps';
 import { find, findIndex } from 'lodash';
@@ -54,11 +54,11 @@ const useEarnWithdrawActions = ({ strategy }: UseEarnWithdrawActionsParams) => {
       activeWallet && strategy?.userPositions?.find((position) => position.owner === activeWallet.address);
     if (!currentPosition) return;
 
-    const protocolToken = getProtocolToken(strategy.farm.chainId);
-    const wrappedProtocolToken = getWrappedProtocolToken(strategy.farm.chainId);
+    // const protocolToken = getProtocolToken(strategy.farm.chainId);
+    // const wrappedProtocolToken = getWrappedProtocolToken(strategy.farm.chainId);
 
     // Protocol tokens will be unwrapped
-    const assetIsWrappedProtocol = isSameToken(wrappedProtocolToken, asset);
+    // const assetIsWrappedProtocol = isSameToken(wrappedProtocolToken, asset);
 
     const rewardsWithdrawAmounts = currentPosition.balances
       .filter((balance) => !isSameToken(balance.token, asset))
@@ -73,7 +73,8 @@ const useEarnWithdrawActions = ({ strategy }: UseEarnWithdrawActionsParams) => {
       {
         amount: parseUnits(assetAmountInUnits || '0', asset.decimals),
         token: asset,
-        convertTo: assetIsWrappedProtocol ? protocolToken.address : undefined,
+        // convertTo: assetIsWrappedProtocol ? protocolToken.address : undefined,
+        convertTo: undefined,
       },
       ...rewardsWithdrawAmounts,
     ];

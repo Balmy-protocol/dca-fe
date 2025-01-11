@@ -10,6 +10,7 @@ import AllStrategiesTable from '../components/all-strategies-table';
 import useHasFetchedAllStrategies from '@hooks/earn/useHasFetchedAllStrategies';
 import { FormattedMessage } from 'react-intl';
 import OneClickMigrationCard from '../components/one-click-migration-card';
+import { useIsEarnMobile } from '@hooks/earn/useIsEarnMobile';
 
 const EarnFrame = () => {
   const dispatch = useAppDispatch();
@@ -29,12 +30,14 @@ const EarnFrame = () => {
     }
   }, []);
 
+  const isEarnMobile = useIsEarnMobile();
+
   return (
     <StyledNonFormContainer flexDirection="column" flexWrap="nowrap">
       <ContainerBox flexDirection="column" gap={32}>
         <ContainerBox flexDirection="column" gap={20}>
           <ContainerBox flexDirection="column" gap={5}>
-            <ContainerBox gap={2} justifyContent="space-between">
+            <ContainerBox gap={2} justifyContent="space-between" flexDirection={isEarnMobile ? 'column' : 'row'}>
               <ContainerBox flexDirection="column" gap={2}>
                 <Typography variant="h1Bold">
                   <FormattedMessage defaultMessage="Earn" description="earn.all-strategies.title" />

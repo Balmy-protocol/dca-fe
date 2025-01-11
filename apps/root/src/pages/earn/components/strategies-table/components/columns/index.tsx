@@ -149,7 +149,7 @@ const StyledMoreRewardsBadge = styled(ContainerBox).attrs({ alignItems: 'center'
   `}
 `;
 
-const MoreRewardsBadge = () => {
+export const MoreRewardsBadge = () => {
   return (
     <StyledMoreRewardsBadge>
       <MovingStarIcon sx={({ palette }) => ({ color: colors[palette.mode].semantic.success.darker })} />

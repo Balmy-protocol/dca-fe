@@ -797,6 +797,7 @@ export default class AccountService extends EventsManager<AccountServiceData> {
     });
 
     this.earlyAccessEnabled = true;
+    void this.tierService.pollUser();
   }
 
   async getElegibilityAchievements() {

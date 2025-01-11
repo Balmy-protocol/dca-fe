@@ -1,12 +1,5 @@
 import React from 'react';
-import {
-  AmountsOfToken,
-  EarnPosition,
-  SetStateCallback,
-  Strategy,
-  StrategyConditionType,
-  StrategyId,
-} from 'common-types';
+import { AmountsOfToken, EarnPosition, SetStateCallback, Strategy, StrategyConditionType } from 'common-types';
 import {
   BackgroundPaper,
   ContainerBox,
@@ -42,7 +35,6 @@ import {
 import EmptyPortfolio from './components/empty-portfolio';
 import TotalFooter from './components/total-footer';
 import { FarmWithAvailableDepositTokens } from '@hooks/earn/useAvailableDepositTokens';
-import { PROMOTED_STRATEGIES_IDS } from '@constants/earn';
 import PromotedFlag from './components/promoted-flag';
 import { isNil } from 'lodash';
 import useTierLevel from '@hooks/tiers/useTierLevel';
@@ -247,10 +239,9 @@ const Row = <T extends StrategiesTableVariants>({
 
   const strategy = getStrategyFromTableObject(rowData, variant);
   const needsTier = getNeedsTierFromTableObject(rowData, variant);
-  const isPromoted = PROMOTED_STRATEGIES_IDS.includes(strategy.id as StrategyId);
   const isLocked = !isNil(needsTier);
 
-  const condition = isLocked ? StrategyConditionType.LOCKED : isPromoted ? StrategyConditionType.PROMOTED : undefined;
+  const condition = isLocked ? StrategyConditionType.LOCKED : undefined;
   // If TierIcon is rendered, needsTier is defined
   const TierIcon = ActiveTiersIcons[needsTier || 0];
 
