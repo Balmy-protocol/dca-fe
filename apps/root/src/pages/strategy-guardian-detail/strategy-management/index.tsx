@@ -5,7 +5,7 @@ import styled from 'styled-components';
 import { BackgroundPaper, Badge, ContainerBox, Skeleton, Tab, Typography, UnderlinedTabs } from 'ui-library';
 import DepositForm from './deposit/form';
 import { useAppDispatch } from '@hooks/state';
-import { setAsset } from '@state/earn-management/actions';
+import { fullyResetEarnForm, setAsset } from '@state/earn-management/actions';
 import WithdrawForm from './withdraw/form';
 import DelayWithdrawWarning from './components/delay-withdraw-warning';
 import { WithdrawType } from 'common-types';
@@ -59,6 +59,9 @@ const StrategyManagement = ({ chainId, strategyGuardianId }: StrategyManagementP
   );
 
   React.useEffect(() => {
+    if (strategy?.asset.address !== asset?.address) {
+      dispatch(fullyResetEarnForm());
+    }
     if (strategy?.asset && !asset) dispatch(setAsset(strategy.asset));
   }, [strategy?.asset?.address, asset]);
 
