@@ -229,9 +229,9 @@ const HowToLevelUpModalNextTierRequirementBoolean = ({
           {`·`}
         </Typography>
         {currentValueToUse >= required ? (
-          <CheckCircleOutlineIcon sx={{ color: ({ palette: { mode } }) => colors[mode].typography.typo5 }} />
-        ) : (
           <CheckCircleOutlineIcon color="success" />
+        ) : (
+          <CheckCircleOutlineIcon sx={{ color: ({ palette: { mode } }) => colors[mode].typography.typo5 }} />
         )}
       </ContainerBox>
     </ContainerBox>
