@@ -24,7 +24,7 @@ const processAchievements = (achievements: ElegibilityAchievementsResponse, wall
       (achievements[wallet.address].find((achievement) => achievement.id === ElegibilityAchievements.LOBSTER_NFT_HOLDER)
         ?.achieved as boolean) ||
       (achievements[wallet.address].find((achievement) => achievement.id === ElegibilityAchievements.DCA_POSITIONS)
-        ?.achieved as number) >= 30
+        ?.achieved as number) >= 1
   );
 
 export type ElegibilityStatus = {
