@@ -1,4 +1,4 @@
-import { parseNumberUsdPriceToBigInt, parseUsdPrice, toToken } from '@common/utils/currency';
+import { parseBaseUsdPriceToNumber, parseNumberUsdPriceToBigInt, parseUsdPrice, toToken } from '@common/utils/currency';
 import { useAllBalances } from '@state/balances/hooks';
 import { Address, AmountsOfToken, FarmId, Strategy, StrategyFarm, Token, TokenType } from '@types';
 import React from 'react';
@@ -6,7 +6,8 @@ import useAllStrategies from './useAllStrategies';
 import { formatUnits } from 'viem';
 import useEarnService from './useEarnService';
 import useTierLevel from '@hooks/tiers/useTierLevel';
-import { isNil } from 'lodash';
+import { compact, isNil } from 'lodash';
+import usePriceService from '@hooks/usePriceService';
 
 export interface TokenWithStrategy extends Token {
   strategy: Strategy;
@@ -32,12 +33,14 @@ const useAvailableDepositTokens = ({ filterSmallValues = false }: { filterSmallV
 
   const earnService = useEarnService();
 
+  const priceService = usePriceService();
+
   const { tierLevel } = useTierLevel();
 
   const [{ result, isLoading }, setState] = React.useState<{
     isLoading: boolean;
     // The key is chainId-tokenAddress-amount
-    result: Record<string, { underlying: string; underlyingAmount: string }>;
+    result: Record<string, { underlying: string; underlyingAmount: string; price: bigint }>;
   }>({ isLoading: false, result: {} });
 
   const depositTokens = React.useMemo(() => {
@@ -105,7 +108,23 @@ const useAvailableDepositTokens = ({ filterSmallValues = false }: { filterSmallV
       );
       try {
         const response = await earnService.transformVaultTokensToUnderlying(tokensToTransform);
-        setState({ result: response, isLoading: false });
+        const underlyingTokens = tokensToTransform.map(({ token, amount }) => {
+          console.log(response, token, amount);
+          const underlying = response[`${token.chainId}-${token.address}-${amount}`];
+          if (!underlying) {
+            return null;
+          }
+          return toToken({ address: underlying.underlying, chainId: token.chainId });
+        });
+        console.log(underlyingTokens);
+        const priceResponse = await priceService.getUsdHistoricPrice(compact(underlyingTokens));
+        console.log(priceResponse);
+        const reultsWithPrice = Object.fromEntries(
+          Object.entries(response).map(([key, value]) => {
+            return [key, { ...value, price: priceResponse[value.underlying] }];
+          })
+        );
+        setState({ result: reultsWithPrice, isLoading: false });
       } catch (e) {
         console.error(e);
       }
@@ -128,24 +147,20 @@ const useAvailableDepositTokens = ({ filterSmallValues = false }: { filterSmallV
               if (!underlying) {
                 return acc;
               }
-              const chainBalancesAndPrices = allBalances.balances[token.chainId];
-              if (!chainBalancesAndPrices) {
-                return false;
-              }
-              const tokenBalances = chainBalancesAndPrices.balancesAndPrices[underlying.underlying as Address];
 
-              if (!tokenBalances) {
-                return false;
+              if (!underlying.price) {
+                return acc;
               }
-              const underlyingPrice = tokenBalances.price;
-              const underlyingToken = toToken({ ...tokenBalances.token, chainId: token.chainId, type: TokenType.FARM });
+              const underlyingPrice = underlying.price;
+              const underlyingToken = toToken({
+                address: underlying.underlying,
+                price: parseBaseUsdPriceToNumber(underlyingPrice),
+                chainId: token.chainId,
+                decimals: token.decimals,
+              });
               const underlyingAmount = BigInt(underlying.underlyingAmount);
-              const underlyingAmountUSD = parseUsdPrice(
-                underlyingToken,
-                underlyingAmount,
-                parseNumberUsdPriceToBigInt(underlyingPrice)
-              ).toFixed(2);
-              const underlyingAmountUnits = formatUnits(underlyingAmount, tokenBalances.token.decimals);
+              const underlyingAmountUSD = parseUsdPrice(underlyingToken, underlyingAmount, underlyingPrice).toFixed(2);
+              const underlyingAmountUnits = formatUnits(underlyingAmount, underlyingToken.decimals);
               // eslint-disable-next-line no-param-reassign
               acc[`${token.strategy.farm.id}-${walletAddress}`] = {
                 id: token.strategy.farm.id,
