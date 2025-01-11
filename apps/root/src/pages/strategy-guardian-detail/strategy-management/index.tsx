@@ -5,7 +5,7 @@ import styled from 'styled-components';
 import { BackgroundPaper, Badge, ContainerBox, Skeleton, Tab, Typography, UnderlinedTabs } from 'ui-library';
 import DepositForm from './deposit/form';
 import { useAppDispatch } from '@hooks/state';
-import { setAsset } from '@state/earn-management/actions';
+import { fullyResetEarnForm, setAsset } from '@state/earn-management/actions';
 import WithdrawForm from './withdraw/form';
 import DelayWithdrawWarning from './components/delay-withdraw-warning';
 import { WithdrawType } from 'common-types';
@@ -59,14 +59,23 @@ const StrategyManagement = ({ chainId, strategyGuardianId }: StrategyManagementP
   );
 
   React.useEffect(() => {
+    if (strategy?.asset.address !== asset?.address) {
+      dispatch(fullyResetEarnForm());
+    }
     if (strategy?.asset && !asset) dispatch(setAsset(strategy.asset));
   }, [strategy?.asset?.address, asset]);
 
   const hasAssetDelayedWithdrawal = strategy?.asset.withdrawTypes.includes(WithdrawType.DELAYED);
 
+  const hasToWithdraw = strategy?.userPositions?.some((position) =>
+    position.balances.some((balance) => balance.amount.amount > 0)
+  );
+
+  const isLocked = needsTier && needsTier > (tierLevel ?? 0);
+
   return (
     <StyledBackgroundPaper sx={{ height: height }}>
-      {needsTier && needsTier > (tierLevel ?? 0) ? (
+      {isLocked && !hasToWithdraw ? (
         <LockedDeposit strategy={strategy} needsTier={needsTier} />
       ) : (
         <>

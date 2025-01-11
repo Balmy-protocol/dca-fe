@@ -160,7 +160,7 @@ const Navigation = ({ children }: React.PropsWithChildren) => {
       if (
         section.type === SectionType.divider ||
         section.type === SectionType.group ||
-        section.key === currentRoute ||
+        // section.key === currentRoute ||
         (!hasEarnAccess && NON_NAVIGABLE_EARN_ROUTES.includes(section.key))
       ) {
         return;

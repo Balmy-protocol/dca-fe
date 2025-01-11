@@ -9,6 +9,7 @@ import {
   setWithdrawRewards,
   setDepositAsset,
   setDepositAssetAmount,
+  fullyResetEarnForm,
 } from './actions';
 
 export interface EarnManagementState {
@@ -57,6 +58,11 @@ export default createReducer(initialState, (builder) => {
         ...initialState,
         asset: state.asset,
         chainId: state.chainId,
+      };
+    })
+    .addCase(fullyResetEarnForm, () => {
+      return {
+        ...initialState,
       };
     });
 });
