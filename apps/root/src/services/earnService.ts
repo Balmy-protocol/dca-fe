@@ -718,11 +718,7 @@ export class EarnService extends EventsManager<EarnServiceData> {
     const permissions = [
       {
         operator: earnCompanionAddress,
-        permissions: [EarnPermission.INCREASE],
-      },
-      {
-        operator: earnCompanionAddress,
-        permissions: [EarnPermission.WITHDRAW],
+        permissions: [EarnPermission.INCREASE, EarnPermission.WITHDRAW],
       },
     ];
 
