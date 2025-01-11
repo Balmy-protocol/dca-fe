@@ -67,9 +67,15 @@ const StrategyManagement = ({ chainId, strategyGuardianId }: StrategyManagementP
 
   const hasAssetDelayedWithdrawal = strategy?.asset.withdrawTypes.includes(WithdrawType.DELAYED);
 
+  const hasToWithdraw = strategy?.userPositions?.some((position) =>
+    position.balances.some((balance) => balance.amount.amount > 0)
+  );
+
+  const isLocked = needsTier && needsTier > (tierLevel ?? 0);
+
   return (
     <StyledBackgroundPaper sx={{ height: height }}>
-      {needsTier && needsTier > (tierLevel ?? 0) ? (
+      {isLocked && !hasToWithdraw ? (
         <LockedDeposit strategy={strategy} needsTier={needsTier} />
       ) : (
         <>
