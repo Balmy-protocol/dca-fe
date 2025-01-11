@@ -37,7 +37,6 @@ import { calculateDeadline, PermitData } from '@balmy/sdk';
 import { EarnPermissionData } from '@balmy/sdk/dist/services/earn/types';
 import ContractService from './contractService';
 import { mapPermission } from '@balmy/sdk/dist/services/earn/earn-service';
-import { getWrappedProtocolToken } from '@common/mocks/tokens';
 import { orderBy, uniqBy } from 'lodash';
 import MeanApiService from './meanApiService';
 
