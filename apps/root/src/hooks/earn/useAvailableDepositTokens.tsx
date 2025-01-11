@@ -109,16 +109,13 @@ const useAvailableDepositTokens = ({ filterSmallValues = false }: { filterSmallV
       try {
         const response = await earnService.transformVaultTokensToUnderlying(tokensToTransform);
         const underlyingTokens = tokensToTransform.map(({ token, amount }) => {
-          console.log(response, token, amount);
           const underlying = response[`${token.chainId}-${token.address}-${amount}`];
           if (!underlying) {
             return null;
           }
           return toToken({ address: underlying.underlying, chainId: token.chainId });
         });
-        console.log(underlyingTokens);
         const priceResponse = await priceService.getUsdHistoricPrice(compact(underlyingTokens));
-        console.log(priceResponse);
         const reultsWithPrice = Object.fromEntries(
           Object.entries(response).map(([key, value]) => {
             return [key, { ...value, price: priceResponse[value.underlying] }];
