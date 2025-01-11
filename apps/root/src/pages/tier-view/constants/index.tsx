@@ -427,7 +427,7 @@ export const TIER_REQUIREMENTS: TierRequirements[] = [
             type: 'OR',
             requirements: [
               { id: AchievementKeys.SWAP_VOLUME, value: 2000 },
-              { id: AchievementKeys.MIGRATED_VOLUME, value: 2000 },
+              { id: AchievementKeys.MIGRATED_VOLUME, value: 20 },
             ],
           },
         ],
