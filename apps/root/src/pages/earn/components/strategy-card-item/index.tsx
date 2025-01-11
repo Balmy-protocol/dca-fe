@@ -7,8 +7,9 @@ import TokenIconWithNetwork from '@common/components/token-icon-with-network';
 import { FormattedMessage } from 'react-intl';
 import ComposedTokenIcon from '@common/components/composed-token-icon';
 import { Link } from 'react-router-dom';
-import { PROMOTED_STRATEGIES_IDS } from '@constants/earn';
 import PromotedFlag from '../strategies-table/components/promoted-flag';
+import { isNil } from 'lodash';
+import { MoreRewardsBadge } from '../strategies-table/components/columns';
 
 interface SugestedStrategyCardProps {
   strategy: Strategy;
@@ -32,6 +33,8 @@ const StyledCard = styled(Card).attrs({ variant: 'outlined' })<{ $condition?: St
       display: flex;
       flex-direction: column;
       gap: ${spacing(4)};
+      overflow: visible;
+      position: relative;
       ${
         $condition === StrategyConditionType.PROMOTED &&
         `
@@ -52,10 +55,11 @@ const StyledCard = styled(Card).attrs({ variant: 'outlined' })<{ $condition?: St
     `}
 `;
 
-const StrategyCardItem = ({ strategy, variant, tierLevel }: SugestedStrategyCardProps) => {
-  const isPromoted = PROMOTED_STRATEGIES_IDS.includes(strategy.id);
-  const isLocked = Boolean(strategy.needsTier && strategy.needsTier > tierLevel);
-  const condition = isLocked ? StrategyConditionType.LOCKED : isPromoted ? StrategyConditionType.PROMOTED : undefined;
+const StrategyCardItem = ({ strategy, variant }: SugestedStrategyCardProps) => {
+  const needsTier = strategy.needsTier;
+  const isLocked = !isNil(needsTier);
+
+  const condition = isLocked ? StrategyConditionType.LOCKED : undefined;
 
   return (
     <StyledCard $condition={condition}>
@@ -71,7 +75,11 @@ const StrategyCardItem = ({ strategy, variant, tierLevel }: SugestedStrategyCard
               <Typography variant="bodySmallRegular">
                 <FormattedMessage description="earn.strategy-card.rewards" defaultMessage="Rewards" />
               </Typography>
-              <ComposedTokenIcon size={8} tokens={strategy.rewards.tokens} />
+              <ContainerBox gap={2} alignItems="center">
+                <ComposedTokenIcon tokens={strategy.rewards.tokens} size={4.5} />
+                {/* Only tier 2 and above have more rewards */}
+                {needsTier && needsTier > 1 && <MoreRewardsBadge />}
+              </ContainerBox>
             </>
           )}
         </ContainerBox>
@@ -90,7 +98,7 @@ const StrategyCardItem = ({ strategy, variant, tierLevel }: SugestedStrategyCard
           <FormattedMessage description="earn.strategy-card.button" defaultMessage="View Vault" />
         </Typography>
       </StyledLink>
-      {condition === StrategyConditionType.PROMOTED && <PromotedFlag isCard tier={strategy.needsTier} />}
+      {isLocked && <PromotedFlag isCard tier={strategy.needsTier} />}
     </StyledCard>
   );
 };
