@@ -106,59 +106,28 @@ const FeeContainer = ({
   </ContainerBox>
 );
 
+const AAVE_FARM_DESCRIPTION = defineMessage({
+  defaultMessage: 'Aave',
+  description: 'earn.strategy-details.vault-about.vault-description.Aave',
+});
+
 const FARM_DESCRIPTION_MAP: Record<FarmId, MessageDescriptor> = {
   '8453-0xee8f4ec5672f09119b96ab6fb59c27e1b7e44b61': defineMessage({
     description: 'earn.strategy-details.vault-about.vault-description.Base-Morpho-USDC',
     defaultMessage: 'Base-Morpho-USDC',
   }),
-  '8453-0x4e65fe4dba92790696d040ac24aa414708f5c0ab': defineMessage({
-    description: 'earn.strategy-details.vault-about.vault-description.Base-Aave-USDC',
-    defaultMessage: 'Base-Aave-USDC',
-  }),
-  '10-0xe50fa9b3c56ffb159cb0fca61f5c9d750e8128c8': defineMessage({
-    description: 'earn.strategy-details.vault-about.vault-description.Optimism-Aave-WETH',
-    defaultMessage: 'Optimism-Aave-WETH',
-  }),
-  '10-0x625e7708f30ca75bfd92586e17077590c60eb4cd': defineMessage({
-    description: 'earn.strategy-details.vault-about.vault-description.Optimism-Aave-USDC.e',
-    defaultMessage: 'Optimism-Aave-USDC.e',
-  }),
-  '10-0x078f358208685046a11c85e8ad32895ded33a249': defineMessage({
-    description: 'earn.strategy-details.vault-about.vault-description.Optimism-Aave-WBTC',
-    defaultMessage: 'Optimism-Aave-WBTC',
-  }),
-  '10-0x6ab707aca953edaefbc4fd23ba73294241490620': defineMessage({
-    description: 'earn.strategy-details.vault-about.vault-description.Optimism-Aave-USDT',
-    defaultMessage: 'Optimism-Aave-USDT',
-  }),
-  '10-0x513c7e3a9c69ca3e22550ef58ac1c0088e918fff': defineMessage({
-    description: 'earn.strategy-details.vault-about.vault-description.Optimism-Aave-OP',
-    defaultMessage: 'Optimism-Aave-OP',
-  }),
-  '10-0x6d80113e533a2c0fe82eabd35f1875dcea89ea97': defineMessage({
-    description: 'earn.strategy-details.vault-about.vault-description.Optimism-Aave-sUSD',
-    defaultMessage: 'Optimism-Aave-sUSD',
-  }),
-  '10-0x38d693ce1df5aadf7bc62595a37d667ad57922e5': defineMessage({
-    description: 'earn.strategy-details.vault-about.vault-description.Optimism-Aave-USDC',
-    defaultMessage: 'Optimism-Aave-USDC',
-  }),
-  '10-0x82e64f49ed5ec1bc6e43dad4fc8af9bb3a2312ee': defineMessage({
-    description: 'earn.strategy-details.vault-about.vault-description.Optimism-Aave-DAI',
-    defaultMessage: 'Optimism-Aave-DAI',
-  }),
-  '10-0x8eb270e296023e9d92081fdf967ddd7878724424': defineMessage({
-    description: 'earn.strategy-details.vault-about.vault-description.Optimism-Aave-LUSD',
-    defaultMessage: 'Optimism-Aave-LUSD',
-  }),
-  '8453-0xd4a0e0b9149bcee3c920d2e00b5de09138fd8bb7': defineMessage({
-    description: 'earn.strategy-details.vault-about.vault-description.Base-Aave-WETH',
-    defaultMessage: 'Base-Aave-WETH',
-  }),
-  '8453-0xbdb9300b7cde636d9cd4aff00f6f009ffbbc8ee6': defineMessage({
-    description: 'earn.strategy-details.vault-about.vault-description.Base-Aave-cbBTC',
-    defaultMessage: 'Base-Aave-cbBTC',
-  }),
+  '8453-0x4e65fe4dba92790696d040ac24aa414708f5c0ab': AAVE_FARM_DESCRIPTION,
+  '10-0xe50fa9b3c56ffb159cb0fca61f5c9d750e8128c8': AAVE_FARM_DESCRIPTION,
+  '10-0x625e7708f30ca75bfd92586e17077590c60eb4cd': AAVE_FARM_DESCRIPTION,
+  '10-0x078f358208685046a11c85e8ad32895ded33a249': AAVE_FARM_DESCRIPTION,
+  '10-0x6ab707aca953edaefbc4fd23ba73294241490620': AAVE_FARM_DESCRIPTION,
+  '10-0x513c7e3a9c69ca3e22550ef58ac1c0088e918fff': AAVE_FARM_DESCRIPTION,
+  '10-0x6d80113e533a2c0fe82eabd35f1875dcea89ea97': AAVE_FARM_DESCRIPTION,
+  '10-0x38d693ce1df5aadf7bc62595a37d667ad57922e5': AAVE_FARM_DESCRIPTION,
+  '10-0x82e64f49ed5ec1bc6e43dad4fc8af9bb3a2312ee': AAVE_FARM_DESCRIPTION,
+  '10-0x8eb270e296023e9d92081fdf967ddd7878724424': AAVE_FARM_DESCRIPTION,
+  '8453-0xd4a0e0b9149bcee3c920d2e00b5de09138fd8bb7': AAVE_FARM_DESCRIPTION,
+  '8453-0xbdb9300b7cde636d9cd4aff00f6f009ffbbc8ee6': AAVE_FARM_DESCRIPTION,
   '8453-0xa0e430870c4604ccfc7b38ca7845b1ff653d0ff1': defineMessage({
     description: 'earn.strategy-details.vault-about.vault-description.Base-Morpho-WETH',
     defaultMessage: 'Base-Morpho-WETH',
