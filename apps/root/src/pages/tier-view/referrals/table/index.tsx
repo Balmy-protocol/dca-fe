@@ -128,9 +128,11 @@ const ReferralStatusCell = ({
 
   if (isReferralActive) {
     return (
-      <StyledActiveReferralStatusCellPill>
-        <FormattedMessage description="tier-view.referrals.table.status.active" defaultMessage="Completed" />
-      </StyledActiveReferralStatusCellPill>
+      <ContainerBox gap={2} alignItems="center">
+        <StyledActiveReferralStatusCellPill>
+          <FormattedMessage description="tier-view.referrals.table.status.active" defaultMessage="Completed" />
+        </StyledActiveReferralStatusCellPill>
+      </ContainerBox>
     );
   }
 
