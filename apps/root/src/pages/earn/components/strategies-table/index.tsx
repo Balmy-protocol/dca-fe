@@ -246,6 +246,7 @@ const Row = <T extends StrategiesTableVariants>({
   const TierIcon = ActiveTiersIcons[needsTier || 0];
 
   const isSameTierLevel = !isNil(needsTier) && !isNil(tierLevel) && needsTier === tierLevel;
+
   return (
     <StyledTableRow
       $condition={condition}
@@ -265,7 +266,7 @@ const Row = <T extends StrategiesTableVariants>({
           >
             {isLocked && !isSameTierLevel && i === 0 && <PromotedFlag tier={needsTier} />}
             {isLocked && !isSameTierLevel && i === 0 && <StyledTierBadge isPromoted CurrentTierBadge={TierIcon} />}
-            {renderBodyCell(column.renderCell(rowData, showBalances))}
+            {renderBodyCell(column.renderCell(rowData, showBalances, tierLevel))}
           </StyledBodyTableCell>
         </Hidden>
       ))}

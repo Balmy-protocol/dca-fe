@@ -118,7 +118,7 @@ const StyledBoxedOwners = ({ owners }: { owners: ViemAddress[] }) => {
 export interface StrategyColumnConfig<T extends StrategiesTableVariants> {
   key: StrategyColumnKeys;
   label: React.ReactNode;
-  renderCell: (data: TableStrategy<T>, showBalances: boolean) => React.ReactNode | string;
+  renderCell: (data: TableStrategy<T>, showBalances: boolean, tierLevel?: number) => React.ReactNode | string;
   getOrderValue?: (data: TableStrategy<T>) => string | number | undefined;
   customSkeleton?: React.ReactNode;
   hiddenProps?: HiddenProps;
@@ -302,10 +302,17 @@ export const portfolioColumnConfigs: StrategyColumnConfig<StrategiesTableVariant
   {
     key: StrategyColumnKeys.VAULT_NAME,
     label: <FormattedMessage description="earn.all-strategies-table.column.vault-name" defaultMessage="Vault" />,
-    renderCell: (data) => (
+    renderCell: (data, showBalances, tierLevel) => (
       <Tooltip title={data[0].strategy.farm.name}>
         <StyledTitleContainer>
-          <StyledBodySmallRegularTypo2>{data[0].strategy.farm.name}</StyledBodySmallRegularTypo2>
+          {!isNil(tierLevel) && !isNil(data[0].strategy.needsTier) && data[0].strategy.needsTier === tierLevel ? (
+            <>
+              <StyledCurrentTierFarmName>{data[0].strategy.farm.name}</StyledCurrentTierFarmName>
+              <StyledTierBadge CurrentTierBadge={ActiveTiersIcons[tierLevel]} />
+            </>
+          ) : (
+            <StyledBodySmallRegularTypo2>{data[0].strategy.farm.name}</StyledBodySmallRegularTypo2>
+          )}
         </StyledTitleContainer>
       </Tooltip>
     ),
