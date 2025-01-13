@@ -75,14 +75,22 @@ const StrategyTimeline = ({ strategy }: StrategyTimelineProps) => {
       (acc, position) => {
         if (!('history' in position)) return acc;
 
-        position.history?.forEach((positionState) => {
-          if (FILTERS[tabIndex].includes(positionState.action as EarnPositionActionType)) {
-            acc.push({
-              position,
-              positionState,
-            });
-          }
-        });
+        position.history
+          ?.filter((positionState) => {
+            // filter withdraw 0 positions
+            if (positionState.action === EarnPositionActionType.WITHDREW) {
+              return positionState.withdrawn.length > 0;
+            }
+            return true;
+          })
+          .forEach((positionState) => {
+            if (FILTERS[tabIndex].includes(positionState.action as EarnPositionActionType)) {
+              acc.push({
+                position,
+                positionState,
+              });
+            }
+          });
 
         return acc;
       },
