@@ -559,18 +559,18 @@ export const SMOL_DOMAIN_ADDRESS: Record<number, Address> = {
 };
 
 export const EARN_COMPANION_ADDRESS: Record<number, Address> = {
-  [Chains.POLYGON.chainId]: '0xabbfc43f00e88d0ab836c8c630a98e6a27094bb5',
-  [Chains.BASE.chainId]: '0xabbfc43f00e88d0ab836c8c630a98e6a27094bb5',
+  [Chains.POLYGON.chainId]: '0x5cb7667a29d2029ac2e38aa43f0608b620fad087',
+  [Chains.BASE.chainId]: '0x5cb7667a29d2029ac2e38aa43f0608b620fad087',
 };
 
 export const EARN_VAULT_ADDRESS: Record<number, Lowercase<Address>> = {
-  [Chains.POLYGON.chainId]: '0x9332b2ceccb56bed1d727c5e350e174699f96cca',
-  [Chains.BASE.chainId]: '0x9332b2ceccb56bed1d727c5e350e174699f96cca',
+  [Chains.POLYGON.chainId]: '0x0990a4a641636d437af9aa214a1a580377ef1954',
+  [Chains.BASE.chainId]: '0x0990a4a641636d437af9aa214a1a580377ef1954',
 };
 
 export const EARN_STRATEGY_REGISTRY: Record<number, Lowercase<Address>> = {
-  [Chains.POLYGON.chainId]: '0x020ebf53f4e5ef859e18e2973bd8d8b9af5c9c9f',
-  [Chains.BASE.chainId]: '0x020ebf53f4e5ef859e18e2973bd8d8b9af5c9c9f',
+  [Chains.POLYGON.chainId]: '0xc0571929c21b71fc7579ec7159b1e88a2199bc78',
+  [Chains.BASE.chainId]: '0xc0571929c21b71fc7579ec7159b1e88a2199bc78',
 };
 
 export const EXPLORER_URL = getAllChains().reduce<Record<number, string>>(
