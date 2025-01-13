@@ -1,7 +1,7 @@
 import { isSingleRequirement } from '@common/utils/tiers';
 import { defineMessage, IntlShape, MessageDescriptor, FormattedMessage, useIntl } from 'react-intl';
 import useTierLevel from '@hooks/tiers/useTierLevel';
-import { TIER_REQUIREMENTS } from '@pages/tier-view/constants';
+import { SHARE_TWEET_ID, TIER_REQUIREMENTS } from '@pages/tier-view/constants';
 import { ThemeMode } from '@state/config/hooks';
 import { AchievementKeys, TierConditionalRequirement, TierRequirements, TierSingleRequirement } from 'common-types';
 import React from 'react';
@@ -13,6 +13,7 @@ import {
   InfoCircleIcon,
   LinearProgress,
   LinearProgressProps,
+  Link,
   Modal,
   TagUserIcon,
   TwitterIcon,
@@ -22,6 +23,8 @@ import {
 import styled from 'styled-components';
 import { withStyles } from 'tss-react/mui';
 import { isNil } from 'lodash';
+import useTierService from '@hooks/tiers/useTierService';
+import useAnalytics from '@hooks/useAnalytics';
 
 const getTierColor = (isNextTier: boolean, isBelowCurrentTier: boolean, mode: ThemeMode) => {
   if (isNextTier) return colors[mode].accent.primary;
@@ -218,13 +221,35 @@ const HowToLevelUpModalNextTierRequirementBoolean = ({
   const intl = useIntl();
 
   const icon = TIER_REQUIREMENT_ICONS[achievementKey];
+
+  const tierService = useTierService();
+  const { trackEvent } = useAnalytics();
+
+  const onShare = React.useCallback(() => {
+    void tierService.updateTwitterShare();
+    trackEvent('Tiers - Share tweet to level up');
+  }, [achievementKey, tierService, trackEvent]);
+
   return (
     <ContainerBox gap={2} alignItems="center">
       {icon}
       <ContainerBox gap={1} alignItems="center">
-        <Typography variant="bodySmallSemibold" color={({ palette: { mode } }) => colors[mode].typography.typo2}>
-          {intl.formatMessage(TIER_REQUIREMENT_MESSAGES[achievementKey])}
-        </Typography>
+        {achievementKey === AchievementKeys.TWEET && (
+          <Link
+            href={`https://twitter.com/intent/retweet?tweet_id=${SHARE_TWEET_ID}`}
+            target="_blank"
+            onClick={onShare}
+          >
+            <Typography variant="bodySmallSemibold" color={({ palette: { mode } }) => colors[mode].accentPrimary}>
+              {intl.formatMessage(TIER_REQUIREMENT_MESSAGES[achievementKey])}
+            </Typography>
+          </Link>
+        )}
+        {achievementKey !== AchievementKeys.TWEET && (
+          <Typography variant="bodySmallSemibold" color={({ palette: { mode } }) => colors[mode].typography.typo2}>
+            {intl.formatMessage(TIER_REQUIREMENT_MESSAGES[achievementKey])}
+          </Typography>
+        )}
         <Typography variant="bodySmallSemibold" color={({ palette: { mode } }) => colors[mode].typography.typo5}>
           {`·`}
         </Typography>
@@ -358,6 +383,7 @@ const HowToLevelUpModalNextTier = ({
       required: achieved.required,
     };
   });
+
   return (
     <ContainerBox gap={3} flexDirection="column">
       <ContainerBox gap={1} alignItems="center" flexWrap="wrap">

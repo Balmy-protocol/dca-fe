@@ -469,3 +469,5 @@ export const TIER_REQUIREMENTS: TierRequirements[] = [
     requirements: [],
   },
 ];
+
+export const SHARE_TWEET_ID = '1878894791636713836';
