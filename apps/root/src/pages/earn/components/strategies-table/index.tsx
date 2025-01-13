@@ -139,11 +139,13 @@ const StrategiesTableHeader = <T extends StrategiesTableVariants>({
   variant,
   disabled,
   showEndChevron = true,
+  setPage,
 }: {
   columns: StrategyColumnConfig<T>[];
   variant: T;
   disabled?: boolean;
   showEndChevron?: boolean;
+  setPage: SetStateCallback<number>;
 }) => {
   const dispatch = useAppDispatch();
   const { orderBy } = useStrategiesFilters(variant);
@@ -152,6 +154,7 @@ const StrategiesTableHeader = <T extends StrategiesTableVariants>({
     const isAsc = orderBy.column === column && orderBy.order === 'asc';
     const order = isAsc ? 'desc' : 'asc';
     dispatch(setOrderBy({ variant, column, order }));
+    setPage(0);
   };
 
   return (
@@ -344,6 +347,7 @@ const StrategiesTable = <T extends StrategiesTableVariants>({
           variant={variant}
           disabled={isEmptyPortfolio}
           showEndChevron={showEndChevron}
+          setPage={setPage}
         />
         <TableBody>
           {isLoading ? (
