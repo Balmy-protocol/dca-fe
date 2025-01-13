@@ -89,9 +89,10 @@ const AllStrategiesTableToolbar = ({
                 description: 'allStrategiesSearch',
               })
             )}
-            onChange={(evt: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) =>
-              handleSearchChange(evt.currentTarget.value)
-            }
+            onChange={(evt: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
+              handleSearchChange(evt.currentTarget.value);
+              setPage(0);
+            }}
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
