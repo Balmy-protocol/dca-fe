@@ -110,7 +110,7 @@ export const parseAllStrategies = ({
             chainId
           )
         ),
-        apy: farm.apy,
+        apy: farm.rewards?.apy ?? 0,
       },
       network,
       guardian: guardian,

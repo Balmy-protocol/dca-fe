@@ -26,6 +26,7 @@ import { isSameToken, parseUsdPrice, parseNumberUsdPriceToBigInt } from '@common
 import { TransactionAction, TransactionAction as TransactionStep } from '@common/components/transaction-steps';
 import { find, findIndex } from 'lodash';
 import { TRANSACTION_ACTION_APPROVE_COMPANION_SIGN_EARN, TRANSACTION_ACTION_EARN_WITHDRAW } from '@constants';
+import { getWrappedProtocolToken, getProtocolToken } from '@common/mocks/tokens';
 
 interface UseEarnWithdrawActionsParams {
   strategy?: DisplayStrategy;
@@ -54,11 +55,11 @@ const useEarnWithdrawActions = ({ strategy }: UseEarnWithdrawActionsParams) => {
       activeWallet && strategy?.userPositions?.find((position) => position.owner === activeWallet.address);
     if (!currentPosition) return;
 
-    // const protocolToken = getProtocolToken(strategy.farm.chainId);
-    // const wrappedProtocolToken = getWrappedProtocolToken(strategy.farm.chainId);
+    const protocolToken = getProtocolToken(strategy.farm.chainId);
+    const wrappedProtocolToken = getWrappedProtocolToken(strategy.farm.chainId);
 
     // Protocol tokens will be unwrapped
-    // const assetIsWrappedProtocol = isSameToken(wrappedProtocolToken, asset);
+    const assetIsProtocolToken = isSameToken(protocolToken, asset);
 
     const rewardsWithdrawAmounts = currentPosition.balances
       .filter((balance) => !isSameToken(balance.token, asset))
@@ -72,9 +73,8 @@ const useEarnWithdrawActions = ({ strategy }: UseEarnWithdrawActionsParams) => {
     const withdrawList = [
       {
         amount: parseUnits(assetAmountInUnits || '0', asset.decimals),
-        token: asset,
-        // convertTo: assetIsWrappedProtocol ? protocolToken.address : undefined,
-        convertTo: undefined,
+        token: assetIsProtocolToken ? wrappedProtocolToken : asset,
+        convertTo: assetIsProtocolToken ? protocolToken.address : undefined,
       },
       ...rewardsWithdrawAmounts,
     ];
@@ -230,8 +230,14 @@ const useEarnWithdrawActions = ({ strategy }: UseEarnWithdrawActionsParams) => {
           }
         }
 
+        const protocolToken = getProtocolToken(strategy.farm.chainId);
+        const wrappedProtocolToken = getWrappedProtocolToken(strategy.farm.chainId);
+
         const parsedTokensToWithdraw = tokensToWithdraw.map((withdraw) => {
-          if (isSameToken(withdraw.token, asset)) {
+          if (
+            isSameToken(withdraw.token, asset) ||
+            (isSameToken(withdraw.token, wrappedProtocolToken) && isSameToken(asset, protocolToken))
+          ) {
             return {
               ...withdraw,
               withdrawType: assetWithdrawType,
