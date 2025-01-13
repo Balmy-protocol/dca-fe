@@ -249,7 +249,6 @@ export class EarnService extends EventsManager<EarnServiceData> {
 
   async fetchAllStrategies(): Promise<void> {
     this.hasFetchedAllStrategies = false;
-    // TODO: UPDATE HERE
     const strategies = (await this.sdkService.getAllStrategies()).map((strategy) => this.updateStrategyToken(strategy));
     this.strategiesParameters = this.processStrategyParameters(strategies);
     const lastUpdatedAt = nowInSeconds();
@@ -338,7 +337,6 @@ export class EarnService extends EventsManager<EarnServiceData> {
       return;
     }
 
-    // TODO: UPDATE HERE
     const strategy = await this.sdkService.getDetailedStrategy({ strategyId });
 
     this.updateStrategy({ strategy: { ...this.updateStrategyToken(strategy), hasFetchedHistoricalData: true } });
@@ -707,7 +705,6 @@ export class EarnService extends EventsManager<EarnServiceData> {
   }
 
   async fetchUserStrategy(strategyId: Parameters<typeof this.sdkService.getUserStrategy>[0]) {
-    // TODO: UPDATE HERE
     const needsToUpdate = this.needsToUpdateUserStrategy(strategyId);
     if (!needsToUpdate) {
       return;
