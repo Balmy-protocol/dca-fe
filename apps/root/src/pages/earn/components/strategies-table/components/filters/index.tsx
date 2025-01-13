@@ -270,9 +270,10 @@ interface TableFiltersProps {
   isLoading: boolean;
   variant: StrategiesTableVariants;
   disabled?: boolean;
+  setPage: (page: number) => void;
 }
 
-const TableFilters = ({ isLoading, variant, disabled }: TableFiltersProps) => {
+const TableFilters = ({ isLoading, variant, disabled, setPage }: TableFiltersProps) => {
   const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
   const dispatch = useAppDispatch();
   const intl = useIntl();
@@ -293,6 +294,7 @@ const TableFilters = ({ isLoading, variant, disabled }: TableFiltersProps) => {
 
   const onResetFilters = () => {
     dispatch(resetFilters(variant));
+    setPage(0);
   };
 
   const open = Boolean(anchorEl);
@@ -301,6 +303,7 @@ const TableFilters = ({ isLoading, variant, disabled }: TableFiltersProps) => {
   const onFilterChange = React.useCallback(
     <T,>(filter: T, action: (payload: { variant: StrategiesTableVariants; value: T }) => AnyAction) => {
       dispatch(action({ variant, value: filter }));
+      setPage(0);
     },
     []
   );

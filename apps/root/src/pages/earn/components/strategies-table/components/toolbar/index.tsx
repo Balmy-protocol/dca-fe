@@ -13,6 +13,7 @@ interface AllStrategiesTableToolbarProps {
   handleSearchChange: (search: string) => void;
   variant: StrategiesTableVariants;
   strategiesCount: number;
+  setPage: (page: number) => void;
 }
 
 const StyledTextField = styled(TextField)`
@@ -27,6 +28,7 @@ const AllStrategiesTableToolbar = ({
   handleSearchChange,
   variant,
   strategiesCount,
+  setPage,
 }: AllStrategiesTableToolbarProps) => {
   const intl = useIntl();
 
@@ -104,7 +106,7 @@ const AllStrategiesTableToolbar = ({
               }
             }}
           />
-          <TableFilters isLoading={isLoading} variant={variant} />
+          <TableFilters isLoading={isLoading} variant={variant} setPage={setPage} />
         </ContainerBox>
       </ContainerBox>
     </ContainerBox>
