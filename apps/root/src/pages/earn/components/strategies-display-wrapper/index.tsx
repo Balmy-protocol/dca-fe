@@ -67,7 +67,6 @@ const StrategiesDisplayWrapper = <T extends StrategiesTableVariants>({
         isLoading={isLoading}
         handleSearchChange={handleSearchChange}
         variant={variant}
-        disabled={strategies.length === 0}
       />
       {shouldShowMobileList ? (
         <StrategiesList
