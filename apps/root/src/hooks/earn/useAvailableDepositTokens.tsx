@@ -1,4 +1,4 @@
-import { parseBaseUsdPriceToNumber, parseNumberUsdPriceToBigInt, parseUsdPrice, toToken } from '@common/utils/currency';
+import { parseNumberUsdPriceToBigInt, parseUsdPrice, toToken } from '@common/utils/currency';
 import { useAllBalances } from '@state/balances/hooks';
 import { Address, AmountsOfToken, FarmId, Strategy, StrategyFarm, Token, TokenType } from '@types';
 import React from 'react';
@@ -40,7 +40,7 @@ const useAvailableDepositTokens = ({ filterSmallValues = false }: { filterSmallV
   const [{ result, isLoading }, setState] = React.useState<{
     isLoading: boolean;
     // The key is chainId-tokenAddress-amount
-    result: Record<string, { underlying: string; underlyingAmount: string; price: bigint }>;
+    result: Record<string, { underlying: string; underlyingAmount: string; price: number }>;
   }>({ isLoading: false, result: {} });
 
   const depositTokens = React.useMemo(() => {
@@ -115,12 +115,28 @@ const useAvailableDepositTokens = ({ filterSmallValues = false }: { filterSmallV
           }
           return toToken({ address: underlying.underlying, chainId: token.chainId });
         });
-        const priceResponse = await priceService.getUsdHistoricPrice(compact(underlyingTokens));
+        const priceResponse = await priceService.getUsdCurrentPrices(compact(underlyingTokens));
         const reultsWithPrice = Object.fromEntries(
-          Object.entries(response).map(([key, value]) => {
-            return [key, { ...value, price: priceResponse[value.underlying] }];
-          })
+          compact(
+            Object.entries(response).map(([key, value]) => {
+              const underlyingChainId = underlyingTokens.find((token) => token?.address === value.underlying)?.chainId;
+              if (!underlyingChainId) {
+                return null;
+              }
+              const chainPrices = priceResponse[underlyingChainId];
+              if (!chainPrices) {
+                return null;
+              }
+
+              const underlyingPrice = chainPrices[value.underlying];
+              if (!underlyingPrice) {
+                return null;
+              }
+              return [key, { ...value, price: underlyingPrice.price }];
+            })
+          )
         );
+
         setState({ result: reultsWithPrice, isLoading: false });
       } catch (e) {
         console.error(e);
@@ -151,13 +167,22 @@ const useAvailableDepositTokens = ({ filterSmallValues = false }: { filterSmallV
               const underlyingPrice = underlying.price;
               const underlyingToken = toToken({
                 address: underlying.underlying,
-                price: parseBaseUsdPriceToNumber(underlyingPrice),
+                price: underlyingPrice,
                 chainId: token.chainId,
                 decimals: token.decimals,
               });
               const underlyingAmount = BigInt(underlying.underlyingAmount);
-              const underlyingAmountUSD = parseUsdPrice(underlyingToken, underlyingAmount, underlyingPrice).toFixed(2);
+              const underlyingAmountUSD = parseUsdPrice(
+                underlyingToken,
+                underlyingAmount,
+                parseNumberUsdPriceToBigInt(underlyingPrice)
+              ).toFixed(2);
               const underlyingAmountUnits = formatUnits(underlyingAmount, underlyingToken.decimals);
+
+              if (Number.isNaN(Number(underlyingAmountUSD)) || Number(underlyingAmountUSD) < 1) {
+                return acc;
+              }
+
               // eslint-disable-next-line no-param-reassign
               acc[`${token.strategy.farm.id}-${walletAddress}`] = {
                 id: token.strategy.farm.id,

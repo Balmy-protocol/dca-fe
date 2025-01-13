@@ -17,3 +17,12 @@ export const fullyResetEarnForm = createAction('earnPositionManagement/fullyRese
 export const setDepositAssetAmount = createAction<string>('earnPositionManagement/setDepositAssetAmount');
 
 export const setDepositAsset = createAction<Token>('earnPositionManagement/setDepositAsset');
+
+export const setOneClickMigrationSettings = createAction<{
+  paramAssetToDeposit: Token;
+  paramUnderlyingAsset: Token;
+  paramUnderlyingAmount: string;
+  depositAmount: string;
+}>('earnPositionManagement/setOneClickMigrationSettings');
+
+export const setTriggerSteps = createAction<boolean>('earnPositionManagement/setTriggerSteps');

@@ -17,6 +17,7 @@ import { identifyNetwork } from '@common/utils/parsing';
 import StrategyManagement from '../strategy-management';
 import { getAllChains } from '@balmy/sdk';
 import { StrategyId } from 'common-types';
+import { fullyResetEarnForm } from '@state/earn-management/actions';
 
 const StyledFlexGridItem = styled(Grid)`
   display: flex;
@@ -57,6 +58,8 @@ const StrategyDetailFrame = () => {
       dispatch(changeRoute(EARN_ROUTE.key));
       pushToHistory(`/${EARN_ROUTE.key}`);
     }
+
+    dispatch(fullyResetEarnForm());
   };
 
   React.useEffect(() => {

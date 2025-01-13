@@ -8,7 +8,7 @@ import { ContainerBox } from 'ui-library';
 import EarnTransactionSteps from '../tx-steps';
 import { useSearchParams } from 'react-router-dom';
 import { useAppDispatch } from '@state/hooks';
-import { setAsset, setDepositAmount, setDepositAssetAmount, setDepositAsset } from '@state/earn-management/actions';
+import { setOneClickMigrationSettings, setTriggerSteps } from '@state/earn-management/actions';
 import useToken from '@hooks/useToken';
 import { isNil } from 'lodash';
 
@@ -55,7 +55,7 @@ const EarnDepositTransactionManager = ({ balance, strategy, setHeight }: EarnDep
 
   const recapDataProps = React.useMemo(() => ({ strategy }), [strategy]);
 
-  React.useMemo(() => {
+  React.useEffect(() => {
     const depositAmount = params.get('assetToDepositAmount');
     const paramUnderlyingAmount = params.get('underlyingAmount');
     if (
@@ -68,11 +68,15 @@ const EarnDepositTransactionManager = ({ balance, strategy, setHeight }: EarnDep
       !isNil(paramUnderlyingAsset)
     ) {
       hasTriggeredSteps.current = true;
-      dispatch(setAsset(paramUnderlyingAsset));
-      dispatch(setDepositAmount(paramUnderlyingAmount));
-      dispatch(setDepositAssetAmount(depositAmount));
-      dispatch(setDepositAsset(paramAssetToDeposit));
-      handleMultiSteps();
+      dispatch(
+        setOneClickMigrationSettings({
+          paramAssetToDeposit,
+          paramUnderlyingAsset,
+          paramUnderlyingAmount,
+          depositAmount,
+        })
+      );
+      dispatch(setTriggerSteps(true));
     }
   }, [strategy, paramAssetToDeposit, paramUnderlyingAsset, handleMultiSteps]);
 
