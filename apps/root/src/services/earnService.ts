@@ -33,12 +33,13 @@ import { getNewEarnPositionFromTxTypeData } from '@common/utils/transactions';
 import { parseUsdPrice, parseNumberUsdPriceToBigInt, toToken, isSameToken } from '@common/utils/currency';
 import { nowInSeconds } from '@common/utils/time';
 import ProviderService from './providerService';
-import { calculateDeadline, PermitData } from '@balmy/sdk';
+import { calculateDeadline, isSameAddress, PermitData } from '@balmy/sdk';
 import { EarnPermissionData } from '@balmy/sdk/dist/services/earn/types';
 import ContractService from './contractService';
 import { mapPermission } from '@balmy/sdk/dist/services/earn/earn-service';
 import { orderBy, uniqBy } from 'lodash';
 import MeanApiService from './meanApiService';
+import { getProtocolToken, getWrappedProtocolToken } from '@common/mocks/tokens';
 
 export interface EarnServiceData {
   allStrategies: SavedSdkStrategy[];
@@ -248,7 +249,8 @@ export class EarnService extends EventsManager<EarnServiceData> {
 
   async fetchAllStrategies(): Promise<void> {
     this.hasFetchedAllStrategies = false;
-    const strategies = await this.sdkService.getAllStrategies();
+    // TODO: UPDATE HERE
+    const strategies = (await this.sdkService.getAllStrategies()).map((strategy) => this.updateStrategyToken(strategy));
     this.strategiesParameters = this.processStrategyParameters(strategies);
     const lastUpdatedAt = nowInSeconds();
 
@@ -336,16 +338,24 @@ export class EarnService extends EventsManager<EarnServiceData> {
       return;
     }
 
+    // TODO: UPDATE HERE
     const strategy = await this.sdkService.getDetailedStrategy({ strategyId });
 
-    this.updateStrategy({ strategy: { ...strategy, hasFetchedHistoricalData: true } });
+    this.updateStrategy({ strategy: { ...this.updateStrategyToken(strategy), hasFetchedHistoricalData: true } });
   }
 
   async fetchUserStrategies(): Promise<SdkEarnPosition[]> {
     this.hasFetchedUserStrategies = false;
     const accounts = this.accountService.getWallets();
     const addresses = accounts.map((account) => account.address);
-    const userStrategies = await this.sdkService.getUserStrategies({ accounts: addresses });
+    const fetchedUserStrategies = await this.sdkService.getUserStrategies({ accounts: addresses });
+    const userStrategies = Object.fromEntries(
+      Object.entries(fetchedUserStrategies).map(([key, strategies]) => [
+        key,
+        strategies.map((strategy) => this.updateUserStrategyToken(strategy)),
+      ])
+    );
+
     const lastUpdatedAt = nowInSeconds();
     const strategiesArray = Object.values(userStrategies).reduce((acc, strategies) => {
       acc.push(...strategies);
@@ -586,7 +596,118 @@ export class EarnService extends EventsManager<EarnServiceData> {
     return updatedDelayed;
   }
 
+  updateStrategyToken(strategy: SdkStrategy) {
+    const protocolToken = getProtocolToken(strategy.farm.chainId);
+    const wrappedProtocolToken = getWrappedProtocolToken(strategy.farm.chainId);
+    const newStrategy = {
+      ...strategy,
+      farm: {
+        ...strategy.farm,
+        asset: isSameAddress(strategy.farm.asset.address, wrappedProtocolToken.address)
+          ? { ...strategy.farm.asset, ...protocolToken }
+          : strategy.farm.asset,
+      },
+    };
+
+    return newStrategy;
+  }
+
+  updateUserStrategyToken(userStrategy: SdkEarnPosition): SdkEarnPosition {
+    // Now lets update all WETH to ETH
+    const protocolToken = getProtocolToken(userStrategy.strategy.farm.chainId);
+    const wrappedProtocolToken = getWrappedProtocolToken(userStrategy.strategy.farm.chainId);
+    const updatedUserStrategy = {
+      ...userStrategy,
+      strategy: this.updateStrategyToken(userStrategy.strategy),
+    };
+
+    updatedUserStrategy.balances = updatedUserStrategy.balances.map((balance) => {
+      if (isSameAddress(balance.token.address, wrappedProtocolToken.address)) {
+        return {
+          ...balance,
+          token: {
+            ...balance.token,
+            ...protocolToken,
+          },
+        };
+      }
+      return balance;
+    });
+
+    updatedUserStrategy.delayed = updatedUserStrategy.delayed?.map((delayed) => {
+      if (isSameAddress(delayed.token.address, wrappedProtocolToken.address)) {
+        return {
+          ...delayed,
+          token: {
+            ...delayed.token,
+            ...protocolToken,
+          },
+        };
+      }
+      return delayed;
+    });
+
+    updatedUserStrategy.history = updatedUserStrategy.history?.map((history) => {
+      switch (history.action) {
+        case EarnPositionActionType.WITHDREW:
+          return {
+            ...history,
+            withdrawn: history.withdrawn.map((withdrawn) => ({
+              ...withdrawn,
+              token: isSameAddress(withdrawn.token.address, wrappedProtocolToken.address)
+                ? {
+                    ...withdrawn.token,
+                    ...protocolToken,
+                  }
+                : withdrawn.token,
+            })),
+          };
+        case EarnPositionActionType.DELAYED_WITHDRAWAL_CLAIMED:
+          return {
+            ...history,
+            token: isSameAddress(history.token.address, wrappedProtocolToken.address)
+              ? {
+                  ...history.token,
+                  ...protocolToken,
+                }
+              : history.token,
+          };
+        case EarnPositionActionType.SPECIAL_WITHDREW:
+          return {
+            ...history,
+            withdrawn: history.withdrawn.map((withdrawn) => ({
+              ...withdrawn,
+              token: isSameAddress(withdrawn.token.address, wrappedProtocolToken.address)
+                ? {
+                    ...withdrawn.token,
+                    ...protocolToken,
+                  }
+                : withdrawn.token,
+            })),
+          };
+        default:
+          return history;
+      }
+    });
+
+    updatedUserStrategy.historicalBalances = updatedUserStrategy.historicalBalances?.map((historicalBalance) => ({
+      ...historicalBalance,
+      balances: historicalBalance.balances.map((balance) => ({
+        ...balance,
+        token: isSameAddress(balance.token.address, wrappedProtocolToken.address)
+          ? {
+              ...balance.token,
+              ...protocolToken,
+            }
+          : balance.token,
+      })),
+    }));
+
+    return updatedUserStrategy;
+  }
+
   async fetchUserStrategy(strategyId: Parameters<typeof this.sdkService.getUserStrategy>[0]) {
+    // TODO: UPDATE HERE
     const needsToUpdate = this.needsToUpdateUserStrategy(strategyId);
     if (!needsToUpdate) {
       return;
@@ -594,7 +715,7 @@ export class EarnService extends EventsManager<EarnServiceData> {
 
     const userStrategy = await this.sdkService.getUserStrategy(strategyId);
 
-    return userStrategy;
+    return this.updateUserStrategyToken(userStrategy);
   }
 
   async fetchMultipleEarnPositionsFromStrategy(strategyId: StrategyId) {
