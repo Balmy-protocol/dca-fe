@@ -119,20 +119,32 @@ export const WizardSelection = ({
 
   const assetOptions = React.useMemo<AssetSelectorOption[]>(
     () =>
-      assets.map((asset) => {
-        const balanceItem = mergedBalances.find((item) =>
-          item.tokens.some((balanceToken) => getIsSameOrTokenEquivalent(balanceToken.token, asset))
-        );
-        return {
-          key: asset.address,
-          token: asset,
-          balance: balanceItem ? parseUnits(balanceItem.totalBalanceInUnits, asset.decimals) : undefined,
-          balanceUsd: balanceItem
-            ? parseUnits(parseExponentialNumberToString(balanceItem.totalBalanceUsd || 0), asset.decimals + 18)
-            : undefined,
-          chainsWithBalance: balanceItem ? balanceItem.tokens.map((token) => token.token.chainId) : [],
-        };
-      }),
+      assets
+        .map((asset) => {
+          const balanceItem = mergedBalances.find((item) =>
+            item.tokens.some((balanceToken) => getIsSameOrTokenEquivalent(balanceToken.token, asset))
+          );
+          return {
+            key: asset.address,
+            token: asset,
+            balance: balanceItem ? parseUnits(balanceItem.totalBalanceInUnits, asset.decimals) : undefined,
+            balanceUsd: balanceItem
+              ? parseUnits(parseExponentialNumberToString(balanceItem.totalBalanceUsd || 0), asset.decimals + 18)
+              : undefined,
+            chainsWithBalance: balanceItem ? balanceItem.tokens.map((token) => token.token.chainId) : [],
+          };
+        })
+        .sort((a, b) => {
+          const aBalance = Number(a.balanceUsd);
+          const bBalance = Number(b.balanceUsd);
+          const aHasBalance = !isNaN(aBalance) && aBalance > 0;
+          const bHasBalance = !isNaN(bBalance) && bBalance > 0;
+
+          if (aHasBalance && !bHasBalance) return -1;
+          if (!aHasBalance && bHasBalance) return 1;
+          if (aHasBalance && bHasBalance) return bBalance - aBalance;
+          return 0;
+        }),
     [assets, mergedBalances]
   );
 
