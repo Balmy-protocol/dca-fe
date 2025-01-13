@@ -25,7 +25,6 @@ import {
 } from 'ui-library';
 import { getLogoURL } from '@common/utils/urlParser';
 import { FeeItem } from '@pages/strategy-guardian-detail/vault-data/components/data-about';
-import { PROMOTED_STRATEGIES_IDS } from '@constants/earn';
 import { isNil } from 'lodash';
 
 const StyledTitleDataContainer = styled(ContainerBox).attrs({
@@ -62,7 +61,6 @@ interface StrategyItemProps {
 }
 const StrategyItem = ({ strategy, selected, onSelect }: StrategyItemProps) => {
   const intl = useIntl();
-  const isPromoted = PROMOTED_STRATEGIES_IDS.includes(strategy.id);
 
   return (
     <StyledStrategyItem $selected={selected} onClick={() => onSelect(strategy)}>
@@ -72,7 +70,7 @@ const StrategyItem = ({ strategy, selected, onSelect }: StrategyItemProps) => {
           <Typography variant="h6Bold" color={({ palette }) => colors[palette.mode].typography.typo2}>
             {strategy.guardian?.name}
           </Typography>
-          {isPromoted && (
+          {strategy.needsTier && strategy.needsTier > 1 && (
             <ContainerBox gap={1} alignItems="center">
               <MovingStarIcon sx={({ palette }) => ({ color: colors[palette.mode].semantic.success.darker })} />
               <Typography
