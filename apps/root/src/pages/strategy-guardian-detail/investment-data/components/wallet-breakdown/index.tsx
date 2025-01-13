@@ -23,6 +23,7 @@ import {
   Tooltip,
   colors,
   HiddenNumber,
+  ContainerBox,
 } from 'ui-library';
 
 interface WalletBreakdownProps {
@@ -121,15 +122,17 @@ const WalletBreakdownTableBody = ({ strategy, showRewards }: WalletBreakdownProp
       </StyledCell>
       {showRewards && (
         <StyledCell size="small">
-          <Tooltip title={<TokenNetworksTooltipTitle balanceTokens={balanceTokens} />}>
-            <ComposedTokenIcon
-              size={6}
-              tokens={strategy.rewards.tokens}
-              overlapRatio={0.6}
-              marginRight={1.75}
-              withShadow
-            />
-          </Tooltip>
+          <ContainerBox>
+            <Tooltip title={<TokenNetworksTooltipTitle balanceTokens={balanceTokens} />}>
+              <ComposedTokenIcon
+                size={6}
+                tokens={strategy.rewards.tokens}
+                overlapRatio={0.6}
+                marginRight={1.75}
+                withShadow
+              />
+            </Tooltip>
+          </ContainerBox>
         </StyledCell>
       )}
     </StyledRow>
