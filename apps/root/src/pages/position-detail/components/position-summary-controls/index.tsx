@@ -44,7 +44,6 @@ import { AddPositionToCalendarButton } from '@common/components/add-position-to-
 import { getDcaTweetContent } from '@common/utils/dca';
 import styled from 'styled-components';
 import { DisplayWallet } from '@hooks/useWallets';
-import useTierService from '@hooks/tiers/useTierService';
 
 const StyledMenu = withStyles(Menu, () =>
   createStyles({
@@ -109,7 +108,6 @@ const PositionSummaryControls = ({ show, pendingTransaction, position, ownerWall
     !isOnNetwork && CHAIN_CHANGING_WALLETS_WITH_REFRESH.includes(ownerWallet?.providerInfo?.name || '');
 
   const disabled = showSwitchAction;
-  const tierService = useTierService();
 
   const showExtendedFunctions =
     position.version === LATEST_VERSION &&
@@ -437,7 +435,6 @@ const PositionSummaryControls = ({ show, pendingTransaction, position, ownerWall
 
   const onClickShare = () => {
     trackEvent('DCA - Position details - Share on X', { positionId: position.id });
-    void tierService.updateTwitterShare();
   };
 
   return (
