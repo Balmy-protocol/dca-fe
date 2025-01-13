@@ -842,7 +842,6 @@ const useEarnDepositActions = ({ strategy }: UseEarnDepositActionParams) => {
       if (!asset || assetAmountInUnits === '' || !assetAmountInUnits) {
         return;
       }
-      // hasTriggeredSteps.current = true;
       handleMultiSteps();
       dispatch(setTriggerSteps(false));
     }
