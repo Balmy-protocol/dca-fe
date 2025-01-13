@@ -75,10 +75,10 @@ export const initialState: StrategiesFiltersState = {
     //   column: StrategyColumnKeys.NEEDS_TIER,
     //   order: 'desc' as ColumnOrder,
     // },
-    // tertiaryOrderBy: {
-    //   column: StrategyColumnKeys.WALLET_BALANCE,
-    //   order: 'desc' as ColumnOrder,
-    // },
+    tertiaryOrderBy: {
+      column: StrategyColumnKeys.WALLET_BALANCE,
+      order: 'desc' as ColumnOrder,
+    },
     // quarterOrderBy: {
     //   column: StrategyColumnKeys.TVL,
     //   order: 'desc' as ColumnOrder,
