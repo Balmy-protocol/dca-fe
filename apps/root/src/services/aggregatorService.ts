@@ -21,7 +21,7 @@ import ProviderService from './providerService';
 import SdkService from './sdkService';
 import SafeService from './safeService';
 import SimulationService from './simulationService';
-import EventService from './eventService';
+import AnalyticsService from './analyticsService';
 import { EstimatedQuoteResponseWithTx } from '@balmy/sdk';
 
 export default class AggregatorService {
@@ -37,7 +37,7 @@ export default class AggregatorService {
 
   simulationService: SimulationService;
 
-  eventService: EventService;
+  analyticsService: AnalyticsService;
 
   constructor(
     walletService: WalletService,
@@ -46,7 +46,7 @@ export default class AggregatorService {
     providerService: ProviderService,
     safeService: SafeService,
     simulationService: SimulationService,
-    eventService: EventService
+    analyticsService: AnalyticsService
   ) {
     this.contractService = contractService;
     this.walletService = walletService;
@@ -54,7 +54,7 @@ export default class AggregatorService {
     this.providerService = providerService;
     this.safeService = safeService;
     this.simulationService = simulationService;
-    this.eventService = eventService;
+    this.analyticsService = analyticsService;
   }
 
   async addGasLimit(tx: TransactionRequestWithChain): Promise<TransactionRequestWithChain> {
@@ -152,7 +152,7 @@ export default class AggregatorService {
       swapOptionsResponse.map((option) => {
         if ('failed' in option) {
           // eslint-disable-next-line no-void
-          void this.eventService.trackEvent('Aggregator - Fetching quote error', {
+          void this.analyticsService.trackEvent('Aggregator - Fetching quote error', {
             source: option.source.id,
             sourceTimeout,
             errorType: categorizeError(option.error as string),
@@ -160,7 +160,7 @@ export default class AggregatorService {
           return null;
         }
         // eslint-disable-next-line no-void
-        void this.eventService.trackEvent('Aggregator - Fetching quote successfull', {
+        void this.analyticsService.trackEvent('Aggregator - Fetching quote successfull', {
           source: option.source.id,
           sourceTimeout,
         });

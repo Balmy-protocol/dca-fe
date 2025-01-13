@@ -9,7 +9,7 @@ import useLabelService from '@hooks/useLabelService';
 import useOpenConnectModal from '@hooks/useOpenConnectModal';
 import usePositionService from '@hooks/usePositionService';
 import usePrevious from '@hooks/usePrevious';
-import useTrackEvent from '@hooks/useTrackEvent';
+import useAnalytics from '@hooks/useAnalytics';
 import useTransactionService from '@hooks/useTransactionService';
 import useWalletClientService from '@hooks/useWalletClientService';
 import useWallets from '@hooks/useWallets';
@@ -39,10 +39,14 @@ import {
   KeyboardArrowRightIcon,
   Typography,
   AddIcon,
+  SuccessOutlineIcon,
+  InfoCircleIcon,
+  PenAddIcon,
 } from 'ui-library';
 import { WalletOptionValues, ALL_WALLETS, WalletSelectorBaseProps } from './types';
 import styled from 'styled-components';
 import Address from '../address';
+import useEarnAccess from '@hooks/useEarnAccess';
 
 const StyledCounter = styled(ContainerBox)`
   ${({
@@ -66,7 +70,7 @@ const useWalletSelectorState = ({ options, showWalletCounter }: WalletSelectorBa
   const intl = useIntl();
   const wallets = useWallets();
   const activeWallet = useActiveWallet();
-  const trackEvent = useTrackEvent();
+  const { trackEvent } = useAnalytics();
   const accountService = useAccountService();
   const labelService = useLabelService();
   const dispatch = useAppDispatch();
@@ -76,13 +80,18 @@ const useWalletSelectorState = ({ options, showWalletCounter }: WalletSelectorBa
   const prevWallets = usePrevious(wallets);
   const [openUnlinkModal, setOpenUnlinkModal] = React.useState(false);
   const [openEditLabelModal, setOpenEditLabelModal] = React.useState(false);
+  const [openVerifyOwnershipModal, setOpenVerifyOwnershipModal] = React.useState(false);
   const snackbar = useSnackbar();
   const [selectedWallet, setSelectedWallet] = React.useState<Wallet | undefined>(undefined);
   const openConnectModal = useOpenConnectModal();
   const walletClientService = useWalletClientService();
+  const { hasEarnAccess } = useEarnAccess();
 
   const selectedOptionValue =
     selectedWalletOption || activeWallet?.address || find(wallets, { isAuth: true })?.address || '';
+
+  const allWalletsVerified = wallets.every((wallet) => wallet.isOwner);
+  const isSelectedWalletVerified = wallets.find((wallet) => wallet.address === selectedOptionValue)?.isOwner;
 
   const onClickWalletItem = (newWallet: WalletOptionValues) => {
     trackEvent('Wallet selector - Changed active wallet');
@@ -126,6 +135,17 @@ const useWalletSelectorState = ({ options, showWalletCounter }: WalletSelectorBa
     setSelectedWallet(wallet);
     setOpenEditLabelModal(true);
     trackEvent('Wallet selector - Edited wallet label');
+  };
+
+  const onOpenVerifyOwnershipModal = (wallet: Wallet) => {
+    setSelectedWallet(wallet);
+    setOpenVerifyOwnershipModal(true);
+    trackEvent('Wallet selector - Opened verify ownership modal');
+  };
+
+  const onCloseVerifyOwnershipModal = () => {
+    setOpenVerifyOwnershipModal(false);
+    setSelectedWallet(undefined);
   };
 
   const onUnlinkWallet = async () => {
@@ -194,7 +214,7 @@ const useWalletSelectorState = ({ options, showWalletCounter }: WalletSelectorBa
           description: ApiErrorKeys.DCA_POSITIONS,
         }).then(() => void dispatch(processConfirmedTransactionsForDca()));
 
-        if (process.env.EARN_ENABLED === 'true') {
+        if (hasEarnAccess) {
           void timeoutPromise(earnService.fetchUserStrategies(), TimeoutPromises.COMMON, {
             description: ApiErrorKeys.EARN,
           }).then(() => void dispatch(processConfirmedTransactionsForEarn()));
@@ -336,7 +356,13 @@ const useWalletSelectorState = ({ options, showWalletCounter }: WalletSelectorBa
             label: primaryLabel,
             secondaryLabel: secondaryLabel,
             Icon: WalletIcon,
-            control: selectedOptionValue !== address ? <KeyboardArrowRightIcon /> : undefined,
+            control:
+              selectedOptionValue !== address ? (
+                <ContainerBox gap={1} alignItems="center">
+                  {wallet.isOwner ? <SuccessOutlineIcon /> : <InfoCircleIcon sx={{ transform: 'rotate(180deg)' }} />}
+                  <KeyboardArrowRightIcon />
+                </ContainerBox>
+              ) : undefined,
             type: OptionsMenuOptionType.option,
             options: [
               {
@@ -350,6 +376,31 @@ const useWalletSelectorState = ({ options, showWalletCounter }: WalletSelectorBa
                 onClick: () => onClickWalletItem(address),
                 type: OptionsMenuOptionType.option,
               },
+              ...(!wallet.isOwner
+                ? [
+                    {
+                      label: intl.formatMessage(
+                        defineMessage({
+                          defaultMessage: 'Ownership',
+                          description: 'wallet-selector.ownership',
+                        })
+                      ),
+                      Icon: PenAddIcon,
+                      control: (
+                        <Typography variant="bodySmallBold" color={({ palette }) => colors[palette.mode].accentPrimary}>
+                          {intl.formatMessage(
+                            defineMessage({
+                              defaultMessage: 'Verify ownership',
+                              description: 'wallet-selector.verify-ownership',
+                            })
+                          )}
+                        </Typography>
+                      ),
+                      onClick: () => onOpenVerifyOwnershipModal(wallet),
+                      type: OptionsMenuOptionType.option,
+                    },
+                  ]
+                : []),
               {
                 label: intl.formatMessage(
                   defineMessage({
@@ -405,18 +456,26 @@ const useWalletSelectorState = ({ options, showWalletCounter }: WalletSelectorBa
 
   const selectedOptionLabel =
     selectedOptionValue === ALL_WALLETS ? (
-      <ContainerBox alignItems="center" gap={1}>
-        <Typography variant="bodySmallBold" color={({ palette: { mode } }) => colors[mode].typography.typo2}>
-          {intl.formatMessage(
-            defineMessage({
-              defaultMessage: 'All',
-              description: 'allWallets',
-            })
+      <ContainerBox alignItems="center" gap={2}>
+        <ContainerBox alignItems="center" gap={1}>
+          <Typography variant="bodySmallBold" color={({ palette: { mode } }) => colors[mode].typography.typo2}>
+            {intl.formatMessage(
+              defineMessage({
+                defaultMessage: 'All',
+                description: 'allWallets',
+              })
+            )}
+          </Typography>
+          {allWalletsVerified ? (
+            <SuccessOutlineIcon />
+          ) : (
+            <InfoCircleIcon
+              sx={{ color: ({ palette }) => colors[palette.mode].semantic.warning.darker, transform: 'rotate(180deg)' }}
+            />
           )}
-        </Typography>
+        </ContainerBox>
         {showWalletCounter ? (
           <StyledCounter>
-            {/* change to label when typography is merged */}
             <Typography variant="labelRegular" color={({ palette: { mode } }) => colors[mode].typography.typo3}>
               {wallets.length}
             </Typography>
@@ -424,7 +483,10 @@ const useWalletSelectorState = ({ options, showWalletCounter }: WalletSelectorBa
         ) : null}
       </ContainerBox>
     ) : (
-      <Address address={selectedOptionValue} trimAddress />
+      <ContainerBox alignItems="center" gap={1}>
+        <Address address={selectedOptionValue} trimAddress />
+        {isSelectedWalletVerified && <SuccessOutlineIcon />}
+      </ContainerBox>
     );
 
   return React.useMemo(
@@ -435,6 +497,9 @@ const useWalletSelectorState = ({ options, showWalletCounter }: WalletSelectorBa
       onCloseUnlinkModal,
       onUnlinkWallet,
       openUnlinkModal,
+      openVerifyOwnershipModal,
+      onCloseVerifyOwnershipModal,
+      onOpenVerifyOwnershipModal,
       selectedOptionLabel,
       menuOptions,
       onConnectWallet,
@@ -447,6 +512,9 @@ const useWalletSelectorState = ({ options, showWalletCounter }: WalletSelectorBa
       onCloseUnlinkModal,
       onUnlinkWallet,
       openUnlinkModal,
+      openVerifyOwnershipModal,
+      onCloseVerifyOwnershipModal,
+      onOpenVerifyOwnershipModal,
       selectedOptionLabel,
       menuOptions,
       onConnectWallet,

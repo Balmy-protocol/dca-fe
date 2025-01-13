@@ -134,7 +134,7 @@ export const AGGREGATOR_SUPPORTED_CHAINS: ChainId[] = [
   Chains.FANTOM.chainId,
   Chains.GNOSIS.chainId,
   Chains.KAVA.chainId,
-  Chains.KLAYTN.chainId,
+  Chains.KAIA.chainId,
   Chains.LINEA.chainId,
   Chains.MOONBEAM.chainId,
   Chains.OPTIMISM.chainId,

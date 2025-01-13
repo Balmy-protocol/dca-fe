@@ -1,5 +1,5 @@
 import React from 'react';
-import { AmountsOfToken, EarnPosition, SetStateCallback, Strategy, StrategyId } from 'common-types';
+import { AmountsOfToken, EarnPosition, SetStateCallback, Strategy, StrategyConditionType } from 'common-types';
 import {
   BackgroundPaper,
   ContainerBox,
@@ -19,6 +19,7 @@ import {
   Hidden,
   SortIcon,
   colors,
+  ActiveTiersIcons,
 } from 'ui-library';
 import styled from 'styled-components';
 import { useAppDispatch } from '@state/hooks';
@@ -26,19 +27,25 @@ import { StrategyColumnConfig, StrategyColumnKeys } from './components/columns';
 import { setOrderBy } from '@state/strategies-filters/actions';
 import { StrategiesTableVariants } from '@state/strategies-filters/reducer';
 import { useStrategiesFilters } from '@state/strategies-filters/hooks';
-import { getStrategyFromTableObject, RowClickParamValue } from '@common/utils/earn/parsing';
+import {
+  getNeedsTierFromTableObject,
+  getStrategyFromTableObject,
+  RowClickParamValue,
+} from '@common/utils/earn/parsing';
 import EmptyPortfolio from './components/empty-portfolio';
 import TotalFooter from './components/total-footer';
 import { FarmWithAvailableDepositTokens } from '@hooks/earn/useAvailableDepositTokens';
-import { PROMOTED_STRATEGIES_IDS } from '@constants/earn';
 import PromotedFlag from './components/promoted-flag';
+import { isNil } from 'lodash';
+import useTierLevel from '@hooks/tiers/useTierLevel';
 
-export type StrategyWithWalletBalance = Strategy & {
+export type StrategyWithWalletBalanceAndTierLevel = Strategy & {
   walletBalance?: AmountsOfToken;
+  tierLevel?: number;
 };
 
 export type TableStrategy<T extends StrategiesTableVariants> = T extends StrategiesTableVariants.ALL_STRATEGIES
-  ? StrategyWithWalletBalance
+  ? StrategyWithWalletBalanceAndTierLevel
   : T extends StrategiesTableVariants.USER_STRATEGIES
     ? EarnPosition[]
     : T extends StrategiesTableVariants.MIGRATION_OPTIONS
@@ -59,13 +66,26 @@ const StyledBackgroundPaper = styled(BackgroundPaper).attrs({ variant: 'outlined
   position: relative;
 `;
 
-const StyledTableRow = styled(TableRow)<{ $isPromoted?: boolean }>`
-  ${({ theme: { palette, spacing }, $isPromoted }) =>
-    $isPromoted &&
+const StyledTableRow = styled(TableRow)<{ $condition?: StrategyConditionType }>`
+  ${({ theme: { spacing }, $condition }) =>
+    !isNil($condition) &&
     `
-    box-shadow: 0px 0px 0px 1.5px ${colors[palette.mode].semantic.success.darker};
     border-radius: ${spacing(2)};
   `}
+`;
+
+interface StyledTierBadgeProps {
+  CurrentTierBadge: React.ElementType;
+  isPromoted?: boolean;
+}
+const StyledTierBadge = styled(({ CurrentTierBadge, ...props }: StyledTierBadgeProps) => (
+  <CurrentTierBadge {...props} size="1.5rem" />
+))`
+  position: absolute;
+  z-index: 1;
+  top: ${({ isPromoted }) => (isPromoted ? '65%' : '50%')};
+  left: 0;
+  transform: translate(-50%, -50%);
 `;
 
 const StyledTableEnd = styled(TableCell)`
@@ -82,12 +102,23 @@ const StyledNavContainer = styled(ContainerBox)`
   margin: 0 auto;
 `;
 
-const StyledBodyTableCell = styled(TableCell)<{ $isPromoted?: boolean }>`
-  ${({ theme: { spacing }, $isPromoted }) => `
+const StyledBodyTableCell = styled(TableCell)<{ $hasCondition?: boolean; $hovered?: boolean }>`
+  ${({
+    theme: {
+      spacing,
+      palette: { mode },
+    },
+    $hasCondition,
+    $hovered,
+  }) => `
   height: ${spacing(14.5)};
   padding-top: ${spacing(0.5)};
   padding-bottom: ${spacing(0.5)};
-  ${$isPromoted && `position: relative;`}
+  ${$hasCondition && `position: relative;`}
+  background: linear-gradient(${$hovered ? colors[mode].background.tertiary : colors[mode].background.secondary}, ${$hovered ? colors[mode].background.tertiary : colors[mode].background.secondary}) padding-box,
+              linear-gradient(to right, ${colors[mode].promoted.start}, ${colors[mode].promoted.stop}) border-box;
+  border: 1px solid transparent;
+  border-right: 0px;
 `}
 `;
 
@@ -107,10 +138,14 @@ const StrategiesTableHeader = <T extends StrategiesTableVariants>({
   columns,
   variant,
   disabled,
+  showEndChevron = true,
+  setPage,
 }: {
   columns: StrategyColumnConfig<T>[];
   variant: T;
   disabled?: boolean;
+  showEndChevron?: boolean;
+  setPage: SetStateCallback<number>;
 }) => {
   const dispatch = useAppDispatch();
   const { orderBy } = useStrategiesFilters(variant);
@@ -119,6 +154,7 @@ const StrategiesTableHeader = <T extends StrategiesTableVariants>({
     const isAsc = orderBy.column === column && orderBy.order === 'asc';
     const order = isAsc ? 'desc' : 'asc';
     dispatch(setOrderBy({ variant, column, order }));
+    setPage(0);
   };
 
   return (
@@ -148,7 +184,7 @@ const StrategiesTableHeader = <T extends StrategiesTableVariants>({
             </StyledHeaderTableCell>
           </Hidden>
         ))}
-        <StyledTableEnd size="small"></StyledTableEnd>
+        {showEndChevron && <StyledTableEnd size="small"></StyledTableEnd>}
       </StyledHeaderTableRow>
     </TableHead>
   );
@@ -157,9 +193,11 @@ const StrategiesTableHeader = <T extends StrategiesTableVariants>({
 const AllStrategiesTableBodySkeleton = <T extends StrategiesTableVariants>({
   columns,
   rowsPerPage,
+  showEndChevron = true,
 }: {
   columns: StrategyColumnConfig<T>[];
   rowsPerPage: number;
+  showEndChevron?: boolean;
 }) => (
   <>
     {Array.from(Array(rowsPerPage).keys()).map((i) => (
@@ -173,7 +211,7 @@ const AllStrategiesTableBodySkeleton = <T extends StrategiesTableVariants>({
             )}
           </StyledBodyTableCell>
         ))}
-        <StyledTableEnd size="small"></StyledTableEnd>
+        {showEndChevron && <StyledTableEnd size="small"></StyledTableEnd>}
       </TableRow>
     ))}
   </>
@@ -185,6 +223,7 @@ interface RowProps<T extends StrategiesTableVariants> {
   onRowClick: (strategy: RowClickParamValue<T>) => void;
   variant: T;
   showBalances?: boolean;
+  showEndChevron?: boolean;
 }
 
 const renderBodyCell = (cell: React.ReactNode | string) =>
@@ -196,14 +235,24 @@ const Row = <T extends StrategiesTableVariants>({
   onRowClick,
   variant,
   showBalances = true,
+  showEndChevron = true,
 }: RowProps<T>) => {
   const [hovered, setHovered] = React.useState(false);
+  const { tierLevel } = useTierLevel();
 
   const strategy = getStrategyFromTableObject(rowData, variant);
-  const isPromoted = PROMOTED_STRATEGIES_IDS.includes(strategy.id as StrategyId);
+  const needsTier = getNeedsTierFromTableObject(rowData, variant);
+  const isLocked = !isNil(needsTier);
+
+  const condition = isLocked ? StrategyConditionType.LOCKED : undefined;
+  // If TierIcon is rendered, needsTier is defined
+  const TierIcon = ActiveTiersIcons[needsTier || 0];
+
+  const isSameTierLevel = !isNil(needsTier) && !isNil(tierLevel) && needsTier === tierLevel;
+
   return (
     <StyledTableRow
-      $isPromoted={isPromoted}
+      $condition={condition}
       key={strategy.id}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
@@ -213,21 +262,28 @@ const Row = <T extends StrategiesTableVariants>({
     >
       {columns.map((column, i) => (
         <Hidden {...column.hiddenProps} key={`${strategy.id}-${column.key}`}>
-          <StyledBodyTableCell key={`${strategy.id}-${column.key}`} $isPromoted={isPromoted && i === 0}>
-            {isPromoted && i === 0 && <PromotedFlag />}
-            {renderBodyCell(column.renderCell(rowData, showBalances))}
+          <StyledBodyTableCell
+            key={`${strategy.id}-${column.key}`}
+            $hasCondition={!!condition && !isSameTierLevel && i === 0}
+            $hovered={hovered}
+          >
+            {isLocked && !isSameTierLevel && i === 0 && <PromotedFlag tier={needsTier} />}
+            {isLocked && !isSameTierLevel && i === 0 && <StyledTierBadge isPromoted CurrentTierBadge={TierIcon} />}
+            {renderBodyCell(column.renderCell(rowData, showBalances, tierLevel))}
           </StyledBodyTableCell>
         </Hidden>
       ))}
-      <StyledTableEnd size="small">
-        <StyledNavContainer alignItems="center">
-          <DividerBorder2 orientation="vertical" />
-          <AnimatedChevronRightIcon
-            $hovered={hovered}
-            sx={({ palette }) => ({ color: colors[palette.mode].accentPrimary })}
-          />
-        </StyledNavContainer>
-      </StyledTableEnd>
+      {showEndChevron && (
+        <StyledTableEnd size="small">
+          <StyledNavContainer alignItems="center">
+            <DividerBorder2 orientation="vertical" />
+            <AnimatedChevronRightIcon
+              $hovered={hovered}
+              sx={({ palette }) => ({ color: colors[palette.mode].accentPrimary })}
+            />
+          </StyledNavContainer>
+        </StyledTableEnd>
+      )}
     </StyledTableRow>
   );
 };
@@ -253,6 +309,7 @@ interface StrategiesTableProps<T extends StrategiesTableVariants> {
   rowsPerPage: number;
   showBalances?: boolean;
   showPagination?: boolean;
+  showEndChevron?: boolean;
 }
 
 const StrategiesTable = <T extends StrategiesTableVariants>({
@@ -267,6 +324,7 @@ const StrategiesTable = <T extends StrategiesTableVariants>({
   rowsPerPage,
   showBalances = true,
   showPagination = true,
+  showEndChevron = true,
 }: StrategiesTableProps<T>) => {
   // Keeps the table height consistent
   const emptyRows = createEmptyRows(rowsPerPage - visibleRows.length);
@@ -285,10 +343,20 @@ const StrategiesTable = <T extends StrategiesTableVariants>({
     >
       {isEmptyPortfolio && <EmptyPortfolio contained />}
       <Table sx={{ tableLayout: 'auto' }} stickyHeader={isPortfolio}>
-        <StrategiesTableHeader columns={columns} variant={variant} disabled={isEmptyPortfolio} />
+        <StrategiesTableHeader
+          columns={columns}
+          variant={variant}
+          disabled={isEmptyPortfolio}
+          showEndChevron={showEndChevron}
+          setPage={setPage}
+        />
         <TableBody>
           {isLoading ? (
-            <AllStrategiesTableBodySkeleton columns={columns} rowsPerPage={rowsPerPage} />
+            <AllStrategiesTableBodySkeleton
+              columns={columns}
+              rowsPerPage={rowsPerPage}
+              showEndChevron={showEndChevron}
+            />
           ) : (
             <>
               {visibleRows.map((row, index) => (
@@ -299,6 +367,7 @@ const StrategiesTable = <T extends StrategiesTableVariants>({
                   onRowClick={onGoToStrategy}
                   variant={variant}
                   showBalances={showBalances}
+                  showEndChevron={showEndChevron}
                 />
               ))}
               {emptyRows}

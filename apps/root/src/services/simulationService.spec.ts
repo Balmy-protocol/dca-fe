@@ -8,14 +8,14 @@ import MeanApiService from './meanApiService';
 import ProviderService from './providerService';
 import ContractService from './contractService';
 import SdkService from './sdkService';
-import EventService from './eventService';
+import AnalyticsService from './analyticsService';
 import WalletService from './walletService';
 
 jest.mock('./providerService');
 jest.mock('./meanApiService');
 jest.mock('./contractService');
 jest.mock('./sdkService');
-jest.mock('./eventService');
+jest.mock('./analyticsService');
 
 /**
  * Create mock instance of given class or function constructor
@@ -30,7 +30,7 @@ const MockedMeanApiService = jest.mocked(MeanApiService, { shallow: true });
 const MockedProviderService = jest.mocked(ProviderService, { shallow: true });
 const MockedContractService = jest.mocked(ContractService, { shallow: true });
 const MockedSdkService = jest.mocked(SdkService, { shallow: true });
-const MockedEventService = jest.mocked(EventService, { shallow: true });
+const MockedAnalyticsService = jest.mocked(AnalyticsService, { shallow: true });
 const MockedWalletService = jest.mocked(WalletService, { shallow: true });
 describe('Simulation Service', () => {
   let simulationService: SimulationService;
@@ -38,7 +38,7 @@ describe('Simulation Service', () => {
   let providerService: jest.MockedObject<ProviderService>;
   let contractService: jest.MockedObject<ContractService>;
   let sdkService: jest.MockedObject<SdkService>;
-  let eventService: jest.MockedObject<EventService>;
+  let analyticsService: jest.MockedObject<AnalyticsService>;
   let walletService: jest.MockedObject<WalletService>;
 
   beforeEach(() => {
@@ -46,7 +46,7 @@ describe('Simulation Service', () => {
     providerService = createMockInstance(MockedProviderService);
     contractService = createMockInstance(MockedContractService);
     sdkService = createMockInstance(MockedSdkService);
-    eventService = createMockInstance(MockedEventService);
+    analyticsService = createMockInstance(MockedAnalyticsService);
     walletService = createMockInstance(MockedWalletService);
 
     simulationService = new SimulationService(
@@ -54,7 +54,7 @@ describe('Simulation Service', () => {
       providerService as unknown as ProviderService,
       contractService as unknown as ContractService,
       sdkService as unknown as SdkService,
-      eventService as unknown as EventService,
+      analyticsService as unknown as AnalyticsService,
       walletService as unknown as WalletService
     );
   });

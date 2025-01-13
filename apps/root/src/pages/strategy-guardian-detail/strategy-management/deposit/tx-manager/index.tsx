@@ -6,6 +6,11 @@ import useEarnDepositActions from '../hooks/useEarnDepositActions';
 import styled from 'styled-components';
 import { ContainerBox } from 'ui-library';
 import EarnTransactionSteps from '../tx-steps';
+import { useSearchParams } from 'react-router-dom';
+import { useAppDispatch } from '@state/hooks';
+import { setOneClickMigrationSettings, setTriggerSteps } from '@state/earn-management/actions';
+import useToken from '@hooks/useToken';
+import { isNil } from 'lodash';
 
 const StyledButtonContainer = styled(ContainerBox).attrs(() => ({ alignItems: 'center', justifyContent: 'center' }))`
   margin-top: ${({ theme }) => theme.spacing(2)};
@@ -32,8 +37,48 @@ const EarnDepositTransactionManager = ({ balance, strategy, setHeight }: EarnDep
     requiresCompanionSignature,
     isIncrease,
   } = useEarnDepositActions({ strategy });
+  const hasTriggeredSteps = React.useRef(false);
+  const [params] = useSearchParams();
+  const dispatch = useAppDispatch();
+  const paramAssetToDeposit = useToken({
+    chainId: strategy?.network.chainId,
+    tokenAddress: params.get('assetToDeposit') ?? undefined,
+    checkForSymbol: true,
+    filterForDca: false,
+  });
+  const paramUnderlyingAsset = useToken({
+    chainId: strategy?.network.chainId,
+    tokenAddress: params.get('underlyingAsset') ?? undefined,
+    checkForSymbol: true,
+    filterForDca: false,
+  });
 
   const recapDataProps = React.useMemo(() => ({ strategy }), [strategy]);
+
+  React.useEffect(() => {
+    const depositAmount = params.get('assetToDepositAmount');
+    const paramUnderlyingAmount = params.get('underlyingAmount');
+    if (
+      params.get('triggerSteps') &&
+      paramAssetToDeposit &&
+      !!strategy &&
+      !hasTriggeredSteps.current &&
+      !isNil(depositAmount) &&
+      !isNil(paramUnderlyingAmount) &&
+      !isNil(paramUnderlyingAsset)
+    ) {
+      hasTriggeredSteps.current = true;
+      dispatch(
+        setOneClickMigrationSettings({
+          paramAssetToDeposit,
+          paramUnderlyingAsset,
+          paramUnderlyingAmount,
+          depositAmount,
+        })
+      );
+      dispatch(setTriggerSteps(true));
+    }
+  }, [strategy, paramAssetToDeposit, paramUnderlyingAsset, handleMultiSteps]);
 
   return (
     <>

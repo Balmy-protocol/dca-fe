@@ -1,5 +1,5 @@
 import React from 'react';
-import { Strategy } from 'common-types';
+import { Strategy, StrategyConditionType } from 'common-types';
 import styled from 'styled-components';
 import { Button, ContainerBox, Typography, colors, Card, Skeleton } from 'ui-library';
 import DataCards, { DataCardVariants } from '@pages/strategy-guardian-detail/vault-data/components/data-cards';
@@ -7,12 +7,14 @@ import TokenIconWithNetwork from '@common/components/token-icon-with-network';
 import { FormattedMessage } from 'react-intl';
 import ComposedTokenIcon from '@common/components/composed-token-icon';
 import { Link } from 'react-router-dom';
-import { PROMOTED_STRATEGIES_IDS } from '@constants/earn';
 import PromotedFlag from '../strategies-table/components/promoted-flag';
+import { isNil } from 'lodash';
+import { MoreRewardsBadge } from '../strategies-table/components/columns';
 
 interface SugestedStrategyCardProps {
   strategy: Strategy;
   variant?: DataCardVariants;
+  tierLevel: number;
 }
 
 const StyledLink = styled(Link)`
@@ -24,29 +26,43 @@ const StyledLink = styled(Link)`
   `}
 `;
 
-const StyledCard = styled(Card).attrs({ variant: 'outlined' })<{ $isPromoted?: boolean }>`
-  ${({ theme: { palette, spacing }, $isPromoted }) => `
+const StyledCard = styled(Card).attrs({ variant: 'outlined' })<{ $condition?: StrategyConditionType }>`
+  ${({ theme: { palette, spacing }, $condition }) => `
       padding: ${spacing(6)};
       box-shadow: ${colors[palette.mode].dropShadow.dropShadow300};
       display: flex;
       flex-direction: column;
       gap: ${spacing(4)};
+      overflow: visible;
+      position: relative;
       ${
-        $isPromoted &&
+        $condition === StrategyConditionType.PROMOTED &&
         `
-        overflow: visible;
-        position: relative;
-        outline-color: ${colors[palette.mode].semantic.success.darker};
-        outline-width: 1.5px;
-      `
+          overflow: visible;
+          position: relative;
+          outline-color: ${colors[palette.mode].semantic.success.darker};
+          outline-width: 1.5px;
+        `
+      }
+      ${
+        $condition === StrategyConditionType.LOCKED &&
+        `
+          position: relative;
+          outline-color: ${colors[palette.mode].accentPrimary};
+          outline-width: 1.5px;
+        `
       }
     `}
 `;
 
 const StrategyCardItem = ({ strategy, variant }: SugestedStrategyCardProps) => {
-  const isPromoted = PROMOTED_STRATEGIES_IDS.includes(strategy.id);
+  const needsTier = strategy.needsTier;
+  const isLocked = !isNil(needsTier);
+
+  const condition = isLocked ? StrategyConditionType.LOCKED : undefined;
+
   return (
-    <StyledCard $isPromoted={isPromoted}>
+    <StyledCard $condition={condition}>
       <ContainerBox justifyContent="space-between" alignItems="center">
         <ContainerBox gap={2} alignItems="center">
           <TokenIconWithNetwork token={strategy.asset} />
@@ -59,7 +75,11 @@ const StrategyCardItem = ({ strategy, variant }: SugestedStrategyCardProps) => {
               <Typography variant="bodySmallRegular">
                 <FormattedMessage description="earn.strategy-card.rewards" defaultMessage="Rewards" />
               </Typography>
-              <ComposedTokenIcon size={8} tokens={strategy.rewards.tokens} />
+              <ContainerBox gap={2} alignItems="center">
+                <ComposedTokenIcon tokens={strategy.rewards.tokens} size={4.5} />
+                {/* Only tier 2 and above have more rewards */}
+                {needsTier && needsTier > 1 && <MoreRewardsBadge />}
+              </ContainerBox>
             </>
           )}
         </ContainerBox>
@@ -67,13 +87,18 @@ const StrategyCardItem = ({ strategy, variant }: SugestedStrategyCardProps) => {
           {strategy.farm.name}
         </Typography>
       </ContainerBox>
-      <DataCards strategy={strategy} dataCardsGap={2} variant={variant} />
+      <DataCards
+        strategy={strategy}
+        dataCardsGap={2}
+        variant={variant}
+        isLocked={condition === StrategyConditionType.LOCKED}
+      />
       <StyledLink to={`/earn/vaults/${strategy.network.chainId}/${strategy.id}`}>
         <Typography variant="bodyBold" color={({ palette }) => colors[palette.mode].accentPrimary}>
           <FormattedMessage description="earn.strategy-card.button" defaultMessage="View Vault" />
         </Typography>
       </StyledLink>
-      {isPromoted && <PromotedFlag isCard />}
+      {isLocked && <PromotedFlag isCard tier={strategy.needsTier} />}
     </StyledCard>
   );
 };

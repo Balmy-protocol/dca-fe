@@ -559,18 +559,18 @@ export const SMOL_DOMAIN_ADDRESS: Record<number, Address> = {
 };
 
 export const EARN_COMPANION_ADDRESS: Record<number, Address> = {
-  [Chains.POLYGON.chainId]: '0x814CE82aCDE3D99aB6f92e2722A87d8daa20d6cB',
-  [Chains.BASE.chainId]: '0x260B192b9A5679121FF7f9F0Cf3FED3238753A48',
+  [Chains.POLYGON.chainId]: '0x5cb7667a29d2029ac2e38aa43f0608b620fad087',
+  [Chains.BASE.chainId]: '0x5cb7667a29d2029ac2e38aa43f0608b620fad087',
 };
 
 export const EARN_VAULT_ADDRESS: Record<number, Lowercase<Address>> = {
-  [Chains.POLYGON.chainId]: '0x58e5d76fbbd7e1b51f0fc0f66b7734e108be0461',
-  [Chains.BASE.chainId]: '0x9324a1f92a82b539f8fb1194a0b894025581ec33',
+  [Chains.POLYGON.chainId]: '0x0990a4a641636d437af9aa214a1a580377ef1954',
+  [Chains.BASE.chainId]: '0x0990a4a641636d437af9aa214a1a580377ef1954',
 };
 
 export const EARN_STRATEGY_REGISTRY: Record<number, Lowercase<Address>> = {
-  [Chains.POLYGON.chainId]: '0xb034a43d1ffe0f88ed3a50fc096179f543fd3f3a',
-  [Chains.BASE.chainId]: '0x04a3bd5cc16435f27e7b31e44e4e522c0bc413e9',
+  [Chains.POLYGON.chainId]: '0xc0571929c21b71fc7579ec7159b1e88a2199bc78',
+  [Chains.BASE.chainId]: '0xc0571929c21b71fc7579ec7159b1e88a2199bc78',
 };
 
 export const EXPLORER_URL = getAllChains().reduce<Record<number, string>>(
@@ -692,3 +692,10 @@ export const getTokenAddressForPriceFetching = (chainId: number, address: Addres
 };
 
 export const BALMY_FEES_LOGO_URL = 'https://ipfs.io/ipfs/Qmd2GuuoqECL2wDpjWCKfSNUPYCCWGhrYVf8fjtyeyWWBV';
+
+export const SUPERCHAIN_CHAIN_IDS = [
+  Chains.OPTIMISM.chainId,
+  Chains.BASE.chainId,
+  Chains.MODE.chainId,
+  Chains.ETHEREUM_SEPOLIA.chainId,
+];

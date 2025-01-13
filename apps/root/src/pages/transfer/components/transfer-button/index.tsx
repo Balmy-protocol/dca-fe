@@ -2,7 +2,7 @@ import { NETWORKS } from '@constants';
 import useActiveWallet from '@hooks/useActiveWallet';
 import useCurrentNetwork from '@hooks/useCurrentNetwork';
 import useOpenConnectModal from '@hooks/useOpenConnectModal';
-import useTrackEvent from '@hooks/useTrackEvent';
+import useAnalytics from '@hooks/useAnalytics';
 import useWalletService from '@hooks/useWalletService';
 import useWallets from '@hooks/useWallets';
 import { setNetwork } from '@state/config/actions';
@@ -29,7 +29,7 @@ const TransferButton = ({ disableTransfer, onTransferClick, isValidAddress }: Tr
   const wallets = useWallets();
   const walletService = useWalletService();
   const dispatch = useAppDispatch();
-  const trackEvent = useTrackEvent();
+  const { trackEvent } = useAnalytics();
   const intl = useIntl();
   const isOnCorrectNetwork = actualCurrentNetwork.chainId === network;
   const reconnectingWallet = activeWallet || find(wallets, { isAuth: true });

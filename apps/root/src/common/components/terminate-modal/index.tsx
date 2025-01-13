@@ -12,7 +12,7 @@ import useSupportsSigning from '@hooks/useSupportsSigning';
 import usePositionService from '@hooks/usePositionService';
 import useErrorService from '@hooks/useErrorService';
 import { deserializeError, shouldTrackError } from '@common/utils/errors';
-import useTrackEvent from '@hooks/useTrackEvent';
+import useAnalytics from '@hooks/useAnalytics';
 import { formatCurrencyAmount } from '@common/utils/currency';
 
 interface TerminateModalProps {
@@ -54,7 +54,7 @@ const TerminateModal = ({ position, open, onCancel }: TerminateModalProps) => {
     position.to.address === protocolToken.address || position.to.address === wrappedProtocolToken.address;
   const swappedOrLiquidity = protocolIsFrom ? remainingLiquidity : toWithdraw;
   const hasSignSupport = useSupportsSigning();
-  const trackEvent = useTrackEvent();
+  const { trackEvent, trackPositionTerminated } = useAnalytics();
 
   const protocolBalance = hasWrappedOrProtocol ? swappedOrLiquidity.amount : 0n;
   let fromSymbol = position.from.symbol;
@@ -149,11 +149,16 @@ const TerminateModal = ({ position, open, onCancel }: TerminateModalProps) => {
           />
         ),
       });
+
       trackEvent('DCA - Terminate position submitted', {
         terminateWithUnwrap,
         toWidthdraw: position.toWithdraw.amountInUSD,
         remainingSwaps: position.remainingSwaps,
         remainingLiquidity: position.remainingLiquidity.amountInUSD,
+      });
+      trackPositionTerminated({
+        chainId: position.chainId,
+        usdValueDiff: (position.remainingLiquidity.amountInUSD ?? 0).toString(),
       });
     } catch (e) {
       // User rejecting transaction

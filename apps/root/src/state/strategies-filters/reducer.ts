@@ -1,7 +1,7 @@
 import { createReducer } from '@reduxjs/toolkit';
 import {
   setAssetFilter,
-  setFarmFilter,
+  setProtocolFilter,
   setGuardianFilter,
   setNetworkFilter,
   setRewardFilter,
@@ -10,7 +10,7 @@ import {
   setSearch,
   setOrderBy,
 } from './actions';
-import { ChainId, FarmId, GuardianId, StrategyYieldType, Token } from 'common-types';
+import { ChainId, GuardianId, StrategyYieldType, Token } from 'common-types';
 import { StrategyColumnKeys } from '@pages/earn/components/strategies-table/components/columns';
 
 export type ColumnOrder = 'asc' | 'desc';
@@ -27,7 +27,7 @@ export type StrategiesFiltersState = Record<
     assets: Token[];
     networks: ChainId[];
     rewards: Token[];
-    farms: FarmId[];
+    protocols: string[];
     yieldTypes: StrategyYieldType[];
     guardians: GuardianId[];
     search: string;
@@ -43,6 +43,10 @@ export type StrategiesFiltersState = Record<
       column: StrategyColumnKeys;
       order: ColumnOrder;
     };
+    quarterOrderBy?: {
+      column: StrategyColumnKeys;
+      order: ColumnOrder;
+    };
   }
 >;
 
@@ -50,7 +54,7 @@ const initialFiltersBase = {
   assets: [],
   networks: [],
   rewards: [],
-  farms: [],
+  protocols: [],
   guardians: [],
   yieldTypes: [],
   search: '',
@@ -60,17 +64,25 @@ export const initialState: StrategiesFiltersState = {
   [StrategiesTableVariants.ALL_STRATEGIES]: {
     ...initialFiltersBase,
     orderBy: {
-      column: StrategyColumnKeys.IS_PROMOTED,
+      column: StrategyColumnKeys.APY,
       order: 'desc' as ColumnOrder,
     },
     secondaryOrderBy: {
+      column: StrategyColumnKeys.NEEDS_TIER,
+      order: 'desc' as ColumnOrder,
+    },
+    // orderBy: {
+    //   column: StrategyColumnKeys.NEEDS_TIER,
+    //   order: 'desc' as ColumnOrder,
+    // },
+    tertiaryOrderBy: {
       column: StrategyColumnKeys.WALLET_BALANCE,
       order: 'desc' as ColumnOrder,
     },
-    tertiaryOrderBy: {
-      column: StrategyColumnKeys.TVL,
-      order: 'desc' as ColumnOrder,
-    },
+    // quarterOrderBy: {
+    //   column: StrategyColumnKeys.TVL,
+    //   order: 'desc' as ColumnOrder,
+    // },
   },
   [StrategiesTableVariants.USER_STRATEGIES]: {
     ...initialFiltersBase,
@@ -93,8 +105,8 @@ export default createReducer(initialState, (builder) => {
     .addCase(setAssetFilter, (state, { payload }) => {
       state[payload.variant].assets = payload.value;
     })
-    .addCase(setFarmFilter, (state, { payload }) => {
-      state[payload.variant].farms = payload.value;
+    .addCase(setProtocolFilter, (state, { payload }) => {
+      state[payload.variant].protocols = payload.value;
     })
     .addCase(setNetworkFilter, (state, { payload }) => {
       state[payload.variant].networks = payload.value;

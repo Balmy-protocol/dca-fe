@@ -10,6 +10,7 @@ export const toWallet = (wallet: ToWalletParameter): Wallet => {
     label: undefined,
     type: WalletType.external,
     isAuth: false,
+    isOwner: false,
   };
 
   const lowerCasedAddress = (wallet.address?.toLowerCase() || baseWallet.address) as Address;

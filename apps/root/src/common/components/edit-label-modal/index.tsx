@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
 import { ContainerBox, Modal, TextField, Zoom, useSnackbar } from 'ui-library';
-import useTrackEvent from '@hooks/useTrackEvent';
+import useAnalytics from '@hooks/useAnalytics';
 import { Wallet } from 'common-types';
 import useEditLabel from '@hooks/useEditLabel';
 
@@ -15,7 +15,7 @@ interface EditWalletLabelModalProps {
 }
 
 const EditWalletLabelModal = ({ open, onCancel, walletToEdit }: EditWalletLabelModalProps) => {
-  const trackEvent = useTrackEvent();
+  const { trackEvent } = useAnalytics();
   const intl = useIntl();
   const { triggerUpdate } = useEditLabel();
   const snackbar = useSnackbar();

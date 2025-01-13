@@ -1,4 +1,4 @@
-import { NetworkStruct, TokenListId, Token } from '.';
+import { NetworkStruct, TokenListId, Token, AccountId, Achievement, Address } from '.';
 import { AmountsOfToken, Timestamp } from '@balmy/sdk';
 import {
   Strategy as SdkBaseStrategy,
@@ -7,7 +7,7 @@ import {
   StrategyId,
   FarmId,
   GuardianId,
-  GuardianFeeType,
+  FeeType,
   EarnPosition as BaseSdkEarnPosition,
   HistoricalBalance as SdkHistoricalBalance,
   EarnPositionAction as SdkEarnPositionAction,
@@ -31,7 +31,7 @@ export {
   StrategyId,
   FarmId,
   GuardianId,
-  GuardianFeeType as FeeType,
+  FeeType,
   SdkHistoricalBalance,
   SdkEarnPositionAction,
   BaseSdkEarnPosition,
@@ -52,7 +52,7 @@ export type FeeTypeType = StrategyGuardian['fees'][number]['type'];
 export type ApiGuardianFee = StrategyGuardian['fees'][number];
 
 export type SummarizedSdkStrategyParameters = {
-  farms: Record<FarmId, StrategyFarm>;
+  protocols: string[];
   guardians: Record<GuardianId, StrategyGuardian>;
   tokens: {
     assets: Record<TokenListId, SdkStrategyToken>;
@@ -171,4 +171,18 @@ export type DelayedWithdrawalPositions = EarnPosition & {
 export enum DelayedWithdrawalStatus {
   PENDING = 'pending',
   READY = 'ready',
+}
+export type EarnInviteCode = { code: string; claimedBy?: AccountId };
+
+export type EarnEarlyAccess = {
+  earlyAccess: boolean;
+  inviteCodes: EarnInviteCode[];
+  referrals: AccountId[];
+  twitterShare: boolean;
+  achievements: Record<Address, Achievement[]>;
+};
+
+export enum StrategyConditionType {
+  PROMOTED = 'PROMOTED',
+  LOCKED = 'LOCKED',
 }

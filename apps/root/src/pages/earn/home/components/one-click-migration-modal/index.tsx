@@ -4,7 +4,9 @@ import { FormattedMessage } from 'react-intl';
 import { Modal } from 'ui-library';
 import OneClickMigrationOptionsContent from './options-content';
 import usePushToHistory from '@hooks/usePushToHistory';
-import useTrackEvent from '@hooks/useTrackEvent';
+import useAnalytics from '@hooks/useAnalytics';
+import OneClickMigrationConfirmMigrationContent from './confirm-migration';
+import { Strategy, Token } from 'common-types';
 
 interface OneClickMigrationModalProps {
   open: boolean;
@@ -18,20 +20,29 @@ enum OneClickMigrationModalStep {
 
 const OneClickMigrationModal = ({ open, onClose }: OneClickMigrationModalProps) => {
   const [step, setStep] = React.useState<OneClickMigrationModalStep>(OneClickMigrationModalStep.SELECT_VAULTS);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [selectedFarm, setSelectedFarm] = React.useState<FarmWithAvailableDepositTokens | null>(null);
   const pushToHistory = usePushToHistory();
-  const trackEvent = useTrackEvent();
+  const { trackEvent } = useAnalytics();
   const farms = useAvailableDepositTokens();
 
+  const handleClose = React.useCallback(() => {
+    onClose();
+    setStep(OneClickMigrationModalStep.SELECT_VAULTS);
+  }, [onClose]);
   const handleOnGoToStrategy = React.useCallback(
-    (farm: FarmWithAvailableDepositTokens) => {
-      pushToHistory(`/earn/vaults/${farm.strategies[0].network.chainId}/${farm.strategies[0].id}`);
-      trackEvent('Earn One Click Migration - Go to strategy', {
-        chainId: farm.strategies[0].network.chainId,
-      });
+    (strategy: Strategy, token: Token, depositAmount: string, underlyingAmount: string, underlyingToken: Token) => {
+      handleClose();
+      // Give a little time for the modal to close
+      setTimeout(() => {
+        pushToHistory(
+          `/earn/vaults/${strategy.network.chainId}/${strategy.id}?triggerSteps=true&assetToDeposit=${token.address}&assetToDepositAmount=${depositAmount}&underlyingAmount=${underlyingAmount}&underlyingAsset=${underlyingToken.address}`
+        );
+        trackEvent('Earn One Click Migration - Go to strategy', {
+          chainId: strategy.network.chainId,
+        });
+      }, 10);
     },
-    [pushToHistory, trackEvent]
+    [pushToHistory, trackEvent, handleClose]
   );
 
   const handleOnGoToDetails = (farm: FarmWithAvailableDepositTokens) => {
@@ -46,26 +57,32 @@ const OneClickMigrationModal = ({ open, onClose }: OneClickMigrationModalProps) 
       showCloseIcon
       maxWidth="sm"
       title={
-        <FormattedMessage
-          defaultMessage="Import Your Investments to Balmy"
-          description="earn.one-click-migration-modal.title"
-        />
+        step === OneClickMigrationModalStep.SELECT_VAULTS ? (
+          <FormattedMessage
+            defaultMessage="Import Your Investments to Balmy"
+            description="earn.one-click-migration-modal.title"
+          />
+        ) : undefined
       }
       subtitle={
-        <FormattedMessage
-          defaultMessage="Here are the Investments we've detected from external platforms. Get exclusive Guardian Protection and performance information now."
-          description="earn.one-click-migration-modal.subtitle"
-        />
+        step === OneClickMigrationModalStep.SELECT_VAULTS ? (
+          <FormattedMessage
+            defaultMessage="Here are the Investments we've detected from external platforms. Get exclusive Guardian Protection and performance information now."
+            description="earn.one-click-migration-modal.subtitle"
+          />
+        ) : undefined
       }
     >
       {step === OneClickMigrationModalStep.SELECT_VAULTS && (
-        <OneClickMigrationOptionsContent
+        <OneClickMigrationOptionsContent onGoToDetails={handleOnGoToDetails} farms={farms} />
+      )}
+      {step === OneClickMigrationModalStep.CONFIRM_MIGRATION && (
+        <OneClickMigrationConfirmMigrationContent
+          selectedFarm={selectedFarm}
+          onGoBack={() => setStep(OneClickMigrationModalStep.SELECT_VAULTS)}
           onGoToStrategy={handleOnGoToStrategy}
-          onGoToDetails={handleOnGoToDetails}
-          farms={farms}
         />
       )}
-      {step === OneClickMigrationModalStep.CONFIRM_MIGRATION && <div>Confirm migration</div>}
     </Modal>
   );
 };

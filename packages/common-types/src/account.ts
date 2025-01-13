@@ -20,6 +20,7 @@ export type Wallet = {
   label?: string;
   isAuth: boolean;
   ens?: string | null;
+  isOwner: boolean;
 };
 
 export enum UserStatus {
@@ -42,6 +43,24 @@ export interface AccountLabelsAndContactList {
   labels: AccountLabels;
   contacts: ContactList;
 }
+
+// Mapping of achievement IDs to specific requirements
+export enum AchievementKeys {
+  SWAP_VOLUME = 'agg-swaps',
+  TWEET = 'tweet_shared',
+  MIGRATED_VOLUME = 'migrations',
+  REFERRALS = 'referrals',
+}
+
+export type ApiAchievement = {
+  id: AchievementKeys;
+  achieved: boolean | number;
+};
+
+export type Achievement = {
+  id: AchievementKeys;
+  achieved: number;
+};
 
 export type AccountId = string;
 export type Account = {

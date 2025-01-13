@@ -8,7 +8,10 @@ import { AmountsOfToken } from 'common-types';
 import { parseUnits } from 'viem';
 import { formatCurrencyAmount, parseNumberUsdPriceToBigInt, parseUsdPrice } from '@common/utils/currency';
 import { EarnDepositRecapDataProps } from '@common/components/transaction-steps/recap-data';
-import { GuardianFeeType } from '@balmy/sdk/dist/services/earn/types';
+import { FeeType } from '@balmy/sdk/dist/services/earn/types';
+import { useEarnManagementState } from '@state/earn-management/hooks';
+import { isNil } from 'lodash';
+import useToken from '@hooks/useToken';
 
 const RecapDataContainer = styled(ContainerBox).attrs({ flexDirection: 'column', alignItems: 'start', gap: 3 })``;
 const RecapDataGroupContainer = styled(ContainerBox).attrs({ alignItems: 'flex-start', gap: 8 })``;
@@ -38,8 +41,15 @@ const RecapDataItemValue = styled(Typography).attrs(
 
 const EarnDepositRecapData = ({ strategy, assetAmount: assetAmountInUnits }: EarnDepositRecapDataProps) => {
   const intl = useIntl();
-  const token = strategy?.asset;
-  if (!token) return null;
+  const { asset } = useEarnManagementState();
+  const fetchedToken = useToken({ tokenAddress: asset?.address, chainId: asset?.chainId });
+
+  if (!asset) return null;
+
+  let token = asset;
+  if (isNil(token?.price) && !isNil(fetchedToken?.price)) {
+    token = fetchedToken;
+  }
 
   const depositAmount = parseUnits(assetAmountInUnits || '0', token.decimals);
   const depositAmounts: AmountsOfToken = {
@@ -56,7 +66,7 @@ const EarnDepositRecapData = ({ strategy, assetAmount: assetAmountInUnits }: Ear
   const depositFeeAmount = calculateEarnFeeBigIntAmount({
     strategy,
     assetAmount: depositAmount,
-    feeType: GuardianFeeType.DEPOSIT,
+    feeType: FeeType.DEPOSIT,
   });
   if (depositFeeAmount) {
     feeAmounts = {

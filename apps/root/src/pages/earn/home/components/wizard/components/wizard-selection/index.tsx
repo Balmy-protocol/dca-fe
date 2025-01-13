@@ -7,7 +7,7 @@ import { useThemeMode } from '@state/config/hooks';
 import useMergedTokensBalances from '@hooks/useMergedTokensBalances';
 import { ALL_WALLETS } from '@common/components/wallet-selector/types';
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
-import { findTokenAnyMatch, getIsSameOrTokenEquivalent } from '@common/utils/currency';
+import { findTokenAnyMatch, getIsSameOrTokenEquivalent, parseExponentialNumberToString } from '@common/utils/currency';
 import { parseUnits } from 'viem';
 import { SkeletonTokenSelectorItem } from '@common/components/token-selector';
 import { TokenSelectorItem } from '@common/components/token-selector/token-items';
@@ -119,20 +119,32 @@ export const WizardSelection = ({
 
   const assetOptions = React.useMemo<AssetSelectorOption[]>(
     () =>
-      assets.map((asset) => {
-        const balanceItem = mergedBalances.find((item) =>
-          item.tokens.some((balanceToken) => getIsSameOrTokenEquivalent(balanceToken.token, asset))
-        );
-        return {
-          key: asset.address,
-          token: asset,
-          balance: balanceItem ? parseUnits(balanceItem.totalBalanceInUnits, asset.decimals) : undefined,
-          balanceUsd: balanceItem
-            ? parseUnits((balanceItem.totalBalanceUsd || 0).toString(), asset.decimals + 18)
-            : undefined,
-          chainsWithBalance: balanceItem ? balanceItem.tokens.map((token) => token.token.chainId) : [],
-        };
-      }),
+      assets
+        .map((asset) => {
+          const balanceItem = mergedBalances.find((item) =>
+            item.tokens.some((balanceToken) => getIsSameOrTokenEquivalent(balanceToken.token, asset))
+          );
+          return {
+            key: asset.address,
+            token: asset,
+            balance: balanceItem ? parseUnits(balanceItem.totalBalanceInUnits, asset.decimals) : undefined,
+            balanceUsd: balanceItem
+              ? parseUnits(parseExponentialNumberToString(balanceItem.totalBalanceUsd || 0), asset.decimals + 18)
+              : undefined,
+            chainsWithBalance: balanceItem ? balanceItem.tokens.map((token) => token.token.chainId) : [],
+          };
+        })
+        .sort((a, b) => {
+          const aBalance = Number(a.balanceUsd);
+          const bBalance = Number(b.balanceUsd);
+          const aHasBalance = !isNaN(aBalance) && aBalance > 0;
+          const bHasBalance = !isNaN(bBalance) && bBalance > 0;
+
+          if (aHasBalance && !bHasBalance) return -1;
+          if (!aHasBalance && bHasBalance) return 1;
+          if (aHasBalance && bHasBalance) return bBalance - aBalance;
+          return 0;
+        }),
     [assets, mergedBalances]
   );
 

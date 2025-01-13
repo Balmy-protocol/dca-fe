@@ -1,12 +1,16 @@
 import React from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 
 function usePushToHistory() {
   const navigate = useNavigate();
   const location = useLocation();
+  const [, setSearchParams] = useSearchParams();
 
   return React.useCallback(
-    (path: string) => navigate(`${path}${location.search}`, { state: { from: location.pathname } }),
+    (path: string) => {
+      setSearchParams([]);
+      navigate(`${path}`, { state: { from: location.pathname } });
+    },
     [navigate, location]
   );
 }

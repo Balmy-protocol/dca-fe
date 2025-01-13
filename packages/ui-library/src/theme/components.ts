@@ -180,6 +180,17 @@ const baseComponents: Components = {
       },
     },
   },
+  MuiRadio: {
+    styleOverrides: {
+      root: {
+        padding: SPACING(1),
+
+        '& .MuiSvgIcon-root': {
+          fontSize: SPACING(6),
+        },
+      },
+    },
+  },
 };
 
 export const lightModeComponents = merge({}, baseComponents, lightModeVariants);

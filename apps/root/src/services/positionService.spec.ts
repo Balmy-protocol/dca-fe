@@ -417,12 +417,14 @@ describe('Position Service', () => {
           status: WalletStatus.connected,
           type: WalletType.embedded,
           isAuth: true,
+          isOwner: true,
         },
         {
           address: '0xwallet-2',
           status: WalletStatus.connected,
           type: WalletType.embedded,
           isAuth: true,
+          isOwner: true,
         },
       ]);
       sdkService.getUsersDcaPositions.mockResolvedValue({
@@ -774,12 +776,14 @@ describe('Position Service', () => {
           status: WalletStatus.connected,
           type: WalletType.embedded,
           isAuth: true,
+          isOwner: true,
         },
         {
           address: '0xwallet-2',
           status: WalletStatus.connected,
           type: WalletType.embedded,
           isAuth: true,
+          isOwner: true,
         },
       ]);
 
@@ -3889,12 +3893,14 @@ describe('Position Service', () => {
           status: WalletStatus.connected,
           type: WalletType.embedded,
           isAuth: true,
+          isOwner: true,
         },
         {
           address: '0xwallet-2',
           status: WalletStatus.connected,
           type: WalletType.embedded,
           isAuth: true,
+          isOwner: true,
         },
       ]);
     });

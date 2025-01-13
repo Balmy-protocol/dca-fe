@@ -17,7 +17,7 @@ import SdkService from './sdkService';
 import ErrorService from './errorService';
 import SimulationService from './simulationService';
 import SafeService from './safeService';
-import EventService from './eventService';
+import AnalyticsService from './analyticsService';
 import CampaignService from './campaignService';
 import Permit2Service from './permit2Service';
 import AccountService, { WalletActionType } from './accountService';
@@ -27,6 +27,7 @@ import getWagmiConfig from './wagmiConfig';
 import { EarnService } from './earnService';
 import WalletClientsService from './walletClientsService';
 import { reconnect } from '@wagmi/core';
+import TierService from './tierService';
 
 /* eslint-disable */
 let deepDiffMapper = (function () {
@@ -144,7 +145,7 @@ export default class Web3Service {
 
   errorService: ErrorService;
 
-  eventService: EventService;
+  analyticsService: AnalyticsService;
 
   simulationService: SimulationService;
 
@@ -164,6 +165,8 @@ export default class Web3Service {
 
   walletClientsService: WalletClientsService;
 
+  tierService: TierService;
+
   constructor() {
     this.loadedAsSafeApp = false;
 
@@ -173,7 +176,8 @@ export default class Web3Service {
     this.safeService = new SafeService();
     this.meanApiService = new MeanApiService(this.axiosClient);
     this.walletClientsService = new WalletClientsService(this);
-    this.accountService = new AccountService(this, this.meanApiService, this.walletClientsService);
+    this.tierService = new TierService(this, this.meanApiService);
+    this.accountService = new AccountService(this, this.meanApiService, this.walletClientsService, this.tierService);
     this.sdkService = new SdkService(this.axiosClient);
     this.providerService = new ProviderService(this.accountService, this.sdkService, this.walletClientsService);
     this.contractService = new ContractService(this.providerService);
@@ -181,7 +185,8 @@ export default class Web3Service {
       this.sdkService,
       this.accountService,
       this.providerService,
-      this.contractService
+      this.contractService,
+      this.meanApiService
     );
     this.labelService = new LabelService(
       this.meanApiService,
@@ -198,7 +203,7 @@ export default class Web3Service {
       this.walletService,
       this.labelService
     );
-    this.eventService = new EventService(this.providerService, this.accountService);
+    this.analyticsService = new AnalyticsService(this.providerService, this.accountService);
     this.pairService = new PairService(this.sdkService);
     this.transactionService = new TransactionService(
       this.contractService,
@@ -237,7 +242,7 @@ export default class Web3Service {
       this.providerService,
       this.contractService,
       this.sdkService,
-      this.eventService,
+      this.analyticsService,
       this.walletService
     );
     this.campaignService = new CampaignService(
@@ -254,12 +259,16 @@ export default class Web3Service {
       this.providerService,
       this.safeService,
       this.simulationService,
-      this.eventService
+      this.analyticsService
     );
   }
 
   setOnUpdateConfig(onUpdateConfig: (config: Partial<SavedCustomConfig>) => void) {
     this.onUpdateConfig = onUpdateConfig;
+  }
+
+  getTierService() {
+    return this.tierService;
   }
 
   getAccountService() {
@@ -330,8 +339,8 @@ export default class Web3Service {
     return this.pairService;
   }
 
-  getEventService() {
-    return this.eventService;
+  getAnalyticsService() {
+    return this.analyticsService;
   }
 
   getCampaignService() {

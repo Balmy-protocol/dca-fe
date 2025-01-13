@@ -10,6 +10,7 @@ import { getConnectorData, getChainIdFromWalletClient } from '@common/utils/wagm
 import { Connector } from 'wagmi';
 import { WalletClient } from 'viem';
 import WalletClientsService, { AvailableProvider } from './walletClientsService';
+import TierService from './tierService';
 
 jest.mock('./web3Service');
 jest.mock('@common/utils/provider-info', () => ({
@@ -22,6 +23,7 @@ jest.mock('@common/utils/wagmi', () => ({
 
 const MockedMeanApiService = jest.mocked(MeanApiService, { shallow: true });
 const MockedWeb3Service = jest.mocked(Web3Service, { shallow: true });
+const MockedTierService = jest.mocked(TierService, { shallow: true });
 const MockedWalletClientsService = jest.mocked(WalletClientsService, { shallow: true });
 const mockedGetConnectorData = jest.mocked(getConnectorData, { shallow: true });
 const mockedGetChainIdFromWalletClient = jest.mocked(getChainIdFromWalletClient, { shallow: true });
@@ -30,6 +32,7 @@ describe('Account Service', () => {
   let web3Service: jest.MockedObject<Web3Service>;
   let meanApiService: jest.MockedObject<MeanApiService>;
   let walletClientService: jest.MockedObject<WalletClientsService>;
+  let tierService: jest.MockedObject<TierService>;
   let accountService: AccountService;
   let activeWallet: Wallet;
   let user: User;
@@ -55,11 +58,12 @@ describe('Account Service', () => {
 
     meanApiService = createMockInstance(MockedMeanApiService);
 
+    tierService = createMockInstance(MockedTierService);
     walletClientService = createMockInstance(MockedWalletClientsService);
 
     mockedGetChainIdFromWalletClient.mockResolvedValue(10);
 
-    accountService = new AccountService(web3Service, meanApiService, walletClientService);
+    accountService = new AccountService(web3Service, meanApiService, walletClientService, tierService);
 
     signMessageMock = jest.fn().mockResolvedValue('signature');
 
@@ -81,6 +85,7 @@ describe('Account Service', () => {
       label: 'External wallet',
       status: WalletStatus.connected,
       isAuth: true,
+      isOwner: true,
     };
 
     accounts = [
@@ -93,10 +98,12 @@ describe('Account Service', () => {
           {
             address: '0xaddress',
             isAuth: true,
+            isOwner: true,
           },
           {
             address: '0xsecondaddress',
             isAuth: false,
+            isOwner: false,
           },
         ],
       },
@@ -109,6 +116,7 @@ describe('Account Service', () => {
           {
             address: '0xaddress',
             isAuth: true,
+            isOwner: true,
           },
         ],
       },
@@ -157,6 +165,8 @@ describe('Account Service', () => {
     beforeEach(() => {
       meanApiService.unlinkWallet.mockResolvedValue(true);
       accountService.getWalletVerifyingSignature = jest.fn().mockResolvedValue('signature');
+      accountService.tierService.calculateAndSetUserTier = jest.fn();
+      accountService.tierService.pollUser = jest.fn().mockResolvedValue(true);
     });
     it('should throw an error if the user does not exist', async () => {
       accountService.user = undefined;
@@ -469,6 +479,8 @@ describe('Account Service', () => {
       accountService.setWalletActionType(WalletActionType.link);
 
       walletClientService.getWalletClient = jest.fn().mockReturnValue(walletClientMock);
+      accountService.tierService.calculateAndSetUserTier = jest.fn();
+      accountService.tierService.pollUser = jest.fn().mockResolvedValue(true);
     });
 
     it('should thow if the connector is not existent', async () => {
@@ -527,6 +539,7 @@ describe('Account Service', () => {
         expect(accountService.accounts[0].wallets[2]).toEqual({
           address: '0xThirdAddress',
           isAuth: true,
+          isOwner: true,
         });
       });
     });
@@ -550,11 +563,13 @@ describe('Account Service', () => {
             address: '0xThirdAddress',
             status: WalletStatus.connected,
             isAuth: false,
+            isOwner: false,
           })
         );
         expect(accountService.accounts[0].wallets[2]).toEqual({
           address: '0xThirdAddress',
           isAuth: false,
+          isOwner: false,
         });
       });
     });
@@ -598,6 +613,7 @@ describe('Account Service', () => {
           isAuth: true,
           status: WalletStatus.disconnected,
           type: WalletType.external,
+          isOwner: true,
         }
       );
       expect(accountService.accounts[2]).toEqual({
@@ -611,6 +627,7 @@ describe('Account Service', () => {
             isAuth: true,
             status: WalletStatus.disconnected,
             type: WalletType.external,
+            isOwner: true,
           },
         ],
       });
@@ -619,6 +636,7 @@ describe('Account Service', () => {
         isAuth: true,
         status: WalletStatus.disconnected,
         type: WalletType.external,
+        isOwner: true,
       });
     });
   });
@@ -685,10 +703,12 @@ describe('Account Service', () => {
                 {
                   address: '0xaddress',
                   isAuth: true,
+                  isOwner: true,
                 },
                 {
                   address: '0xsecondaddress',
                   isAuth: false,
+                  isOwner: false,
                 },
               ],
               config: {},
@@ -703,6 +723,7 @@ describe('Account Service', () => {
                 {
                   address: '0xaddress',
                   isAuth: true,
+                  isOwner: true,
                 },
               ],
             },
@@ -745,10 +766,12 @@ describe('Account Service', () => {
               {
                 address: '0xaddress',
                 isAuth: true,
+                isOwner: true,
               },
               {
                 address: '0xsecondaddress',
                 isAuth: false,
+                isOwner: false,
               },
             ],
           },
@@ -762,6 +785,7 @@ describe('Account Service', () => {
               {
                 address: '0xaddress',
                 isAuth: true,
+                isOwner: true,
               },
             ],
           },
@@ -795,6 +819,7 @@ describe('Account Service', () => {
             isAuth: true,
             type: WalletType.external,
             status: WalletStatus.connected,
+            isOwner: false,
           },
         });
       });

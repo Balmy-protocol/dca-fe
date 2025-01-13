@@ -2,14 +2,16 @@ import React from 'react';
 import { Grid, TablePagination } from 'ui-library';
 import { TableStrategy } from '../strategies-table';
 import { StrategiesTableVariants } from '@state/strategies-filters/reducer';
-import { SetStateCallback, Strategy } from 'common-types';
+import { SetStateCallback } from 'common-types';
 import StrategyCardItem from '../strategy-card-item';
 import { getStrategyFromTableObject } from '@common/utils/earn/parsing';
 import EmptyPortfolio from '../strategies-table/components/empty-portfolio';
+import { DataCardVariants } from '@pages/strategy-guardian-detail/vault-data/components/data-cards';
+import useTierLevel from '@hooks/tiers/useTierLevel';
 
-interface StrategiesListProps<
-  T extends StrategiesTableVariants.ALL_STRATEGIES | StrategiesTableVariants.USER_STRATEGIES,
-> {
+type ValidVariants = StrategiesTableVariants.ALL_STRATEGIES | StrategiesTableVariants.USER_STRATEGIES;
+
+interface StrategiesListProps<T extends ValidVariants> {
   visibleStrategies: TableStrategy<T>[];
   totalCount: number;
   rowsPerPage: number;
@@ -21,7 +23,7 @@ interface StrategiesListProps<
 
 const skeletonRows = Array.from(Array(4).keys());
 
-const StrategiesList = <T extends StrategiesTableVariants.ALL_STRATEGIES | StrategiesTableVariants.USER_STRATEGIES>({
+const StrategiesList = <T extends ValidVariants>({
   visibleStrategies,
   totalCount,
   page,
@@ -30,6 +32,7 @@ const StrategiesList = <T extends StrategiesTableVariants.ALL_STRATEGIES | Strat
   variant,
   isLoading,
 }: StrategiesListProps<T>) => {
+  const { tierLevel } = useTierLevel();
   const isPortfolio = variant === StrategiesTableVariants.USER_STRATEGIES;
 
   const showEmptyPortfolioMessage = React.useMemo(
@@ -51,7 +54,11 @@ const StrategiesList = <T extends StrategiesTableVariants.ALL_STRATEGIES | Strat
           ))
         : visibleStrategies.map((tableStrategy, index) => (
             <Grid item xs={12} md={6} key={index}>
-              <StrategyCardItem strategy={getStrategyFromTableObject<T>(tableStrategy, variant as T) as Strategy} />
+              <StrategyCardItem
+                strategy={getStrategyFromTableObject(tableStrategy, variant as ValidVariants)}
+                variant={DataCardVariants.Home}
+                tierLevel={tierLevel ?? 0}
+              />
             </Grid>
           ))}
       {!isPortfolio && (

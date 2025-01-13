@@ -52,6 +52,7 @@ interface ComposedTokenIconProps {
   overlapRatio?: number;
   marginRight?: number;
   withShadow?: boolean;
+  maxTokens?: number;
 }
 const ComposedTokenIcon = ({
   tokens,
@@ -62,6 +63,7 @@ const ComposedTokenIcon = ({
   overlapRatio = 0.6,
   marginRight = 2.5,
   withShadow,
+  maxTokens = 3,
 }: ComposedTokenIconProps) => {
   const theme = useTheme();
   const marginRightToUse = compact(tokens).length === 1 ? 0 : marginRight;
@@ -93,8 +95,8 @@ const ComposedTokenIcon = ({
 
   const chainId = tokens.find((token) => !isUndefined(token?.chainId))?.chainId;
 
-  const isOverflown = tokens.length > 3;
-  const tokensToDisplay = isOverflown ? tokens.slice(0, 3) : tokens;
+  const isOverflown = tokens.length > maxTokens;
+  const tokensToDisplay = isOverflown ? tokens.slice(0, maxTokens) : tokens;
 
   // We move the network icon to the right, starting from spacing(1), adding any overlapped width
   const networkIconRight = tokens.length !== 1 ? -size * overlapRatioToUse - 1 : -1;
@@ -103,9 +105,9 @@ const ComposedTokenIcon = ({
     <StyledComposedTokenIconContainer marginRight={marginRightToUse}>
       {tokensToDisplay.map((token, index) => (
         <StyledTopTokenContainer $isFirst={index === 0} key={index} $right={size * index * overlapRatioToUse}>
-          {index === 2 && isOverflown ? (
+          {index === maxTokens - 1 && isOverflown ? (
             <Typography variant="bodyExtraSmall" fontSize="9px">
-              +{tokens.length - 2}
+              +{tokens.length - maxTokens}
             </Typography>
           ) : (
             <TokenIcon border token={token} isInChip={isInChip} size={size} withShadow={withShadow} />

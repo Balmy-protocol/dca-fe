@@ -13,7 +13,7 @@ import {
 } from 'common-types';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import { Hash, parseUnits } from 'viem';
-import useTrackEvent from '@hooks/useTrackEvent';
+import useAnalytics from '@hooks/useAnalytics';
 import useActiveWallet from '@hooks/useActiveWallet';
 import { shouldTrackError } from '@common/utils/errors';
 import useErrorService from '@hooks/useErrorService';
@@ -21,11 +21,12 @@ import { Typography } from 'ui-library';
 import useTransactionModal from '@hooks/useTransactionModal';
 import { useTransactionAdder } from '@state/transactions/hooks';
 import useEarnService from '@hooks/earn/useEarnService';
-import { getProtocolToken, getWrappedProtocolToken } from '@common/mocks/tokens';
-import { isSameToken } from '@common/utils/currency';
+// import { getProtocolToken, getWrappedProtocolToken } from '@common/mocks/tokens';
+import { isSameToken, parseUsdPrice, parseNumberUsdPriceToBigInt } from '@common/utils/currency';
 import { TransactionAction, TransactionAction as TransactionStep } from '@common/components/transaction-steps';
 import { find, findIndex } from 'lodash';
 import { TRANSACTION_ACTION_APPROVE_COMPANION_SIGN_EARN, TRANSACTION_ACTION_EARN_WITHDRAW } from '@constants';
+import { getWrappedProtocolToken, getProtocolToken } from '@common/mocks/tokens';
 
 interface UseEarnWithdrawActionsParams {
   strategy?: DisplayStrategy;
@@ -35,7 +36,7 @@ const useEarnWithdrawActions = ({ strategy }: UseEarnWithdrawActionsParams) => {
   const intl = useIntl();
   const asset = strategy?.asset;
   const activeWallet = useActiveWallet();
-  const trackEvent = useTrackEvent();
+  const { trackEvent, trackEarnWithdraw } = useAnalytics();
   const errorService = useErrorService();
   const earnService = useEarnService();
   const [currentTransaction, setCurrentTransaction] = React.useState<{ hash: Hash; chainId: number } | undefined>();
@@ -58,7 +59,7 @@ const useEarnWithdrawActions = ({ strategy }: UseEarnWithdrawActionsParams) => {
     const wrappedProtocolToken = getWrappedProtocolToken(strategy.farm.chainId);
 
     // Protocol tokens will be unwrapped
-    const assetIsWrappedProtocol = isSameToken(wrappedProtocolToken, asset);
+    const assetIsProtocolToken = isSameToken(protocolToken, asset);
 
     const rewardsWithdrawAmounts = currentPosition.balances
       .filter((balance) => !isSameToken(balance.token, asset))
@@ -72,8 +73,8 @@ const useEarnWithdrawActions = ({ strategy }: UseEarnWithdrawActionsParams) => {
     const withdrawList = [
       {
         amount: parseUnits(assetAmountInUnits || '0', asset.decimals),
-        token: asset,
-        convertTo: assetIsWrappedProtocol ? protocolToken.address : undefined,
+        token: assetIsProtocolToken ? wrappedProtocolToken : asset,
+        convertTo: assetIsProtocolToken ? protocolToken.address : undefined,
       },
       ...rewardsWithdrawAmounts,
     ];
@@ -138,7 +139,7 @@ const useEarnWithdrawActions = ({ strategy }: UseEarnWithdrawActionsParams) => {
       }
     } catch (e) {
       if (shouldTrackError(e as Error)) {
-        trackEvent('EARN - Sign companion error', {
+        trackEvent('Earn - Sign companion error', {
           fromSteps: !!transactionsToExecute?.length,
         });
         // eslint-disable-next-line no-void, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
@@ -229,8 +230,14 @@ const useEarnWithdrawActions = ({ strategy }: UseEarnWithdrawActionsParams) => {
           }
         }
 
+        const protocolToken = getProtocolToken(strategy.farm.chainId);
+        const wrappedProtocolToken = getWrappedProtocolToken(strategy.farm.chainId);
+
         const parsedTokensToWithdraw = tokensToWithdraw.map((withdraw) => {
-          if (isSameToken(withdraw.token, asset)) {
+          if (
+            isSameToken(withdraw.token, asset) ||
+            (isSameToken(withdraw.token, wrappedProtocolToken) && isSameToken(asset, protocolToken))
+          ) {
             return {
               ...withdraw,
               withdrawType: assetWithdrawType,
@@ -260,6 +267,11 @@ const useEarnWithdrawActions = ({ strategy }: UseEarnWithdrawActionsParams) => {
           amount: withdraw.amount.toString(),
         }));
 
+        const amountInUsd = parsedTokensToWithdraw.reduce((acc, withdraw) => {
+          return (
+            acc + parseUsdPrice(withdraw.token, withdraw.amount, parseNumberUsdPriceToBigInt(withdraw.token.price ?? 0))
+          );
+        }, 0);
         const typeData: EarnWithdrawTypeData = {
           type: TransactionTypes.earnWithdraw,
           typeData: {
@@ -275,6 +287,13 @@ const useEarnWithdrawActions = ({ strategy }: UseEarnWithdrawActionsParams) => {
           strategy: strategy.id,
           amount: assetAmountInUnits,
           withdrawRewards,
+          amountInUsd,
+          withdrawType: assetWithdrawType,
+        });
+
+        trackEarnWithdraw({
+          chainId: strategy.network.chainId,
+          amountInUsd,
         });
 
         addTransaction(result, typeData);

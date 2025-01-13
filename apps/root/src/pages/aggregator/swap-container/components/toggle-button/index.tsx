@@ -5,7 +5,7 @@ import { useAppDispatch } from '@state/hooks';
 import { useAggregatorState } from '@state/aggregator/hooks';
 import useSelectedNetwork from '@hooks/useSelectedNetwork';
 import useReplaceHistory from '@hooks/useReplaceHistory';
-import useTrackEvent from '@hooks/useTrackEvent';
+import useAnalytics from '@hooks/useAnalytics';
 import { setSelectedRoute, toggleFromTo } from '@state/aggregator/actions';
 
 const StyledToggleContainer = styled(ContainerBox).attrs({ justifyContent: 'center', flex: '1' })`
@@ -52,7 +52,7 @@ const ToggleButton = ({ isLoadingRoute }: Props) => {
 
   const currentNetwork = useSelectedNetwork();
   const replaceHistory = useReplaceHistory();
-  const trackEvent = useTrackEvent();
+  const { trackEvent } = useAnalytics();
 
   const onToggleFromTo = () => {
     dispatch(setSelectedRoute(null));

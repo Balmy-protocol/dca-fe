@@ -168,7 +168,7 @@ function addOrganicVariation<T extends DataItem>(data: T[], keys: (keyof T)[], v
         return dataPoint;
       }
 
-      const randomVariation = (Math.random() * 2 - 1) * variationFactor * dataPointData;
+      const randomVariation = Math.random() * variationFactor * dataPointData;
       return { ...dataPoint, [key]: dataPointData + randomVariation };
     });
 

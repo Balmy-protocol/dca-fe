@@ -62,7 +62,7 @@ import useWalletService from '@hooks/useWalletService';
 import useErrorService from '@hooks/useErrorService';
 import { deserializeError, shouldTrackError } from '@common/utils/errors';
 import useLoadedAsSafeApp from '@hooks/useLoadedAsSafeApp';
-import useTrackEvent from '@hooks/useTrackEvent';
+import useAnalytics from '@hooks/useAnalytics';
 import usePermit2Service from '@hooks/usePermit2Service';
 import useSpecificAllowance from '@hooks/useSpecificAllowance';
 import useDcaAllowanceTarget from '@hooks/useDcaAllowanceTarget';
@@ -129,7 +129,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
   const hasConfirmedApproval = useHasPendingApproval(fromToUse, position.user, fromHasYield, allowanceTarget);
   const realBalance = (balance && BigInt(balance.amount) + remainingLiquidity) || remainingLiquidity;
   const hasYield = !!from.underlyingTokens.length;
-  const trackEvent = useTrackEvent();
+  const { trackEvent, trackPositionModified } = useAnalytics();
   const usdPrice = parseNumberUsdPriceToBigInt(from.price);
   const rateUsdPrice = parseUsdPrice(from, (rate !== '' && parseUnits(rate, from?.decimals)) || null, usdPrice);
   const remainingLiquidityDifference = abs(
@@ -335,6 +335,14 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
         ),
       });
       trackEvent('DCA - Modify position submitted', { isIncreasingPosition, useWrappedProtocolToken });
+
+      trackPositionModified({
+        chainId: position.chainId,
+        remainingLiquidityDifference,
+        usdPrice,
+        isIncreasingPosition,
+        token: fromToUse,
+      });
     } catch (e) {
       // User rejecting transaction
       // eslint-disable-next-line no-void, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
@@ -403,7 +411,16 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
         frequencyValue,
         useWrappedProtocolToken
       );
+
       trackEvent('DCA - Safe modify position submitted', { isIncreasingPosition, useWrappedProtocolToken });
+
+      trackPositionModified({
+        chainId: position.chainId,
+        remainingLiquidityDifference,
+        usdPrice,
+        isIncreasingPosition,
+        token: fromToUse,
+      });
 
       addTransaction(
         { hash: result.safeTxHash as Address, from: position.user, chainId: position.chainId },

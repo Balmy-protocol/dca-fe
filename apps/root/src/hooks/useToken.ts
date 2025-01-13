@@ -7,6 +7,7 @@ import { fetchTokenDetails } from '@state/token-lists/actions';
 import { find } from 'lodash';
 import { PROTOCOL_TOKEN } from '@common/mocks/tokens';
 import { NETWORKS } from '@constants';
+import { useAllBalances } from '@state/balances/hooks';
 
 interface UseTokenProps {
   tokenAddress?: string;
@@ -22,7 +23,14 @@ function useToken({
 }: UseTokenProps) {
   const tokenList = useTokenList({ filterForDca, chainId, curateList: true });
   const dispatch = useAppDispatch();
-  return React.useMemo<Token | undefined>(() => {
+  const { balances } = useAllBalances();
+
+  const isLoadingBalanceChainPrices = React.useMemo(() => {
+    if (!chainId) return false;
+    return balances[chainId]?.isLoadingChainPrices;
+  }, [balances, chainId]);
+
+  const token = React.useMemo<Token | undefined>(() => {
     if (!upperTokenAddress) {
       return undefined;
     }
@@ -46,7 +54,7 @@ function useToken({
     }
 
     // Try address
-    const tokenByAddress = find(tokenList, (token) => token.address === tokenAddress);
+    const tokenByAddress = find(tokenList, (tokenListToken) => tokenListToken.address === tokenAddress);
     if (tokenByAddress) return tokenByAddress;
 
     // Try symbol
@@ -61,7 +69,17 @@ function useToken({
     const erc20TokenBySymbol = find(tokenList, ({ symbol }) => symbol.toLowerCase() === tokenAddress);
 
     return erc20TokenBySymbol;
-  }, [upperTokenAddress, chainId, checkForSymbol, filterForDca, tokenList]);
+  }, [upperTokenAddress, chainId, checkForSymbol, filterForDca, tokenList, isLoadingBalanceChainPrices]);
+
+  const tokenWithPrice = React.useMemo(() => {
+    if (!token) return undefined;
+    return {
+      ...token,
+      price: token.price || balances[token.chainId]?.balancesAndPrices[token.address]?.price,
+    };
+  }, [token, balances]);
+
+  return tokenWithPrice;
 }
 
 export default useToken;

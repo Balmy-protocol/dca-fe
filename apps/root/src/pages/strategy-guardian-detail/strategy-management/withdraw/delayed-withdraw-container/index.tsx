@@ -6,7 +6,7 @@ import { buildEtherscanTransaction } from '@common/utils/etherscan';
 import useEarnClaimDelayedWithdrawAction from '@hooks/earn/useEarnClaimDelayedWithdrawAction';
 import useEarnPositions from '@hooks/earn/useEarnPositions';
 import useOpenConnectModal from '@hooks/useOpenConnectModal';
-import useTrackEvent from '@hooks/useTrackEvent';
+import useAnalytics from '@hooks/useAnalytics';
 import useWallet from '@hooks/useWallet';
 import { WalletActionType } from '@services/accountService';
 import { useShowBalances } from '@state/config/hooks';
@@ -50,7 +50,7 @@ const StyledIconContainer = styled(ContainerBox)`
 
 const DelayedWithdrawItem = ({ delayed, type, position, setPage }: DelayedWithdrawItemProps) => {
   const intl = useIntl();
-  const trackEvent = useTrackEvent();
+  const { trackEvent } = useAnalytics();
   const openConnectModal = useOpenConnectModal();
   const onClaimDelayedWithdraw = useEarnClaimDelayedWithdrawAction();
   const showBalances = useShowBalances();

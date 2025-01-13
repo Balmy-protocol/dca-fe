@@ -8,7 +8,7 @@ import { IconButton } from '../iconbutton';
 import { Breakpoint } from '../breakpoint';
 import { CloseIcon } from '../../icons';
 import { Button, ButtonProps } from '../button';
-import { FormattedMessage } from 'react-intl';
+import { defineMessage, FormattedMessage, MessageDescriptor, useIntl } from 'react-intl';
 import { colors } from '../../theme';
 import { ForegroundPaper } from '../foreground-paper';
 import { ContainerBox } from '../container-box';
@@ -28,6 +28,7 @@ const StyledDialogContent = styled(DialogContent)<{ withTitle: boolean }>`
     ${withTitle && 'flex-direction: column;'}
     overflow-y: visible;
     gap: ${space.s05}
+    position: relative;
   `}
 `;
 
@@ -52,7 +53,9 @@ const StyledDialogTitle = styled.div`
   flex-grow: 0;
 `;
 
-const StyledDialog = styled(Dialog)``;
+const StyledDialog = styled(Dialog)<{ $customMaxWidth?: string }>`
+  ${({ $customMaxWidth }) => $customMaxWidth && `max-width: ${$customMaxWidth};`}
+`;
 
 const StyledPaperModal = styled(ForegroundPaper)`
   ${({ theme: { palette, space } }) => `
@@ -76,12 +79,15 @@ const StyledCloseIconButton = styled(IconButton)`
   `}
 `;
 
+const DEFAULT_CLOSE_MESSAGE = defineMessage({ defaultMessage: 'Close', description: 'modal.close' });
 export interface ModalProps extends PropsWithChildren {
   open: boolean;
   onClose?: () => void;
   showCloseIcon?: boolean;
+  closeMessage?: MessageDescriptor;
   showCloseButton?: boolean;
   maxWidth?: Breakpoint;
+  customMaxWidth?: string;
   title?: React.ReactNode;
   subtitle?: React.ReactNode;
   headerButton?: React.ReactNode;
@@ -105,6 +111,7 @@ const Modal: React.FC<ModalProps> = ({
   open,
   onClose,
   maxWidth,
+  customMaxWidth,
   showCloseIcon,
   showCloseButton,
   subtitle,
@@ -116,11 +123,14 @@ const Modal: React.FC<ModalProps> = ({
   headerButton,
   actionsAlignment = 'vertical',
   extraActions,
+  closeMessage,
 }) => {
   const {
     palette: { mode },
     spacing,
   } = useTheme();
+
+  const intl = useIntl();
 
   const handleClose = () => {
     if (onClose && (showCloseButton || showCloseIcon || closeOnBackdrop)) {
@@ -134,7 +144,7 @@ const Modal: React.FC<ModalProps> = ({
 
   const titleComponent = useMemo(
     () =>
-      withTitle ? (
+      !!title ? (
         <StyledDialogTitle>
           <StyledDialogHeader>
             <ContainerBox flexDirection="column" gap={2}>
@@ -149,14 +159,21 @@ const Modal: React.FC<ModalProps> = ({
             </ContainerBox>
             {headerButton}
           </StyledDialogHeader>
-          <StyledCloseIconContainer>
-            <StyledCloseIconButton aria-label="close" onClick={onClose}>
-              <CloseIcon sx={{ color: colors[mode].typography.typo2 }} size={spacing(3)} />
-            </StyledCloseIconButton>
-          </StyledCloseIconContainer>
         </StyledDialogTitle>
       ) : null,
-    [headerButton, mode, onClose, title, withTitle, spacing, subtitle]
+    [title, subtitle, headerButton, mode]
+  );
+
+  const closeIconComponent = useMemo(
+    () =>
+      showCloseIcon ? (
+        <StyledCloseIconContainer>
+          <StyledCloseIconButton aria-label="close" onClick={onClose}>
+            <CloseIcon sx={{ color: colors[mode].typography.typo2 }} size={spacing(3)} />
+          </StyledCloseIconButton>
+        </StyledCloseIconContainer>
+      ) : null,
+    [showCloseIcon, onClose, mode, spacing]
   );
 
   return (
@@ -165,19 +182,23 @@ const Modal: React.FC<ModalProps> = ({
       fullWidth
       maxWidth={maxWidth || 'lg'}
       onClose={handleClose}
-      PaperProps={fullHeightProps}
+      PaperProps={{
+        ...fullHeightProps,
+        style: { maxWidth: customMaxWidth },
+      }}
       keepMounted={keepMounted}
       PaperComponent={StyledPaperModal}
     >
       <StyledDialogContent withTitle={withTitle || !!fullHeight}>
         {titleComponent}
+        {closeIconComponent}
         <StyledModalDialogChildren>{children}</StyledModalDialogChildren>
       </StyledDialogContent>
       {(showCloseButton || !!actions?.length) && (
         <ContainerBox
           flexDirection={actionsAlignment === 'vertical' ? 'column' : 'row'}
           gap={4}
-          justify-content="center"
+          justifyContent="center"
           alignItems="center"
         >
           {showCloseButton && actionsAlignment === 'horizontal' && (
@@ -214,7 +235,7 @@ const Modal: React.FC<ModalProps> = ({
           )}
           {showCloseButton && actionsAlignment === 'vertical' && (
             <Button onClick={onClose} variant="contained" size="large" sx={{ width: '100%' }}>
-              <FormattedMessage description="Close" defaultMessage="Close" />
+              {intl.formatMessage(closeMessage || DEFAULT_CLOSE_MESSAGE)}
             </Button>
           )}
           {extraActions}

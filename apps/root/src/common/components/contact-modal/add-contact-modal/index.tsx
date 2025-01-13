@@ -7,7 +7,7 @@ import CenteredLoadingIndicator from '@common/components/centered-loading-indica
 import styled from 'styled-components';
 import { SetStateCallback } from 'common-types';
 import { ContactListActiveModal, PostContactStatus, StyledContactModalParagraph } from '..';
-import useTrackEvent from '@hooks/useTrackEvent';
+import useAnalytics from '@hooks/useAnalytics';
 
 interface AddContactModalProps {
   activeModal: ContactListActiveModal;
@@ -67,7 +67,7 @@ const AddContactModal = ({
     restrictContactRepetition: true,
     defaultValue: defaultAddressValue,
   });
-  const trackEvent = useTrackEvent();
+  const { trackEvent } = useAnalytics();
 
   React.useEffect(() => {
     if (activeModal !== ContactListActiveModal.ADD_CONTACT) {

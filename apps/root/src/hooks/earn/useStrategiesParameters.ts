@@ -3,14 +3,14 @@ import useTokenList from '@hooks/useTokenList';
 import useEarnService from './useEarnService';
 import useServiceEvents from '@hooks/useServiceEvents';
 import { EarnService, EarnServiceData } from '@services/earnService';
-import { StrategyFarm, StrategyGuardian, NetworkStruct, StrategyYieldType, Token, TokenListId } from 'common-types';
+import { StrategyGuardian, NetworkStruct, StrategyYieldType, Token, TokenListId } from 'common-types';
 import { sdkStrategyTokenToToken, yieldTypeFormatter } from '@common/utils/earn/parsing';
 import { useIntl } from 'react-intl';
 import { removeEquivalentFromTokensArray } from '@common/utils/currency';
 import { StrategiesTableVariants } from '@state/strategies-filters/reducer';
 
 interface ParsedStrategiesParameters {
-  farms: StrategyFarm[];
+  protocols: string[];
   networks: NetworkStruct[];
   assets: Token[];
   rewards: Token[];
@@ -53,7 +53,7 @@ export function useStrategiesParameters(variant: StrategiesTableVariants): Parse
     }));
 
     return {
-      farms: Object.values(parameters.farms),
+      protocols: parameters.protocols,
       networks: Object.values(parameters.networks),
       assets: removeEquivalentFromTokensArray(assets),
       rewards: removeEquivalentFromTokensArray(rewards),

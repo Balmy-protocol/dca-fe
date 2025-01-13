@@ -1,6 +1,7 @@
 import { useAppSelector } from '@state/hooks';
 import { RootState } from '../index';
 
+export type ThemeMode = 'light' | 'dark';
 export function useThemeMode() {
   return useAppSelector((state: RootState) => state.config.theme);
 }

@@ -30,7 +30,7 @@ import useReplaceHistory from '@hooks/useReplaceHistory';
 import { useAppDispatch } from '@state/hooks';
 import { setNetwork } from '@state/config/actions';
 import { NetworkStruct, WalletStatus } from '@types';
-import useTrackEvent from '@hooks/useTrackEvent';
+import useAnalytics from '@hooks/useAnalytics';
 import useActiveWallet from '@hooks/useActiveWallet';
 import useOpenConnectModal from '@hooks/useOpenConnectModal';
 import useWallets from '@hooks/useWallets';
@@ -82,7 +82,7 @@ const DcaButton = ({
   const loadedAsSafeApp = useLoadedAsSafeApp();
   const replaceHistory = useReplaceHistory();
   const dispatch = useAppDispatch();
-  const trackEvent = useTrackEvent();
+  const { trackEvent } = useAnalytics();
   const activeWallet = useActiveWallet();
   const wallets = useWallets();
   const reconnectingWallet = activeWallet || find(wallets, { isAuth: true });

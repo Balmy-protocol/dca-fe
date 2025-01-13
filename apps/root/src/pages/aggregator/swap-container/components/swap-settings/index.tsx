@@ -49,7 +49,7 @@ import {
   TimeoutKey,
 } from '@constants/aggregator';
 import useSdkDexes from '@hooks/useSdkSources';
-import useTrackEvent from '@hooks/useTrackEvent';
+import useAnalytics from '@hooks/useAnalytics';
 import SlippageInput from './components/slippage-input';
 import { capitalize } from 'lodash';
 import { SetStateCallback } from 'common-types';
@@ -134,7 +134,15 @@ const SwapSettings = ({ shouldShow, onClose, setShouldShowFirstStep }: SwapSetti
   const { slippage, gasSpeed, disabledDexes, isPermit2Enabled, sourceTimeout, sorting } = useAggregatorSettingsState();
   const dispatch = useAppDispatch();
   const dexes = useSdkDexes();
-  const trackEvent = useTrackEvent();
+  const {
+    trackEvent,
+    trackSlippageChanged,
+    trackGasSpeedChanged,
+    trackSourceTimeoutChanged,
+    trackPermit2Enabled,
+    trackDefaultSettingsChanged,
+    trackQuoteSortingChanged,
+  } = useAnalytics();
   const intl = useIntl();
 
   const gasOptions = GAS_KEYS.map((key) => ({ value: key, text: intl.formatMessage(GAS_LABELS_BY_KEY[key]) }));
@@ -146,18 +154,23 @@ const SwapSettings = ({ shouldShow, onClose, setShouldShowFirstStep }: SwapSetti
   const onSlippageChange = (newSlippage: string) => {
     dispatch(setSlippage(newSlippage));
     trackEvent('Aggregator - Set slippage', { slippage: newSlippage });
+    trackSlippageChanged({ slippage: newSlippage });
   };
   const onGasSpeedChange = (newGasSpeed: GasKeys) => {
     dispatch(setGasSpeed(newGasSpeed));
     trackEvent('Aggregator - Set gas speed', { gasSpeed: newGasSpeed });
+    trackGasSpeedChanged({ gasSpeed: newGasSpeed });
   };
   const onSourceTimeoutChange = (newSourceTimeout: TimeoutKey) => {
     dispatch(setSourceTimeout(newSourceTimeout));
     trackEvent('Aggregator - Set source timeout speed', { sourceTimeout: newSourceTimeout });
+    trackSourceTimeoutChanged({ sourceTimeout: newSourceTimeout });
   };
+
   const setQuoteSorting = (newSort: SwapSortOptions) => {
     dispatch(setSorting(newSort));
     trackEvent('Aggregator - Change selected sorting', { sort: newSort });
+    trackQuoteSortingChanged({ quoteSorting: newSort });
   };
   const handleToggleDex = (id: string) => {
     const newDisabledDexes = [...disabledDexes];
@@ -177,14 +190,17 @@ const SwapSettings = ({ shouldShow, onClose, setShouldShowFirstStep }: SwapSetti
 
     if (newPermitConfig) {
       trackEvent('Aggregator - Enable permit2');
+      trackPermit2Enabled({ permit2Enabled: true });
     } else {
       trackEvent('Aggregator - Disable permit2');
+      trackPermit2Enabled({ permit2Enabled: false });
     }
   };
 
   const onRestoreDefaults = () => {
     dispatch(restoreDefaults());
     trackEvent('Aggregator - Set default settings');
+    trackDefaultSettingsChanged({ defaultSettings: true });
   };
 
   const dexOptions: OptionsMenuOption[] = Object.keys(dexes).map((dexKey) => ({

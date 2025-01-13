@@ -1,7 +1,7 @@
 import { PROTOCOL_TOKEN_ADDRESS, getWrappedProtocolToken } from '@common/mocks/tokens';
 import { DISABLED_YIELD_WITHDRAWS } from '@constants';
 import usePushToHistory from '@hooks/usePushToHistory';
-import useTrackEvent from '@hooks/useTrackEvent';
+import useAnalytics from '@hooks/useAnalytics';
 import { useAppDispatch } from '@state/hooks';
 import { setPosition } from '@state/position-details/actions';
 import { Position, Token } from 'common-types';
@@ -46,7 +46,7 @@ const PositionOptions = ({
   const { toWithdraw, chainId, pendingTransaction } = position;
   const dispatch = useAppDispatch();
   const pushToHistory = usePushToHistory();
-  const trackEvent = useTrackEvent();
+  const { trackEvent } = useAnalytics();
   const intl = useIntl();
   const wrappedProtocolToken = getWrappedProtocolToken(position.chainId);
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);

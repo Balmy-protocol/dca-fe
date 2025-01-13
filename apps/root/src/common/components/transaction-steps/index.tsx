@@ -274,7 +274,7 @@ const buildApproveTokenItem = ({
   done,
 }: TransactionActionApproveTokenProps) => ({
   content: () => {
-    const { token, amount, isPermit2Enabled, swapper } = extraData;
+    const { token, amount, isPermit2Enabled, swapper, allowsExactApproval = true } = extraData;
     const [showReceipt, setShowReceipt] = React.useState(false);
     const receipt = useTransactionReceipt({ transaction: { hash: hash as Hash, chainId } });
     const isPendingTransaction = useIsTransactionPending(hash);
@@ -337,6 +337,7 @@ const buildApproveTokenItem = ({
       receipt.type === TransactionEventTypes.ERC20_APPROVAL &&
       receipt.data.amount.amount >= totalSupplyThreshold(token.decimals);
 
+    const shouldDoUnlimitedApproval = isPermit2Enabled && (useUnlimitedApproval || !allowsExactApproval);
     return (
       <>
         <TransactionReceipt open={showReceipt} onClose={() => setShowReceipt(false)} transaction={receipt} />
@@ -354,7 +355,7 @@ const buildApproveTokenItem = ({
               {isCurrentStep && (
                 <ContainerBox gap={3}>
                   <Button
-                    onClick={isPermit2Enabled && useUnlimitedApproval ? () => onAction() : () => onAction(amount)}
+                    onClick={shouldDoUnlimitedApproval ? () => onAction() : () => onAction(amount)}
                     variant="contained"
                     sx={{ flex: 1 }}
                     size="large"
@@ -362,7 +363,7 @@ const buildApproveTokenItem = ({
                   >
                     {isPendingTransaction
                       ? waitingForAppvText
-                      : isPermit2Enabled && useUnlimitedApproval
+                      : shouldDoUnlimitedApproval
                         ? infiniteBtnText
                         : specificBtnText}
                   </Button>

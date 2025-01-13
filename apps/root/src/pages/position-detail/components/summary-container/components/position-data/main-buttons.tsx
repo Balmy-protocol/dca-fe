@@ -14,7 +14,7 @@ import useDcaTokens from '@hooks/useDcaTokens';
 import { initializeModifyRateSettings } from '@state/modify-rate-settings/actions';
 import { formatUnits } from 'viem';
 import { useAppDispatch } from '@state/hooks';
-import useTrackEvent from '@hooks/useTrackEvent';
+import useAnalytics from '@hooks/useAnalytics';
 import ModifySettingsModal from '@common/components/modify-settings-modal';
 import useWalletNetwork from '@hooks/useWalletNetwork';
 import useWallets from '@hooks/useWallets';
@@ -39,7 +39,7 @@ const PositionDataMainButton = ({ position }: PositionDataMainButtonProps) => {
   const fromHasYield = !!position.from.underlyingTokens.length;
   const toHasYield = !!position.to.underlyingTokens.length;
   const dispatch = useAppDispatch();
-  const trackEvent = useTrackEvent();
+  const { trackEvent } = useAnalytics();
   const openConnectModal = useOpenConnectModal();
   const [showModifyRateSettingsModal, setShowModifyRateSettingsModal] = React.useState(false);
   const isPending = position.pendingTransaction !== null && position.pendingTransaction !== '';

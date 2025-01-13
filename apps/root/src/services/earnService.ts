@@ -19,6 +19,7 @@ import {
   WithdrawType,
   EarnPositionWithdrewAction,
   EarnPositionDelayedWithdrawalClaimedAction,
+  AccountId,
 } from 'common-types';
 import { EventsManager } from './eventsManager';
 import SdkService from './sdkService';
@@ -26,18 +27,19 @@ import { NETWORKS } from '@constants';
 import { IntervalSetActions } from '@constants/timing';
 import AccountService from './accountService';
 import compact from 'lodash/compact';
-import { Address, formatUnits, Hex, maxUint256 } from 'viem';
+import { Address, encodeAbiParameters, formatUnits, Hex, maxUint256, parseAbiParameters } from 'viem';
 import { parseSignatureValues } from '@common/utils/signatures';
 import { getNewEarnPositionFromTxTypeData } from '@common/utils/transactions';
 import { parseUsdPrice, parseNumberUsdPriceToBigInt, toToken, isSameToken } from '@common/utils/currency';
 import { nowInSeconds } from '@common/utils/time';
 import ProviderService from './providerService';
-import { PermitData } from '@balmy/sdk';
+import { calculateDeadline, isSameAddress, PermitData } from '@balmy/sdk';
 import { EarnPermissionData } from '@balmy/sdk/dist/services/earn/types';
 import ContractService from './contractService';
 import { mapPermission } from '@balmy/sdk/dist/services/earn/earn-service';
-import { getWrappedProtocolToken } from '@common/mocks/tokens';
 import { orderBy, uniqBy } from 'lodash';
+import MeanApiService from './meanApiService';
+import { getProtocolToken, getWrappedProtocolToken } from '@common/mocks/tokens';
 
 export interface EarnServiceData {
   allStrategies: SavedSdkStrategy[];
@@ -54,7 +56,7 @@ const defaultEarnServiceData: EarnServiceData = {
   hasFetchedUserStrategies: false,
   userStrategies: [],
   strategiesParameters: {
-    farms: {},
+    protocols: [],
     guardians: {},
     tokens: {
       assets: {},
@@ -64,7 +66,7 @@ const defaultEarnServiceData: EarnServiceData = {
     yieldTypes: [],
   },
   earnPositionsParameters: {
-    farms: {},
+    protocols: [],
     guardians: {},
     tokens: {
       assets: {},
@@ -84,11 +86,14 @@ export class EarnService extends EventsManager<EarnServiceData> {
 
   contractService: ContractService;
 
+  meanApiService: MeanApiService;
+
   constructor(
     sdkService: SdkService,
     accountService: AccountService,
     providerService: ProviderService,
-    contractService: ContractService
+    contractService: ContractService,
+    meanApiService: MeanApiService
   ) {
     super(defaultEarnServiceData);
 
@@ -96,6 +101,7 @@ export class EarnService extends EventsManager<EarnServiceData> {
     this.accountService = accountService;
     this.providerService = providerService;
     this.contractService = contractService;
+    this.meanApiService = meanApiService;
   }
 
   get allStrategies(): SavedSdkStrategy[] {
@@ -182,10 +188,9 @@ export class EarnService extends EventsManager<EarnServiceData> {
   processStrategyParameters(strategies: SdkStrategy[]) {
     const summarizedParameters = strategies.reduce<SummarizedSdkStrategyParameters>(
       (acc, strategy) => {
-        // Farms
-        if (!acc.farms[strategy.farm.id]) {
-          // eslint-disable-next-line no-param-reassign
-          acc.farms[strategy.farm.id] = strategy.farm;
+        // Protocols
+        if (!acc.protocols.find((protocol) => protocol === strategy.farm.name)) {
+          acc.protocols.push(strategy.farm.name);
         }
 
         // Guardians
@@ -228,7 +233,7 @@ export class EarnService extends EventsManager<EarnServiceData> {
         return acc;
       },
       {
-        farms: {},
+        protocols: [],
         guardians: {},
         tokens: {
           assets: {},
@@ -244,7 +249,7 @@ export class EarnService extends EventsManager<EarnServiceData> {
 
   async fetchAllStrategies(): Promise<void> {
     this.hasFetchedAllStrategies = false;
-    const strategies = await this.sdkService.getAllStrategies();
+    const strategies = (await this.sdkService.getAllStrategies()).map((strategy) => this.updateStrategyToken(strategy));
     this.strategiesParameters = this.processStrategyParameters(strategies);
     const lastUpdatedAt = nowInSeconds();
 
@@ -334,14 +339,21 @@ export class EarnService extends EventsManager<EarnServiceData> {
 
     const strategy = await this.sdkService.getDetailedStrategy({ strategyId });
 
-    this.updateStrategy({ strategy: { ...strategy, hasFetchedHistoricalData: true } });
+    this.updateStrategy({ strategy: { ...this.updateStrategyToken(strategy), hasFetchedHistoricalData: true } });
   }
 
   async fetchUserStrategies(): Promise<SdkEarnPosition[]> {
     this.hasFetchedUserStrategies = false;
     const accounts = this.accountService.getWallets();
     const addresses = accounts.map((account) => account.address);
-    const userStrategies = await this.sdkService.getUserStrategies({ accounts: addresses });
+    const fetchedUserStrategies = await this.sdkService.getUserStrategies({ accounts: addresses });
+    const userStrategies = Object.fromEntries(
+      Object.entries(fetchedUserStrategies).map(([key, strategies]) => [
+        key,
+        strategies.map((strategy) => this.updateUserStrategyToken(strategy)),
+      ])
+    );
+
     const lastUpdatedAt = nowInSeconds();
     const strategiesArray = Object.values(userStrategies).reduce((acc, strategies) => {
       acc.push(...strategies);
@@ -582,6 +594,116 @@ export class EarnService extends EventsManager<EarnServiceData> {
     return updatedDelayed;
   }
 
+  updateStrategyToken(strategy: SdkStrategy) {
+    const protocolToken = getProtocolToken(strategy.farm.chainId);
+    const wrappedProtocolToken = getWrappedProtocolToken(strategy.farm.chainId);
+    const newStrategy = {
+      ...strategy,
+      farm: {
+        ...strategy.farm,
+        asset: isSameAddress(strategy.farm.asset.address, wrappedProtocolToken.address)
+          ? { ...strategy.farm.asset, ...protocolToken }
+          : strategy.farm.asset,
+      },
+    };
+
+    return newStrategy;
+  }
+
+  updateUserStrategyToken(userStrategy: SdkEarnPosition): SdkEarnPosition {
+    // Now lets update all WETH to ETH
+    const protocolToken = getProtocolToken(userStrategy.strategy.farm.chainId);
+    const wrappedProtocolToken = getWrappedProtocolToken(userStrategy.strategy.farm.chainId);
+    const updatedUserStrategy = {
+      ...userStrategy,
+      strategy: this.updateStrategyToken(userStrategy.strategy),
+    };
+
+    updatedUserStrategy.balances = updatedUserStrategy.balances.map((balance) => {
+      if (isSameAddress(balance.token.address, wrappedProtocolToken.address)) {
+        return {
+          ...balance,
+          token: {
+            ...balance.token,
+            ...protocolToken,
+          },
+        };
+      }
+      return balance;
+    });
+
+    updatedUserStrategy.delayed = updatedUserStrategy.delayed?.map((delayed) => {
+      if (isSameAddress(delayed.token.address, wrappedProtocolToken.address)) {
+        return {
+          ...delayed,
+          token: {
+            ...delayed.token,
+            ...protocolToken,
+          },
+        };
+      }
+      return delayed;
+    });
+
+    updatedUserStrategy.history = updatedUserStrategy.history?.map((history) => {
+      switch (history.action) {
+        case EarnPositionActionType.WITHDREW:
+          return {
+            ...history,
+            withdrawn: history.withdrawn.map((withdrawn) => ({
+              ...withdrawn,
+              token: isSameAddress(withdrawn.token.address, wrappedProtocolToken.address)
+                ? {
+                    ...withdrawn.token,
+                    ...protocolToken,
+                  }
+                : withdrawn.token,
+            })),
+          };
+        case EarnPositionActionType.DELAYED_WITHDRAWAL_CLAIMED:
+          return {
+            ...history,
+            token: isSameAddress(history.token.address, wrappedProtocolToken.address)
+              ? {
+                  ...history.token,
+                  ...protocolToken,
+                }
+              : history.token,
+          };
+        case EarnPositionActionType.SPECIAL_WITHDREW:
+          return {
+            ...history,
+            withdrawn: history.withdrawn.map((withdrawn) => ({
+              ...withdrawn,
+              token: isSameAddress(withdrawn.token.address, wrappedProtocolToken.address)
+                ? {
+                    ...withdrawn.token,
+                    ...protocolToken,
+                  }
+                : withdrawn.token,
+            })),
+          };
+        default:
+          return history;
+      }
+    });
+
+    updatedUserStrategy.historicalBalances = updatedUserStrategy.historicalBalances?.map((historicalBalance) => ({
+      ...historicalBalance,
+      balances: historicalBalance.balances.map((balance) => ({
+        ...balance,
+        token: isSameAddress(balance.token.address, wrappedProtocolToken.address)
+          ? {
+              ...balance.token,
+              ...protocolToken,
+            }
+          : balance.token,
+      })),
+    }));
+
+    return updatedUserStrategy;
+  }
+
   async fetchUserStrategy(strategyId: Parameters<typeof this.sdkService.getUserStrategy>[0]) {
     const needsToUpdate = this.needsToUpdateUserStrategy(strategyId);
     if (!needsToUpdate) {
@@ -590,7 +712,7 @@ export class EarnService extends EventsManager<EarnServiceData> {
 
     const userStrategy = await this.sdkService.getUserStrategy(strategyId);
 
-    return userStrategy;
+    return this.updateUserStrategyToken(userStrategy);
   }
 
   async fetchMultipleEarnPositionsFromStrategy(strategyId: StrategyId) {
@@ -615,9 +737,11 @@ export class EarnService extends EventsManager<EarnServiceData> {
     amount,
     permitSignature,
     permissionSignature,
+    asset,
   }: {
     earnPositionId: SdkEarnPositionId;
     amount: bigint;
+    asset: Token;
     permitSignature?: PermitData['permitData'] & { signature: Hex };
     permissionSignature?: EarnPermissionData['permitData'] & { signature: Hex };
   }) {
@@ -636,14 +760,14 @@ export class EarnService extends EventsManager<EarnServiceData> {
       ? {
           permitData: {
             amount,
-            token: strategy.farm.asset.address,
+            token: asset.address,
             nonce: permitSignature.nonce,
             deadline: BigInt(permitSignature.deadline),
           },
           signature: permitSignature.signature,
         }
       : {
-          token: strategy.farm.asset.address,
+          token: asset.address,
           amount: amount,
         };
 
@@ -675,12 +799,14 @@ export class EarnService extends EventsManager<EarnServiceData> {
     user,
     strategyId,
     amount,
+    asset,
     permitSignature,
     tosSignature,
   }: {
     strategyId: StrategyId;
     user: Address;
     amount: bigint;
+    asset: Token;
     permitSignature?: PermitData['permitData'] & { signature: Hex };
     tosSignature?: Hex;
   }) {
@@ -694,14 +820,14 @@ export class EarnService extends EventsManager<EarnServiceData> {
       ? {
           permitData: {
             amount,
-            token: strategy.farm.asset.address,
+            token: asset.address,
             nonce: permitSignature.nonce,
             deadline: BigInt(permitSignature.deadline),
           },
           signature: permitSignature.signature,
         }
       : {
-          token: strategy.farm.asset.address,
+          token: asset.address,
           amount: amount,
         };
 
@@ -710,23 +836,18 @@ export class EarnService extends EventsManager<EarnServiceData> {
     const permissions = [
       {
         operator: earnCompanionAddress,
-        permissions: [EarnPermission.INCREASE],
+        permissions: [EarnPermission.INCREASE, EarnPermission.WITHDRAW],
       },
     ];
 
-    const wrappedProtocol = getWrappedProtocolToken(strategy.farm.chainId);
-
-    // We ensure withdraw permission if the withdrawn token needs the be swaped in the process
-    const hasSomeDelayedWithdraw =
-      strategy.farm.asset.withdrawTypes.includes(WithdrawType.DELAYED) ||
-      strategy.farm.rewards?.tokens.some((t) => t.withdrawTypes.includes(WithdrawType.DELAYED));
-
-    if (strategy.farm.asset.address === wrappedProtocol.address || hasSomeDelayedWithdraw) {
-      permissions.push({
-        operator: earnCompanionAddress,
-        permissions: [EarnPermission.WITHDRAW],
-      });
-    }
+    const account = this.accountService.getUser()!;
+    const strategyValidationData = await this.generateCreationData({
+      tosSignature,
+      accountId: account.id,
+      strategyId: strategy.id,
+      address: user,
+      needsAPI: (strategy?.needsTier ?? 0) > 0,
+    });
 
     const tx = await this.sdkService.buildEarnCreatePositionTx({
       chainId: strategy.farm.chainId,
@@ -735,7 +856,7 @@ export class EarnService extends EventsManager<EarnServiceData> {
       // We dont operate with smart wallets so we always need this
       permissions,
       deposit,
-      strategyValidationData: tosSignature,
+      strategyValidationData,
       caller: user,
     });
 
@@ -743,6 +864,54 @@ export class EarnService extends EventsManager<EarnServiceData> {
       ...tx,
       from: user,
       chainId: strategy.farm.chainId,
+    });
+  }
+
+  private async generateCreationData({
+    tosSignature,
+    accountId,
+    strategyId,
+    address,
+    needsAPI,
+    deadline,
+  }: {
+    tosSignature?: Hex;
+    accountId: string;
+    strategyId: StrategyId;
+    address: Address;
+    needsAPI?: boolean;
+    deadline?: number;
+  }): Promise<Hex> {
+    const tosBytes = tosSignature ?? '0x';
+
+    let signatureBytes: Hex = '0x';
+    if (needsAPI) {
+      const actualDeadline = BigInt(deadline ?? calculateDeadline('1d'));
+      const { signature } = await this.getApiSignature({ accountId, strategyId, address, deadline: actualDeadline });
+      signatureBytes = encodeAbiParameters(parseAbiParameters('bytes, uint'), [signature, actualDeadline]);
+    }
+
+    return encodeAbiParameters(parseAbiParameters('bytes[]'), [[tosBytes, signatureBytes]]);
+  }
+
+  private async getApiSignature({
+    accountId,
+    strategyId,
+    address,
+    deadline,
+  }: {
+    accountId: AccountId;
+    strategyId: StrategyId;
+    address: Address;
+    deadline: bigint;
+  }) {
+    const signature = await this.accountService.getWalletVerifyingSignature({});
+    return this.meanApiService.getEarnStrategySignature({
+      signature,
+      accountId,
+      strategyId,
+      toValidate: address,
+      deadline,
     });
   }
 
@@ -1477,5 +1646,11 @@ export class EarnService extends EventsManager<EarnServiceData> {
     }
 
     this.userStrategies = userStrategies;
+  }
+
+  async transformVaultTokensToUnderlying(tokens: { token: Token; amount: bigint }[]) {
+    const response = await this.meanApiService.transformTokensToUnderlying(tokens);
+    const underlyingTokens = response.data.underlying;
+    return underlyingTokens;
   }
 }

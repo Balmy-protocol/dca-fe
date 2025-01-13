@@ -29,7 +29,7 @@ import {
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import findIndex from 'lodash/findIndex';
 import { Hash, parseUnits } from 'viem';
-import useTrackEvent from '@hooks/useTrackEvent';
+import useAnalytics from '@hooks/useAnalytics';
 import useActiveWallet from '@hooks/useActiveWallet';
 import usePermit2Service from '@hooks/usePermit2Service';
 import { shouldTrackError } from '@common/utils/errors';
@@ -41,31 +41,36 @@ import { useTransactionAdder } from '@state/transactions/hooks';
 import useEarnService from '@hooks/earn/useEarnService';
 import { PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import useContractService from '@hooks/useContractService';
+import { parseNumberUsdPriceToBigInt, parseUsdPrice } from '@common/utils/currency';
+import { setTriggerSteps } from '@state/earn-management/actions';
+import { useAppDispatch } from '@state/hooks';
 
 interface UseEarnDepositActionParams {
   strategy?: DisplayStrategy;
 }
 
 const useEarnDepositActions = ({ strategy }: UseEarnDepositActionParams) => {
-  const asset = strategy?.asset;
+  const { asset: baseAsset, depositAsset, depositAmount, depositAssetAmount, triggerSteps } = useEarnManagementState();
   const intl = useIntl();
   const activeWallet = useActiveWallet();
-  const trackEvent = useTrackEvent();
+  const { trackEvent, trackEarnDeposit } = useAnalytics();
   const errorService = useErrorService();
   const permit2Service = usePermit2Service();
   const walletService = useWalletService();
   const earnService = useEarnService();
   const [currentTransaction, setCurrentTransaction] = React.useState<{ hash: Hash; chainId: number } | undefined>();
-  const { depositAmount: assetAmountInUnits } = useEarnManagementState();
   const addTransaction = useTransactionAdder();
   const [shouldShowSteps, setShouldShowSteps] = React.useState(false);
   const [shouldShowConfirmation, setShouldShowConfirmation] = React.useState(false);
   const contractService = useContractService();
   const [transactionsToExecute, setTransactionsToExecute] = React.useState<TransactionStep[]>([]);
   const [, setModalLoading, setModalError, setModalClosed] = useTransactionModal();
+  const asset = depositAsset || baseAsset;
+  const assetAmountInUnits = depositAssetAmount || depositAmount;
+  const dispatch = useAppDispatch();
 
   const onDeposit = React.useCallback(async () => {
-    if (!asset || !assetAmountInUnits || !activeWallet?.address || !strategy) return;
+    if (!asset || !assetAmountInUnits || !activeWallet?.address || !strategy || !baseAsset || !depositAmount) return;
     try {
       setModalLoading({
         content: (
@@ -102,9 +107,20 @@ const useEarnDepositActions = ({ strategy }: UseEarnDepositActionParams) => {
       trackEvent(`Earn - ${hasPosition ? 'Increase' : 'Create'} position submitting`);
 
       const baseTypeData = {
-        asset: asset,
-        assetAmount: parseUnits(assetAmountInUnits, asset.decimals).toString(),
+        asset: baseAsset,
+        assetAmount: parseUnits(depositAmount, baseAsset.decimals).toString(),
         strategyId: strategy.id,
+        amountInUsd: parseUsdPrice(
+          baseAsset,
+          parseUnits(depositAmount, baseAsset.decimals),
+          parseNumberUsdPriceToBigInt(baseAsset.price)
+        ),
+        isMigration: baseAsset.address !== asset.address,
+        depositAsset,
+        depositAssetAmount:
+          depositAssetAmount && depositAsset
+            ? parseUnits(depositAssetAmount, depositAsset.decimals).toString()
+            : undefined,
       };
 
       let typeData: EarnCreateTypeData | EarnIncreaseTypeData;
@@ -113,6 +129,7 @@ const useEarnDepositActions = ({ strategy }: UseEarnDepositActionParams) => {
         result = await earnService.increasePosition({
           earnPositionId: hasPosition.id,
           amount: parseUnits(assetAmountInUnits, asset.decimals),
+          asset,
           permitSignature,
           permissionSignature,
         });
@@ -129,6 +146,7 @@ const useEarnDepositActions = ({ strategy }: UseEarnDepositActionParams) => {
         result = await earnService.createPosition({
           strategyId: strategy.id,
           amount: parseUnits(assetAmountInUnits, asset.decimals),
+          asset,
           permitSignature,
           user: activeWallet.address,
           tosSignature,
@@ -140,14 +158,33 @@ const useEarnDepositActions = ({ strategy }: UseEarnDepositActionParams) => {
         };
       }
 
-      try {
-        trackEvent(`Earn - ${hasPosition ? 'Increase' : 'Create'} position submitted`, {
-          asset: asset.symbol,
-          strategy: strategy.id,
-          amount: assetAmountInUnits,
-          assetPrice: asset.price,
-        });
-      } catch {}
+      const parsedAmountInUSD = parseUsdPrice(
+        asset,
+        parseUnits(assetAmountInUnits, asset.decimals),
+        parseNumberUsdPriceToBigInt(asset.price)
+      );
+
+      trackEvent(`Earn - ${hasPosition ? 'Increase' : 'Create'} position submitted`, {
+        asset: baseAsset.symbol,
+        strategy: strategy.id,
+        amount: depositAmount,
+        assetPrice: baseAsset.price,
+        amountInUsd: parseUsdPrice(
+          baseAsset,
+          parseUnits(depositAmount, baseAsset.decimals),
+          parseNumberUsdPriceToBigInt(baseAsset.price)
+        ),
+        isDeposit: !hasPosition,
+        isIncrease: hasPosition,
+        isMigration: baseAsset.address !== asset.address,
+      });
+      trackEarnDeposit({
+        chainId: strategy.network.chainId,
+        asset,
+        strategy,
+        parsedAmountInUSD,
+        hasPosition: !!hasPosition,
+      });
 
       addTransaction(result, typeData);
 
@@ -462,7 +499,7 @@ const useEarnDepositActions = ({ strategy }: UseEarnDepositActionParams) => {
       }
     } catch (e) {
       if (shouldTrackError(e as Error)) {
-        trackEvent('EARN - Sign ToS error', {
+        trackEvent('Earn - Sign ToS error', {
           fromSteps: !!transactionsToExecute?.length,
         });
         // eslint-disable-next-line no-void, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
@@ -572,7 +609,7 @@ const useEarnDepositActions = ({ strategy }: UseEarnDepositActionParams) => {
       }
     } catch (e) {
       if (shouldTrackError(e as Error)) {
-        trackEvent('EARN - Sign companion error', {
+        trackEvent('Eearn - Sign companion error', {
           fromSteps: !!transactionsToExecute?.length,
         });
         // eslint-disable-next-line no-void, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
@@ -629,157 +666,186 @@ const useEarnDepositActions = ({ strategy }: UseEarnDepositActionParams) => {
     return isIncrease && !companionHasPermission;
   }, [strategy, activeWallet?.address, isIncrease, userStrategy]);
 
-  const buildSteps = React.useCallback(
-    (isApproved?: boolean) => {
-      if (!asset || !assetAmountInUnits || assetAmountInUnits === '' || !activeWallet?.address) {
-        return [];
-      }
+  const buildSteps = React.useCallback(async () => {
+    if (!asset || !assetAmountInUnits || assetAmountInUnits === '' || !activeWallet?.address || !strategy) {
+      return [];
+    }
 
-      const assetAmount = parseUnits(assetAmountInUnits, asset.decimals);
-      const newSteps: TransactionStep[] = [];
+    const allowance = await walletService.getSpecificAllowance(
+      asset,
+      PERMIT_2_ADDRESS[strategy.network.chainId],
+      activeWallet?.address
+    );
 
-      if (!isIncrease && strategy?.tos) {
-        newSteps.push({
-          hash: '',
-          chainId: strategy.network.chainId,
-          onAction: onSignEarnToS,
-          checkForPending: false,
-          done: false,
-          type: TRANSACTION_ACTION_SIGN_TOS_EARN,
-          explanation: intl.formatMessage(
-            defineMessage({
-              description: 'earn.strategy-management.deposit.tx-steps.sign-tos',
-              // TODO: Agregar un link aca
-              defaultMessage: 'You need to sign the ToS of balmy to continue',
-            })
-          ),
-          extraData: {
-            tos: strategy.tos,
-            signStatus: SignStatus.none,
-          },
-        });
-      }
+    const isApproved =
+      allowance.allowance &&
+      allowance.token.address === asset.address &&
+      parseUnits(allowance.allowance, asset.decimals) >= parseUnits(assetAmountInUnits, asset.decimals);
 
-      if (!isApproved) {
-        newSteps.push({
-          hash: '',
-          chainId: strategy.network.chainId,
-          onAction: (amount) => onApproveToken(amount),
-          onActionConfirmed: (hash) => onApproveTransactionConfirmed(hash),
-          checkForPending: false,
-          done: false,
-          type: TRANSACTION_ACTION_APPROVE_TOKEN,
-          explanation: intl.formatMessage(
-            defineMessage({
-              description: 'approveTokenExplanation',
-              defaultMessage:
-                'By enabling Universal Approval, you will be able to use Uniswap, Balmy, swap aggregators and more protocols without having to authorize each one of them',
-            })
-          ),
-          extraData: {
-            token: asset,
-            amount: assetAmount,
-            swapper: intl.formatMessage(
-              defineMessage({
-                description: 'us',
-                defaultMessage: 'us',
-              })
-            ),
-            isPermit2Enabled: true,
-          },
-        });
-      }
+    const assetAmount = parseUnits(assetAmountInUnits, asset.decimals);
+    const newSteps: TransactionStep[] = [];
 
-      if (asset.address !== PROTOCOL_TOKEN_ADDRESS) {
-        newSteps.push({
-          hash: '',
-          chainId: strategy.network.chainId,
-          onAction: onSignPermit2Approval,
-          checkForPending: false,
-          done: false,
-          type: TRANSACTION_ACTION_APPROVE_TOKEN_SIGN_EARN,
-          explanation: intl.formatMessage(
-            defineMessage({
-              description: 'earn.strategy-management.deposit.tx-steps.sign-permit2',
-              defaultMessage: 'Balmy now needs your explicit authorization to deposit your {asset}',
-            }),
-            { asset: asset.symbol }
-          ),
-          extraData: {
-            asset,
-            assetAmount,
-            signStatus: SignStatus.none,
-          },
-        });
-      }
+    if (!isIncrease && strategy?.tos) {
+      newSteps.push({
+        hash: '',
+        chainId: strategy.network.chainId,
+        onAction: onSignEarnToS,
+        checkForPending: false,
+        done: false,
+        type: TRANSACTION_ACTION_SIGN_TOS_EARN,
+        explanation: intl.formatMessage(
+          defineMessage({
+            description: 'earn.strategy-management.deposit.tx-steps.sign-tos',
+            // TODO: Agregar un link aca
+            defaultMessage: 'You need to sign the ToS of balmy to continue',
+          })
+        ),
+        extraData: {
+          tos: strategy.tos,
+          signStatus: SignStatus.none,
+        },
+      });
+    }
 
-      if (requiresCompanionSignature) {
-        newSteps.push({
-          hash: '',
-          chainId: strategy.network.chainId,
-          onAction: onSignCompanionApproval,
-          checkForPending: false,
-          done: false,
-          type: TRANSACTION_ACTION_APPROVE_COMPANION_SIGN_EARN,
-          explanation: intl.formatMessage(
-            defineMessage({
-              description: 'earn.strategy-management.increase.tx-steps.sign-companion-approval',
-              defaultMessage: 'Balmy now needs your explicit authorization to increase your investment on {farm}',
-            }),
-            { farm: strategy.farm.name }
-          ),
-          extraData: {
-            type: EarnPermission.INCREASE,
-            signStatus: SignStatus.none,
-          },
-        });
+    if (!isApproved) {
+      // Here we need to check if the token is from compound
+      let allowsExactApproval = true;
+      if (strategy.farm.name === 'Compound' && asset.address !== strategy.asset.address) {
+        allowsExactApproval = false;
       }
 
       newSteps.push({
         hash: '',
-        chainId: strategy.network.chainId,
-        onAction: () => onDeposit(),
-        checkForPending: true,
+        chainId: asset.chainId,
+        onAction: (amount) => onApproveToken(amount),
+        onActionConfirmed: (hash) => onApproveTransactionConfirmed(hash),
+        checkForPending: false,
         done: false,
-        type: TRANSACTION_ACTION_EARN_DEPOSIT,
+        type: TRANSACTION_ACTION_APPROVE_TOKEN,
+        explanation: intl.formatMessage(
+          defineMessage({
+            description: 'approveTokenExplanation',
+            defaultMessage:
+              'By enabling Universal Approval, you will be able to use Uniswap, Balmy, swap aggregators and more protocols without having to authorize each one of them',
+          })
+        ),
+        extraData: {
+          token: asset,
+          amount: assetAmount,
+          allowsExactApproval: allowsExactApproval,
+          swapper: intl.formatMessage(
+            defineMessage({
+              description: 'us',
+              defaultMessage: 'us',
+            })
+          ),
+          isPermit2Enabled: true,
+        },
+      });
+    }
+
+    if (asset.address !== PROTOCOL_TOKEN_ADDRESS) {
+      newSteps.push({
+        hash: '',
+        chainId: asset.chainId,
+        onAction: onSignPermit2Approval,
+        checkForPending: false,
+        done: false,
+        type: TRANSACTION_ACTION_APPROVE_TOKEN_SIGN_EARN,
+        explanation: intl.formatMessage(
+          defineMessage({
+            description: 'earn.strategy-management.deposit.tx-steps.sign-permit2',
+            defaultMessage: 'Balmy now needs your explicit authorization to deposit your {asset}',
+          }),
+          { asset: asset.symbol }
+        ),
         extraData: {
           asset,
           assetAmount,
+          signStatus: SignStatus.none,
         },
       });
+    }
 
-      return newSteps;
-    },
-    [
-      isIncrease,
-      requiresCompanionSignature,
-      asset,
-      assetAmountInUnits,
-      intl,
-      onApproveToken,
-      onDeposit,
-      onSignPermit2Approval,
-      onApproveTransactionConfirmed,
-      onSignEarnToS,
-    ]
-  );
+    if (requiresCompanionSignature) {
+      newSteps.push({
+        hash: '',
+        chainId: asset.chainId,
+        onAction: onSignCompanionApproval,
+        checkForPending: false,
+        done: false,
+        type: TRANSACTION_ACTION_APPROVE_COMPANION_SIGN_EARN,
+        explanation: intl.formatMessage(
+          defineMessage({
+            description: 'earn.strategy-management.increase.tx-steps.sign-companion-approval',
+            defaultMessage: 'Balmy now needs your explicit authorization to increase your investment on {farm}',
+          }),
+          { farm: strategy.farm.name }
+        ),
+        extraData: {
+          type: EarnPermission.INCREASE,
+          signStatus: SignStatus.none,
+        },
+      });
+    }
 
-  const handleMultiSteps = React.useCallback(
-    (isApproved?: boolean) => {
+    newSteps.push({
+      hash: '',
+      chainId: asset.chainId,
+      onAction: () => onDeposit(),
+      checkForPending: true,
+      done: false,
+      type: TRANSACTION_ACTION_EARN_DEPOSIT,
+      extraData: {
+        asset,
+        assetAmount,
+      },
+    });
+
+    return newSteps;
+  }, [
+    isIncrease,
+    requiresCompanionSignature,
+    asset,
+    assetAmountInUnits,
+    intl,
+    onApproveToken,
+    onDeposit,
+    onSignPermit2Approval,
+    onApproveTransactionConfirmed,
+    onSignEarnToS,
+    strategy,
+    activeWallet?.address,
+  ]);
+
+  const handleMultiSteps = React.useCallback(() => {
+    if (!asset || assetAmountInUnits === '' || !assetAmountInUnits) {
+      return;
+    }
+
+    // Scroll to top of page
+    window.scrollTo(0, 0);
+    buildSteps()
+      .then((newSteps) => {
+        trackEvent('Earn - Deposit - Start swap steps');
+        setTransactionsToExecute(newSteps);
+        setShouldShowSteps(true);
+        return newSteps;
+      })
+      .catch((error) => {
+        console.error('Error building steps', error);
+      });
+  }, [asset, assetAmountInUnits, buildSteps]);
+
+  React.useEffect(() => {
+    if (triggerSteps) {
       if (!asset || assetAmountInUnits === '' || !assetAmountInUnits) {
         return;
       }
-
-      // Scroll to top of page
-      window.scrollTo(0, 0);
-      const newSteps = buildSteps(isApproved);
-
-      trackEvent('Earn - Deposit - Start swap steps');
-      setTransactionsToExecute(newSteps);
-      setShouldShowSteps(true);
-    },
-    [asset, assetAmountInUnits, buildSteps]
-  );
+      handleMultiSteps();
+      dispatch(setTriggerSteps(false));
+    }
+  }, [triggerSteps, asset?.address, assetAmountInUnits, handleMultiSteps]);
 
   const currentTransactionStep = React.useMemo(() => {
     const foundStep = find(transactionsToExecute, { done: false });

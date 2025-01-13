@@ -185,7 +185,7 @@ export interface AccountLabelsAndContactListResponse {
   contacts: { wallet: string }[];
 }
 
-export type ApiWallet = { address: Address; isAuth: boolean };
+export type ApiWallet = { address: Address; isAuth: boolean; isOwner: boolean };
 export type ApiNewWallet = { address: Address } & ApiWalletAdminConfig;
 export type ApiWalletAdminConfig = { isAuth: true; signature: string; expiration: string } | { isAuth: false };
 

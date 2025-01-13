@@ -4,23 +4,44 @@ import { ContainerBox, InputAdornment, SearchIcon, TextField, Typography, colors
 import TableFilters from '../filters';
 import { StrategiesTableVariants } from '@state/strategies-filters/reducer';
 import DelayedWithdrawContainer from '../delayed-withdraw-container';
+import styled from 'styled-components';
+import useEarnPositions from '@hooks/earn/useEarnPositions';
+import { getDelayedWithdrawals } from '@common/utils/earn/parsing';
 
 interface AllStrategiesTableToolbarProps {
   isLoading: boolean;
   handleSearchChange: (search: string) => void;
   variant: StrategiesTableVariants;
   strategiesCount: number;
-  disabled?: boolean;
+  setPage: (page: number) => void;
 }
+
+const StyledTextField = styled(TextField)`
+  flex: 1;
+  min-width: ${({ theme: { spacing } }) => spacing(30)};
+  max-width: ${({ theme: { spacing } }) => spacing(70)};
+  margin-left: auto;
+`;
 
 const AllStrategiesTableToolbar = ({
   isLoading,
   handleSearchChange,
   variant,
   strategiesCount,
-  disabled,
+  setPage,
 }: AllStrategiesTableToolbarProps) => {
   const intl = useIntl();
+
+  const { userStrategies } = useEarnPositions();
+  const hasDelayedWithdraws = React.useMemo(
+    () => getDelayedWithdrawals({ userStrategies }).length > 0,
+    [userStrategies]
+  );
+
+  React.useEffect(() => {
+    // Having an uncontrolled input, the value will be stored in redux and not displayed in the input, so we need to clear it when the page is loaded
+    handleSearchChange('');
+  }, []);
 
   return (
     <ContainerBox justifyContent="space-between" alignItems="end" flexWrap="wrap" gap={3}>
@@ -51,10 +72,16 @@ const AllStrategiesTableToolbar = ({
           </Typography>
         </ContainerBox>
       )}
-      <ContainerBox gap={6} alignItems="center" justifyContent="space-between" flexWrap="wrap">
-        <DelayedWithdrawContainer />
-        <ContainerBox gap={6} alignItems="center">
-          <TextField
+      <ContainerBox
+        gap={6}
+        alignItems="center"
+        justifyContent={!hasDelayedWithdraws ? 'end' : 'space-between'}
+        flexWrap="wrap"
+        flex={!hasDelayedWithdraws ? 1 : undefined}
+      >
+        {hasDelayedWithdraws && <DelayedWithdrawContainer />}
+        <ContainerBox gap={6} alignItems="center" fullWidth={!hasDelayedWithdraws}>
+          <StyledTextField
             size="small"
             placeholder={intl.formatMessage(
               defineMessage({
@@ -62,9 +89,10 @@ const AllStrategiesTableToolbar = ({
                 description: 'allStrategiesSearch',
               })
             )}
-            onChange={(evt: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) =>
-              handleSearchChange(evt.currentTarget.value)
-            }
+            onChange={(evt: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
+              handleSearchChange(evt.currentTarget.value);
+              setPage(0);
+            }}
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
@@ -78,9 +106,8 @@ const AllStrategiesTableToolbar = ({
                 e.stopPropagation();
               }
             }}
-            disabled={disabled}
           />
-          <TableFilters isLoading={isLoading} variant={variant} disabled={disabled} />
+          <TableFilters isLoading={isLoading} variant={variant} setPage={setPage} />
         </ContainerBox>
       </ContainerBox>
     </ContainerBox>

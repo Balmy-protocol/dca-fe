@@ -30,6 +30,9 @@ export const getImpactedTokensByTxType = (tx: TransactionDetails, positions: Pos
 
     case TransactionTypes.earnCreate:
     case TransactionTypes.earnIncrease:
+      if (tx.typeData.depositAsset) {
+        return [tx.typeData.asset, tx.typeData.depositAsset];
+      }
       return [tx.typeData.asset];
     case TransactionTypes.earnWithdraw:
       return tx.typeData.withdrawn.map((withdrawn) => withdrawn.token);
@@ -253,7 +256,7 @@ export const getNewEarnPositionFromTxTypeData = ({
     lastUpdatedAt: nowInSeconds(),
     strategy: strategyId,
     hasFetchedHistory: false,
-    permissions: companionAddress ? { [companionAddress]: [EarnPermission.INCREASE] } : {},
+    permissions: companionAddress ? { [companionAddress]: [EarnPermission.INCREASE, EarnPermission.WITHDRAW] } : {},
     balances: [
       {
         token: tokenToSdkStrategyToken(asset),

@@ -5,11 +5,14 @@ import styled from 'styled-components';
 import { BackgroundPaper, Badge, ContainerBox, Skeleton, Tab, Typography, UnderlinedTabs } from 'ui-library';
 import DepositForm from './deposit/form';
 import { useAppDispatch } from '@hooks/state';
-import { setAsset } from '@state/earn-management/actions';
+import { fullyResetEarnForm, setAsset } from '@state/earn-management/actions';
 import WithdrawForm from './withdraw/form';
 import DelayWithdrawWarning from './components/delay-withdraw-warning';
 import { WithdrawType } from 'common-types';
 import { getDelayedWithdrawals } from '@common/utils/earn/parsing';
+import LockedDeposit from './components/locked-deposit';
+import useTierLevel from '@hooks/tiers/useTierLevel';
+import { useEarnManagementState } from '@state/earn-management/hooks';
 
 const StyledBackgroundPaper = styled(BackgroundPaper).attrs({ variant: 'outlined', elevation: 0 })`
   ${({ theme: { spacing } }) => `
@@ -41,6 +44,10 @@ const StrategyManagement = ({ chainId, strategyGuardianId }: StrategyManagementP
   const strategy = useStrategyDetails({ chainId, strategyGuardianId });
   const [height, setHeight] = React.useState<number | undefined>(undefined);
   const dispatch = useAppDispatch();
+  const { tierLevel } = useTierLevel();
+
+  const needsTier = strategy?.needsTier;
+  const { asset } = useEarnManagementState();
 
   const delayedWithdrawalsCount = React.useMemo(
     () =>
@@ -52,37 +59,55 @@ const StrategyManagement = ({ chainId, strategyGuardianId }: StrategyManagementP
   );
 
   React.useEffect(() => {
-    if (strategy?.asset) dispatch(setAsset(strategy.asset));
-  }, [strategy?.asset]);
+    if (strategy?.asset && asset && strategy.asset.address !== asset.address) {
+      dispatch(fullyResetEarnForm());
+    }
+    if (strategy?.asset && !asset) dispatch(setAsset(strategy.asset));
+  }, [strategy?.asset?.address, asset]);
 
   const hasAssetDelayedWithdrawal = strategy?.asset.withdrawTypes.includes(WithdrawType.DELAYED);
 
+  const hasToWithdraw = strategy?.userPositions?.some((position) =>
+    position.balances.some((balance) => balance.amount.amount > 0)
+  );
+
+  const isLocked = needsTier && needsTier > (tierLevel ?? 0);
+
   return (
     <StyledBackgroundPaper sx={{ height: height }}>
-      <Typography variant="h4Bold">{strategy?.farm.name || <Skeleton width="6ch" variant="text" />}</Typography>
-      <ContainerBox>
-        <UnderlinedTabs value={tab} onChange={(_, val: number) => setTab(val)}>
-          <Tab
-            label={
-              <Typography variant="bodyRegular" color="inherit">
-                {<FormattedMessage description="earn.strategy-management.tabs.deposit" defaultMessage="Deposit" />}
-              </Typography>
-            }
-          />
-          <Tab
-            label={
-              <StyledBadge badgeContent={delayedWithdrawalsCount} color="primary">
-                <Typography variant="bodyRegular" color="inherit">
-                  <FormattedMessage description="earn.strategy-management.tabs.withdraw" defaultMessage="Withdraw" />
-                </Typography>
-              </StyledBadge>
-            }
-          />
-        </UnderlinedTabs>
-        {hasAssetDelayedWithdrawal && <DelayWithdrawWarning />}
-      </ContainerBox>
-      {tab === 0 && <DepositForm strategy={strategy} setHeight={setHeight} />}
-      {tab === 1 && <WithdrawForm strategy={strategy} setHeight={setHeight} />}
+      {isLocked && !hasToWithdraw ? (
+        <LockedDeposit strategy={strategy} needsTier={needsTier} />
+      ) : (
+        <>
+          <Typography variant="h4Bold">{strategy?.farm.name || <Skeleton width="6ch" variant="text" />}</Typography>
+          <ContainerBox>
+            <UnderlinedTabs value={tab} onChange={(_, val: number) => setTab(val)}>
+              <Tab
+                label={
+                  <Typography variant="bodyRegular" color="inherit">
+                    {<FormattedMessage description="earn.strategy-management.tabs.deposit" defaultMessage="Deposit" />}
+                  </Typography>
+                }
+              />
+              <Tab
+                label={
+                  <StyledBadge badgeContent={delayedWithdrawalsCount} color="primary">
+                    <Typography variant="bodyRegular" color="inherit">
+                      <FormattedMessage
+                        description="earn.strategy-management.tabs.withdraw"
+                        defaultMessage="Withdraw"
+                      />
+                    </Typography>
+                  </StyledBadge>
+                }
+              />
+            </UnderlinedTabs>
+            {hasAssetDelayedWithdrawal && <DelayWithdrawWarning />}
+          </ContainerBox>
+          {tab === 0 && <DepositForm strategy={strategy} setHeight={setHeight} />}
+          {tab === 1 && <WithdrawForm strategy={strategy} setHeight={setHeight} />}
+        </>
+      )}
     </StyledBackgroundPaper>
   );
 };

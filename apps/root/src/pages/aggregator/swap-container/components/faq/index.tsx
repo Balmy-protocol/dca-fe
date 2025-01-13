@@ -11,7 +11,7 @@ import {
 } from 'ui-library';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
-import useTrackEvent from '@hooks/useTrackEvent';
+import useAnalytics from '@hooks/useAnalytics';
 
 const StyledQuestion = styled(Typography).attrs({ variant: 'h4Bold' })`
   ${({ theme: { palette } }) => `
@@ -30,7 +30,7 @@ const StyledContainer = styled(ContainerBox)`
 `;
 
 const AggregatorFAQ = () => {
-  const trackEvent = useTrackEvent();
+  const { trackEvent } = useAnalytics();
 
   const onFeedbackClick = ({ id, value: helpfull }: { id: string; value: boolean }) => {
     trackEvent(`FAQ ${id} was usefull`, { helpfull });

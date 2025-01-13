@@ -124,6 +124,10 @@ export const buildTypographyVariant = (mode: PaletteMode): TypographyOptions => 
     ...baseBodyTypography(mode),
     fontWeight: 600,
   },
+  bodyBoldNormalLineHeight: {
+    ...baseBodyTypography(mode),
+    fontWeight: 700,
+  },
   bodyBold: {
     ...baseBodyTypography(mode),
     fontWeight: 700,
@@ -189,6 +193,14 @@ export const buildTypographyVariant = (mode: PaletteMode): TypographyOptions => 
     color: colors[mode].accentPrimary,
   },
   // Labels
+  labelExtraLarge: {
+    fontFamily: 'Inter',
+    fontSize: '1rem', // 16/16
+    fontStyle: 'normal',
+    fontWeight: 600,
+    lineHeight: 'normal', // 16.94/14
+    color: colors[mode].typography.typo2,
+  },
   labelLarge: {
     fontFamily: 'Inter',
     fontSize: '0.875rem', // 14/16

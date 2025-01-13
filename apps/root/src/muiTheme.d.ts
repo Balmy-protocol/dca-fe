@@ -22,6 +22,7 @@ declare module '@mui/material/styles' {
     bodyRegular: React.CSSProperties;
     bodySemibold: React.CSSProperties;
     bodyBold: React.CSSProperties;
+    bodyBoldNormalLineHeight: React.CSSProperties;
     bodySmallRegular: React.CSSProperties;
     bodySmallSemibold: React.CSSProperties;
     bodySmallBold: React.CSSProperties;
@@ -33,6 +34,7 @@ declare module '@mui/material/styles' {
     linkRegular: React.CSSProperties;
     linkSmall: React.CSSProperties;
     labelLarge: React.CSSProperties;
+    labelExtraLarge: React.CSSProperties;
     labelRegular: React.CSSProperties;
     labelSemiBold: React.CSSProperties;
   }
@@ -50,6 +52,7 @@ declare module '@mui/material/styles' {
     bodyRegular?: React.CSSProperties;
     bodySemibold?: React.CSSProperties;
     bodyBold?: React.CSSProperties;
+    bodyBoldNormalLineHeight?: React.CSSProperties;
     bodySmallRegular?: React.CSSProperties;
     bodySmallSemibold?: React.CSSProperties;
     bodySmallBold?: React.CSSProperties;
@@ -63,12 +66,14 @@ declare module '@mui/material/styles' {
     labelLarge?: React.CSSProperties;
     labelRegular?: React.CSSProperties;
     labelSemiBold?: React.CSSProperties;
+    labelExtraLarge?: React.CSSProperties;
   }
 
   interface Palette {
     gradient: PaletteColor & {
       earnWizard: string;
       newsBanner: string;
+      tierLevel: string;
       rewards: string;
     };
     typo1: string;
@@ -83,6 +88,7 @@ declare module '@mui/material/styles' {
       earnWizard?: string;
       newsBanner?: string;
       rewards?: string;
+      tierLevel?: string;
     };
     typo1?: string;
     typo2?: string;
@@ -106,6 +112,7 @@ declare module '@mui/material/Typography' {
     bodyRegular: true;
     bodySemibold: true;
     bodyBold: true;
+    bodyBoldNormalLineHeight: true;
     bodySmallRegular: true;
     bodySmallSemibold: true;
     bodySmallBold: true;
@@ -119,5 +126,6 @@ declare module '@mui/material/Typography' {
     labelLarge: true;
     labelRegular: true;
     labelSemiBold: true;
+    labelExtraLarge: true;
   }
 }

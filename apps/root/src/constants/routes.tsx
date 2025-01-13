@@ -67,6 +67,10 @@ export const HISTORY_ROUTE = {
   key: 'history',
 };
 
+export const TIER_VIEW_ROUTE = {
+  key: 'tier-view',
+};
+
 const StyledComingSoonContainer = styled(ContainerBox)`
   ${({
     theme: {
@@ -99,6 +103,8 @@ export const EARN_SUBSCRIBE_ROUTE = {
   endContent: <ComingSoon />,
 };
 
-// export const NON_NAVIGABLE_ROUTES = [EARN_ROUTE.key];
-export const NON_NAVIGABLE_ROUTES: string[] =
-  process.env.EARN_ENABLED === 'true' ? [] : [EARN_GROUP.key, EARN_ROUTE.key, EARN_PORTFOLIO.key];
+export const NON_NAVIGABLE_EARN_ROUTES: string[] = [EARN_GROUP.key, EARN_ROUTE.key, EARN_PORTFOLIO.key];
+
+export const EARN_ACCESS_NOW_ROUTE = {
+  key: 'earn/access-now',
+};

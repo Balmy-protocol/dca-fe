@@ -25,13 +25,13 @@ import { compact, find, isUndefined } from 'lodash';
 import { NETWORKS } from '@constants';
 import { defineMessage, useIntl } from 'react-intl';
 import { isSameToken, parseNumberUsdPriceToBigInt, parseUsdPrice, toToken } from '../currency';
-import { StrategyColumnConfig, StrategyColumnKeys } from '@pages/earn/components/strategies-table/components/columns';
 import { TableStrategy } from '@pages/earn/components/strategies-table';
-import { ColumnOrder, StrategiesTableVariants } from '@state/strategies-filters/reducer';
+import { StrategiesTableVariants } from '@state/strategies-filters/reducer';
 import { Address, formatUnits, parseUnits } from 'viem';
 import { FarmWithAvailableDepositTokens } from '@hooks/earn/useAvailableDepositTokens';
 import { nowInSeconds } from '../time';
 import { findClosestTimestamp } from '@common/components/earn/action-graph-components';
+import { createEmptyEarnPosition } from '@common/mocks/earn';
 
 export const sdkStrategyTokenToToken = (
   sdkToken: SdkStrategyToken,
@@ -110,7 +110,7 @@ export const parseAllStrategies = ({
             chainId
           )
         ),
-        apy: farm.apy,
+        apy: farm.rewards?.apy ?? 0,
       },
       network,
       guardian: guardian,
@@ -233,49 +233,6 @@ export const parseUserStrategies = ({
   );
 };
 
-export function getComparator<Key extends StrategyColumnKeys, Variant extends StrategiesTableVariants>({
-  columns,
-  primaryOrder,
-  secondaryOrder,
-}: {
-  columns: StrategyColumnConfig<Variant>[];
-  primaryOrder: { order: ColumnOrder; column: Key };
-  secondaryOrder?: { order: ColumnOrder; column: Key };
-}): (a: TableStrategy<Variant>, b: TableStrategy<Variant>) => number {
-  return (a, b) => {
-    const column = columns.find((config) => config.key === primaryOrder.column);
-    if (column && column.getOrderValue) {
-      const aValue = column.getOrderValue(a);
-      const bValue = column.getOrderValue(b);
-      if (typeof aValue === 'string' && typeof bValue === 'string') {
-        return primaryOrder.order === 'asc' ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue);
-      } else if (typeof aValue === 'number' && typeof bValue === 'number') {
-        return primaryOrder.order === 'asc' ? aValue - bValue : bValue - aValue;
-      }
-    }
-
-    if (!secondaryOrder) {
-      return primaryOrder.order === 'asc' ? 1 : -1;
-    }
-
-    // Secondary sorting criteria
-    const secondaryColumn = columns.find((config) => config.key === secondaryOrder.column);
-    if (secondaryColumn && secondaryColumn.getOrderValue) {
-      const aSecondaryValue = secondaryColumn.getOrderValue(a);
-      const bSecondaryValue = secondaryColumn.getOrderValue(b);
-      if (typeof aSecondaryValue === 'string' && typeof bSecondaryValue === 'string') {
-        return secondaryOrder.order === 'asc'
-          ? aSecondaryValue.localeCompare(bSecondaryValue)
-          : bSecondaryValue.localeCompare(aSecondaryValue);
-      } else if (typeof aSecondaryValue === 'number' && typeof bSecondaryValue === 'number') {
-        return secondaryOrder.order === 'asc' ? aSecondaryValue - bSecondaryValue : bSecondaryValue - aSecondaryValue;
-      }
-    }
-
-    return secondaryOrder.order === 'asc' ? 1 : -1;
-  };
-}
-
 export type RowClickParamValue<T extends StrategiesTableVariants> = T extends StrategiesTableVariants.ALL_STRATEGIES
   ? Strategy
   : T extends StrategiesTableVariants.USER_STRATEGIES
@@ -298,6 +255,37 @@ export const getStrategyFromTableObject = <T extends StrategiesTableVariants>(
   }
 
   return strategy as RowClickParamValue<T>;
+};
+
+export const getNeedsTierFromTableObject = <T extends StrategiesTableVariants>(
+  tableStrategy: TableStrategy<T>,
+  variant: T
+): number | undefined => {
+  if (variant === StrategiesTableVariants.ALL_STRATEGIES) {
+    const strategy = getStrategyFromTableObject<StrategiesTableVariants.ALL_STRATEGIES>(
+      tableStrategy as TableStrategy<StrategiesTableVariants.ALL_STRATEGIES>,
+      variant
+    );
+    return strategy.needsTier;
+  } else if (variant === StrategiesTableVariants.USER_STRATEGIES) {
+    const strategy = getStrategyFromTableObject<StrategiesTableVariants.USER_STRATEGIES>(
+      tableStrategy as TableStrategy<StrategiesTableVariants.USER_STRATEGIES>,
+      variant
+    );
+    return strategy.needsTier;
+  } else if (variant === StrategiesTableVariants.MIGRATION_OPTIONS) {
+    const farmWithAvailableDepositTokens = getStrategyFromTableObject<StrategiesTableVariants.MIGRATION_OPTIONS>(
+      tableStrategy as TableStrategy<StrategiesTableVariants.MIGRATION_OPTIONS>,
+      variant
+    );
+    // TODO: Implement this in migration modal (BLY-3658)
+    const needsTierLevels = farmWithAvailableDepositTokens.strategies.map((s) => s.needsTier);
+    if (needsTierLevels.some((tier) => tier === undefined)) {
+      return undefined;
+    }
+    return Math.min(...needsTierLevels.filter((tier): tier is number => tier !== undefined));
+  }
+  return undefined;
 };
 
 export enum StrategyReturnPeriods {
@@ -550,6 +538,23 @@ export function parseUserStrategiesFinancialData(userPositions: EarnPosition[] =
     monthlyEarnings,
     totalMonthlyEarnings,
   };
+}
+
+export function generateEstimatedUserPosition({
+  token,
+  owner,
+  amount,
+  strategy,
+}: {
+  token: Token;
+  owner: Address;
+  amount: AmountsOfToken;
+  strategy: DisplayStrategy;
+}): EarnPosition {
+  // Create a mock position with the token balance
+  const mockPosition = createEmptyEarnPosition(strategy, owner, token);
+  mockPosition.balances[0].amount = amount;
+  return mockPosition;
 }
 
 export function calculateUserStrategiesBalances(userPositions: EarnPosition[] = []): EarnPosition['balances'] {

@@ -147,7 +147,16 @@ const EarnPositionTvlGraph = ({
       })) as DataItem[],
       'timestamp',
       'asc'
-    );
+      // Now lets merge all the data that has the same name
+    ).reduce<DataItem[]>((acc, item) => {
+      const existingItem = acc.find((i) => i.name === item.name);
+      if (existingItem) {
+        existingItem.tvl = (existingItem.tvl ?? 0) + (item.tvl ?? 0);
+      } else {
+        acc.push(item);
+      }
+      return acc;
+    }, []);
 
     if (actualData.length < minPoints) {
       return [];

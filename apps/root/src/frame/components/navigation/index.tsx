@@ -8,8 +8,9 @@ import {
   EARN_ROUTE,
   EARN_PORTFOLIO,
   EARN_GROUP,
-  NON_NAVIGABLE_ROUTES,
+  NON_NAVIGABLE_EARN_ROUTES,
   EARN_SUBSCRIBE_ROUTE,
+  EARN_ACCESS_NOW_ROUTE,
 } from '@constants/routes';
 import { useAppDispatch } from '@hooks/state';
 import usePushToHistory from '@hooks/usePushToHistory';
@@ -45,10 +46,14 @@ import { useThemeMode, useUseUnlimitedApproval } from '@state/config/hooks';
 import useSelectedLanguage from '@hooks/useSelectedLanguage';
 import { SUPPORTED_LANGUAGES_STRING, SupportedLanguages } from '@constants/lang';
 import useChangeLanguage from '@hooks/useChangeLanguage';
-import useTrackEvent from '@hooks/useTrackEvent';
+import useAnalytics from '@hooks/useAnalytics';
 import NetWorth, { NetWorthVariants } from '@common/components/net-worth';
 import { WalletOptionValues, ALL_WALLETS, WalletSelectorVariants } from '@common/components/wallet-selector/types';
 import GuardianListSubscribeModal from '../guardian-list-subscribe-modal';
+import EarnGainAccessModal from '../earn-gain-access-modal';
+import useEarnAccess from '@hooks/useEarnAccess';
+import TierPill from '../tier-pill';
+import LevelUpModal from '@common/components/level-up-modal';
 
 const helpOptions = [
   {
@@ -115,11 +120,12 @@ const Navigation = ({ children }: React.PropsWithChildren) => {
   const snackbar = useSnackbar();
   const selectedLanguage = useSelectedLanguage();
   const changeLanguage = useChangeLanguage();
-  const trackEvent = useTrackEvent();
+  const { trackEvent } = useAnalytics();
   const useUnlimitedApproval = useUseUnlimitedApproval();
   const [selectedWalletOption, setSelectedWalletOption] = React.useState<WalletOptionValues>(ALL_WALLETS);
-  const [showGuardianListSubscribeModal, setShowGuardianListSubscribeModal] = React.useState(false);
+  const [showEarnModal, setShowEarnModal] = React.useState(false);
   // const switchActiveWalletOnConnection = useSwitchActiveWalletOnConnection();
+  const { isEarnEnabled, hasEarnAccess } = useEarnAccess();
 
   React.useEffect(() => {
     if (HOME_ROUTES.includes(location.pathname)) {
@@ -140,20 +146,22 @@ const Navigation = ({ children }: React.PropsWithChildren) => {
       dispatch(changeRoute('settings'));
     } else if (location.pathname.startsWith('/token')) {
       dispatch(changeRoute('token'));
+    } else if (location.pathname.startsWith('/tier-view')) {
+      dispatch(changeRoute('tier-view'));
     }
   }, []);
 
   const onSectionClick = useCallback(
     (section: Section, openInNewTab?: boolean) => {
       if (section.type === SectionType.link && section.key === EARN_GROUP.key) {
-        setShowGuardianListSubscribeModal(true);
+        setShowEarnModal(true);
       }
 
       if (
         section.type === SectionType.divider ||
         section.type === SectionType.group ||
-        section.key === currentRoute ||
-        NON_NAVIGABLE_ROUTES.includes(section.key)
+        // section.key === currentRoute ||
+        (!hasEarnAccess && NON_NAVIGABLE_EARN_ROUTES.includes(section.key))
       ) {
         return;
       }
@@ -165,7 +173,7 @@ const Navigation = ({ children }: React.PropsWithChildren) => {
       pushToHistory(`/${section.key}`);
       trackEvent('Main - Changed active app', { newSection: section.key, oldSection: currentRoute });
     },
-    [dispatch, pushToHistory, currentRoute]
+    [dispatch, pushToHistory, currentRoute, hasEarnAccess]
   );
 
   const openExternalLink = (url: string) => {
@@ -277,11 +285,17 @@ const Navigation = ({ children }: React.PropsWithChildren) => {
 
   return (
     <>
-      <GuardianListSubscribeModal
-        isOpen={showGuardianListSubscribeModal}
-        onClose={() => setShowGuardianListSubscribeModal(false)}
-      />
+      {isEarnEnabled ? (
+        <>
+          <LevelUpModal />
+          <EarnGainAccessModal isOpen={showEarnModal} onClose={() => setShowEarnModal(false)} />
+        </>
+      ) : (
+        <GuardianListSubscribeModal isOpen={showEarnModal} onClose={() => setShowEarnModal(false)} />
+      )}
+
       <NavigationUI
+        extraHeaderTools={<TierPill />}
         headerContent={
           <NetWorth
             variant={NetWorthVariants.nav}
@@ -324,7 +338,7 @@ const Navigation = ({ children }: React.PropsWithChildren) => {
               //   label: intl.formatMessage(EARN_ROUTE.label),
               //   type: SectionType.link,
               // },
-              ...((process.env.EARN_ENABLED === 'true'
+              ...((hasEarnAccess
                 ? [
                     {
                       ...EARN_GROUP,
@@ -349,6 +363,7 @@ const Navigation = ({ children }: React.PropsWithChildren) => {
                     {
                       ...EARN_SUBSCRIBE_ROUTE,
                       label: intl.formatMessage(EARN_SUBSCRIBE_ROUTE.label),
+                      activeKeys: [EARN_ACCESS_NOW_ROUTE.key],
                       type: SectionType.link,
                     },
                   ]) satisfies LinkSection[]),

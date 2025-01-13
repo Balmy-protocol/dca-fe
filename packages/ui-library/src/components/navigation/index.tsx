@@ -350,8 +350,13 @@ const Navigation = ({
     setMobileOpen(!mobileOpen);
   };
 
+  const handleSectionClick = (section: Section, openInNewTab?: boolean) => {
+    onSectionClick(section, openInNewTab);
+    setMobileOpen(false);
+  };
+
   const drawerWidth = isDownLg ? drawerWidthSm : drawerWidthLg;
-  const drawerLinks = buildDrawer({ sections, selectedSection, onSectionClick });
+  const drawerLinks = buildDrawer({ sections, selectedSection, onSectionClick: handleSectionClick });
 
   const iconProps = { cursor: 'pointer', onClick: onClickBrandLogo, size: '110px' };
   const icon = mode === 'light' ? <BalmyLogoLight {...iconProps} /> : <BalmyLogoDark {...iconProps} />;
@@ -397,7 +402,6 @@ const Navigation = ({
               <MenuIcon sx={{ color: colors[mode].accentPrimary }} />
             </IconButton>
             <AppBarRightContainer alignItems="center" justifyContent="flex-end" flex={1} gap={2}>
-              {extraHeaderTools}
               <OptionsMenu
                 options={helpOptions}
                 mainDisplay={
@@ -407,6 +411,7 @@ const Navigation = ({
                 }
               />
               <OptionsMenu options={settingsOptions} mainDisplay={<CogIcon />} />
+              {extraHeaderTools}
             </AppBarRightContainer>
           </Toolbar>
         </Container>

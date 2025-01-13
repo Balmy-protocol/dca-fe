@@ -13,7 +13,7 @@ import {
 } from 'ui-library';
 import styled from 'styled-components';
 import NetWorthNumber from '@common/components/networth-number';
-import useTrackEvent from '@hooks/useTrackEvent';
+import useAnalytics from '@hooks/useAnalytics';
 import { useShowBalances, useThemeMode } from '@state/config/hooks';
 import isUndefined from 'lodash/isUndefined';
 
@@ -89,7 +89,7 @@ const WidgetFrame = ({
   solid,
 }: WidgetFrameProps) => {
   const [shouldShow, setShouldShow] = React.useState(true);
-  const trackEvent = useTrackEvent();
+  const { trackEvent } = useAnalytics();
   const showBalances = useShowBalances();
   const mode = useThemeMode();
 

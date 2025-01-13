@@ -2,7 +2,7 @@ import React from 'react';
 import { Grid, StyledFormContainer, ContainerBox, Typography, colors, StyledPageTitleDescription } from 'ui-library';
 import { changeRoute } from '@state/tabs/actions';
 import { useAppDispatch } from '@state/hooks';
-import useTrackEvent from '@hooks/useTrackEvent';
+import useAnalytics from '@hooks/useAnalytics';
 import { TRANSFER_ROUTE } from '@constants/routes';
 import TransferForm from '../components/transfer-form';
 import { FormattedMessage } from 'react-intl';
@@ -11,7 +11,7 @@ interface TransferFrameProps {}
 
 const TransferFrame = ({}: TransferFrameProps) => {
   const dispatch = useAppDispatch();
-  const trackEvent = useTrackEvent();
+  const { trackEvent } = useAnalytics();
 
   React.useEffect(() => {
     dispatch(changeRoute(TRANSFER_ROUTE.key));

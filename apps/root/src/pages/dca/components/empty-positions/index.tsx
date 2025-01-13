@@ -6,7 +6,7 @@ import { DCA_CREATE_ROUTE } from '@constants/routes';
 import usePushToHistory from '@hooks/usePushToHistory';
 import { useAppDispatch } from '@state/hooks';
 import { changeRoute } from '@state/tabs/actions';
-import useTrackEvent from '@hooks/useTrackEvent';
+import useAnalytics from '@hooks/useAnalytics';
 
 const StyledCard = styled(Card)`
   ${({
@@ -32,7 +32,7 @@ const StyledCard = styled(Card)`
 const EmptyPositions = () => {
   const pushToHistory = usePushToHistory();
   const dispatch = useAppDispatch();
-  const trackEvent = useTrackEvent();
+  const { trackEvent } = useAnalytics();
 
   const onClick = React.useCallback(() => {
     dispatch(changeRoute(DCA_CREATE_ROUTE.key));

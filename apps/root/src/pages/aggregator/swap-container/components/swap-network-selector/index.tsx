@@ -1,6 +1,6 @@
 import React from 'react';
 import NetworkSelector from '@common/components/network-selector';
-import useTrackEvent from '@hooks/useTrackEvent';
+import useAnalytics from '@hooks/useAnalytics';
 import { useAppDispatch } from '@hooks/state';
 import { compact, find, orderBy } from 'lodash';
 import useSdkChains from '@hooks/useSdkChains';
@@ -11,7 +11,7 @@ import { setAggregatorChainId } from '@state/aggregator/actions';
 
 const SwapNetworkSelector = () => {
   const dispatch = useAppDispatch();
-  const trackEvent = useTrackEvent();
+  const { trackEvent } = useAnalytics();
   const supportedChains = useSdkChains();
   const replaceHistory = useReplaceHistory();
 

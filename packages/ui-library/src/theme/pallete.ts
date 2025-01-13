@@ -111,6 +111,7 @@ export const darkModePallete: PaletteOptions = {
     earnWizard: `linear-gradient(180deg, #150033 25.13%, rgba(32, 0, 77, 0.80) 100%)`,
     newsBanner: `linear-gradient(286deg, #7A1BFF 1.4%, #0EECC1 113.11%)`,
     rewards: `linear-gradient(180deg, #473267 0%, #47326700 100%)`,
+    tierLevel: `linear-gradient(90deg, #07DFAA 24.91%, #049571 86.35%)`,
   },
 };
 
@@ -168,5 +169,6 @@ export const lightModePallete: PaletteOptions = {
     earnWizard: `linear-gradient(180deg, #EADBFF 25.13%, rgba(211, 180, 255, 0.80) 100%)`,
     newsBanner: `linear-gradient(286deg, #7A1BFF 1.4%, #0EECC1 113.11%)`,
     rewards: `linear-gradient(180deg, ${colors.light.background.tertiary} 0%, #F9F7FC00 100%)`,
+    tierLevel: `linear-gradient(90deg, #791AFF 24.91%, #4A00B2 86.35%)`,
   },
 };

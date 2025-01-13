@@ -43,7 +43,7 @@ import ComposedTokenIcon from '@common/components/composed-token-icon';
 import PositionCardButton from '../current-positions/components/position-card-button';
 import Address from '@common/components/address';
 import { capitalize } from 'lodash';
-import useTrackEvent from '@hooks/useTrackEvent';
+import useAnalytics from '@hooks/useAnalytics';
 import PositionOptions from '../current-positions/components/position-options';
 import useWallet from '@hooks/useWallet';
 import useWalletNetwork from '@hooks/useWalletNetwork';
@@ -153,7 +153,7 @@ interface TerminatedPositionProps {
 export const TerminatedPosition = ({ position }: TerminatedPositionProps) => {
   const { from, to, swapInterval, swapped, totalExecutedSwaps, chainId } = position;
   const mode = useThemeMode();
-  const trackEvent = useTrackEvent();
+  const { trackEvent } = useAnalytics();
 
   const intl = useIntl();
   const positionNetwork = React.useMemo(() => {
@@ -298,7 +298,7 @@ export const OpenPosition = ({
   }, [chainId]);
 
   const intl = useIntl();
-  const trackEvent = useTrackEvent();
+  const { trackEvent } = useAnalytics();
   const wallet = useWallet(user);
 
   const remainingLiquidity = totalRemainingLiquidity.amount - (yieldFromGenerated?.amount || 0n);

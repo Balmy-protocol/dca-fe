@@ -22,7 +22,7 @@ import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
 import { trimAddress } from '@common/utils/parsing';
 import { DateTime } from 'luxon';
 import { ContactListActiveModal } from '..';
-import useTrackEvent from '@hooks/useTrackEvent';
+import useAnalytics from '@hooks/useAnalytics';
 import useWallets from '@hooks/useWallets';
 import { find } from 'lodash';
 
@@ -80,7 +80,7 @@ const ContactItem = ({
   const intl = useIntl();
   const snackbar = useSnackbar();
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
-  const trackEvent = useTrackEvent();
+  const { trackEvent } = useAnalytics();
   const wallets = useWallets();
   const onCopyAddress = React.useCallback(() => {
     copyTextToClipboard(contact.address);

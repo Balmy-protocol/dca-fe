@@ -1,5 +1,5 @@
 import { generateCalendarLinks, LinkType } from '@common/utils/calendar/calendar';
-import useTrackEvent from '@hooks/useTrackEvent';
+import useAnalytics from '@hooks/useAnalytics';
 import { Position } from 'common-types';
 import { DateTime } from 'luxon';
 import React from 'react';
@@ -64,7 +64,7 @@ const generateCalendarInfo = (
 
 export const AddPositionToCalendarButton = ({ position, variant, size }: AddPositionToCalendarButtonProps) => {
   const intl = useIntl();
-  const trackEvent = useTrackEvent();
+  const { trackEvent } = useAnalytics();
   const [anchorWithdrawButton, setAnchorWithdrawButton] = React.useState<null | HTMLElement>(null);
 
   const onClick = (linkType: LinkType) => {

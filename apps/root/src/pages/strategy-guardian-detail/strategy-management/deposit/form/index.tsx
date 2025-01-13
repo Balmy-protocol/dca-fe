@@ -8,6 +8,9 @@ import FormWalletSelector from '@common/components/form-wallet-selector';
 import { ContainerBox } from 'ui-library';
 import StrategyManagementFees from '../../components/fees';
 import { useEarnManagementState } from '@state/earn-management/hooks';
+import useTierLevel from '@hooks/tiers/useTierLevel';
+import LockedDeposit from '../../components/locked-deposit';
+import { isNil } from 'lodash';
 
 interface DepositFormProps {
   strategy?: DisplayStrategy;
@@ -22,6 +25,14 @@ const DepositForm = ({ strategy, setHeight }: DepositFormProps) => {
     walletAddress: activeWallet?.address,
     shouldAutoFetch: true,
   });
+
+  const { tierLevel } = useTierLevel();
+
+  const isLocked = strategy?.needsTier && strategy?.needsTier > (tierLevel ?? 0);
+
+  if (isLocked && !isNil(strategy?.needsTier)) {
+    return <LockedDeposit strategy={strategy} needsTier={strategy?.needsTier} />;
+  }
 
   return (
     <>

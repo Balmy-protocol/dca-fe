@@ -2,8 +2,10 @@ import React from 'react';
 import { FormattedMessage } from 'react-intl';
 import { TableStrategy } from '../..';
 import {
+  ActiveTiersIcons,
   ContainerBox,
   HiddenProps,
+  MovingStarIcon,
   Skeleton,
   StyledBodySmallRegularTypo2,
   Tooltip,
@@ -23,6 +25,7 @@ import { useThemeMode } from '@state/config/hooks';
 import TokenIconWithNetwork from '@common/components/token-icon-with-network';
 import TokenAmount from '@common/components/token-amount';
 import { PROMOTED_STRATEGIES_IDS } from '@constants/earn';
+import { isNil } from 'lodash';
 
 export enum StrategyColumnKeys {
   IS_PROMOTED = 'isPromoted',
@@ -41,6 +44,8 @@ export enum StrategyColumnKeys {
   PLATFORM = 'platform',
   PLATFORM_USER_BALANCE = 'platformUserBalance',
   SINGLE_WALLET = 'singleWallet',
+  MIGRATE = 'migrate',
+  NEEDS_TIER = 'needsTier',
 }
 
 const StyledWalletsPlusIndicator = styled(ContainerBox)`
@@ -63,7 +68,7 @@ const StyledBoxedLabel = styled.div`
   `}
 `;
 
-const StyledTitleContainer = styled(ContainerBox)`
+const StyledTitleContainer = styled(ContainerBox).attrs({ alignItems: 'center', gap: 1 })`
   max-width: 26ch;
   text-overflow: ellipsis;
   overflow: hidden;
@@ -113,11 +118,47 @@ const StyledBoxedOwners = ({ owners }: { owners: ViemAddress[] }) => {
 export interface StrategyColumnConfig<T extends StrategiesTableVariants> {
   key: StrategyColumnKeys;
   label: React.ReactNode;
-  renderCell: (data: TableStrategy<T>, showBalances: boolean) => React.ReactNode | string;
+  renderCell: (data: TableStrategy<T>, showBalances: boolean, tierLevel?: number) => React.ReactNode | string;
   getOrderValue?: (data: TableStrategy<T>) => string | number | undefined;
   customSkeleton?: React.ReactNode;
   hiddenProps?: HiddenProps;
 }
+
+const StyledCurrentTierFarmName = styled(StyledBodySmallRegularTypo2)`
+  ${({ theme: { palette } }) => `
+    background: ${palette.gradient.tierLevel};
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  `}
+`;
+
+interface StyledTierBadgeProps {
+  CurrentTierBadge: React.ElementType;
+}
+
+const StyledTierBadge = styled(({ CurrentTierBadge, ...props }: StyledTierBadgeProps) => (
+  <CurrentTierBadge {...props} size="1.25rem" />
+))``;
+
+const StyledMoreRewardsBadge = styled(ContainerBox).attrs({ alignItems: 'center', gap: 1 })`
+  ${({ theme: { spacing, palette } }) => `
+    padding: ${spacing(1)} ${spacing(1)};
+    border-radius: ${spacing(2)};
+    background-color: ${colors[palette.mode].background.tertiary};
+    border: 1px solid ${colors[palette.mode].semantic.success.darker};
+  `}
+`;
+
+export const MoreRewardsBadge = () => {
+  return (
+    <StyledMoreRewardsBadge>
+      <MovingStarIcon sx={({ palette }) => ({ color: colors[palette.mode].semantic.success.darker })} />
+      <Typography variant="bodyExtraSmallBold" color={({ palette }) => colors[palette.mode].semantic.success.darker}>
+        <FormattedMessage description="earn.all-strategies-table.column.more-rewards" defaultMessage="Higher rewards" />
+      </Typography>
+    </StyledMoreRewardsBadge>
+  );
+};
 
 export const strategyColumnConfigs: StrategyColumnConfig<StrategiesTableVariants.ALL_STRATEGIES>[] = [
   {
@@ -126,7 +167,14 @@ export const strategyColumnConfigs: StrategyColumnConfig<StrategiesTableVariants
     renderCell: (data) => (
       <Tooltip title={data.farm.name}>
         <StyledTitleContainer>
-          <StyledBodySmallRegularTypo2>{data.farm.name}</StyledBodySmallRegularTypo2>
+          {!isNil(data.tierLevel) && !isNil(data.needsTier) && data.needsTier === data.tierLevel ? (
+            <>
+              <StyledCurrentTierFarmName>{data.farm.name}</StyledCurrentTierFarmName>
+              <StyledTierBadge CurrentTierBadge={ActiveTiersIcons[data.tierLevel]} />
+            </>
+          ) : (
+            <StyledBodySmallRegularTypo2>{data.farm.name}</StyledBodySmallRegularTypo2>
+          )}
         </StyledTitleContainer>
       </Tooltip>
     ),
@@ -174,9 +222,24 @@ export const strategyColumnConfigs: StrategyColumnConfig<StrategiesTableVariants
     },
   },
   {
+    key: StrategyColumnKeys.NEEDS_TIER,
+    label: <></>,
+    renderCell: () => <></>,
+    getOrderValue: (data) => data.needsTier ?? 0,
+    hiddenProps: {
+      xsUp: true,
+    },
+  },
+  {
     key: StrategyColumnKeys.REWARDS,
     label: <FormattedMessage description="earn.all-strategies-table.column.rewards" defaultMessage="Rewards" />,
-    renderCell: (data) => <ComposedTokenIcon tokens={data.rewards.tokens} size={4.5} />,
+    renderCell: (data) => (
+      <ContainerBox gap={2} alignItems="center">
+        <ComposedTokenIcon tokens={data.rewards.tokens} size={4.5} />
+        {/* Only tier 2 and above have more rewards */}
+        {data.needsTier && data.needsTier > 1 && <MoreRewardsBadge />}
+      </ContainerBox>
+    ),
   },
   {
     key: StrategyColumnKeys.CHAIN_NAME,
@@ -239,10 +302,17 @@ export const portfolioColumnConfigs: StrategyColumnConfig<StrategiesTableVariant
   {
     key: StrategyColumnKeys.VAULT_NAME,
     label: <FormattedMessage description="earn.all-strategies-table.column.vault-name" defaultMessage="Vault" />,
-    renderCell: (data) => (
+    renderCell: (data, showBalances, tierLevel) => (
       <Tooltip title={data[0].strategy.farm.name}>
         <StyledTitleContainer>
-          <StyledBodySmallRegularTypo2>{data[0].strategy.farm.name}</StyledBodySmallRegularTypo2>
+          {!isNil(tierLevel) && !isNil(data[0].strategy.needsTier) && data[0].strategy.needsTier === tierLevel ? (
+            <>
+              <StyledCurrentTierFarmName>{data[0].strategy.farm.name}</StyledCurrentTierFarmName>
+              <StyledTierBadge CurrentTierBadge={ActiveTiersIcons[tierLevel]} />
+            </>
+          ) : (
+            <StyledBodySmallRegularTypo2>{data[0].strategy.farm.name}</StyledBodySmallRegularTypo2>
+          )}
         </StyledTitleContainer>
       </Tooltip>
     ),
@@ -370,19 +440,38 @@ export const migrationOptionsColumnConfigs: StrategyColumnConfig<StrategiesTable
     label: <FormattedMessage description="earn.one-click-migration-modal.column.token" defaultMessage="Amount" />,
     renderCell: (data) => (
       <TokenAmount
-        token={data.token}
-        amount={data.balance}
+        token={data.underlying || data.token}
+        amount={data.underlyingAmount || data.balance}
         showIcon={false}
         amountTypographyVariant="bodySmallRegular"
         usdPriceTypographyVariant="labelRegular"
         gap={0.5}
       />
     ),
-    getOrderValue: (data) => Number(data.balance.amountInUSD),
+    getOrderValue: (data) => Number(data.underlyingAmount.amountInUSD) || Number(data.balance.amountInUSD),
   },
   {
     key: StrategyColumnKeys.SINGLE_WALLET,
     label: <FormattedMessage description="earn.one-click-migration-modal.column.wallet" defaultMessage="Wallet" />,
     renderCell: (data) => <StyledBoxedOwners owners={[data.wallet]} />,
   },
+  // {
+  //   key: StrategyColumnKeys.MIGRATE,
+  //   label: null,
+  //   renderCell: (data) => (
+  //     <Typography variant="linkRegular" color={({ palette: { mode } }) => colors[mode].accent.primary}>
+  //       {data.strategies.length === 1 ? (
+  //         <FormattedMessage
+  //           description="earn.one-click-migration-modal.column.migrate-single"
+  //           defaultMessage="Continue in vault"
+  //         />
+  //       ) : (
+  //         <FormattedMessage
+  //           description="earn.one-click-migration-modal.column.migrate-multiple"
+  //           defaultMessage="Select guardian"
+  //         />
+  //       )}
+  //     </Typography>
+  //   ),
+  // },
 ];

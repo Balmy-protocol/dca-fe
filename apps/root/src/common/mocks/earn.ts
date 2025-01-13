@@ -78,6 +78,12 @@ export const sdkStrategyMock: SdkStrategy = {
     },
   },
   id: '1-0xaaveUsdcOptimism' as `${number}-${Lowercase<string>}-${number}`,
+  fees: [
+    { percentage: 0.2, type: FeeType.DEPOSIT },
+    { percentage: 10, type: FeeType.RESCUE },
+    { percentage: 0.5, type: FeeType.WITHDRAW },
+    { percentage: 8.3, type: FeeType.PERFORMANCE },
+  ],
   guardian: {
     id: 'x-guardian',
     description: 'X Guardian protection',
@@ -159,6 +165,7 @@ export const sdkStrategyMock2: SdkStrategy = {
     },
   ],
   id: '1-0xyearnDaiPolygon' as `${number}-${Lowercase<string>}-${number}`,
+  fees: [{ percentage: 0.1, type: FeeType.PERFORMANCE }],
   guardian: {
     id: 'y-guardian',
     description: 'Y Guardian protection',

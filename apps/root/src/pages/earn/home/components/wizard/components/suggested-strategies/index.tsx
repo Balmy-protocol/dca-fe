@@ -6,6 +6,7 @@ import { useThemeMode } from '@state/config/hooks';
 import useSuggestedStrategies from '@hooks/earn/useSuggestedStrategies';
 import StrategyCardItem from '@pages/earn/components/strategy-card-item';
 import { DataCardVariants } from '@pages/strategy-guardian-detail/vault-data/components/data-cards';
+import useTierLevel from '@hooks/tiers/useTierLevel';
 
 interface SuggestedStrategiesProps {
   selectedAsset: {
@@ -19,6 +20,7 @@ interface SuggestedStrategiesProps {
 const SuggestedStrategies = ({ selectedAsset, selectedReward }: SuggestedStrategiesProps) => {
   const themeMode = useThemeMode();
   const suggested = useSuggestedStrategies(selectedAsset, selectedReward);
+  const { tierLevel } = useTierLevel();
 
   return (
     <ContainerBox flexDirection="column" gap={5}>
@@ -32,7 +34,7 @@ const SuggestedStrategies = ({ selectedAsset, selectedReward }: SuggestedStrateg
         {suggested.slice(0, 3).map((strategy, index) => (
           <Grow in timeout={(index + 1) * 1000} key={strategy.id}>
             <Grid item xs={12} md={6} lg={4}>
-              <StrategyCardItem strategy={strategy} variant={DataCardVariants.Home} />
+              <StrategyCardItem strategy={strategy} variant={DataCardVariants.Home} tierLevel={tierLevel ?? 0} />
             </Grid>
           </Grow>
         ))}

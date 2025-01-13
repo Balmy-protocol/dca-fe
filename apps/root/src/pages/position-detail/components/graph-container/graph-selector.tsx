@@ -2,7 +2,7 @@ import * as React from 'react';
 import find from 'lodash/find';
 import isUndefined from 'lodash/isUndefined';
 import { Menu, MenuItem, KeyboardArrowDownIcon, Button } from 'ui-library';
-import useTrackEvent from '@hooks/useTrackEvent';
+import useAnalytics from '@hooks/useAnalytics';
 
 interface GraphSelectorProps {
   setGraph: (sorting: number) => void;
@@ -15,7 +15,7 @@ interface GraphSelectorProps {
 
 const GraphSelector = ({ setGraph, selected, options }: GraphSelectorProps) => {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-  const trackEvent = useTrackEvent();
+  const { trackEvent } = useAnalytics();
   const open = Boolean(anchorEl);
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);

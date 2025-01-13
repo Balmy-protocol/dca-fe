@@ -37,7 +37,7 @@ import ContactModal, { ContactListActiveModal } from '../../../../common/compone
 import ContactsButton from '../recipient-address/components/contacts-button';
 import TransferButton from '../transfer-button';
 import useWallets from '@hooks/useWallets';
-import useTrackEvent from '@hooks/useTrackEvent';
+import useAnalytics from '@hooks/useAnalytics';
 import { formatUsdAmount } from '@common/utils/currency';
 import useValidateAddress from '@hooks/useValidateAddress';
 import FormWalletSelector from '@common/components/form-wallet-selector';
@@ -97,7 +97,7 @@ const TransferForm = () => {
   const wallets = useWallets();
   const dispatch = useAppDispatch();
   const replaceHistory = useReplaceHistory();
-  const trackEvent = useTrackEvent();
+  const { trackEvent } = useAnalytics();
   const actualCurrentNetwork = useCurrentNetwork();
   const { token: selectedToken, recipient, amount } = useTransferState();
   const selectedNetwork = useSelectedNetwork();

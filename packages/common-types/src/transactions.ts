@@ -152,6 +152,8 @@ export interface SwapTypeData {
     transferTo?: string | null;
     swapContract: string;
     orderType: 'buy' | 'sell';
+    amountFromUsd?: number | null;
+    amountToUsd?: number | null;
   };
 }
 
@@ -160,9 +162,13 @@ export interface EarnCreateTypeData {
   typeData: {
     asset: Token;
     assetAmount: string;
+    depositAsset?: Token;
+    depositAssetAmount?: string;
     positionId?: SdkEarnPositionId;
     strategyId: StrategyId;
     vault: Lowercase<Address>;
+    amountInUsd?: number;
+    isMigration: boolean;
   };
 }
 
@@ -174,6 +180,10 @@ export interface EarnIncreaseTypeData {
     positionId: SdkEarnPositionId;
     strategyId: StrategyId;
     signedPermit: boolean;
+    depositAsset?: Token;
+    depositAssetAmount?: string;
+    amountInUsd?: number;
+    isMigration: boolean;
   };
 }
 

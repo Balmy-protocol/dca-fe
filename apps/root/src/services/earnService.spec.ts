@@ -33,7 +33,7 @@ import { EarnService } from './earnService';
 import ProviderService from './providerService';
 import ContractService from './contractService';
 import { toToken } from '@common/utils/currency';
-
+import MeanApiService from './meanApiService';
 jest.mock('./sdkService');
 jest.mock('./accountService');
 jest.mock('./providerService');
@@ -42,7 +42,7 @@ const MockedSdkService = jest.mocked(SdkService, { shallow: false });
 const MockedAccountService = jest.mocked(AccountService, { shallow: false });
 const MockedProviderService = jest.mocked(ProviderService, { shallow: false });
 const MockedContractService = jest.mocked(ContractService, { shallow: false });
-
+const MockedMeanApiService = jest.mocked(MeanApiService, { shallow: false });
 const now = 1724101777;
 const nowInMillis = 1724101777000;
 
@@ -140,10 +140,12 @@ const createStrategyMock = ({
   guardian,
   lastUpdatedAt,
   userPositions,
+  fees,
 }: Partial<SavedSdkStrategy> = {}): SavedSdkStrategy => ({
   depositTokens: [{ ...(farm?.asset || createStrategyFarmMock({}).asset), type: TokenType.ASSET }],
   id: !isUndefined(id) ? id : ('0xvault' as SavedSdkStrategy['id']),
   farm: !isUndefined(farm) ? createStrategyFarmMock(farm) : createStrategyFarmMock({}),
+  fees: !isUndefined(fees) ? fees : [],
   guardian: !isUndefined(guardian) ? createStrategyGuardianMock(guardian) : createStrategyGuardianMock({}),
   lastUpdatedAt: !isUndefined(lastUpdatedAt) ? lastUpdatedAt : now,
   userPositions: !isUndefined(userPositions) ? userPositions : [],
@@ -238,6 +240,7 @@ describe('Earn Service', () => {
   let accountService: jest.MockedObject<AccountService>;
   let providerService: jest.MockedObject<ProviderService>;
   let contractService: jest.MockedObject<ContractService>;
+  let meanApiService: jest.MockedObject<MeanApiService>;
   let earnService: EarnService;
 
   afterAll(() => {
@@ -251,10 +254,10 @@ describe('Earn Service', () => {
     accountService = createMockInstance(MockedAccountService);
     providerService = createMockInstance(MockedProviderService);
     contractService = createMockInstance(MockedContractService);
-
+    meanApiService = createMockInstance(MockedMeanApiService);
     contractService.getEarnVaultAddress = jest.fn().mockReturnValue('0xvault');
     contractService.getEarnCompanionAddress = jest.fn().mockReturnValue('0xcompanion');
-    earnService = new EarnService(sdkService, accountService, providerService, contractService);
+    earnService = new EarnService(sdkService, accountService, providerService, contractService, meanApiService);
 
     earnService.allStrategies = [createStrategyMock({})];
   });
@@ -285,6 +288,8 @@ describe('Earn Service', () => {
             assetAmount: '1000000000000000000',
             strategyId: '0xvault' as SavedSdkStrategy['id'],
             vault: '0xvault' as Lowercase<Address>,
+            amountInUsd: 1,
+            isMigration: false,
           },
         };
 
@@ -301,7 +306,7 @@ describe('Earn Service', () => {
             id: '10-0xvault-0xhash' as SdkEarnPositionId,
             pendingTransaction: '0xhash',
             permissions: {
-              '0xcompanion': [EarnPermission.INCREASE],
+              '0xcompanion': [EarnPermission.INCREASE, EarnPermission.WITHDRAW],
             },
             balances: [
               {
@@ -398,6 +403,8 @@ describe('Earn Service', () => {
           assetAmount: '1000000000000000000',
           strategyId: '0xvault' as SavedSdkStrategy['id'],
           vault: '0xvault' as Lowercase<Address>,
+          amountInUsd: 1,
+          isMigration: false,
         },
       };
 
@@ -449,12 +456,14 @@ describe('Earn Service', () => {
           status: WalletStatus.connected,
           type: WalletType.embedded,
           isAuth: true,
+          isOwner: true,
         },
         {
           address: '0xwallet-2',
           status: WalletStatus.connected,
           type: WalletType.embedded,
           isAuth: true,
+          isOwner: true,
         },
       ]);
     });
@@ -483,7 +492,7 @@ describe('Earn Service', () => {
               ],
               createdAt: now,
               permissions: {
-                '0xcompanion': [EarnPermission.INCREASE],
+                '0xcompanion': [EarnPermission.INCREASE, EarnPermission.WITHDRAW],
               },
               history: [
                 {
@@ -557,6 +566,8 @@ describe('Earn Service', () => {
               positionId: '10-0xvault-20' as SdkEarnPositionId,
               strategyId: '0xvault' as SavedSdkStrategy['id'],
               vault: '0xvault' as Lowercase<Address>,
+              amountInUsd: 1,
+              isMigration: false,
             } satisfies EarnCreateTypeData['typeData'],
           },
         },
@@ -640,6 +651,8 @@ describe('Earn Service', () => {
               positionId: '10-0xvault-10',
               strategyId: '0xvault' as SavedSdkStrategy['id'],
               signedPermit: true,
+              amountInUsd: 1,
+              isMigration: false,
             } satisfies EarnIncreaseTypeData['typeData'],
           },
         },

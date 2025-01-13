@@ -3,13 +3,13 @@ import { Grid, BackControl, ContainerBox } from 'ui-library';
 import { useParams, useLocation } from 'react-router-dom';
 import usePushToHistory from '@hooks/usePushToHistory';
 import { useAppDispatch } from '@state/hooks';
-import useTrackEvent from '@hooks/useTrackEvent';
+import useAnalytics from '@hooks/useAnalytics';
 import { defineMessage, useIntl } from 'react-intl';
 import { changeRoute } from '@state/tabs/actions';
 import { EARN_PORTFOLIO, EARN_ROUTE } from '@constants/routes';
 import EarnFAQ from '@pages/earn/components/faq';
 import VaultDataFrame from '@pages/strategy-guardian-detail/data-frame';
-import Sticky from 'react-stickynode';
+import Sticky from 'balmy-fork-react-stickynode';
 import styled from 'styled-components';
 import useCurrentBreakpoint from '@hooks/useCurrentBreakpoint';
 import useEarnService from '@hooks/earn/useEarnService';
@@ -17,7 +17,7 @@ import { identifyNetwork } from '@common/utils/parsing';
 import StrategyManagement from '../strategy-management';
 import { getAllChains } from '@balmy/sdk';
 import { StrategyId } from 'common-types';
-import { resetEarnForm } from '@state/earn-management/actions';
+import { fullyResetEarnForm } from '@state/earn-management/actions';
 
 const StyledFlexGridItem = styled(Grid)`
   display: flex;
@@ -35,7 +35,7 @@ const StrategyDetailFrame = () => {
   const pushToHistory = usePushToHistory();
   const earnService = useEarnService();
   const dispatch = useAppDispatch();
-  const trackEvent = useTrackEvent();
+  const { trackEvent } = useAnalytics();
   const intl = useIntl();
   const currentBreakpoint = useCurrentBreakpoint();
   const history = useLocation();
@@ -58,6 +58,8 @@ const StrategyDetailFrame = () => {
       dispatch(changeRoute(EARN_ROUTE.key));
       pushToHistory(`/${EARN_ROUTE.key}`);
     }
+
+    dispatch(fullyResetEarnForm());
   };
 
   React.useEffect(() => {
@@ -75,8 +77,6 @@ const StrategyDetailFrame = () => {
 
   React.useEffect(() => {
     if (strategyGuardianId) {
-      dispatch(resetEarnForm());
-
       try {
         void earnService.fetchMultipleEarnPositionsFromStrategy(strategyGuardianId);
       } catch (error) {

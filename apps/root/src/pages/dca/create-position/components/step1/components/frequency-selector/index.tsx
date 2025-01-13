@@ -5,7 +5,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { useCreatePositionState } from '@state/create-position/hooks';
 import { AvailableSwapInterval } from '@types';
 import { useAppDispatch } from '@state/hooks';
-import useTrackEvent from '@hooks/useTrackEvent';
+import useAnalytics from '@hooks/useAnalytics';
 import { setFrequencyType } from '@state/create-position/actions';
 import { StyledDcaInputLabel } from '../..';
 import { capitalize } from 'lodash';
@@ -19,7 +19,7 @@ type Props = {
 
 const FrecuencySelector = ({ frequencies, handleFrequencyChange }: Props) => {
   const { frequencyType, frequencyValue } = useCreatePositionState();
-  const trackEvent = useTrackEvent();
+  const { trackEvent } = useAnalytics();
   const dispatch = useAppDispatch();
 
   const intl = useIntl();

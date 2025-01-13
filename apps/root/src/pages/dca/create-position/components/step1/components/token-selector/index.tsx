@@ -16,7 +16,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { emptyTokenWithAddress, formatCurrencyAmount, formatUsdAmount } from '@common/utils/currency';
 import { useCreatePositionState } from '@state/create-position/hooks';
 import useSelectedNetwork from '@hooks/useSelectedNetwork';
-import useTrackEvent from '@hooks/useTrackEvent';
+import useAnalytics from '@hooks/useAnalytics';
 import { useAppDispatch } from '@state/hooks';
 import { setTo, setFromValue, setFrom } from '@state/create-position/actions';
 import useReplaceHistory from '@hooks/useReplaceHistory';
@@ -55,7 +55,7 @@ type Props = {
 const TokenSelector = ({ startSelectingCoin, fromBalance, isLoadingFromBalance }: Props) => {
   const { from, to, fromValue } = useCreatePositionState();
   const selectedNetwork = useSelectedNetwork();
-  const trackEvent = useTrackEvent();
+  const { trackEvent } = useAnalytics();
   const dispatch = useAppDispatch();
   const replaceHistory = useReplaceHistory();
   const mode = useThemeMode();

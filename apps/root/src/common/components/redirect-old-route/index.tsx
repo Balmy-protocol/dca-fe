@@ -1,5 +1,5 @@
 import React from 'react';
-import useTrackEvent from '@hooks/useTrackEvent';
+import useAnalytics from '@hooks/useAnalytics';
 import { Navigate, Params, useParams } from 'react-router-dom';
 
 export interface RedirectProps {
@@ -30,7 +30,7 @@ const updateTo = (to: string, params: Readonly<Params<string>>) => {
 // Function usefull for routes close to be deprecated
 const RedirectOldRoute = ({ to, oldRoute }: RedirectProps) => {
   const params = useParams();
-  const trackEvent = useTrackEvent();
+  const { trackEvent } = useAnalytics();
 
   React.useEffect(() => {
     trackEvent('Redirect old route', { oldRoute, newRoute: to });

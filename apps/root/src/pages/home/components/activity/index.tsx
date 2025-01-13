@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import TokenIconWithNetwork from '@common/components/token-icon-with-network';
 import usePushToHistory from '@hooks/usePushToHistory';
-import useTrackEvent from '@hooks/useTrackEvent';
+import useAnalytics from '@hooks/useAnalytics';
 import useTransactionsHistory from '@hooks/useTransactionsHistory';
 import { useAppDispatch } from '@state/hooks';
 import { changeRoute } from '@state/tabs/actions';
@@ -127,7 +127,16 @@ const formatTokenElement = (txEvent: TransactionEvent): React.ReactElement => {
       return <TokenIconWithNetwork token={txEvent.data.depositToken} tokenSize={8} withShadow />;
     case TransactionEventTypes.EARN_WITHDRAW:
       const tokens = txEvent.data.withdrawn.map((withdrawn) => withdrawn.token);
-      return <ComposedTokenIcon tokens={tokens} withNetwork withShadow size={8} marginRight={4} />;
+      return (
+        <ComposedTokenIcon
+          tokens={tokens}
+          withNetwork
+          withShadow
+          size={8}
+          marginRight={4}
+          overlapRatio={tokens.length > 2 ? 0.4 : undefined}
+        />
+      );
     case TransactionEventTypes.EARN_SPECIAL_WITHDRAW:
       const specialWithdrawTokens = txEvent.data.tokens.map((token) => token.token);
       return <ComposedTokenIcon tokens={specialWithdrawTokens} withNetwork withShadow size={8} marginRight={4} />;
@@ -259,7 +268,7 @@ interface ActivityProps {
 }
 
 const Activity = ({ selectedWalletOption }: ActivityProps) => {
-  const trackEvent = useTrackEvent();
+  const { trackEvent } = useAnalytics();
   const dispatch = useAppDispatch();
   const pushToHistory = usePushToHistory();
   const showBalances = useShowBalances();

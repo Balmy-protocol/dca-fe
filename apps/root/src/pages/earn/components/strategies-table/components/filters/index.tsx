@@ -24,7 +24,7 @@ import { SetStateCallback, StrategyYieldType, Token } from 'common-types';
 import {
   resetFilters,
   setAssetFilter,
-  setFarmFilter,
+  setProtocolFilter,
   setGuardianFilter,
   setNetworkFilter,
   setRewardFilter,
@@ -270,9 +270,10 @@ interface TableFiltersProps {
   isLoading: boolean;
   variant: StrategiesTableVariants;
   disabled?: boolean;
+  setPage: (page: number) => void;
 }
 
-const TableFilters = ({ isLoading, variant, disabled }: TableFiltersProps) => {
+const TableFilters = ({ isLoading, variant, disabled, setPage }: TableFiltersProps) => {
   const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
   const dispatch = useAppDispatch();
   const intl = useIntl();
@@ -293,6 +294,7 @@ const TableFilters = ({ isLoading, variant, disabled }: TableFiltersProps) => {
 
   const onResetFilters = () => {
     dispatch(resetFilters(variant));
+    setPage(0);
   };
 
   const open = Boolean(anchorEl);
@@ -301,6 +303,7 @@ const TableFilters = ({ isLoading, variant, disabled }: TableFiltersProps) => {
   const onFilterChange = React.useCallback(
     <T,>(filter: T, action: (payload: { variant: StrategiesTableVariants; value: T }) => AnyAction) => {
       dispatch(action({ variant, value: filter }));
+      setPage(0);
     },
     []
   );
@@ -332,19 +335,19 @@ const TableFilters = ({ isLoading, variant, disabled }: TableFiltersProps) => {
       getOptionValue: (reward) => reward,
     });
 
-    const farmsFilter = createFilterControl({
-      options: strategiesParameters.farms,
-      filteredOptions: strategiesFilters.farms,
+    const protocolsFilter = createFilterControl({
+      options: strategiesParameters.protocols,
+      filteredOptions: strategiesFilters.protocols,
       summaryLabel: intl.formatMessage(
         defineMessage({
           defaultMessage: 'Protocol',
           description: 'earn.all-strategies-table.filters.protocol',
         })
       ),
-      handleFilterChange: (filter) => onFilterChange(filter, setFarmFilter),
-      getSearchParams: (farm) => [farm.name],
-      getOptionLabel: (farm) => farm.name,
-      getOptionValue: (farm) => farm.id,
+      handleFilterChange: (filter) => onFilterChange(filter, setProtocolFilter),
+      getSearchParams: (protocol) => [protocol],
+      getOptionLabel: (protocol) => protocol,
+      getOptionValue: (protocol) => protocol,
     });
 
     const networksFilter = createFilterControl({
@@ -398,7 +401,7 @@ const TableFilters = ({ isLoading, variant, disabled }: TableFiltersProps) => {
       getOptionValue: (guardian) => guardian.id,
     });
 
-    return [networksFilter, assetFilter, rewardsFilter, farmsFilter, yieldTypesFilter, guardiansFilter];
+    return [networksFilter, assetFilter, rewardsFilter, protocolsFilter, yieldTypesFilter, guardiansFilter];
   }, [intl, strategiesFilters, variant, strategiesParameters]);
 
   const hasSelectedAnyFilter = React.useMemo(
