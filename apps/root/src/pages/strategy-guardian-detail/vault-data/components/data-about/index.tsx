@@ -158,6 +158,7 @@ const DataAbout = ({ strategy }: DataAboutProps) => {
               strategy?.farm.id
                 ? intl.formatMessage(FARM_DESCRIPTION_MAP[strategy.farm.id] ?? DEFAULT_FARM_DESCRIPTION, {
                     asset: strategy.asset.symbol,
+                    br: <br />,
                   })
                 : intl.formatMessage(DEFAULT_FARM_DESCRIPTION)
             }

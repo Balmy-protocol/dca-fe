@@ -13,7 +13,6 @@ interface AllStrategiesTableToolbarProps {
   handleSearchChange: (search: string) => void;
   variant: StrategiesTableVariants;
   strategiesCount: number;
-  disabled?: boolean;
 }
 
 const StyledTextField = styled(TextField)`
@@ -28,7 +27,6 @@ const AllStrategiesTableToolbar = ({
   handleSearchChange,
   variant,
   strategiesCount,
-  disabled,
 }: AllStrategiesTableToolbarProps) => {
   const intl = useIntl();
 
@@ -37,6 +35,11 @@ const AllStrategiesTableToolbar = ({
     () => getDelayedWithdrawals({ userStrategies }).length > 0,
     [userStrategies]
   );
+
+  React.useEffect(() => {
+    // Having an uncontrolled input, the value will be stored in redux and not displayed in the input, so we need to clear it when the page is loaded
+    handleSearchChange('');
+  }, []);
 
   return (
     <ContainerBox justifyContent="space-between" alignItems="end" flexWrap="wrap" gap={3}>
@@ -100,9 +103,8 @@ const AllStrategiesTableToolbar = ({
                 e.stopPropagation();
               }
             }}
-            disabled={disabled}
           />
-          <TableFilters isLoading={isLoading} variant={variant} disabled={disabled} />
+          <TableFilters isLoading={isLoading} variant={variant} />
         </ContainerBox>
       </ContainerBox>
     </ContainerBox>
