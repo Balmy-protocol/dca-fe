@@ -36,6 +36,11 @@ const AllStrategiesTableToolbar = ({
     [userStrategies]
   );
 
+  React.useEffect(() => {
+    // Having an uncontrolled input, the value will be stored in redux and not displayed in the input, so we need to clear it when the page is loaded
+    handleSearchChange('');
+  }, []);
+
   return (
     <ContainerBox justifyContent="space-between" alignItems="end" flexWrap="wrap" gap={3}>
       {variant === StrategiesTableVariants.ALL_STRATEGIES ? (
