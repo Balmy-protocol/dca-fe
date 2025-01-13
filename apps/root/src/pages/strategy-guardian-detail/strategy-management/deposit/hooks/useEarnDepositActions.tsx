@@ -42,13 +42,15 @@ import useEarnService from '@hooks/earn/useEarnService';
 import { PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import useContractService from '@hooks/useContractService';
 import { parseNumberUsdPriceToBigInt, parseUsdPrice } from '@common/utils/currency';
+import { setTriggerSteps } from '@state/earn-management/actions';
+import { useAppDispatch } from '@state/hooks';
 
 interface UseEarnDepositActionParams {
   strategy?: DisplayStrategy;
 }
 
 const useEarnDepositActions = ({ strategy }: UseEarnDepositActionParams) => {
-  const { asset: baseAsset, depositAsset, depositAmount, depositAssetAmount } = useEarnManagementState();
+  const { asset: baseAsset, depositAsset, depositAmount, depositAssetAmount, triggerSteps } = useEarnManagementState();
   const intl = useIntl();
   const activeWallet = useActiveWallet();
   const { trackEvent, trackEarnDeposit } = useAnalytics();
@@ -65,6 +67,7 @@ const useEarnDepositActions = ({ strategy }: UseEarnDepositActionParams) => {
   const [, setModalLoading, setModalError, setModalClosed] = useTransactionModal();
   const asset = depositAsset || baseAsset;
   const assetAmountInUnits = depositAssetAmount || depositAmount;
+  const dispatch = useAppDispatch();
 
   const onDeposit = React.useCallback(async () => {
     if (!asset || !assetAmountInUnits || !activeWallet?.address || !strategy || !baseAsset || !depositAmount) return;
@@ -833,6 +836,17 @@ const useEarnDepositActions = ({ strategy }: UseEarnDepositActionParams) => {
         console.error('Error building steps', error);
       });
   }, [asset, assetAmountInUnits, buildSteps]);
+
+  React.useEffect(() => {
+    if (triggerSteps) {
+      if (!asset || assetAmountInUnits === '' || !assetAmountInUnits) {
+        return;
+      }
+      // hasTriggeredSteps.current = true;
+      handleMultiSteps();
+      dispatch(setTriggerSteps(false));
+    }
+  }, [triggerSteps, asset?.address, assetAmountInUnits, handleMultiSteps]);
 
   const currentTransactionStep = React.useMemo(() => {
     const foundStep = find(transactionsToExecute, { done: false });

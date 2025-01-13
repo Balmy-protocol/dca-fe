@@ -51,6 +51,19 @@ export default class PriceService {
     this.sdkService = sdkService;
   }
 
+  async getUsdCurrentPrices(tokens: Token[]) {
+    if (!tokens.length) {
+      return {};
+    }
+
+    return this.sdkService.sdk.priceService.getCurrentPrices({
+      tokens: tokens.map((token) => ({
+        chainId: token.chainId,
+        token: token.address,
+      })),
+    });
+  }
+
   // TOKEN METHODS
   async getUsdHistoricPrice(tokens: Token[], date?: string, chainId?: number) {
     if (!tokens.length) {

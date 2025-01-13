@@ -10,6 +10,8 @@ import {
   setDepositAsset,
   setDepositAssetAmount,
   fullyResetEarnForm,
+  setOneClickMigrationSettings,
+  setTriggerSteps,
 } from './actions';
 
 export interface EarnManagementState {
@@ -20,6 +22,7 @@ export interface EarnManagementState {
   withdrawAmount?: string;
   withdrawRewards: boolean;
   chainId?: number;
+  triggerSteps?: boolean;
 }
 
 export const initialState: EarnManagementState = {
@@ -30,6 +33,7 @@ export const initialState: EarnManagementState = {
   withdrawAmount: undefined,
   withdrawRewards: false,
   chainId: undefined,
+  triggerSteps: false,
 };
 
 export default createReducer(initialState, (builder) => {
@@ -52,6 +56,15 @@ export default createReducer(initialState, (builder) => {
     })
     .addCase(setWithdrawRewards, (state, { payload }) => {
       state.withdrawRewards = payload;
+    })
+    .addCase(setOneClickMigrationSettings, (state, { payload }) => {
+      state.asset = payload.paramUnderlyingAsset;
+      state.depositAmount = payload.paramUnderlyingAmount;
+      state.depositAsset = payload.paramAssetToDeposit;
+      state.depositAssetAmount = payload.depositAmount;
+    })
+    .addCase(setTriggerSteps, (state, { payload }) => {
+      state.triggerSteps = payload;
     })
     .addCase(resetEarnForm, (state) => {
       return {

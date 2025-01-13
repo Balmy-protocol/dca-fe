@@ -59,7 +59,7 @@ const StrategyManagement = ({ chainId, strategyGuardianId }: StrategyManagementP
   );
 
   React.useEffect(() => {
-    if (strategy?.asset.address !== asset?.address) {
+    if (strategy?.asset && asset && strategy.asset.address !== asset.address) {
       dispatch(fullyResetEarnForm());
     }
     if (strategy?.asset && !asset) dispatch(setAsset(strategy.asset));
