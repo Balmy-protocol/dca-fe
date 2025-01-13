@@ -156,7 +156,9 @@ const DataAbout = ({ strategy }: DataAboutProps) => {
             }
             content={
               strategy?.farm.id
-                ? intl.formatMessage(FARM_DESCRIPTION_MAP[strategy.farm.id] ?? DEFAULT_FARM_DESCRIPTION)
+                ? intl.formatMessage(FARM_DESCRIPTION_MAP[strategy.farm.id] ?? DEFAULT_FARM_DESCRIPTION, {
+                    asset: strategy.asset.symbol,
+                  })
                 : intl.formatMessage(DEFAULT_FARM_DESCRIPTION)
             }
             isLoading={isLoading}
