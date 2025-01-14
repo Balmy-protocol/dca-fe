@@ -1175,6 +1175,7 @@ describe('Earn Service', () => {
           const transaction = {
             hash: '0xhash',
             type: TransactionTypes.earnCreate,
+            addedTime: now + 1000,
             typeData: {
               positionId: '10-0xvault-10' as SdkEarnPositionId,
               strategyId: '0xvault' as SavedSdkStrategy['id'],

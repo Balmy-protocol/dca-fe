@@ -1242,9 +1242,11 @@ export class EarnService extends EventsManager<EarnServiceData> {
     if (!isEarnType(transaction)) return;
     const existingUserStrategy = this.userStrategies.find((s) => s.id === transaction.typeData.positionId);
     const isValidCreateTransaction = !existingUserStrategy && transaction.type === TransactionTypes.earnCreate;
-    const isValidTransaction =
-      existingUserStrategy && existingUserStrategy.lastUpdatedAtFromApi < transaction.addedTime;
-    if (!isValidCreateTransaction && !isValidTransaction) return;
+    const isValidNonCreateTransaction =
+      existingUserStrategy &&
+      transaction.type !== TransactionTypes.earnCreate &&
+      existingUserStrategy.lastUpdatedAtFromApi < transaction.addedTime;
+    if (!isValidCreateTransaction && !isValidNonCreateTransaction) return;
 
     this.handleTransaction(transaction);
   }
