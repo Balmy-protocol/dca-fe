@@ -50,13 +50,13 @@ export default function useElegibilityCriteria(): {
     const fetchedAchievements = await accountService.getElegibilityAchievements();
     const processedElegibleWallets = processAchievements(fetchedAchievements, wallets);
     setElegibleWallets(processedElegibleWallets);
-
+    const elegibleAndOwnedAddress = processedElegibleWallets.find((wallet) => wallet.isOwner)?.address;
     if (processedElegibleWallets.length === 0) {
       setElegibilityStatus({ status: ElegibilityConfirmationStatus.NOT_ELIGIBLE });
-    } else if (processedElegibleWallets.some((wallet) => wallet.isOwner)) {
+    } else if (elegibleAndOwnedAddress) {
       setElegibilityStatus({
         status: ElegibilityConfirmationStatus.ELIGIBLE,
-        elegibleAndOwnedAddress: processedElegibleWallets[0].address,
+        elegibleAndOwnedAddress,
       });
     } else {
       setElegibilityStatus({
