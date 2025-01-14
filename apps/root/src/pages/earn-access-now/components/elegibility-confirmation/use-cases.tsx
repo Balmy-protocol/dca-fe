@@ -20,7 +20,7 @@ import { EARN_ROUTE } from '@constants/routes';
 import Address from '@common/components/address';
 import useWallet from '@hooks/useWallet';
 import { Wallet, WalletStatus } from '@types';
-import { getDisplayWallet } from '@common/utils/parsing';
+import { getDisplayWallet, trimAddress } from '@common/utils/parsing';
 import useAccountService from '@hooks/useAccountService';
 import { Address as ViemAddress } from 'viem';
 import { ElegibilityStatus } from '@hooks/earn/useElegibilityCriteria';
@@ -139,7 +139,7 @@ export const NotEligibleStatus = () => {
   );
 };
 
-export const ElegibleCase = ({ elegibleWallets }: { elegibleWallets: Wallet[] }) => (
+export const ElegibleCase = ({ elegibleAndOwnedAddress }: { elegibleAndOwnedAddress?: ViemAddress }) => (
   <>
     <TitleContainer>
       <StyledTitle>
@@ -153,13 +153,13 @@ export const ElegibleCase = ({ elegibleWallets }: { elegibleWallets: Wallet[] })
           description="earn-access-now.eligibility.confirmation.eligible.description"
           defaultMessage="Your wallet {walletAddress} meets the eligibility criteria. <b>You now have full access to Earn with all your connected wallets</b>. Start exploring yield strategies today!"
           values={{
-            walletAddress: getDisplayWallet(elegibleWallets[0]),
+            walletAddress: trimAddress(elegibleAndOwnedAddress || ''),
             b: (chunks: React.ReactNode) => <b>{chunks}</b>,
           }}
         />
       </StyledDescription>
     </TitleContainer>
-    <ClaimEarnButton elegibleAndOwnedAddress={elegibleWallets[0].address} />
+    <ClaimEarnButton elegibleAndOwnedAddress={elegibleAndOwnedAddress} />
   </>
 );
 
