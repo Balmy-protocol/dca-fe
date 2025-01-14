@@ -92,7 +92,7 @@ const StyledComingSoonContainer = styled(ContainerBox)`
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const ComingSoon = () => (
   <StyledComingSoonContainer>
-    <FormattedMessage defaultMessage="Soon!" description="navigation.earn.coming-soon" />
+    <FormattedMessage defaultMessage="Join now!" description="navigation.earn.join-now" />
   </StyledComingSoonContainer>
 );
 
