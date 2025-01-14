@@ -716,6 +716,7 @@ export default class AccountService extends EventsManager<AccountServiceData> {
       await this.meanApiService.claimEarnInviteCode({ inviteCode, accountId: user.id, signature });
       this.earlyAccessEnabled = true;
 
+      void this.tierService.pollUser();
       return { status: 200 };
     } catch (error: unknown) {
       const errorResponse = error as { response?: { status: number; data?: { message?: string } } };
