@@ -154,6 +154,7 @@ const createStrategyMock = ({
 
 const createEarnPositionMock = ({
   lastUpdatedAt,
+  lastUpdatedAtFromApi,
   createdAt,
   pendingTransaction,
   id,
@@ -167,6 +168,7 @@ const createEarnPositionMock = ({
   hasFetchedHistory,
 }: Partial<SavedSdkEarnPosition> = {}): SavedSdkEarnPosition => ({
   lastUpdatedAt: !isUndefined(lastUpdatedAt) ? lastUpdatedAt : now,
+  lastUpdatedAtFromApi: !isUndefined(lastUpdatedAtFromApi) ? lastUpdatedAtFromApi : now,
   createdAt: !isUndefined(createdAt) ? createdAt : now - 10,
   pendingTransaction: !isUndefined(pendingTransaction) ? pendingTransaction : undefined,
   id: !isUndefined(id) ? id : '10-0xvault-99',
@@ -1103,6 +1105,122 @@ describe('Earn Service', () => {
               // eslint-disable-next-line jest/no-standalone-expect
               expect(found).toEqual(strategy);
             });
+          });
+        });
+      });
+    });
+  });
+
+  describe('handleStoredTransaction', () => {
+    let spyHandleTransaction: jest.SpyInstance;
+
+    beforeEach(() => {
+      spyHandleTransaction = jest.spyOn(earnService, 'handleTransaction');
+    });
+
+    describe('when the position does not exist', () => {
+      beforeEach(() => {
+        earnService.userStrategies = [createEarnPositionMock({ id: '1-0xunrelated-0' })];
+      });
+      it('should add the position for create earn transactions', () => {
+        const transaction = {
+          from: '0xwallet-1',
+          hash: '0xhash',
+          type: TransactionTypes.earnCreate,
+          chainId: 10,
+          typeData: {
+            asset: {
+              ...createSdkTokenWithWithdrawTypesMock({}),
+              price: 1,
+              chainId: 10,
+              chainAddresses: [],
+              type: TokenType.ERC20_TOKEN,
+              underlyingTokens: [],
+            },
+            assetAmount: '1000000000000000000',
+            positionId: '10-0xvault-10' as SdkEarnPositionId,
+            strategyId: '0xvault' as SavedSdkStrategy['id'],
+            vault: '0xvault' as Lowercase<Address>,
+            amountInUsd: 1,
+            isMigration: false,
+          } satisfies EarnCreateTypeData['typeData'],
+        };
+
+        earnService.handleStoredTransaction(transaction as unknown as TransactionDetails);
+        expect(spyHandleTransaction).toHaveBeenCalled();
+        expect(earnService.userStrategies).toHaveLength(2);
+        expect(earnService.userStrategies.find((s) => s.id === '10-0xvault-10')).toBeDefined();
+      });
+      it('should not handle transaction non create earn transactions', () => {
+        const transaction = {
+          hash: '0xhash',
+          type: TransactionTypes.earnWithdraw,
+          typeData: {
+            positionId: '10-0xvault-20',
+            strategyId: '0xvault' as `${number}-${Lowercase<string>}-${number}`,
+          },
+        };
+
+        earnService.handleStoredTransaction(transaction as unknown as TransactionDetails);
+        expect(spyHandleTransaction).not.toHaveBeenCalled();
+      });
+    });
+
+    describe('when the position exists', () => {
+      beforeEach(() => {
+        earnService.userStrategies = [createEarnPositionMock({ id: '10-0xvault-10', lastUpdatedAtFromApi: now })];
+      });
+      describe('when the transaction is a create earn transaction', () => {
+        it('should not handle the transaction', () => {
+          const transaction = {
+            hash: '0xhash',
+            type: TransactionTypes.earnCreate,
+            typeData: {
+              positionId: '10-0xvault-10' as SdkEarnPositionId,
+              strategyId: '0xvault' as SavedSdkStrategy['id'],
+            },
+          };
+
+          earnService.handleStoredTransaction(transaction as unknown as TransactionDetails);
+          expect(spyHandleTransaction).not.toHaveBeenCalled();
+        });
+      });
+      describe('when the transaction is a not create earn transaction', () => {
+        describe('and the timestamp is greater than the last updated at from the api', () => {
+          it('should handle the transaction', () => {
+            const transaction = {
+              hash: '0xhash',
+              type: TransactionTypes.earnWithdraw,
+              addedTime: now + 1000,
+              typeData: {
+                withdrawn: [
+                  {
+                    token: toToken({ ...createSdkTokenWithWithdrawTypesMock({}), chainId: 10 }),
+                    amount: '500000000000000000',
+                    withdrawType: WithdrawType.IMMEDIATE,
+                  },
+                ],
+                positionId: '10-0xvault-10' as SdkEarnPositionId,
+                strategyId: '0xvault' as SavedSdkStrategy['id'],
+              },
+            };
+            earnService.handleStoredTransaction(transaction as unknown as TransactionDetails);
+            expect(spyHandleTransaction).toHaveBeenCalled();
+          });
+        });
+        describe('and the timestamp is less than the last updated at from the api', () => {
+          it('should not handle the transaction', () => {
+            const transaction = {
+              hash: '0xhash',
+              type: TransactionTypes.earnWithdraw,
+              addedTime: now - 1000,
+              typeData: {
+                positionId: '10-0xvault-10' as SdkEarnPositionId,
+                strategyId: '0xvault' as SavedSdkStrategy['id'],
+              },
+            };
+            earnService.handleStoredTransaction(transaction as unknown as TransactionDetails);
+            expect(spyHandleTransaction).not.toHaveBeenCalled();
           });
         });
       });

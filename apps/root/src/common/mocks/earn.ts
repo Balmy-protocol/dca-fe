@@ -212,6 +212,7 @@ export const createEmptyEarnPosition = (strategy: DisplayStrategy, owner: Addres
   id: `0-${owner}-0` as `${number}-0x${Lowercase<string>}-${number}`,
   createdAt: nowInSeconds(),
   lastUpdatedAt: nowInSeconds(),
+  lastUpdatedAtFromApi: nowInSeconds(),
   owner,
   permissions: {},
   strategy: { ...strategy, userPositions: [] },

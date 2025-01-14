@@ -100,7 +100,6 @@ export const processConfirmedTransactionsForEarn = createAppAsyncThunk<void, voi
     const transactionService = web3Service.getTransactionService();
     const earnService = web3Service.getEarnService();
     const priceService = web3Service.getPriceService();
-    const earnIndexingBlocks = transactionService.getEarnIndexingBlocks();
     const state = getState().transactions;
 
     const confirmedTransactions = values(state)
@@ -111,65 +110,59 @@ export const processConfirmedTransactionsForEarn = createAppAsyncThunk<void, voi
       .filter((tx) => !!tx.receipt);
 
     for (const tx of confirmedTransactions) {
-      const isEarnNotIndexed =
-        earnIndexingBlocks[tx.chainId] &&
-        tx.receipt!.blockNumber > BigInt(earnIndexingBlocks[tx.chainId].processedUpTo);
+      let extendedTypeData = {};
+      if (tx.type === TransactionTypes.earnCreate) {
+        const newEarnpositionParsedLogs = transactionService.parseLog({
+          logs: tx.receipt!.logs,
+          chainId: tx.chainId,
+          eventToSearch: 'PositionCreated',
+        });
 
-      if (isEarnNotIndexed) {
-        let extendedTypeData = {};
-        if (tx.type === TransactionTypes.earnCreate) {
-          const newEarnpositionParsedLogs = transactionService.parseLog({
-            logs: tx.receipt!.logs,
-            chainId: tx.chainId,
-            eventToSearch: 'PositionCreated',
-          });
+        const token = tx.typeData.asset;
 
-          const token = tx.typeData.asset;
+        const newEarnpositionTokenWithPricePromise = priceService.getUsdHistoricPrice(
+          [token],
+          undefined,
+          token.chainId
+        );
 
-          const newEarnpositionTokenWithPricePromise = priceService.getUsdHistoricPrice(
-            [token],
-            undefined,
-            token.chainId
-          );
+        const [newEarnPositionParsedLog, newEarnPositionTokenWithPrice] = await Promise.all([
+          newEarnpositionParsedLogs,
+          newEarnpositionTokenWithPricePromise,
+        ]);
 
-          const [newEarnPositionParsedLog, newEarnPositionTokenWithPrice] = await Promise.all([
-            newEarnpositionParsedLogs,
-            newEarnpositionTokenWithPricePromise,
-          ]);
+        const tokenPrice = parseUsdPrice(
+          token,
+          10n ** BigInt(token.decimals),
+          newEarnPositionTokenWithPrice[token.address]
+        );
+        const asset = { ...token, price: tokenPrice };
 
-          const tokenPrice = parseUsdPrice(
-            token,
-            10n ** BigInt(token.decimals),
-            newEarnPositionTokenWithPrice[token.address]
-          );
-          const asset = { ...token, price: tokenPrice };
-
-          if ('positionId' in newEarnPositionParsedLog.args) {
-            extendedTypeData = {
-              positionId: getSdkEarnPositionId({
-                chainId: tx.chainId,
-                vault: tx.typeData.vault,
-                positionId: newEarnPositionParsedLog.args.positionId,
-              }),
-              asset,
-              assetAmount: tx.typeData.assetAmount,
-              strategyId: tx.typeData.strategyId,
+        if ('positionId' in newEarnPositionParsedLog.args) {
+          extendedTypeData = {
+            positionId: getSdkEarnPositionId({
+              chainId: tx.chainId,
               vault: tx.typeData.vault,
-              amountInUsd: tx.typeData.amountInUsd,
-              isMigration: tx.typeData.isMigration,
-            } satisfies Partial<EarnCreateTypeData>['typeData'];
-          }
+              positionId: newEarnPositionParsedLog.args.positionId,
+            }),
+            asset,
+            assetAmount: tx.typeData.assetAmount,
+            strategyId: tx.typeData.strategyId,
+            vault: tx.typeData.vault,
+            amountInUsd: tx.typeData.amountInUsd,
+            isMigration: tx.typeData.isMigration,
+          } satisfies Partial<EarnCreateTypeData>['typeData'];
         }
+      }
 
-        if (isEarnType(tx)) {
-          earnService.handleTransaction({
-            ...tx,
-            typeData: {
-              ...tx.typeData,
-              ...extendedTypeData,
-            },
-          } as TransactionDetails);
-        }
+      if (isEarnType(tx)) {
+        earnService.handleStoredTransaction({
+          ...tx,
+          typeData: {
+            ...tx.typeData,
+            ...extendedTypeData,
+          },
+        } as TransactionDetails);
       }
     }
   }
