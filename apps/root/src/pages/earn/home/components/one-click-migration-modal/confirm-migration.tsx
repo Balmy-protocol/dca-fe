@@ -259,7 +259,8 @@ const OneClickMigrationConfirmMigrationContent = ({
           <Typography variant="bodyRegular" color={({ palette: { mode } }) => colors[mode].typography.typo2}>
             <FormattedMessage
               description="earn.one-click-migration.confirm-migration.subtitle"
-              defaultMessage="Main token APY stays the same. Rewards APY may vary by Guardian."
+              defaultMessage="Keep your yield-generating funds in {protocol} under 24/7 watch by top security experts! 🛡"
+              values={{ protocol: selectedFarm.farm.name }}
             />
           </Typography>
         </ContainerBox>
