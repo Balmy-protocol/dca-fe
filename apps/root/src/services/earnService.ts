@@ -715,6 +715,10 @@ export class EarnService extends EventsManager<EarnServiceData> {
 
     const userStrategy = await this.sdkService.getUserStrategy(strategyId);
 
+    if (!userStrategy) {
+      return;
+    }
+
     return this.updateUserStrategyToken(userStrategy);
   }
 

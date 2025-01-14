@@ -529,14 +529,23 @@ export default class SdkService {
     return positionsByAccount;
   }
 
-  async getUserStrategy(positionStrategyId: SdkEarnPositionId): Promise<SdkEarnPosition> {
+  async getUserStrategy(positionStrategyId: SdkEarnPositionId): Promise<SdkEarnPosition | undefined> {
     const positionsById = await this.sdk.earnService.getPositionsById({
       ids: [positionStrategyId],
       includeHistory: true,
       includeHistoricalBalancesFrom: nowInSeconds() - Number(THREE_MONTHS),
     });
 
-    return Object.values(positionsById)[0][0];
+    const positions = Object.values(positionsById);
+    if (!positions || positions.length === 0) {
+      return undefined;
+    }
+
+    if (!positions[0] || positions[0].length === 0) {
+      return undefined;
+    }
+
+    return positions[0][0];
   }
 
   buildEarnCreatePositionTx(
