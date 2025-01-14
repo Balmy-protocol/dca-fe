@@ -715,6 +715,7 @@ export default class AccountService extends EventsManager<AccountServiceData> {
     try {
       await this.meanApiService.claimEarnInviteCode({ inviteCode, accountId: user.id, signature });
       this.earlyAccessEnabled = true;
+      this.web3Service.earnService.hasFetchedUserStrategies = true;
 
       void this.tierService.pollUser();
       return { status: 200 };
@@ -798,6 +799,7 @@ export default class AccountService extends EventsManager<AccountServiceData> {
     });
 
     this.earlyAccessEnabled = true;
+    this.web3Service.earnService.hasFetchedUserStrategies = true;
     void this.tierService.pollUser();
   }
 
