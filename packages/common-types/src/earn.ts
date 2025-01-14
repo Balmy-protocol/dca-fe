@@ -100,6 +100,7 @@ export type DisplayStrategy = DistributiveOmit<Strategy, 'userPositions'> & { us
 export type BaseSavedSdkEarnPosition = DistributiveOmit<BaseSdkEarnPosition, 'historicalBalances'> & {
   historicalBalances: SdkHistoricalBalance[];
   lastUpdatedAt: Timestamp;
+  lastUpdatedAtFromApi: Timestamp;
   pendingTransaction?: string;
   hasFetchedHistory: boolean;
   history: SdkEarnPositionAction[];

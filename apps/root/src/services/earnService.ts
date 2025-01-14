@@ -363,6 +363,7 @@ export class EarnService extends EventsManager<EarnServiceData> {
     const savedUserStrategies = strategiesArray.map<SavedSdkEarnPosition>((strategy) => ({
       ...strategy,
       lastUpdatedAt,
+      lastUpdatedAtFromApi: strategy.lastUpdatedAt,
       strategy: strategy.strategy.id,
       historicalBalances: strategy.historicalBalances || [],
       hasFetchedHistory: false,
@@ -409,6 +410,7 @@ export class EarnService extends EventsManager<EarnServiceData> {
       const newStrat: SavedSdkEarnPosition = {
         ...userStrategy,
         lastUpdatedAt: nowInSeconds(),
+        lastUpdatedAtFromApi: userStrategy.lastUpdatedAt,
         strategy: userStrategy.strategy.id,
         historicalBalances: userStrategy.historicalBalances || [],
         hasFetchedHistory: hasFetchedHistory || false,
@@ -462,6 +464,7 @@ export class EarnService extends EventsManager<EarnServiceData> {
       updatedUserStrategies[userStrategyIndex] = {
         ...updatedUserStrategies[userStrategyIndex],
         lastUpdatedAt: nowInSeconds(),
+        lastUpdatedAtFromApi: userStrategy.lastUpdatedAt,
         strategy: userStrategy.strategy.id,
         historicalBalances: updatedHistoricalBalances,
         balances: updatedBalances,
@@ -1235,6 +1238,19 @@ export class EarnService extends EventsManager<EarnServiceData> {
     this.userStrategies = userStrategies;
   }
 
+  handleStoredTransaction(transaction: TransactionDetails) {
+    if (!isEarnType(transaction)) return;
+    const existingUserStrategy = this.userStrategies.find((s) => s.id === transaction.typeData.positionId);
+    const isValidCreateTransaction = !existingUserStrategy && transaction.type === TransactionTypes.earnCreate;
+    const isValidNonCreateTransaction =
+      existingUserStrategy &&
+      transaction.type !== TransactionTypes.earnCreate &&
+      existingUserStrategy.lastUpdatedAtFromApi < transaction.addedTime;
+    if (!isValidCreateTransaction && !isValidNonCreateTransaction) return;
+
+    this.handleTransaction(transaction);
+  }
+
   handleTransaction(transaction: TransactionDetails) {
     if (!isEarnType(transaction)) return;
 
@@ -1294,8 +1310,8 @@ export class EarnService extends EventsManager<EarnServiceData> {
         } = increaseEarnPositionTypeData;
         const assetAmount = BigInt(assetAmountString);
         userStrategies = [...this.userStrategies.filter((s) => s.id !== positionId)];
-        const existingUserStrategy = this.userStrategies.find((s) => s.id === positionId);
 
+        const existingUserStrategy = this.userStrategies.find((s) => s.id === positionId);
         if (!existingUserStrategy) {
           throw new Error('Could not find existing user strategy');
         }
