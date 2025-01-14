@@ -1,19 +1,10 @@
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
-import {
-  ContainerBox,
-  DividerBorder1,
-  Grid,
-  StyledNonFormContainer,
-  StyledPageTitleDescription,
-  Typography,
-  Zoom,
-} from 'ui-library';
+import { ContainerBox, Grid, StyledNonFormContainer, StyledPageTitleDescription, Typography, Zoom } from 'ui-library';
 import ElegibilityCriteria from '../components/elegibility-criteria';
 import ClaimCodeForm from '../components/claim-code-form';
 import AboutEarnGuardian from '../components/about-earn-guardian';
-import EarnEarlyAccessFAQ from '../faq';
 import { useAppDispatch } from '@state/hooks';
 import { changeRoute } from '@state/tabs/actions';
 import useAnalytics from '@hooks/useAnalytics';
@@ -85,8 +76,6 @@ const EarnAccessNowFrame = () => {
           </Grid>
         </ContainerBox>
         <AboutEarnGuardian />
-        <DividerBorder1 />
-        <EarnEarlyAccessFAQ />
       </ContainerBox>
     </StyledNonFormContainer>
   );
