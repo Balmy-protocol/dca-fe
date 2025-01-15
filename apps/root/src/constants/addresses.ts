@@ -697,5 +697,10 @@ export const SUPERCHAIN_CHAIN_IDS = [
   Chains.OPTIMISM.chainId,
   Chains.BASE.chainId,
   Chains.MODE.chainId,
-  Chains.ETHEREUM_SEPOLIA.chainId,
+  Chains.BOBA.chainId,
+  Chains.CELO.chainId,
+  Chains.BLAST.chainId,
+  Chains.opBNB.chainId,
+  Chains.MANTLE.chainId,
+  Chains.METIS_ANDROMEDA.chainId,
 ];
