@@ -228,7 +228,7 @@ const HowToLevelUpModalNextTierRequirementBoolean = ({
   const onShare = React.useCallback(() => {
     void tierService.updateTwitterShare();
     trackEvent('Tiers - Share tweet to level up');
-  }, [achievementKey, tierService, trackEvent]);
+  }, []);
 
   return (
     <ContainerBox gap={2} alignItems="center">

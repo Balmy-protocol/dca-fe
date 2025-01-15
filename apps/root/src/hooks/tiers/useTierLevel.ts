@@ -8,12 +8,16 @@ const useTierLevel = () => {
   const tierService = useTierService();
   const wallets = useWallets();
   const tierLevel = useServiceEvents<TierServiceData, TierService, 'getUserTier'>(tierService, 'getUserTier');
+  const achievements = useServiceEvents<TierServiceData, TierService, 'getAchievements'>(
+    tierService,
+    'getAchievements'
+  );
 
   const { progress, missing, details, walletsToVerify } = tierService.getProgressPercentageToNextTier();
 
   return React.useMemo(
     () => ({ tierLevel, progress, missing, details, walletsToVerify }),
-    [tierLevel, progress, missing, details, walletsToVerify, wallets]
+    [tierLevel, progress, missing, details, walletsToVerify, wallets, achievements]
   );
 };
 
