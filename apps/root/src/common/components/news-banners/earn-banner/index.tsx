@@ -51,7 +51,7 @@ const EarnBanner = () => {
       )}
       <StyledBannerContainer onClick={handleClick}>
         <Typography variant="h6Bold" color="#FFF" style={{ maxWidth: '35%', textWrap: 'wrap' }}>
-          <FormattedMessage defaultMessage="Join the BETA" description="earn.banner.join-beta" />
+          <FormattedMessage defaultMessage="Early Access LIVE!" description="earn.banner.early-access-live" />
         </Typography>
         <Typography
           variant="bodyBold"
@@ -61,7 +61,7 @@ const EarnBanner = () => {
           lineHeight="1.2"
           style={{ maxWidth: '35%', textWrap: 'wrap' }}
         >
-          <FormattedMessage defaultMessage="Coming soon!" description="earn.banner.comming-soon" />
+          <FormattedMessage defaultMessage="JOIN NOW!" description="earn.banner.join-now" />
         </Typography>
       </StyledBannerContainer>
     </>
