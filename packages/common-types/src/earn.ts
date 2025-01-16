@@ -77,7 +77,7 @@ export enum EarnPositionActionType {
 }
 
 // ---- FE Types -----
-export type TokenWithWitdrawTypes = Token & { withdrawTypes: WithdrawType[] };
+export type TokenWithWitdrawTypes = Token & { withdrawTypes: WithdrawType[]; apy?: number };
 
 export type SavedSdkStrategy = SdkStrategy & {
   lastUpdatedAt: number;
@@ -93,6 +93,8 @@ export type Strategy = DistributiveOmit<SavedSdkStrategy, 'rewards' | 'asset'> &
   lastUpdatedAt: Timestamp;
   userPositions?: SdkEarnPositionId[];
   hasFetchedHistoricalData: boolean;
+  // This will filter all tokens with apy 0
+  displayRewards: { tokens: TokenWithWitdrawTypes[]; apy: number };
 };
 
 export type DisplayStrategy = DistributiveOmit<Strategy, 'userPositions'> & { userPositions?: EarnPosition[] };

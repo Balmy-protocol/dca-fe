@@ -21,7 +21,7 @@ import {
   StrategyId,
   SdkEarnPositionId,
 } from 'common-types';
-import { compact, find, isUndefined } from 'lodash';
+import { compact, find, isNil, isUndefined } from 'lodash';
 import { NETWORKS } from '@constants';
 import { defineMessage, useIntl } from 'react-intl';
 import { isSameToken, parseNumberUsdPriceToBigInt, parseUsdPrice, toToken } from '../currency';
@@ -44,13 +44,13 @@ export const sdkStrategyTokenToToken = (
 };
 
 export const sdkStrategyTokenToTokenWithWitdrawTypes = (
-  sdkToken: SdkStrategyTokenWithWithdrawTypes,
+  sdkToken: SdkStrategyTokenWithWithdrawTypes & { apy?: number },
   tokenKey: TokenListId,
   tokenList: TokenList,
   chainId?: number
-): TokenWithWitdrawTypes => {
+): TokenWithWitdrawTypes & { apy?: number } => {
   const token = sdkStrategyTokenToToken(sdkToken, tokenKey, tokenList, chainId);
-  return { ...token, withdrawTypes: sdkToken.withdrawTypes };
+  return { ...token, withdrawTypes: sdkToken.withdrawTypes, apy: sdkToken.apy };
 };
 
 export const yieldTypeFormatter = (yieldType: StrategyYieldType) => {
@@ -92,6 +92,10 @@ export const parseAllStrategies = ({
     const { chainId } = farm;
     const network = find(NETWORKS, { chainId }) as NetworkStruct;
 
+    const rewardTokens = Object.values(farm.rewards?.tokens || []).map((reward) =>
+      sdkStrategyTokenToTokenWithWitdrawTypes(reward, `${chainId}-${reward.address}` as TokenListId, tokenList, chainId)
+    );
+
     return {
       id: id,
       chainId: chainId,
@@ -125,6 +129,10 @@ export const parseAllStrategies = ({
       },
       formattedYieldType: intl.formatMessage(yieldTypeFormatter(farm.type)),
       lastUpdatedAt: lastUpdatedAt,
+      displayRewards: {
+        tokens: rewardTokens.filter((token) => isNil(token.apy) || token.apy > 0) || [],
+        apy: farm.rewards?.apy || 0,
+      },
       ...rest,
     };
   });

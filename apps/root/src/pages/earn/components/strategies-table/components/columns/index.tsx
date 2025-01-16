@@ -235,7 +235,7 @@ export const strategyColumnConfigs: StrategyColumnConfig<StrategiesTableVariants
     label: <FormattedMessage description="earn.all-strategies-table.column.rewards" defaultMessage="Rewards" />,
     renderCell: (data) => (
       <ContainerBox gap={2} alignItems="center">
-        <ComposedTokenIcon tokens={data.rewards.tokens} size={4.5} />
+        <ComposedTokenIcon tokens={data.displayRewards.tokens} size={4.5} />
         {/* Only tier 2 and above have more rewards */}
         {data.needsTier && data.needsTier > 1 && <MoreRewardsBadge />}
       </ContainerBox>
@@ -361,7 +361,11 @@ export const portfolioColumnConfigs: StrategyColumnConfig<StrategiesTableVariant
   {
     key: StrategyColumnKeys.REWARDS,
     label: <FormattedMessage description="earn.all-strategies-table.column.rewards" defaultMessage="Rewards" />,
-    renderCell: (data) => <ComposedTokenIcon tokens={data[0].strategy.rewards.tokens} size={4.5} />,
+    renderCell: (data) => (
+      <ContainerBox gap={2} alignItems="center">
+        <ComposedTokenIcon tokens={data[0].strategy.displayRewards.tokens} size={4.5} />
+      </ContainerBox>
+    ),
     hiddenProps: {
       lgDown: true,
     },

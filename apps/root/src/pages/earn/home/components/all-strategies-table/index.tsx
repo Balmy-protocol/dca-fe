@@ -16,7 +16,7 @@ const AllStrategiesTable = () => {
     variant,
     strategies,
     columns: strategyColumnConfigs,
-    filterTierLevel: true,
+    filterTierLevel: false,
   });
 
   return (

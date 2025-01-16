@@ -20,7 +20,7 @@
     "downloadAndBuildTranslations": "yarn downloadTranslations:auth && yarn compile"
   },
   "dependencies": {
-    "@balmy/sdk": "0.6.3"
+    "@balmy/sdk": "0.6.5"
   },
   "devDependencies": {
     "@formatjs/cli": "^6.0.4",

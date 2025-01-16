@@ -69,14 +69,14 @@ const StrategyCardItem = ({ strategy, variant }: SugestedStrategyCardProps) => {
           <Typography variant="bodySmallBold" color={({ palette }) => colors[palette.mode].typography.typo2}>
             {strategy.asset.symbol}
           </Typography>
-          {strategy.rewards.tokens.length > 0 && (
+          {strategy.displayRewards.tokens.length > 0 && (
             <>
               {` · `}
               <Typography variant="bodySmallRegular">
                 <FormattedMessage description="earn.strategy-card.rewards" defaultMessage="Rewards" />
               </Typography>
               <ContainerBox gap={2} alignItems="center">
-                <ComposedTokenIcon tokens={strategy.rewards.tokens} size={4.5} />
+                <ComposedTokenIcon tokens={strategy.displayRewards.tokens} size={4.5} />
                 {/* Only tier 2 and above have more rewards */}
                 {needsTier && needsTier > 1 && <MoreRewardsBadge />}
               </ContainerBox>

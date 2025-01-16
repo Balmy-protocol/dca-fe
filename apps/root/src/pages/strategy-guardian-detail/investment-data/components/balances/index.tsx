@@ -60,7 +60,11 @@ const BalancesContainer = ({
     if (!asset) return {};
     const mergedBalances = calculateUserStrategiesBalances(userPositions);
     const mergedAssetBalance = mergedBalances.find((balance) => balance.token.address === asset.address);
-    const mergedRewardsBalances = mergedBalances.filter((balance) => balance.token.address !== asset.address);
+    const rewardsAddresses = rewards?.tokens.map((token) => token.address);
+    const mergedRewardsBalances = mergedBalances.filter(
+      (balance) =>
+        rewardsAddresses && rewardsAddresses.includes(balance.token.address) && balance.token.address !== asset.address
+    );
     return {
       assetBalance: mergedAssetBalance,
       rewardsBalances: mergedRewardsBalances,
