@@ -39,7 +39,7 @@ const WithdrawAssetInput = ({ strategy }: WithdrawAssetInputProps) => {
   const dispatch = useAppDispatch();
   const hasFetchedUserStrategies = useHasFetchedUserStrategies();
 
-  const strategyHasRewards = !!strategy?.rewards.tokens.length;
+  const strategyHasRewards = !!strategy?.displayRewards.tokens.length;
 
   const [fetchedTokenPrice] = useRawUsdPrice(strategy?.asset);
 

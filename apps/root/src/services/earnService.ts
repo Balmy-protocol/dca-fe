@@ -179,6 +179,7 @@ export class EarnService extends EventsManager<EarnServiceData> {
   logOutUser() {
     const previousStrategies = this.allStrategies;
     this.resetData();
+    this.userStrategies = [];
     this.allStrategies = previousStrategies.map((strategy) => ({
       ...strategy,
       userPositions: [],

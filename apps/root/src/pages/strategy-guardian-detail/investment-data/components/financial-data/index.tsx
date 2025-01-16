@@ -28,7 +28,11 @@ const FinancialData = ({ strategy }: FinancialDataProps) => {
         </Typography>
         <ExpectedReturns userPositions={strategy.userPositions} hidePeriods={[StrategyReturnPeriods.DAY]} />
       </ContainerBox>
-      <BalancesContainer asset={strategy?.asset} rewards={strategy?.rewards} userPositions={strategy?.userPositions} />
+      <BalancesContainer
+        asset={strategy?.asset}
+        rewards={strategy?.displayRewards}
+        userPositions={strategy?.userPositions}
+      />
       <WalletBreakdown strategy={strategy} />
       <DividerBorder1 />
       <ContainerBox gap={4} flexDirection="column">

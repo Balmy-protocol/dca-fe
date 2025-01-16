@@ -31,7 +31,7 @@ const RewardsContainer = ({ strategy }: { strategy?: DisplayStrategy }) => {
   const intl = useIntl();
   const isLoading = !strategy;
   const asset = strategy?.asset;
-  const rewards = strategy?.rewards;
+  const rewards = strategy?.displayRewards;
 
   if (!rewards?.tokens?.length && !isLoading) return null;
   return (
@@ -52,7 +52,7 @@ const RewardsContainer = ({ strategy }: { strategy?: DisplayStrategy }) => {
             defaultMessage="For each {asset} deposited, you will earn {apy}% APY in {rewards}."
             values={{
               asset: asset?.symbol,
-              apy: rewards?.apy,
+              apy: rewards?.apy.toFixed(2),
               rewards: formatListMessage({
                 items: rewards?.tokens.map((token) => token.symbol),
                 intl,

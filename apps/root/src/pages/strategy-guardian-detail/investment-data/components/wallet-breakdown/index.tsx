@@ -126,7 +126,7 @@ const WalletBreakdownTableBody = ({ strategy, showRewards }: WalletBreakdownProp
             <Tooltip title={<TokenNetworksTooltipTitle balanceTokens={balanceTokens} />}>
               <ComposedTokenIcon
                 size={6}
-                tokens={strategy.rewards.tokens}
+                tokens={strategy.displayRewards.tokens}
                 overlapRatio={0.6}
                 marginRight={1.75}
                 withShadow
@@ -140,7 +140,7 @@ const WalletBreakdownTableBody = ({ strategy, showRewards }: WalletBreakdownProp
 };
 
 const WalletBreakdown = ({ strategy }: WalletBreakdownProps) => {
-  const showRewards = !!strategy.rewards.tokens.length;
+  const showRewards = !!strategy.displayRewards.tokens.length;
   return (
     <Accordion disableGutters defaultExpanded sx={{ padding: ({ spacing }) => spacing(4) }} variant="outlined">
       <AccordionSummary>

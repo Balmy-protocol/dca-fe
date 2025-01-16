@@ -9,6 +9,7 @@ import { changeRoute } from '@state/tabs/actions';
 import {
   SetStateCallback,
   StrategyId,
+  TokenWithIcon,
   TransactionEvent,
   TransactionEventTypes,
   TransactionStatus,
@@ -53,6 +54,7 @@ import { WalletOptionValues, ALL_WALLETS } from '@common/components/wallet-selec
 import { formatUsdAmount } from '@common/utils/currency';
 import { findHubAddressVersion } from '@common/utils/parsing';
 import { HISTORY_ROUTE } from '@constants/routes';
+import { getProtocolToken, getWrappedProtocolToken } from '@common/mocks/tokens';
 
 const StyledNoActivity = styled.div`
   ${({ theme: { spacing } }) => `
@@ -117,6 +119,9 @@ interface Context {
 }
 
 const formatTokenElement = (txEvent: TransactionEvent): React.ReactElement => {
+  const protocolToken = getProtocolToken(txEvent.tx.chainId);
+  const wrappedToken = getWrappedProtocolToken(txEvent.tx.chainId);
+
   switch (txEvent.type) {
     case TransactionEventTypes.ERC20_APPROVAL:
     case TransactionEventTypes.ERC20_TRANSFER:
@@ -124,12 +129,25 @@ const formatTokenElement = (txEvent: TransactionEvent): React.ReactElement => {
       return <TokenIconWithNetwork token={txEvent.data.token} tokenSize={8} withShadow />;
     case TransactionEventTypes.EARN_CREATED:
     case TransactionEventTypes.EARN_INCREASE:
-      return <TokenIconWithNetwork token={txEvent.data.depositToken} tokenSize={8} withShadow />;
+      const depositToken = txEvent.data.depositToken;
+      let depositTokenToDisplay = depositToken;
+      if (depositToken.address === wrappedToken.address) {
+        depositTokenToDisplay = protocolToken as TokenWithIcon;
+      }
+      return <TokenIconWithNetwork token={depositTokenToDisplay} tokenSize={8} withShadow />;
     case TransactionEventTypes.EARN_WITHDRAW:
-      const tokens = txEvent.data.withdrawn.map((withdrawn) => withdrawn.token);
+      const tokens = txEvent.data.withdrawn
+        .filter((withdrawn) => withdrawn.amount.amount > 0)
+        .map((withdrawn) => withdrawn.token);
+      let withdrawTokensToDisplay = tokens;
+      if (tokens.some((token) => token.address === wrappedToken.address)) {
+        withdrawTokensToDisplay = tokens.map((token) =>
+          token.address === wrappedToken.address ? protocolToken : token
+        ) as TokenWithIcon[];
+      }
       return (
         <ComposedTokenIcon
-          tokens={tokens}
+          tokens={withdrawTokensToDisplay}
           withNetwork
           withShadow
           size={8}
