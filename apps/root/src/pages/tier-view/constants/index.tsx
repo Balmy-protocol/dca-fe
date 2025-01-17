@@ -422,7 +422,7 @@ export const TIER_REQUIREMENTS: TierRequirements[] = [
       {
         type: 'AND',
         requirements: [
-          { id: AchievementKeys.REFERRALS, value: 5 },
+          { id: AchievementKeys.REFERRALS, value: 3 },
           {
             type: 'OR',
             requirements: [
@@ -440,7 +440,7 @@ export const TIER_REQUIREMENTS: TierRequirements[] = [
       {
         type: 'AND',
         requirements: [
-          { id: AchievementKeys.REFERRALS, value: 3 },
+          { id: AchievementKeys.REFERRALS, value: 1 },
           {
             type: 'OR',
             requirements: [
