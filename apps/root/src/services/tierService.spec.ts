@@ -163,7 +163,7 @@ describe('Tier Service', () => {
         ],
       } as User;
 
-      tierService.setReferrals(['0x1', '0x2', '0x3']); // 3 referrals
+      tierService.setReferrals(['0x1']); // 1 referral for tier 2
 
       tierService.setAchievements(['0xaddress'], {}, true);
       const result = tierService.calculateUserTier(user);
@@ -180,7 +180,7 @@ describe('Tier Service', () => {
         ],
       } as User;
 
-      tierService.setReferrals(['0x1', '0x2', '0x3']); // 3 referrals
+      tierService.setReferrals(['0x1']); // 1 referral for tier 2
       tierService.setAchievements(
         ['0x1'],
         {
@@ -202,7 +202,7 @@ describe('Tier Service', () => {
         ],
       } as User;
 
-      tierService.setReferrals(['0x1', '0x2', '0x3', '0x4', '0x5']); // 5 referrals
+      tierService.setReferrals(['0x1', '0x2', '0x3']); // 3 referrals for tier 3
       tierService.setAchievements(
         ['0x1'],
         {
@@ -252,7 +252,7 @@ describe('Tier Service', () => {
       } as AccountService;
 
       web3Service.accountService = mockAccountService;
-      tierService.setReferrals(['0x1', '0x2']); // 2 referrals
+      tierService.setReferrals(['0x1']); // 1 referral
     });
 
     it('should return empty objects when no user is set', () => {
@@ -279,10 +279,9 @@ describe('Tier Service', () => {
       expect(result.missing).toEqual({
         [AchievementKeys.SWAP_VOLUME]: { current: 500, required: 1000 },
         [AchievementKeys.TWEET]: { current: 0, required: 1 },
-        [AchievementKeys.REFERRALS]: { current: 2, required: 3 },
       });
       expect(result.details).toEqual({
-        [AchievementKeys.REFERRALS]: { current: 2, required: 3 },
+        [AchievementKeys.REFERRALS]: { current: 1, required: 1 },
         [AchievementKeys.SWAP_VOLUME]: { current: 500, required: 1000 },
         [AchievementKeys.TWEET]: { current: 0, required: 1 },
       });
@@ -325,7 +324,7 @@ describe('Tier Service', () => {
         [AchievementKeys.TWEET]: { current: 0, required: 1 },
       });
       expect(result.details).toEqual({
-        [AchievementKeys.REFERRALS]: { current: 3, required: 3 },
+        [AchievementKeys.REFERRALS]: { current: 3, required: 1 },
         [AchievementKeys.SWAP_VOLUME]: { current: 1200, required: 1000 },
         [AchievementKeys.TWEET]: { current: 0, required: 1 },
       });
@@ -347,7 +346,7 @@ describe('Tier Service', () => {
       } as AccountService;
 
       web3Service.accountService = mockAccountService;
-      tierService.setReferrals(['0x123', '0x456']); // 2 referrals
+      tierService.setReferrals([]); // 0 referrals
       tierService.setAchievements(
         ['0x1'],
         {
@@ -359,16 +358,16 @@ describe('Tier Service', () => {
       const result = tierService.getProgressPercentageToNextTier();
 
       // For Tier 2, we need:
-      // - 3 referrals (currently have 2/3 = 66.67%)
+      // - 3 referrals (currently have 0/1 = 0%)
       // - AND either 1000 swap volume OR 1 tweet (currently have 500/1000 = 50%)
-      expect(result.progress).toBe(58.33);
+      expect(result.progress).toBe(25);
       expect(result.missing).toEqual({
-        [AchievementKeys.REFERRALS]: { current: 2, required: 3 },
+        [AchievementKeys.REFERRALS]: { current: 0, required: 1 },
         [AchievementKeys.SWAP_VOLUME]: { current: 500, required: 1000 },
         [AchievementKeys.TWEET]: { current: 0, required: 1 },
       });
       expect(result.details).toEqual({
-        [AchievementKeys.REFERRALS]: { current: 2, required: 3 },
+        [AchievementKeys.REFERRALS]: { current: 0, required: 1 },
         [AchievementKeys.SWAP_VOLUME]: { current: 500, required: 1000 },
         [AchievementKeys.TWEET]: { current: 0, required: 1 },
       });

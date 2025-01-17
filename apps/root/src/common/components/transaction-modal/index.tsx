@@ -176,16 +176,17 @@ export const TransactionModal = ({
         </Typography>
       )}
       {errorConfig.content}
-      {errorConfig.error && 'message' in errorConfig.error && (
+      {errorConfig.error && TRANSACTION_ERRORS[getTransactionErrorCode(errorConfig.error)] ? (
         <Typography variant="bodyRegular" sx={{ wordBreak: 'break-word' }}>
-          {TRANSACTION_ERRORS[getTransactionErrorCode(errorConfig.error)] || (
-            <FormattedMessage
-              description="unkown_error"
-              defaultMessage="Unknown error: {message}"
-              values={{ message: errorConfig.error?.message }}
-            />
-          )}
+          {TRANSACTION_ERRORS[getTransactionErrorCode(errorConfig.error)]}
         </Typography>
+      ) : (
+        errorConfig.error &&
+        'message' in errorConfig.error && (
+          <Typography variant="bodyRegular" sx={{ wordBreak: 'break-word' }}>
+            {errorConfig.error?.message}
+          </Typography>
+        )
       )}
       {shouldTrackError(errorConfig.error as unknown as Error) && (
         <Button

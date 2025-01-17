@@ -40,6 +40,7 @@ import { mapPermission } from '@balmy/sdk/dist/services/earn/earn-service';
 import { orderBy, uniqBy } from 'lodash';
 import MeanApiService from './meanApiService';
 import { getProtocolToken, getWrappedProtocolToken } from '@common/mocks/tokens';
+import { CustomTransactionErrorNames } from '@common/utils/errors';
 
 export interface EarnServiceData {
   allStrategies: SavedSdkStrategy[];
@@ -914,13 +915,20 @@ export class EarnService extends EventsManager<EarnServiceData> {
     deadline: bigint;
   }) {
     const signature = await this.accountService.getWalletVerifyingSignature({});
-    return this.meanApiService.getEarnStrategySignature({
-      signature,
-      accountId,
-      strategyId,
-      toValidate: address,
-      deadline,
-    });
+    try {
+      return await this.meanApiService.getEarnStrategySignature({
+        signature,
+        accountId,
+        strategyId,
+        toValidate: address,
+        deadline,
+      });
+    } catch (e) {
+      console.error(e);
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      e.name = CustomTransactionErrorNames.ApiSignatureForEarnCreateTransaction;
+      throw e;
+    }
   }
 
   async signStrategyToS(address: Address, strategyId: StrategyId) {
