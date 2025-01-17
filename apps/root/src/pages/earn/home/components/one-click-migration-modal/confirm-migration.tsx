@@ -26,6 +26,7 @@ import {
 import { getLogoURL } from '@common/utils/urlParser';
 import { FeeItem } from '@pages/strategy-guardian-detail/vault-data/components/data-about';
 import { isNil } from 'lodash';
+import { STRATEGIES_WITH_LM_REWARDS } from '@constants/earn';
 
 const StyledTitleDataContainer = styled(ContainerBox).attrs({
   gap: 1,
@@ -70,7 +71,7 @@ const StrategyItem = ({ strategy, selected, onSelect }: StrategyItemProps) => {
           <Typography variant="h6Bold" color={({ palette }) => colors[palette.mode].typography.typo2}>
             {strategy.guardian?.name}
           </Typography>
-          {strategy.needsTier && strategy.needsTier > 1 && (
+          {STRATEGIES_WITH_LM_REWARDS.includes(strategy.id) && (
             <ContainerBox gap={1} alignItems="center">
               <MovingStarIcon sx={({ palette }) => ({ color: colors[palette.mode].semantic.success.darker })} />
               <Typography

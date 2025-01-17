@@ -24,7 +24,7 @@ import Address from '@common/components/address';
 import { useThemeMode } from '@state/config/hooks';
 import TokenIconWithNetwork from '@common/components/token-icon-with-network';
 import TokenAmount from '@common/components/token-amount';
-import { PROMOTED_STRATEGIES_IDS } from '@constants/earn';
+import { PROMOTED_STRATEGIES_IDS, STRATEGIES_WITH_LM_REWARDS } from '@constants/earn';
 import { isNil } from 'lodash';
 
 export enum StrategyColumnKeys {
@@ -237,7 +237,7 @@ export const strategyColumnConfigs: StrategyColumnConfig<StrategiesTableVariants
       <ContainerBox gap={2} alignItems="center">
         <ComposedTokenIcon tokens={data.displayRewards.tokens} size={4.5} />
         {/* Only tier 2 and above have more rewards */}
-        {data.needsTier && data.needsTier > 1 && <MoreRewardsBadge />}
+        {STRATEGIES_WITH_LM_REWARDS.includes(data.id) && <MoreRewardsBadge />}
       </ContainerBox>
     ),
   },
