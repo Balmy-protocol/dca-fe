@@ -305,7 +305,9 @@ const OneClickMigrationConfirmMigrationContent = ({
             <StyledTitleData>
               <FormattedMessage description="earn.one-click-migration.confirm-migration.apy" defaultMessage="APY" />
             </StyledTitleData>
-            <StyledTitleDataValue>{selectedFarm.farm.apy.toFixed(2)}%</StyledTitleDataValue>
+            <StyledTitleDataValue>
+              {(selectedFarm.farm.apy + (selectedFarm.farm.rewards?.apy ?? 0)).toFixed(2)}%
+            </StyledTitleDataValue>
           </StyledTitleDataContainer>
         </ContainerBox>
       </ContainerBox>
