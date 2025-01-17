@@ -14,6 +14,14 @@ const StyledLink = styled(Link)`
 
 const UNKNOWN_ERROR_CODE = -9999999;
 
+export enum CustomTransactionErrorNames {
+  ApiSignatureForEarnCreateTransaction = 'ApiSignatureForEarnCreateTransaction',
+}
+
+enum CustomTransactionErrorCodes {
+  API_SIGNATURE_FOR_EARN_CREATE_TRANSACTION = 900000,
+}
+
 export const TRANSACTION_ERRORS = {
   4001: <FormattedMessage description="rejected_transaction" defaultMessage="You rejected the transaction" />,
   4100: (
@@ -38,6 +46,12 @@ export const TRANSACTION_ERRORS = {
         <FormattedMessage description="ourDiscord" defaultMessage="our Discord" />
       </StyledLink>
     </>
+  ),
+  [CustomTransactionErrorCodes.API_SIGNATURE_FOR_EARN_CREATE_TRANSACTION]: (
+    <FormattedMessage
+      description="transaction-error.api_signature_for_earn_create_transaction"
+      defaultMessage="There was an error generating the transaction data, if you have just upgraded your tier, please try again in a few minutes"
+    />
   ),
   [UNKNOWN_ERROR_CODE]: undefined,
 };
@@ -84,6 +98,9 @@ export const getTransactionErrorCode = (error?: ErrorConfig['error']) => {
     // Viem Errors
     case 'TransactionExecutionError':
       return getTransactionExecutionErrorCode(error as unknown as TransactionExecutionErrorType);
+    // Custom Errors
+    case CustomTransactionErrorNames.ApiSignatureForEarnCreateTransaction as string:
+      return CustomTransactionErrorCodes.API_SIGNATURE_FOR_EARN_CREATE_TRANSACTION;
     default:
       return UNKNOWN_ERROR_CODE;
   }
