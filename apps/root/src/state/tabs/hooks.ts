@@ -2,7 +2,7 @@ import { useAppSelector } from '@state/hooks';
 import { RootState } from '../index';
 import { shallowEqual } from 'react-redux';
 
-export function useCurrentRoute() {
+export function useRoute() {
   const { currentRoute, prevRoute } = useAppSelector(
     (state: RootState) => ({
       currentRoute: state.tabs.currentRoute,

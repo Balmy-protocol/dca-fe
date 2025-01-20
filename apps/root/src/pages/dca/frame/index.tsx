@@ -8,7 +8,7 @@ import {
   Typography,
 } from 'ui-library';
 import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
-import { useCurrentRoute } from '@state/tabs/hooks';
+import { useRoute } from '@state/tabs/hooks';
 import useAnalytics from '@hooks/useAnalytics';
 import CreatePosition from '../create-position';
 import Positions from '../positions';
@@ -24,7 +24,7 @@ import { FormattedMessage } from 'react-intl';
 interface DcaFrameProps {}
 
 const DcaFrame = ({}: DcaFrameProps) => {
-  const { currentRoute } = useCurrentRoute();
+  const { currentRoute } = useRoute();
   const { trackEvent } = useAnalytics();
   const hasLoadedPairs = useHasFetchedPairs();
   const positionService = usePositionService();

@@ -15,7 +15,7 @@ import {
 import { useAppDispatch } from '@hooks/state';
 import usePushToHistory from '@hooks/usePushToHistory';
 import { changeRoute } from '@state/tabs/actions';
-import { useCurrentRoute } from '@state/tabs/hooks';
+import { useRoute } from '@state/tabs/hooks';
 import React, { useCallback } from 'react';
 import { defineMessage, useIntl } from 'react-intl';
 import {
@@ -57,7 +57,7 @@ import LevelUpModal from '@common/components/level-up-modal';
 import { resetForm as resetAggregatorForm } from '@state/aggregator/actions';
 import { resetForm as resetTransferForm } from '@state/transfer/actions';
 import { resetDcaForm } from '@state/create-position/actions';
-import { resetEarnForm } from '@state/earn-management/actions';
+import { fullyResetEarnForm } from '@state/earn-management/actions';
 
 const helpOptions = [
   {
@@ -115,7 +115,7 @@ const SECRET_MENU_CLICKS = 6;
 const Navigation = ({ children }: React.PropsWithChildren) => {
   const dispatch = useAppDispatch();
   const pushToHistory = usePushToHistory();
-  const { currentRoute, prevRoute } = useCurrentRoute();
+  const { currentRoute, prevRoute } = useRoute();
   const intl = useIntl();
   const mode = useThemeMode();
   const [secretMenuClicks, setSecretMenuClicks] = React.useState(
@@ -167,9 +167,9 @@ const Navigation = ({ children }: React.PropsWithChildren) => {
       dispatch(resetDcaForm());
     }
     if (prevRoute === EARN_PORTFOLIO.key && currentRoute !== EARN_PORTFOLIO.key) {
-      dispatch(resetEarnForm());
+      dispatch(fullyResetEarnForm());
     }
-  }, [currentRoute]);
+  }, [prevRoute, currentRoute]);
 
   const onSectionClick = useCallback(
     (section: Section, openInNewTab?: boolean) => {
