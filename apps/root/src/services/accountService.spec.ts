@@ -819,7 +819,7 @@ describe('Account Service', () => {
             isAuth: true,
             type: WalletType.external,
             status: WalletStatus.connected,
-            isOwner: false,
+            isOwner: true,
           },
         });
       });
