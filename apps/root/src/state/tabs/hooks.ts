@@ -1,8 +1,16 @@
 import { useAppSelector } from '@state/hooks';
 import { RootState } from '../index';
+import { shallowEqual } from 'react-redux';
 
 export function useCurrentRoute() {
-  return useAppSelector((state: RootState) => state.tabs.currentRoute);
+  const { currentRoute, prevRoute } = useAppSelector(
+    (state: RootState) => ({
+      currentRoute: state.tabs.currentRoute,
+      prevRoute: state.tabs.prevRoute,
+    }),
+    shallowEqual
+  );
+  return { currentRoute, prevRoute };
 }
 
 export function useOpenClosePositionTab() {

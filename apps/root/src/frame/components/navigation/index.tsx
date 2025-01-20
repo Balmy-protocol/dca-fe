@@ -54,6 +54,10 @@ import EarnGainAccessModal from '../earn-gain-access-modal';
 import useEarnAccess from '@hooks/useEarnAccess';
 import TierPill from '../tier-pill';
 import LevelUpModal from '@common/components/level-up-modal';
+import { resetForm as resetAggregatorForm } from '@state/aggregator/actions';
+import { resetForm as resetTransferForm } from '@state/transfer/actions';
+import { resetDcaForm } from '@state/create-position/actions';
+import { resetEarnForm } from '@state/earn-management/actions';
 
 const helpOptions = [
   {
@@ -111,7 +115,7 @@ const SECRET_MENU_CLICKS = 6;
 const Navigation = ({ children }: React.PropsWithChildren) => {
   const dispatch = useAppDispatch();
   const pushToHistory = usePushToHistory();
-  const currentRoute = useCurrentRoute();
+  const { currentRoute, prevRoute } = useCurrentRoute();
   const intl = useIntl();
   const mode = useThemeMode();
   const [secretMenuClicks, setSecretMenuClicks] = React.useState(
@@ -150,6 +154,22 @@ const Navigation = ({ children }: React.PropsWithChildren) => {
       dispatch(changeRoute('tier-view'));
     }
   }, []);
+
+  React.useEffect(() => {
+    // Forms reset on navigation away
+    if (prevRoute === SWAP_ROUTE.key && currentRoute !== SWAP_ROUTE.key) {
+      dispatch(resetAggregatorForm());
+    }
+    if (prevRoute === TRANSFER_ROUTE.key && currentRoute !== TRANSFER_ROUTE.key) {
+      dispatch(resetTransferForm());
+    }
+    if (prevRoute === DCA_ROUTE.key && currentRoute !== DCA_ROUTE.key) {
+      dispatch(resetDcaForm());
+    }
+    if (prevRoute === EARN_PORTFOLIO.key && currentRoute !== EARN_PORTFOLIO.key) {
+      dispatch(resetEarnForm());
+    }
+  }, [currentRoute]);
 
   const onSectionClick = useCallback(
     (section: Section, openInNewTab?: boolean) => {

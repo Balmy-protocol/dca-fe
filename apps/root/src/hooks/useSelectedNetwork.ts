@@ -12,7 +12,7 @@ function useSelectedNetwork() {
   const dcaNetwork = useDCANetwork();
   const transferNetwork = useTransferNetwork();
   const earnNetwork = useEarnManagementNetwork();
-  const currentRoute = useCurrentRoute();
+  const { currentRoute } = useCurrentRoute();
   let network: NetworkStruct | undefined;
 
   switch (currentRoute) {

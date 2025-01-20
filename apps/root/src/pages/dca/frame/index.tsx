@@ -24,7 +24,7 @@ import { FormattedMessage } from 'react-intl';
 interface DcaFrameProps {}
 
 const DcaFrame = ({}: DcaFrameProps) => {
-  const currentRoute = useCurrentRoute();
+  const { currentRoute } = useCurrentRoute();
   const { trackEvent } = useAnalytics();
   const hasLoadedPairs = useHasFetchedPairs();
   const positionService = usePositionService();
