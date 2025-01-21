@@ -11,10 +11,14 @@ const BalancesUpdater = () => {
   const tokenListByChainId = useTokenListByChainId({ curateList: true, filter: true });
   const isLoadingAllTokenLists = useIsLoadingAllTokenLists();
   const updateInterval = IntervalSetActions.balance;
+  const updatingBalances = React.useRef(false);
 
   const updateBalancesAndPrices = React.useCallback(() => {
-    if (!isLoadingAllTokenLists) {
-      void dispatch(updateBalancesPeriodically({ tokenListByChainId, updateInterval }));
+    if (!isLoadingAllTokenLists && !updatingBalances.current) {
+      updatingBalances.current = true;
+      dispatch(updateBalancesPeriodically({ tokenListByChainId, updateInterval })).then(() => {
+        updatingBalances.current = false;
+      });
     }
   }, [isLoadingAllTokenLists]);
 
