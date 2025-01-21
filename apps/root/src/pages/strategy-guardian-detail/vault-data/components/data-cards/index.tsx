@@ -1,3 +1,4 @@
+import { formatUsdAmount } from '@common/utils/currency';
 import { DisplayStrategy, Strategy } from 'common-types';
 import React from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -127,7 +128,11 @@ const DataCards = ({ strategy, dataCardsGap = 4, variant = DataCardVariants.Deta
         <DataCard
           title={<FormattedMessage defaultMessage="APY" description="earn.strategy-details.vault-data.apy" />}
           content={
-            loading ? <SkeletonDataCard /> : `${(strategy.farm.apy + (strategy.farm.rewards?.apy ?? 0)).toFixed(2)}%`
+            loading ? (
+              <SkeletonDataCard />
+            ) : (
+              `${formatUsdAmount({ amount: strategy.farm.apy + (strategy.farm.rewards?.apy ?? 0), intl })}%`
+            )
           }
           info={
             <FormattedMessage
