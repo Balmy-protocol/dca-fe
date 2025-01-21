@@ -1,4 +1,3 @@
-import React from 'react';
 import useLabelService from './useLabelService';
 import useServiceEvents from './useServiceEvents';
 import LabelService, { LabelServiceData } from '@services/labelService';
@@ -8,7 +7,7 @@ function useStoredLabels() {
 
   const storedLabels = useServiceEvents<LabelServiceData, LabelService, 'getLabels'>(labelService, 'getLabels');
 
-  return React.useMemo(() => storedLabels, [storedLabels]);
+  return storedLabels;
 }
 
 export default useStoredLabels;
