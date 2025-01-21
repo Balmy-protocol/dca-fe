@@ -114,9 +114,14 @@ const StyledBodyTableCell = styled(TableCell)<{ $hasCondition?: boolean; $hovere
   height: ${spacing(14.5)};
   padding-top: ${spacing(0.5)};
   padding-bottom: ${spacing(0.5)};
-  ${$hasCondition && `position: relative;`}
+  position: relative;
+  ${
+    $hasCondition &&
+    `
   background: linear-gradient(${$hovered ? colors[mode].background.tertiary : colors[mode].background.secondary}, ${$hovered ? colors[mode].background.tertiary : colors[mode].background.secondary}) padding-box,
               linear-gradient(to right, ${colors[mode].promoted.start}, ${colors[mode].promoted.stop}) border-box;
+  `
+  }
   border: 1px solid transparent;
   border-right: 0px;
 `}
@@ -267,7 +272,7 @@ const Row = <T extends StrategiesTableVariants>({
             $hasCondition={!!condition && !isSameTierLevel && i === 0}
             $hovered={hovered}
           >
-            {isLocked && !isSameTierLevel && i === 0 && <PromotedFlag tier={needsTier} />}
+            {isLocked && i === 0 && <PromotedFlag tier={needsTier} />}
             {isLocked && !isSameTierLevel && i === 0 && <StyledTierBadge isPromoted CurrentTierBadge={TierIcon} />}
             {renderBodyCell(column.renderCell(rowData, showBalances, tierLevel))}
           </StyledBodyTableCell>
