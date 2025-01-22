@@ -115,11 +115,6 @@ function useBuildTransactionMessages() {
           message = `Setting your ${transferedTypeData.from}:${transferedTypeData.to} position permissions`;
           break;
         }
-        case TransactionTypes.newPair: {
-          const newPairTypeData = tx.typeData;
-          message = `Creating the pair ${newPairTypeData.token0.symbol}:${newPairTypeData.token1.symbol}`;
-          break;
-        }
         case TransactionTypes.approveToken: {
           const tokenApprovalTypeData = tx.typeData;
           message = `Approving your ${tokenApprovalTypeData.token.symbol}`;
@@ -133,45 +128,6 @@ function useBuildTransactionMessages() {
             sigFigs: 4,
             intl,
           })} ${tokenApprovalExactTypeData.token.symbol}`;
-          break;
-        }
-        case TransactionTypes.eulerClaimClaimFromMigrator: {
-          const eulerClaimClaimFromMigratorTypeData = tx.typeData;
-          message = intl.formatMessage(
-            defineMessage({
-              description: 'transactionRejectedEulerClaimClaimFromMigrator',
-              defaultMessage: 'Claiming your due for {token} from the Euler Claim page',
-            }),
-            {
-              token: eulerClaimClaimFromMigratorTypeData.token.symbol,
-            }
-          );
-          break;
-        }
-        case TransactionTypes.eulerClaimPermitMany: {
-          const eulerClaimPermitManyTypeData = tx.typeData;
-          message = intl.formatMessage(
-            defineMessage({
-              description: 'transactionRejectedEulerClaimPermitMany',
-              defaultMessage: 'Allowing Mean Finance to close {positions} positions',
-            }),
-            {
-              positions: eulerClaimPermitManyTypeData.positionIds.length,
-            }
-          );
-          break;
-        }
-        case TransactionTypes.eulerClaimTerminateMany: {
-          const eulerClaimTerminateManyTypeData = tx.typeData;
-          message = intl.formatMessage(
-            defineMessage({
-              description: 'transactionRejectedEulerClaimTerminateMany',
-              defaultMessage: 'Closing {positions} positions',
-            }),
-            {
-              positions: eulerClaimTerminateManyTypeData.positionIds.length,
-            }
-          );
           break;
         }
         case TransactionTypes.claimCampaign: {

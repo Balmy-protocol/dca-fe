@@ -62,13 +62,6 @@ const PositionWarning = ({ position }: PositionWarningProps) => {
         </Link>
       </>
     );
-  } else if (position.from.symbol === 'agEUR' || position.to.symbol === 'agEUR') {
-    message = (
-      <FormattedMessage
-        description="positionagEURNotSupported"
-        defaultMessage="Due to Euler's security breach, the Angle protocol has been paused. As a consequence, oracles and swaps cannot operate reliably and have been halted."
-      />
-    );
   }
 
   if ((!!position.from.underlyingTokens.length || !!position.to.underlyingTokens.length) && position.chainId === 1) {
@@ -76,11 +69,8 @@ const PositionWarning = ({ position }: PositionWarningProps) => {
       <>
         <FormattedMessage
           description="positionEulerHack1"
-          defaultMessage="Euler has frozen the contracts after the hack, so modifying positions or withdrawing is not possible at the moment. You might be entitled to claim compensation, to do this visit the"
+          defaultMessage="Euler has experienced a security incident and your funds may be eligible for recovery. Please join our Discord and contact us through the #support channel for assistance with the recovery process."
         />
-        <Link href="https://app.balmy.xyz/euler-claim" target="_blank">
-          <FormattedMessage description="EulerClaim ClaimPage" defaultMessage="claim page" />
-        </Link>
       </>
     );
   }

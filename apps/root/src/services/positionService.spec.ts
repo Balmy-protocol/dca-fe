@@ -3549,7 +3549,6 @@ describe('Position Service', () => {
     });
 
     [
-      { type: TransactionTypes.newPair },
       { type: TransactionTypes.approveToken },
       { type: TransactionTypes.approveTokenExact },
       { type: TransactionTypes.swap },
@@ -3661,57 +3660,6 @@ describe('Position Service', () => {
       });
     });
 
-    [
-      {
-        hash: 'hash',
-        type: TransactionTypes.eulerClaimPermitMany,
-        typeData: {
-          id: 'hash',
-          positionIds: ['position-many-1', 'position-many-2'],
-          permissions: [],
-          permittedAddress: 'permittedAddress',
-        },
-      },
-      {
-        hash: 'hash',
-        type: TransactionTypes.eulerClaimTerminateMany,
-        typeData: {
-          id: 'hash',
-          positionIds: ['position-many-1', 'position-many-2'],
-          permissions: [],
-          permittedAddress: 'permittedAddress',
-        },
-      },
-    ].forEach((tx) => {
-      test(`it should update all the positions for the ${tx.type} transaction`, () => {
-        positionService.currentPositions = {
-          ...positionService.currentPositions,
-          'position-many-1': {
-            ...createPositionMock({ id: 'position-many-1' }),
-          },
-          'position-many-2': {
-            ...createPositionMock({ id: 'position-many-2' }),
-          },
-        };
-        const previousCurrentPositions = {
-          ...positionService.currentPositions,
-        };
-        positionService.setPendingTransaction(tx as unknown as TransactionDetails);
-
-        expect(positionService.currentPositions).toEqual({
-          ...previousCurrentPositions,
-          'position-many-1': {
-            ...previousCurrentPositions['position-many-1'],
-            pendingTransaction: 'hash',
-          },
-          'position-many-2': {
-            ...previousCurrentPositions['position-many-2'],
-            pendingTransaction: 'hash',
-          },
-        });
-      });
-    });
-
     test('it should add the position from the transaction if it doesnt exist', () => {
       const previousCurrentPositions = {
         ...positionService.currentPositions,
@@ -3760,7 +3708,6 @@ describe('Position Service', () => {
     });
 
     [
-      { type: TransactionTypes.newPair },
       { type: TransactionTypes.approveToken },
       { type: TransactionTypes.approveTokenExact },
       { type: TransactionTypes.swap },
@@ -3821,51 +3768,6 @@ describe('Position Service', () => {
       });
     });
 
-    [
-      {
-        hash: 'hash',
-        type: TransactionTypes.eulerClaimPermitMany,
-        typeData: {
-          id: 'hash',
-          positionIds: ['position-many-1', 'position-many-2'],
-          permissions: [],
-          permittedAddress: 'permittedAddress',
-        },
-      },
-      {
-        hash: 'hash',
-        type: TransactionTypes.eulerClaimTerminateMany,
-        typeData: {
-          id: 'hash',
-          positionIds: ['position-many-1', 'position-many-2'],
-          permissions: [],
-          permittedAddress: 'permittedAddress',
-        },
-      },
-    ].forEach((tx) => {
-      test(`it should update all the positions for the ${tx.type} transaction`, () => {
-        positionService.currentPositions = {
-          ...positionService.currentPositions,
-          'position-many-1': {
-            ...createPositionMock({ id: 'position-many-1' }),
-          },
-          'position-many-2': {
-            ...createPositionMock({ id: 'position-many-2' }),
-          },
-        };
-
-        const previousCurrentPositions = {
-          ...positionService.currentPositions,
-        };
-
-        positionService.setPendingTransaction(tx as unknown as TransactionDetails);
-
-        positionService.handleTransactionRejection(tx as unknown as TransactionDetails);
-
-        return expect(positionService.currentPositions).toEqual(previousCurrentPositions);
-      });
-    });
-
     test('it should remove the pending status of the position', () => {
       const previousCurrentPositions = {
         ...positionService.currentPositions,
@@ -3907,7 +3809,6 @@ describe('Position Service', () => {
 
     describe('Transactions that should be skipped', () => {
       [
-        { type: TransactionTypes.newPair },
         { type: TransactionTypes.approveToken },
         { type: TransactionTypes.approveTokenExact },
         { type: TransactionTypes.swap },
