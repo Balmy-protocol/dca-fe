@@ -286,7 +286,7 @@ const Portfolio = ({ selectedWalletOption }: PortfolioProps) => {
   const intl = useIntl();
   const showBalances = useShowBalances();
   const pushToHistory = usePushToHistory();
-  const { mergedBalances, isLoadingAllBalances } = useMergedTokensBalances(selectedWalletOption);
+  const { mergedBalances, isLoadingAllBalances } = useMergedTokensBalances({ selectedWalletOption });
 
   const onRefreshBalance = React.useCallback(async () => {
     setIsRefreshDisabled(true);

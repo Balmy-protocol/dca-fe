@@ -5,8 +5,8 @@ import React from 'react';
 import useAllStrategies from './useAllStrategies';
 
 export default function useSuggestedStrategies(
-  selectedAsset: { token: Token; chainsWithBalance: number[] },
-  selectedReward: { token: Token }
+  selectedAsset?: { token: Token; chainsWithBalance: number[] },
+  selectedReward?: { token: Token }
 ) {
   const strategies = useAllStrategies();
 
@@ -22,12 +22,14 @@ export default function useSuggestedStrategies(
     }>(
       (acc, strategy) => {
         const isSameAsset =
-          getIsSameOrTokenEquivalent(selectedAsset.token, strategy.asset) ||
-          getIsSameOrTokenEquivalent(selectedReward.token, strategy.asset);
-        const isSameReward = strategy.rewards.tokens.some((strategyRewardToken) =>
-          getIsSameOrTokenEquivalent(selectedReward.token, strategyRewardToken)
-        );
-        if (isSameAsset && selectedAsset.chainsWithBalance.includes(strategy.network.chainId)) {
+          (selectedAsset && getIsSameOrTokenEquivalent(selectedAsset.token, strategy.asset)) ||
+          (selectedReward && getIsSameOrTokenEquivalent(selectedReward.token, strategy.asset));
+        const isSameReward =
+          selectedReward &&
+          strategy.rewards.tokens.some((strategyRewardToken) =>
+            getIsSameOrTokenEquivalent(selectedReward.token, strategyRewardToken)
+          );
+        if (isSameAsset && selectedAsset && selectedAsset.chainsWithBalance.includes(strategy.network.chainId)) {
           acc.strategiesWithAssetAndBalance.push(strategy);
         } else if (isSameAsset) {
           acc.strategiesWithAssetNoBalance.push(strategy);

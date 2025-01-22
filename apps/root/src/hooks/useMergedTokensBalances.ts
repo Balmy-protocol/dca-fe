@@ -25,7 +25,13 @@ export type BalanceItem = {
   relativeBalance: number;
 };
 
-export default function useMergedTokensBalances(selectedWalletOption?: WalletOptionValues) {
+export default function useMergedTokensBalances({
+  selectedWalletOption,
+  supportedNetworks,
+}: {
+  selectedWalletOption?: WalletOptionValues;
+  supportedNetworks?: number[];
+}) {
   const { balances: allBalances, isLoadingAllBalances } = useAllBalances();
   const { assetsTotalValue } = useNetWorth({ walletSelector: selectedWalletOption });
   const showSmallBalances = useShowSmallBalances();
@@ -34,6 +40,9 @@ export default function useMergedTokensBalances(selectedWalletOption?: WalletOpt
     const balanceTokens = Object.values(allBalances).reduce<Record<string, BalanceToken>>(
       (acc, { balancesAndPrices, isLoadingChainPrices }) => {
         Object.entries(balancesAndPrices).forEach(([tokenAddress, tokenInfo]) => {
+          if (supportedNetworks && !supportedNetworks.includes(tokenInfo.token.chainId)) {
+            return;
+          }
           const tokenKey = `${tokenInfo.token.chainId}-${tokenAddress}`;
           // eslint-disable-next-line no-param-reassign
           acc[tokenKey] = {

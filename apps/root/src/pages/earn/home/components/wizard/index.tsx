@@ -49,16 +49,8 @@ const EarnWizard = () => {
           </ContainerBox>
         )}
       </StyledContainer>
-      {selectedAsset && selectedReward && (
-        <SuggestedStrategies
-          selectedAsset={{
-            token: selectedAsset.token,
-            chainsWithBalance: selectedAsset.chainsWithBalance,
-          }}
-          selectedReward={{
-            token: selectedReward.token,
-          }}
-        />
+      {(selectedAsset || selectedReward) && (
+        <SuggestedStrategies selectedAsset={selectedAsset} selectedReward={selectedReward} />
       )}
     </ContainerBox>
   );
