@@ -988,9 +988,14 @@ export class EarnService extends EventsManager<EarnServiceData> {
       }) ||
       undefined;
 
+    const protocolToken = getProtocolToken(strategy.farm.chainId);
+    const wrappedProtocolToken = getWrappedProtocolToken(strategy.farm.chainId);
     const withdrawAmount = withdraw.map((w) => {
+      const addressToFind = isSameAddress(w.token.address, wrappedProtocolToken.address)
+        ? protocolToken.address
+        : w.token.address;
       const originalTokenBalance = userStrategy.balances.find(
-        (b) => b.token.address.toLowerCase() === w.token.address.toLowerCase()
+        (b) => b.token.address.toLowerCase() === addressToFind.toLowerCase()
       );
 
       const shouldWithdrawMax =
