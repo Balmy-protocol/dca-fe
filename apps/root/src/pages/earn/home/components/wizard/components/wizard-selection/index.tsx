@@ -1,7 +1,16 @@
 import { useStrategiesParameters } from '@hooks/earn/useStrategiesParameters';
 import React from 'react';
 import styled from 'styled-components';
-import { ContainerBox, Money4Icon, Money2Icon, Select, Typography, colors, SvgIconProps } from 'ui-library';
+import {
+  ContainerBox,
+  Money4Icon,
+  Money2Icon,
+  Select,
+  Typography,
+  colors,
+  SvgIconProps,
+  InfoCircleIcon,
+} from 'ui-library';
 import { AssetSelectorOption, RewardSelectorOption } from '../..';
 import { useThemeMode } from '@state/config/hooks';
 import useMergedTokensBalances from '@hooks/useMergedTokensBalances';
@@ -16,6 +25,7 @@ import { useParams } from 'react-router-dom';
 import useReplaceHistory from '@hooks/useReplaceHistory';
 import { StrategiesTableVariants } from '@state/strategies-filters/reducer';
 import useHasFetchedAllStrategies from '@hooks/earn/useHasFetchedAllStrategies';
+import { SUPPORTED_NETWORKS_EARN } from '@constants';
 
 const StyledWizardBaseContainer = styled(ContainerBox).attrs({
   alignItems: 'center',
@@ -68,6 +78,20 @@ const HeaderItem = ({
   );
 };
 
+const FooterItem = () => {
+  return (
+    <ContainerBox gap={1} alignItems="center">
+      <InfoCircleIcon fontSize="large" sx={({ palette }) => ({ color: colors[palette.mode].typography.typo3 })} />
+      <Typography variant="labelSemiBold">
+        <FormattedMessage
+          defaultMessage="We display only the chains we currently support"
+          description="earn.wizard.asset-options.footer"
+        />
+      </Typography>
+    </ContainerBox>
+  );
+};
+
 interface WizardSelectionProps {
   selectedAsset?: AssetSelectorOption;
   selectedReward?: RewardSelectorOption;
@@ -82,7 +106,10 @@ export const WizardSelection = ({
   setSelectedReward,
 }: WizardSelectionProps) => {
   const intl = useIntl();
-  const { mergedBalances, isLoadingAllBalances } = useMergedTokensBalances(ALL_WALLETS);
+  const { mergedBalances, isLoadingAllBalances } = useMergedTokensBalances({
+    selectedWalletOption: ALL_WALLETS,
+    supportedNetworks: SUPPORTED_NETWORKS_EARN,
+  });
   const hasFetchedAllStrategies = useHasFetchedAllStrategies();
   const { assetTokenId, rewardTokenId } = useParams<{
     assetTokenId?: string;
@@ -214,6 +241,9 @@ export const WizardSelection = ({
                 Icon: Money2Icon,
               },
             }}
+            Footer={{
+              component: FooterItem,
+            }}
             isLoading={isLoading}
             placeholder={firstDropdownText}
             placeholderProps={{
@@ -245,6 +275,9 @@ export const WizardSelection = ({
                 label: capitalize(secondDropdownText),
                 Icon: Money4Icon,
               },
+            }}
+            Footer={{
+              component: FooterItem,
             }}
             isLoading={isLoading}
             placeholder={secondDropdownText}

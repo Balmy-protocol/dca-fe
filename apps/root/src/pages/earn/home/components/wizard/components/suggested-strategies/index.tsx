@@ -9,14 +9,10 @@ import { DataCardVariants } from '@pages/strategy-guardian-detail/vault-data/com
 import useTierLevel from '@hooks/tiers/useTierLevel';
 
 interface SuggestedStrategiesProps {
-  selectedAsset: {
-    chainsWithBalance: number[];
-    token: Token;
-  };
-  selectedReward: {
-    token: Token;
-  };
+  selectedAsset?: { token: Token; chainsWithBalance: number[] };
+  selectedReward?: { token: Token };
 }
+
 const SuggestedStrategies = ({ selectedAsset, selectedReward }: SuggestedStrategiesProps) => {
   const themeMode = useThemeMode();
   const suggested = useSuggestedStrategies(selectedAsset, selectedReward);
