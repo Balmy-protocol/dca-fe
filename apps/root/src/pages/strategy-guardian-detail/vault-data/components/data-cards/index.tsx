@@ -127,7 +127,13 @@ const DataCards = ({ strategy, dataCardsGap = 4, variant = DataCardVariants.Deta
       <ContainerBox justifyContent="space-evenly" gap={dataCardsGap}>
         <DataCard
           title={<FormattedMessage defaultMessage="APY" description="earn.strategy-details.vault-data.apy" />}
-          content={loading ? <SkeletonDataCard /> : `${formatUsdAmount({ amount: strategy.farm.apy, intl })}%`}
+          content={
+            loading ? (
+              <SkeletonDataCard />
+            ) : (
+              `${formatUsdAmount({ amount: strategy.farm.apy + (strategy.farm.rewards?.apy ?? 0), intl })}%`
+            )
+          }
           info={
             <FormattedMessage
               defaultMessage="Annual Percentage Yield (APY) shows your potential yearly earnings, including compound interest."

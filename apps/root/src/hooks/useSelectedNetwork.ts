@@ -3,7 +3,7 @@ import { DCA_CREATE_ROUTE, DCA_ROUTE, EARN_PORTFOLIO, EARN_ROUTE, SWAP_ROUTE, TR
 import { useAggregatorNetwork } from '@state/aggregator/hooks';
 import { useDCANetwork } from '@state/create-position/hooks';
 import { useEarnManagementNetwork } from '@state/earn-management/hooks';
-import { useCurrentRoute } from '@state/tabs/hooks';
+import { useRoute } from '@state/tabs/hooks';
 import { useTransferNetwork } from '@state/transfer/hooks';
 import { NetworkStruct } from '@types';
 
@@ -12,7 +12,7 @@ function useSelectedNetwork() {
   const dcaNetwork = useDCANetwork();
   const transferNetwork = useTransferNetwork();
   const earnNetwork = useEarnManagementNetwork();
-  const currentRoute = useCurrentRoute();
+  const { currentRoute } = useRoute();
   let network: NetworkStruct | undefined;
 
   switch (currentRoute) {

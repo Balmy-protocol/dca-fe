@@ -37,6 +37,13 @@ const StyledReferralTable = styled(ContainerBox).attrs({ gap: 6, flexDirection: 
 const StyledTableEnd = styled(TableCell).attrs({ size: 'small' })`
   ${({ theme: { spacing } }) => `
     width: ${spacing(12.5)};
+    padding: ${spacing(2)} ${spacing(4)};
+  `}
+`;
+
+const StyledBodyTableCell = styled(TableCell)`
+  ${({ theme: { spacing } }) => `
+    padding: ${spacing(2)} ${spacing(4)};
   `}
 `;
 
@@ -97,7 +104,7 @@ const ReferralEndCell = ({
 
 const StyledBaseReferralStatusCellPill = styled(ContainerBox).attrs({ alignItems: 'center' })`
   ${({ theme: { spacing, palette } }) => `
-    padding: ${spacing(2)} ${spacing(3)};
+    padding: ${spacing(1)} ${spacing(3)};
     border-radius: ${spacing(2)};
     background-color: ${colors[palette.mode].background.tertiary};
   `}
@@ -197,7 +204,7 @@ const ReferralsBodyItem = ({
 
   return (
     <>
-      <TableCell>
+      <StyledBodyTableCell>
         <Grid container flexDirection={'row'} alignItems={'center'} gap={3}>
           <Typography
             variant="bodySmallRegular"
@@ -209,10 +216,10 @@ const ReferralsBodyItem = ({
             {code}
           </Typography>
         </Grid>
-      </TableCell>
-      <TableCell>
+      </StyledBodyTableCell>
+      <StyledBodyTableCell>
         <ReferralStatusCell isReferralActive={isReferralActive} claimedBy={claimedBy} />
-      </TableCell>
+      </StyledBodyTableCell>
       {/* Add date redeemed when be implemented */}
       {/* <TableCell>
         <Typography variant="bodySmallRegular" color={({ palette }) => colors[palette.mode].typography.typo2}>
@@ -246,6 +253,27 @@ const ReferralsTable = () => {
     setIsShareQRModalOpen(true);
   };
 
+  const sortedInviteCodes = React.useMemo(
+    () =>
+      inviteCodes.sort((a, b) => {
+        const priority = (item: InviteCodeWithReferralStatus) => {
+          if (item.claimedBy && !item.isReferralActive) return 1; // Pending
+          if (!item.claimedBy) return 2; // Unclaimed
+          if (item.claimedBy && item.isReferralActive) return 3; // Claimed & Active
+        };
+
+        const pA = priority(a);
+        const pB = priority(b);
+
+        // If both items have the same priority or no priority, sort alphabetically
+        if (!pA || !pB || pA === pB) return a.code.localeCompare(b.code);
+
+        // Otherwise, sort by priority
+        return pA - pB;
+      }),
+    [inviteCodes]
+  );
+
   return (
     <>
       <ShareQRModal
@@ -276,8 +304,8 @@ const ReferralsTable = () => {
                 <ReferralsTableHeader />
               </TableHead>
               <TableBody>
-                {inviteCodes.map((inviteCode) => (
-                  <TableRow key={inviteCode.code}>
+                {sortedInviteCodes.map((inviteCode) => (
+                  <TableRow key={inviteCode.code} sx={({ spacing }) => ({ height: spacing(13) })}>
                     <ReferralsBodyItem inviteCode={inviteCode} onShare={onShare} />
                   </TableRow>
                 ))}

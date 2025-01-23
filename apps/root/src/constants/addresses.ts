@@ -401,6 +401,8 @@ export const SUPPORTED_NETWORKS_DCA = [
   Chains.BASE.chainId,
 ];
 
+export const SUPPORTED_NETWORKS_EARN = [Chains.BASE.chainId, Chains.OPTIMISM.chainId];
+
 export const DEFAULT_NETWORK_FOR_VERSION: Record<PositionVersions, NetworkStruct> = {
   [POSITION_VERSION_1]: NETWORKS.optimism,
   [POSITION_VERSION_2]: NETWORKS.optimism,

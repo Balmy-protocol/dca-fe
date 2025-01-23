@@ -97,6 +97,10 @@ export default class TierService extends EventsManager<TierServiceData> {
     return this.referrals;
   }
 
+  logOutUser() {
+    this.resetData();
+  }
+
   setAchievements(wallets: Address[], achievements: Record<Address, ApiAchievement[]>, twitterShare: boolean) {
     const currentAchievements = { ...this.achievements };
     const baseAchievements = wallets.reduce<Record<Address, { lastUpdated: number; achievement: Achievement }[]>>(

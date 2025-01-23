@@ -348,7 +348,7 @@ export default class AccountService extends EventsManager<AccountServiceData> {
         address,
         status: WalletStatus.connected,
         isAuth: true,
-        isOwner: false,
+        isOwner: true,
       });
     }
 
@@ -490,6 +490,7 @@ export default class AccountService extends EventsManager<AccountServiceData> {
           : toWallet({
               address: accountWallet.address,
               isAuth: accountWallet.isAuth,
+              isOwner: accountWallet.isOwner,
               status: WalletStatus.disconnected,
             })
     );

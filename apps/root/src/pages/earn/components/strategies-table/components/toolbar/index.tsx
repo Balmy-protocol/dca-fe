@@ -7,6 +7,8 @@ import DelayedWithdrawContainer from '../delayed-withdraw-container';
 import styled from 'styled-components';
 import useEarnPositions from '@hooks/earn/useEarnPositions';
 import { getDelayedWithdrawals } from '@common/utils/earn/parsing';
+import { useAppDispatch } from '@state/hooks';
+import { resetFilters } from '@state/strategies-filters/actions';
 
 interface AllStrategiesTableToolbarProps {
   isLoading: boolean;
@@ -31,6 +33,7 @@ const AllStrategiesTableToolbar = ({
   setPage,
 }: AllStrategiesTableToolbarProps) => {
   const intl = useIntl();
+  const dispatch = useAppDispatch();
 
   const { userStrategies } = useEarnPositions();
   const hasDelayedWithdraws = React.useMemo(
@@ -39,8 +42,8 @@ const AllStrategiesTableToolbar = ({
   );
 
   React.useEffect(() => {
-    // Having an uncontrolled input, the value will be stored in redux and not displayed in the input, so we need to clear it when the page is loaded
     handleSearchChange('');
+    dispatch(resetFilters(variant));
   }, []);
 
   return (

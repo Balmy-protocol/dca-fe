@@ -10,6 +10,7 @@ import {
   ContainerBox,
   Typography,
   TypographyProps,
+  DividerBorder2,
 } from '..';
 import { KeyboardArrowDownIcon, SearchIcon } from '../../icons';
 import { defineMessage, useIntl } from 'react-intl';
@@ -52,6 +53,9 @@ interface BaseSelectProps<T extends { key: string | number }, H = object> {
     component: React.ComponentType<{ props: H }>;
     props: H;
   };
+  Footer?: {
+    component: React.ComponentType;
+  };
 }
 
 type SelectProps<T extends { key: string | number }, H = object> = BaseSelectProps<T, H> & SearchProps<T>;
@@ -79,6 +83,7 @@ function Select<T extends { key: string | number }, H = object>({
   variant,
   size = 'small',
   Header,
+  Footer,
 }: SelectProps<T, H>) {
   const [search, setSearch] = useState('');
   const searchRef = useRef<HTMLDivElement>();
@@ -233,6 +238,25 @@ function Select<T extends { key: string | number }, H = object>({
           <RenderItem item={option} key={option.key} />
         </MenuItem>
       ))}
+      {Footer && (
+        <ListSubheader
+          disableGutters
+          sx={{
+            bottom: 0,
+            backgroundColor: colors[mode].background.modals,
+            paddingTop: SPACING(1.5),
+          }}
+        >
+          <DividerBorder2 />
+          <ContainerBox
+            style={{
+              padding: `${SPACING(2)} ${SPACING(3)} ${SPACING(3)}`,
+            }}
+          >
+            <Footer.component />
+          </ContainerBox>
+        </ListSubheader>
+      )}
     </MuiSelect>
   );
 }

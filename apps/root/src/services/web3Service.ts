@@ -416,5 +416,6 @@ export default class Web3Service {
     this.contactListService.logOutUser();
     this.labelService.logOutUser();
     this.transactionService.logOutUser();
+    this.tierService.logOutUser();
   }
 }
