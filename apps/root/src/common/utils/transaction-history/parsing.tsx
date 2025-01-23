@@ -414,14 +414,15 @@ const parseEarnDepositApiEvent: ParseFunction<BaseApiEvent & EarnDepositApiEvent
   earnBaseEventData,
 }) => {
   const earnDepositedTokenId = getTokenListId({ tokenAddress: event.data.depositToken, chainId: event.tx.chainId });
+  if (!tokenList[earnDepositedTokenId]) return null;
   const earnDepositedToken = parseWrappedProtocolTokenToProtocolToken(tokenList[earnDepositedTokenId]);
+
   const assetTokenId = getTokenListId({ tokenAddress: event.data.asset, chainId: event.tx.chainId });
+  if (!tokenList[assetTokenId]) return null;
   const assetToken = parseWrappedProtocolTokenToProtocolToken({
     ...tokenList[assetTokenId],
     price: event.data.assetPrice,
   });
-
-  if (!earnDepositedToken || !assetToken) return null;
 
   const parsedEvent: EarnDepositEvent = {
     type: TransactionEventTypes.EARN_CREATED,
@@ -464,14 +465,15 @@ const parseEarnIncreaseApiEvent: ParseFunction<BaseApiEvent & EarnIncreaseApiEve
   earnBaseEventData,
 }) => {
   const earnDepositedTokenId = getTokenListId({ tokenAddress: event.data.depositToken, chainId: event.tx.chainId });
+  if (!tokenList[earnDepositedTokenId]) return null;
   const earnDepositedToken = parseWrappedProtocolTokenToProtocolToken(tokenList[earnDepositedTokenId]);
+
   const assetTokenId = getTokenListId({ tokenAddress: event.data.asset, chainId: event.tx.chainId });
+  if (!tokenList[assetTokenId]) return null;
   const assetToken = parseWrappedProtocolTokenToProtocolToken({
     ...tokenList[assetTokenId],
     price: event.data.assetPrice,
   });
-
-  if (!earnDepositedToken || !assetToken) return null;
 
   const parsedEvent: EarnIncreaseEvent = {
     type: TransactionEventTypes.EARN_INCREASE,
