@@ -24,7 +24,7 @@ import {
   TOKEN_BLACKLIST,
   toReadable,
 } from '@constants';
-import { getProtocolToken, TOKEN_MAP_SYMBOL } from '@common/mocks/tokens';
+import { getProtocolToken, getWrappedProtocolToken, TOKEN_MAP_SYMBOL } from '@common/mocks/tokens';
 import { IntlShape } from 'react-intl';
 import {
   AmountsOfToken as SdkAmountsOfToken,
@@ -33,7 +33,7 @@ import {
   ActionTypeAction,
   getAllChains,
 } from '@balmy/sdk';
-import { emptyTokenWithAddress, formatCurrencyAmount } from './currency';
+import { emptyTokenWithAddress, formatCurrencyAmount, isSameToken } from './currency';
 import { Address, formatUnits, maxUint256, Chain as ViemChain } from 'viem';
 import { TokenBalances } from '@state/balances/hooks';
 import compact from 'lodash/compact';
@@ -508,4 +508,14 @@ export const formatListMessage = ({ items, intl }: { items?: string[]; intl: Int
       lastItem,
     }
   );
+};
+
+export const parseWrappedProtocolTokenToProtocolToken = (token: Token): Token => {
+  const protocolToken = getProtocolToken(token.chainId);
+  const isWrappedProtocolToken = isSameToken(token, getWrappedProtocolToken(token.chainId));
+
+  return {
+    ...(isWrappedProtocolToken ? protocolToken : token),
+    price: token.price,
+  };
 };

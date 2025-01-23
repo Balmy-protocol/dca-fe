@@ -69,7 +69,11 @@ import {
 import { buildEtherscanTransaction } from '../etherscan';
 import React from 'react';
 import { getTransactionTokenFlow } from '.';
-import { getTokenListId, transformStoredPositionToPosition } from '../parsing';
+import {
+  getTokenListId,
+  parseWrappedProtocolTokenToProtocolToken,
+  transformStoredPositionToPosition,
+} from '../parsing';
 import { getNewPositionFromTxTypeData } from '../transactions';
 import { getSdkEarnPositionId } from '../earn/parsing';
 
@@ -410,11 +414,15 @@ const parseEarnDepositApiEvent: ParseFunction<BaseApiEvent & EarnDepositApiEvent
   earnBaseEventData,
 }) => {
   const earnDepositedTokenId = getTokenListId({ tokenAddress: event.data.depositToken, chainId: event.tx.chainId });
-  const earnDepositedToken = tokenList[earnDepositedTokenId];
-  const assetTokenId = getTokenListId({ tokenAddress: event.data.asset, chainId: event.tx.chainId });
-  const assetToken = tokenList[assetTokenId];
+  if (!tokenList[earnDepositedTokenId]) return null;
+  const earnDepositedToken = parseWrappedProtocolTokenToProtocolToken(tokenList[earnDepositedTokenId]);
 
-  if (!earnDepositedToken || !assetToken) return null;
+  const assetTokenId = getTokenListId({ tokenAddress: event.data.asset, chainId: event.tx.chainId });
+  if (!tokenList[assetTokenId]) return null;
+  const assetToken = parseWrappedProtocolTokenToProtocolToken({
+    ...tokenList[assetTokenId],
+    price: event.data.assetPrice,
+  });
 
   const parsedEvent: EarnDepositEvent = {
     type: TransactionEventTypes.EARN_CREATED,
@@ -457,11 +465,15 @@ const parseEarnIncreaseApiEvent: ParseFunction<BaseApiEvent & EarnIncreaseApiEve
   earnBaseEventData,
 }) => {
   const earnDepositedTokenId = getTokenListId({ tokenAddress: event.data.depositToken, chainId: event.tx.chainId });
-  const earnDepositedToken = tokenList[earnDepositedTokenId];
-  const assetTokenId = getTokenListId({ tokenAddress: event.data.asset, chainId: event.tx.chainId });
-  const assetToken = tokenList[assetTokenId];
+  if (!tokenList[earnDepositedTokenId]) return null;
+  const earnDepositedToken = parseWrappedProtocolTokenToProtocolToken(tokenList[earnDepositedTokenId]);
 
-  if (!earnDepositedToken || !assetToken) return null;
+  const assetTokenId = getTokenListId({ tokenAddress: event.data.asset, chainId: event.tx.chainId });
+  if (!tokenList[assetTokenId]) return null;
+  const assetToken = parseWrappedProtocolTokenToProtocolToken({
+    ...tokenList[assetTokenId],
+    price: event.data.assetPrice,
+  });
 
   const parsedEvent: EarnIncreaseEvent = {
     type: TransactionEventTypes.EARN_INCREASE,
@@ -521,8 +533,15 @@ const parseEarnWithdrawApiEvent: ParseFunction<BaseApiEvent & EarnWithdrawApiEve
       withdrawn: event.data.tokens
         .filter((withdrawnToken) => BigInt(withdrawnToken.withdrawn) > 0n)
         .map((withdrawnToken) => {
-          const tokenId = getTokenListId({ tokenAddress: withdrawnToken.token, chainId: event.tx.chainId });
-          const token = { ...tokenList[tokenId], price: withdrawnToken.price };
+          const tokenId = getTokenListId({
+            tokenAddress: withdrawnToken.token,
+            chainId: event.tx.chainId,
+          });
+
+          const token = parseWrappedProtocolTokenToProtocolToken({
+            ...tokenList[tokenId],
+            price: withdrawnToken.price,
+          });
 
           return {
             amount: {

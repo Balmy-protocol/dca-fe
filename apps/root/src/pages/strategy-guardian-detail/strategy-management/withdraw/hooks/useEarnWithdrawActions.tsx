@@ -265,6 +265,7 @@ const useEarnWithdrawActions = ({ strategy }: UseEarnWithdrawActionsParams) => {
         const tokensToWithdrawTypeData = parsedTokensToWithdraw.map((withdraw) => ({
           ...withdraw,
           amount: withdraw.amount.toString(),
+          token: isSameToken(withdraw.token, wrappedProtocolToken) ? protocolToken : withdraw.token,
         }));
 
         const amountInUsd = parsedTokensToWithdraw.reduce((acc, withdraw) => {
