@@ -17,7 +17,7 @@ import { MEAN_API_URL, SUPPORTED_NETWORKS_DCA, NULL_ADDRESS } from '@constants/a
 import { ArrayOneOrMore } from '@balmy/sdk/dist/utility-types';
 import { Address } from 'viem';
 import { swapOptionToQuoteResponse } from '@common/utils/quotes';
-import { flatten } from 'lodash';
+import { flatten, isNil } from 'lodash';
 import { THREE_MONTHS } from '@constants';
 import { nowInSeconds } from '@common/utils/time';
 
@@ -271,7 +271,9 @@ export default class SdkService {
       ...(sellAmount ? { sellAmount: sellAmount.toString() } : {}),
       ...(buyAmount ? { buyAmount: buyAmount.toString() } : {}),
       ...(recipient && !usePermit2 ? { recipient } : {}),
-      ...(slippagePercentage && !isNaN(slippagePercentage) ? { slippagePercentage } : { slippagePercentage: 0.1 }),
+      ...(!isNil(slippagePercentage) && !isNaN(slippagePercentage)
+        ? { slippagePercentage }
+        : { slippagePercentage: 0.1 }),
       ...(gasSpeed ? { gasSpeed: { speed: gasSpeed, requirement: 'best effort' } } : {}),
       ...(skipValidation ? { skipValidation } : {}),
       ...(disabledDexes ? { filters: { excludeSources: disabledDexes } } : {}),

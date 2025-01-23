@@ -9,6 +9,7 @@ import { NetworkStruct, Token, TokenType } from '@types';
 import { DCAPositionToken, TokenVariant } from '@balmy/sdk';
 import { isUndefined } from 'lodash';
 import { useIntl } from 'react-intl';
+import { PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 
 const Decimal = toFormat(_Decimal);
 
@@ -303,7 +304,7 @@ export const toDcaPositionToken: (overrides: {
 export const getNetworkCurrencyTokens = (network: NetworkStruct) => {
   const nativeCurrencyToken = toToken({
     ...network?.nativeCurrency,
-    logoURI: network.nativeCurrency.logoURI || getGhTokenListLogoUrl(network.chainId, 'logo'),
+    logoURI: network.nativeCurrency.logoURI || getGhTokenListLogoUrl(network.chainId, PROTOCOL_TOKEN_ADDRESS),
   });
   const mainCurrencyToken = toToken({
     address: network.mainCurrency || '',
