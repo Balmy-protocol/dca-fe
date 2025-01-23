@@ -96,8 +96,10 @@ export default function useFilteredStrategies<V extends StrategiesTableVariants>
         }
 
         // Now we filter all strategies that are below the minAvailableTier
+        // We also always want to show tier 2 and 3 strategies
         const filteredTierLevelStrategies = farmStrategies.filter(
-          (strategy) => (strategy.needsTier ?? 0) >= tierToUseToFilter
+          (strategy) =>
+            (strategy.needsTier ?? 0) >= tierToUseToFilter || strategy.needsTier === 2 || strategy.needsTier === 3
         );
         filteredStrategiesByTierLevel.push(...filteredTierLevelStrategies);
       });

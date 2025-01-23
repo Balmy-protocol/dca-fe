@@ -430,14 +430,14 @@ export function parseUserStrategiesFinancialData(userPositions: EarnPosition[] =
               amountInUSD: '0.00',
             };
           }
+
+          const totalApy = position.strategy.farm.apy + (position.strategy.farm.rewards?.apy || 0);
           const newRatiodAmount =
             ((assetBalance?.amount.amount || 0n) *
-              BigInt(
-                (period.annualRatio * (position.strategy.farm.apy / 100) * 10 ** assetBalance.token.decimals).toFixed(0)
-              )) /
+              BigInt((period.annualRatio * (totalApy / 100) * 10 ** assetBalance.token.decimals).toFixed(0))) /
             BigInt(10 ** assetBalance.token.decimals);
           const newRatiodUsdAmount =
-            Number(assetBalance?.amount.amountInUSD || 0) * (period.annualRatio * (position.strategy.farm.apy / 100));
+            Number(assetBalance?.amount.amountInUSD || 0) * (period.annualRatio * (totalApy / 100));
           const newAmount = newRatiodAmount + periodAcc.byToken[assetBalance.token.address].amount;
           const newAmountInUsd = newRatiodUsdAmount + Number(periodAcc.byToken[assetBalance.token.address].amountInUSD);
           // eslint-disable-next-line no-param-reassign

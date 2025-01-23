@@ -357,7 +357,14 @@ const EarnPositionTvlGraph = ({
                   domain={['auto', 'auto']}
                   axisLine={false}
                   tickLine={false}
-                  tickFormatter={(value: string) => `$${formatUsdAmount({ amount: Number(value), intl })}`}
+                  tickFormatter={(value: string) =>
+                    `$${intl.formatNumber(Number(value), {
+                      notation: 'compact',
+                      compactDisplay: 'short',
+                      maximumFractionDigits: 2,
+                      minimumFractionDigits: 2,
+                    })}`
+                  }
                   // @ts-expect-error no worries about the ones we send here
                   tick={{ fill: colors[mode].typography.typo3, ...buildTypographyVariant(mode).labelRegular }}
                 />
