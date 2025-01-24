@@ -298,6 +298,15 @@ export const strategyColumnConfigs: StrategyColumnConfig<StrategiesTableVariants
   },
 ];
 
+const StyledRewardsPill = styled(ContainerBox).attrs({ alignItems: 'center', gap: 1 })`
+  ${({ theme: { spacing, palette } }) => `
+    padding: ${spacing(1)} ${spacing(2)};
+    border-radius: ${spacing(4)};
+    background-color: ${colors[palette.mode].background.tertiary};
+    border: 1px solid ${colors[palette.mode].semantic.success.darker};
+  `}
+`;
+
 export const portfolioColumnConfigs: StrategyColumnConfig<StrategiesTableVariants.USER_STRATEGIES>[] = [
   {
     key: StrategyColumnKeys.VAULT_NAME,
@@ -362,8 +371,19 @@ export const portfolioColumnConfigs: StrategyColumnConfig<StrategiesTableVariant
     key: StrategyColumnKeys.REWARDS,
     label: <FormattedMessage description="earn.all-strategies-table.column.rewards" defaultMessage="Rewards" />,
     renderCell: (data) => (
-      <ContainerBox gap={2} alignItems="center">
-        <ComposedTokenIcon tokens={data[0].strategy.displayRewards.tokens} size={4.5} />
+      <ContainerBox gap={2} flexWrap="wrap" alignItems="flex-start">
+        <StyledRewardsPill>
+          <ContainerBox alignItems="center">
+            <ComposedTokenIcon tokens={data[0].strategy.displayRewards.tokens} size={4.5} />
+          </ContainerBox>
+          <Typography variant="bodyExtraSmall" color={({ palette: { mode } }) => colors[mode].typography.typo2}>
+            $
+            {data[0].balances
+              .filter((balance) => balance.token.address !== data[0].strategy.asset.address)
+              .reduce((acc, balance) => acc + (Number(balance.amount.amountInUSD) ?? 0), 0)
+              .toFixed(2)}
+          </Typography>
+        </StyledRewardsPill>
       </ContainerBox>
     ),
     hiddenProps: {
