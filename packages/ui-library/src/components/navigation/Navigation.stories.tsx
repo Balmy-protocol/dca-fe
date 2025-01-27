@@ -6,6 +6,7 @@ import { Navigation, SectionType } from '.';
 import type { NavigationProps } from '.';
 import { ContainerBox } from '..';
 import styled from 'styled-components';
+import { colors } from '../../theme/colors';
 
 const StyledContainerBox = styled(ContainerBox)`
   width: 990px;
@@ -19,6 +20,26 @@ function StoryNavigation({ children, ...args }: NavigationProps) {
   );
 }
 
+const StyledPromotedBanner = styled(ContainerBox).attrs({ flex: 1, gap: 1 })`
+  ${({
+    theme: {
+      palette: { mode, gradient },
+      spacing,
+    },
+  }) => `
+  // width: 208px;
+  // height: 122px;
+  padding: ${spacing(3)};
+  position: relative;
+
+  border-radius: ${spacing(3)};
+  border: 1px solid ${colors[mode].accent.primary};
+  background: ${gradient.earnWizard};
+
+  /* dropshadow/100 */
+    box-shadow: ${colors[mode].dropShadow.dropShadow100};
+  `}
+`;
 // More on how to set up stories at: https://storybook.js.org/docs/react/writing-stories/introduction#default-export
 const meta: Meta<typeof StoryNavigation> = {
   title: 'Components/Navigation',
@@ -109,6 +130,7 @@ const meta: Meta<typeof StoryNavigation> = {
       },
     ],
     selectedSection: 'inbox',
+    promotedBanner: <StyledPromotedBanner>Promoted banner</StyledPromotedBanner>,
   },
 };
 
