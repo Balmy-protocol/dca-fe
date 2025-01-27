@@ -14,6 +14,7 @@ interface FinancialOverviewProps {
   isLoading?: boolean;
   isFiat?: boolean;
   showLastMonth?: boolean;
+  sumRewards?: boolean;
 }
 
 const StyledOverviewItem = styled(ContainerBox).attrs({ flexDirection: 'column', gap: 1 })``;
@@ -24,6 +25,7 @@ const FinancialOverview = ({
   isLoading,
   isFiat = true,
   showLastMonth,
+  sumRewards = false,
 }: FinancialOverviewProps) => {
   const {
     currentProfitUsd,
@@ -52,9 +54,11 @@ const FinancialOverview = ({
       amountInUSD: totalInvestedUsd.toFixed(2),
     };
     amountProfit = {
-      amount: parseUnits(currentProfitUsd.toString(), 2),
-      amountInUnits: currentProfitUsd.toFixed(2),
-      amountInUSD: currentProfitUsd.toFixed(2),
+      amount: sumRewards
+        ? parseUnits(currentProfitUsd.total.toString(), 2)
+        : parseUnits(currentProfitUsd.asset.toString(), 2),
+      amountInUnits: sumRewards ? currentProfitUsd.total.toFixed(2) : currentProfitUsd.asset.toFixed(2),
+      amountInUSD: sumRewards ? currentProfitUsd.total.toFixed(2) : currentProfitUsd.asset.toFixed(2),
     };
     lastMonthEarnings = {
       amount: parseUnits(totalMonthlyEarnings.toString(), 2),
@@ -62,10 +66,38 @@ const FinancialOverview = ({
       amountInUSD: totalMonthlyEarnings.toFixed(2),
     };
   } else {
-    amountInvested = (mainAsset && totalInvested[mainAsset.address]) || undefined;
-    amountProfit = (mainAsset && currentProfit[mainAsset.address]) || undefined;
-    lastMonthEarnings = (mainAsset && monthlyEarnings[mainAsset.address]) || undefined;
+    amountInvested = sumRewards
+      ? {
+          amount: parseUnits(totalInvestedUsd.toString(), 2),
+          amountInUnits: totalInvestedUsd.toFixed(2),
+          amountInUSD: totalInvestedUsd.toFixed(2),
+        }
+      : (mainAsset && totalInvested[mainAsset.address]) || undefined;
+    amountProfit = sumRewards
+      ? {
+          amount: parseUnits(currentProfitUsd.total.toString(), 2),
+          amountInUnits: currentProfitUsd.total.toFixed(2),
+          amountInUSD: currentProfitUsd.total.toFixed(2),
+        }
+      : (mainAsset && currentProfit[mainAsset.address]) || undefined;
+    lastMonthEarnings = sumRewards
+      ? {
+          amount: parseUnits(totalMonthlyEarnings.toString(), 2),
+          amountInUnits: totalMonthlyEarnings.toFixed(2),
+          amountInUSD: totalMonthlyEarnings.toFixed(2),
+        }
+      : (mainAsset && monthlyEarnings[mainAsset.address]) || undefined;
   }
+
+  const profitSubtitle = sumRewards
+    ? `+${currentProfitRate.total.toFixed(2)}% · (${formatUsdAmount({
+        amount: currentProfitUsd.total,
+        intl,
+      })})`
+    : `+${currentProfitRate.asset.toFixed(2)}% · (${formatUsdAmount({
+        amount: currentProfitUsd.asset,
+        intl,
+      })})`;
 
   return (
     <ContainerBox gap={size === 'medium' ? 14 : 6}>
@@ -119,7 +151,7 @@ const FinancialOverview = ({
           amountTypographyVariant={size === 'medium' ? 'h3Bold' : 'bodyBold'}
           isLoading={isLoading}
           amountColorVariant={isPortfolioEmpty ? 'typo4' : undefined}
-          overrideSubtitle={`+${currentProfitRate.toFixed(2)}% · (${formatUsdAmount({ amount: currentProfitUsd, intl })})`}
+          overrideSubtitle={profitSubtitle}
           subtitleColorVariant={isPortfolioEmpty ? 'typo4' : 'success.dark'}
           titlePrefix="+"
           showIcon={!isFiat}

@@ -442,7 +442,7 @@ export const portfolioColumnConfigs: StrategyColumnConfig<StrategiesTableVariant
         subtitleColorVariant="success.dark"
       />
     ),
-    getOrderValue: (data) => parseUserStrategiesFinancialData(data).currentProfitUsd,
+    getOrderValue: (data) => parseUserStrategiesFinancialData(data).currentProfitUsd.asset,
   },
 ];
 
