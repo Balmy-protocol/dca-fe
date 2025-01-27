@@ -91,6 +91,7 @@ const EarnPositionsDashboard = ({ selectedWalletOption }: EarnPositionsDashboard
                 isLoading={!hasFetchedUserStrategies}
                 isFiat
                 showLastMonth
+                sumRewards
               />
             </Grid>
             <Grid item xs={12} md="auto" display="flex" flexDirection="column" gap={3}>
