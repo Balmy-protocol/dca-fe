@@ -20,6 +20,7 @@ import SONNE from './sonne.svg';
 import YEARN from './yfi.svg';
 import AGAVE from './agave.svg';
 import MOONWELL from './moonwell.svg';
+import MORPHO from './morpho.svg';
 import { ETH_CHAINS, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 
 const ethTokens = ETH_CHAINS.reduce<Record<string, typeof ETH>>((acc, chainId) => {
@@ -55,6 +56,7 @@ const manifest = {
   VENUS,
   AGAVE,
   MOONWELL,
+  MORPHO,
 };
 
 export default manifest;

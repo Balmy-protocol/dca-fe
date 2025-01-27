@@ -13,6 +13,9 @@ import { getDelayedWithdrawals } from '@common/utils/earn/parsing';
 import LockedDeposit from './components/locked-deposit';
 import useTierLevel from '@hooks/tiers/useTierLevel';
 import { useEarnManagementState } from '@state/earn-management/hooks';
+import { emptyTokenWithAddress } from '@common/utils/currency';
+import TokenIcon from '@common/components/token-icon';
+import { PLATFORM_NAMES_FOR_TOKENS } from '@constants/yield';
 
 const StyledBackgroundPaper = styled(BackgroundPaper).attrs({ variant: 'outlined', elevation: 0 })`
   ${({ theme: { spacing } }) => `
@@ -79,7 +82,12 @@ const StrategyManagement = ({ chainId, strategyGuardianId }: StrategyManagementP
         <LockedDeposit strategy={strategy} needsTier={needsTier} />
       ) : (
         <>
-          <Typography variant="h4Bold">{strategy?.farm.name || <Skeleton width="6ch" variant="text" />}</Typography>
+          <ContainerBox gap={2} alignItems="center">
+            <TokenIcon token={emptyTokenWithAddress(PLATFORM_NAMES_FOR_TOKENS[strategy?.farm.protocol ?? ''])} />
+            <Typography variant="h4Bold">
+              {`${strategy?.farm.protocol} - ${strategy?.farm.name}` || <Skeleton width="6ch" variant="text" />}
+            </Typography>
+          </ContainerBox>
           <ContainerBox>
             <UnderlinedTabs value={tab} onChange={(_, val: number) => setTab(val)}>
               <Tab

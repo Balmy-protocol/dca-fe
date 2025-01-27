@@ -710,7 +710,7 @@ const useEarnDepositActions = ({ strategy }: UseEarnDepositActionParams) => {
     if (!isApproved) {
       // Here we need to check if the token is from compound
       let allowsExactApproval = true;
-      if (strategy.farm.name === 'Compound' && asset.address !== strategy.asset.address) {
+      if (strategy.farm.protocol === 'Compound' && asset.address !== strategy.asset.address) {
         allowsExactApproval = false;
       }
 

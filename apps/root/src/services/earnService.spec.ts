@@ -34,6 +34,7 @@ import ProviderService from './providerService';
 import ContractService from './contractService';
 import { toToken } from '@common/utils/currency';
 import MeanApiService from './meanApiService';
+import { EarnStrategyStatus } from '@balmy/sdk/dist/services/earn/types';
 jest.mock('./sdkService');
 jest.mock('./accountService');
 jest.mock('./providerService');
@@ -86,12 +87,14 @@ const createStrategyFarmMock = ({
   asset,
   rewards,
   tvl,
+  protocol,
   type,
   apy,
   chainId,
 }: Partial<StrategyFarm>): StrategyFarm => ({
   id: !isUndefined(id) ? id : ('0xvault' as StrategyFarm['id']),
   name: !isUndefined(name) ? name : '0xvault',
+  protocol: !isUndefined(protocol) ? protocol : 'Aave',
   chainId: !isUndefined(chainId) ? chainId : 10,
   asset: !isUndefined(asset) ? asset : createSdkTokenWithWithdrawTypesMock({}),
   rewards: !isUndefined(rewards)
@@ -141,7 +144,9 @@ const createStrategyMock = ({
   lastUpdatedAt,
   userPositions,
   fees,
+  status,
 }: Partial<SavedSdkStrategy> = {}): SavedSdkStrategy => ({
+  status: !isUndefined(status) ? status : EarnStrategyStatus.OK,
   depositTokens: [{ ...(farm?.asset || createStrategyFarmMock({}).asset), type: TokenType.ASSET }],
   id: !isUndefined(id) ? id : ('0xvault' as SavedSdkStrategy['id']),
   farm: !isUndefined(farm) ? createStrategyFarmMock(farm) : createStrategyFarmMock({}),
