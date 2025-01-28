@@ -165,6 +165,8 @@ import {
   TierTicketDiscountIcon,
 } from './tiers';
 import TickSquareIcon from './tickSquare';
+import KeyIcon from './key';
+
 export {
   HelpOutline as HelpOutlineIcon,
   HelpOutlineOutlined as HelpOutlineOutlinedIcon,
@@ -331,4 +333,5 @@ export {
   TagUserIcon,
   QrCodeIcon,
   AnimatedArrowRightIcon,
+  KeyIcon,
 };
