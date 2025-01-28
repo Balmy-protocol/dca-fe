@@ -1133,6 +1133,7 @@ describe('Earn Service', () => {
           hash: '0xhash',
           type: TransactionTypes.earnCreate,
           chainId: 10,
+          confirmedTime: nowInMillis + 1000,
           typeData: {
             asset: {
               ...createSdkTokenWithWithdrawTypesMock({}),
@@ -1180,7 +1181,8 @@ describe('Earn Service', () => {
           const transaction = {
             hash: '0xhash',
             type: TransactionTypes.earnCreate,
-            addedTime: now + 1000,
+            addedTime: nowInMillis + 1000,
+            confirmedTime: nowInMillis + 1000,
             typeData: {
               positionId: '10-0xvault-10' as SdkEarnPositionId,
               strategyId: '0xvault' as SavedSdkStrategy['id'],
@@ -1197,7 +1199,8 @@ describe('Earn Service', () => {
             const transaction = {
               hash: '0xhash',
               type: TransactionTypes.earnWithdraw,
-              addedTime: now + 1000,
+              addedTime: nowInMillis + 1000,
+              confirmedTime: nowInMillis + 1000,
               typeData: {
                 withdrawn: [
                   {
@@ -1219,7 +1222,8 @@ describe('Earn Service', () => {
             const transaction = {
               hash: '0xhash',
               type: TransactionTypes.earnWithdraw,
-              addedTime: now - 1000,
+              addedTime: nowInMillis - 1000,
+              confirmedTime: nowInMillis - 1000,
               typeData: {
                 positionId: '10-0xvault-10' as SdkEarnPositionId,
                 strategyId: '0xvault' as SavedSdkStrategy['id'],

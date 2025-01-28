@@ -1257,13 +1257,14 @@ export class EarnService extends EventsManager<EarnServiceData> {
   }
 
   handleStoredTransaction(transaction: TransactionDetails) {
-    if (!isEarnType(transaction)) return;
+    if (!isEarnType(transaction) || !transaction.confirmedTime) return;
     const existingUserStrategy = this.userStrategies.find((s) => s.id === transaction.typeData.positionId);
     const isValidCreateTransaction = !existingUserStrategy && transaction.type === TransactionTypes.earnCreate;
     const isValidNonCreateTransaction =
       existingUserStrategy &&
       transaction.type !== TransactionTypes.earnCreate &&
-      existingUserStrategy.lastUpdatedAtFromApi < transaction.addedTime;
+      // Confirmed time is in milliseconds, so we need to convert it to seconds
+      existingUserStrategy.lastUpdatedAtFromApi < transaction.confirmedTime / 1000;
     if (!isValidCreateTransaction && !isValidNonCreateTransaction) return;
 
     this.handleTransaction(transaction);
