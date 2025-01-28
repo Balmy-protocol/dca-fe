@@ -67,9 +67,9 @@ const EarnWithdrawCTAButton = ({
     !!asset &&
     withdrawAmount &&
     positionBalance &&
-    parseUnits(withdrawAmount, asset.decimals) > positionBalance.amount.amount &&
     positionBalance.amount.amount !== 0n &&
-    withdrawAmount !== maxUint256.toString();
+    withdrawAmount !== maxUint256.toString() &&
+    parseUnits(withdrawAmount, asset.decimals) > positionBalance.amount.amount;
 
   const shouldDisableProceedButton =
     !asset ||
