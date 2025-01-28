@@ -83,6 +83,7 @@ export type SavedSdkStrategy = SdkStrategy & {
   lastUpdatedAt: number;
   userPositions?: SdkEarnPositionId[];
   hasFetchedHistoricalData: boolean;
+  farm: StrategyFarm;
 };
 
 export type Strategy = DistributiveOmit<SavedSdkStrategy, 'rewards' | 'asset'> & {

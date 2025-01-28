@@ -361,7 +361,7 @@ export default class AnalyticsService {
       },
       earn: {
         networks_used: strategy.network.name,
-        protocols_used: [strategy.farm.name],
+        protocols_used: [strategy.farm.protocol],
         tokens_used: [asset.symbol],
       },
     });

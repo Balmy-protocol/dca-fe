@@ -187,7 +187,7 @@ const useEarnWithdrawActions = ({ strategy }: UseEarnWithdrawActionsParams) => {
                   description="earn.strategy-management.delayed-withdraw.modal.loading"
                   defaultMessage="Your funds are being queued for withdrawal from {farm}. They'll be ready for you soon! 🕒. {rewards}"
                   values={{
-                    farm: strategy.farm.name,
+                    farm: strategy.farm.protocol,
                     rewards: withdrawRewards
                       ? intl.formatMessage(
                           defineMessage({
@@ -204,7 +204,7 @@ const useEarnWithdrawActions = ({ strategy }: UseEarnWithdrawActionsParams) => {
                 <FormattedMessage
                   description="earn.strategy-management.withdraw.modal.loading"
                   defaultMessage="You are now withdrawing funds from {farm}. Time to enjoy the rewards you've cultivated 🎉"
-                  values={{ farm: strategy.farm.name }}
+                  values={{ farm: strategy.farm.protocol }}
                 />
               </Typography>
             ),
@@ -392,7 +392,7 @@ const useEarnWithdrawActions = ({ strategy }: UseEarnWithdrawActionsParams) => {
             description: 'earn.strategy-management.withdraw.tx-steps.sign-companion-approval',
             defaultMessage: 'Balmy now needs your explicit authorization to withdraw from your investment on {farm}',
           }),
-          { farm: strategy.farm.name }
+          { farm: strategy.farm.protocol }
         ),
         extraData: {
           signStatus: SignStatus.none,
@@ -417,7 +417,7 @@ const useEarnWithdrawActions = ({ strategy }: UseEarnWithdrawActionsParams) => {
 
       return newSteps;
     },
-    [asset, assetAmountInUnits, intl, onSignCompanionApproval, onWithdraw, strategy?.farm.name]
+    [asset, assetAmountInUnits, intl, onSignCompanionApproval, onWithdraw, strategy?.farm.protocol]
   );
 
   const handleMultiSteps = React.useCallback(

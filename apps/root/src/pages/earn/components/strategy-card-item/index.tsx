@@ -10,6 +10,9 @@ import { Link } from 'react-router-dom';
 import PromotedFlag from '../strategies-table/components/promoted-flag';
 import { isNil } from 'lodash';
 import { MoreRewardsBadge } from '../strategies-table/components/columns';
+import { emptyTokenWithAddress } from '@common/utils/currency';
+import TokenIcon from '@common/components/token-icon';
+import { PLATFORM_NAMES_FOR_TOKENS } from '@constants/yield';
 
 interface SugestedStrategyCardProps {
   strategy: Strategy;
@@ -63,7 +66,13 @@ const StrategyCardItem = ({ strategy, variant }: SugestedStrategyCardProps) => {
 
   return (
     <StyledCard $condition={condition}>
-      <ContainerBox justifyContent="space-between" alignItems="center">
+      <ContainerBox justifyContent="flex-start" alignItems="center" gap={2} flexDirection="column">
+        <ContainerBox gap={2} alignItems="center" justifyContent="center">
+          <TokenIcon token={emptyTokenWithAddress(PLATFORM_NAMES_FOR_TOKENS[strategy.farm.protocol ?? ''])} size={8} />
+          <Typography variant="bodySmallBold" color={({ palette }) => colors[palette.mode].typography.typo2}>
+            {strategy.farm.name} - {strategy.farm.protocol}
+          </Typography>
+        </ContainerBox>
         <ContainerBox gap={2} alignItems="center">
           <TokenIconWithNetwork token={strategy.asset} />
           <Typography variant="bodySmallBold" color={({ palette }) => colors[palette.mode].typography.typo2}>
@@ -83,9 +92,6 @@ const StrategyCardItem = ({ strategy, variant }: SugestedStrategyCardProps) => {
             </>
           )}
         </ContainerBox>
-        <Typography variant="bodySmallRegular" color={({ palette }) => colors[palette.mode].typography.typo2}>
-          {strategy.farm.name}
-        </Typography>
       </ContainerBox>
       <DataCards
         strategy={strategy}

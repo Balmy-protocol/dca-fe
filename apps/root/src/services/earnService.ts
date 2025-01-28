@@ -191,8 +191,8 @@ export class EarnService extends EventsManager<EarnServiceData> {
     const summarizedParameters = strategies.reduce<SummarizedSdkStrategyParameters>(
       (acc, strategy) => {
         // Protocols
-        if (!acc.protocols.find((protocol) => protocol === strategy.farm.name)) {
-          acc.protocols.push(strategy.farm.name);
+        if (!acc.protocols.find((protocol) => protocol === strategy.farm.protocol)) {
+          acc.protocols.push(strategy.farm.protocol);
         }
 
         // Guardians

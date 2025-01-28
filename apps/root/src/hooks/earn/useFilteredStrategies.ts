@@ -53,7 +53,7 @@ export default function useFilteredStrategies<V extends StrategiesTableVariants>
         filtersApplied.yieldTypes.length === 0 || filtersApplied.yieldTypes.includes(strategy.farm.type);
 
       const isProtocolMatch =
-        filtersApplied.protocols.length === 0 || filtersApplied.protocols.includes(strategy.farm.name);
+        filtersApplied.protocols.length === 0 || filtersApplied.protocols.includes(strategy.farm.protocol);
 
       const isGuardiansMatch =
         filtersApplied.guardians.length === 0 || filtersApplied.guardians.includes(strategy.guardian?.id || '');

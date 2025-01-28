@@ -15,7 +15,7 @@ import {
 import TokenIcon from '@common/components/token-icon';
 import ComposedTokenIcon from '@common/components/composed-token-icon';
 import { usdFormatter } from '@common/utils/parsing';
-import { emptyTokenWithLogoURI } from '@common/utils/currency';
+import { emptyTokenWithAddress, emptyTokenWithLogoURI } from '@common/utils/currency';
 import { parseUserStrategiesFinancialData } from '@common/utils/earn/parsing';
 import styled from 'styled-components';
 import { StrategiesTableVariants } from '@state/strategies-filters/reducer';
@@ -26,6 +26,7 @@ import TokenIconWithNetwork from '@common/components/token-icon-with-network';
 import TokenAmount from '@common/components/token-amount';
 import { PROMOTED_STRATEGIES_IDS, STRATEGIES_WITH_LM_REWARDS } from '@constants/earn';
 import { isNil } from 'lodash';
+import { PLATFORM_NAMES_FOR_TOKENS } from '@constants/yield';
 
 export enum StrategyColumnKeys {
   IS_PROMOTED = 'isPromoted',
@@ -46,6 +47,7 @@ export enum StrategyColumnKeys {
   SINGLE_WALLET = 'singleWallet',
   MIGRATE = 'migrate',
   NEEDS_TIER = 'needsTier',
+  PROTOCOL = 'protocol',
 }
 
 const StyledWalletsPlusIndicator = styled(ContainerBox)`
@@ -59,7 +61,7 @@ const StyledWalletsPlusIndicator = styled(ContainerBox)`
   `}
 `;
 
-const StyledBoxedLabel = styled.div`
+const StyledBoxedLabel = styled(ContainerBox).attrs({ alignItems: 'center', gap: 2, flex: 1 })`
   ${({ theme: { palette, spacing } }) => `
   padding: ${spacing(1)} ${spacing(3)};
   border-radius: ${spacing(2)};
@@ -199,6 +201,19 @@ export const strategyColumnConfigs: StrategyColumnConfig<StrategiesTableVariants
     ),
   },
   {
+    key: StrategyColumnKeys.PROTOCOL,
+    label: <FormattedMessage description="earn.all-strategies-table.column.protocol" defaultMessage="Protocol" />,
+    renderCell: (data) => (
+      <ContainerBox>
+        <StyledBoxedLabel>
+          <TokenIcon token={emptyTokenWithAddress(PLATFORM_NAMES_FOR_TOKENS[data.farm.protocol])} size={4.5} />
+          <StyledBodySmallRegularTypo2>{data.farm.protocol}</StyledBodySmallRegularTypo2>
+        </StyledBoxedLabel>
+      </ContainerBox>
+    ),
+    getOrderValue: (data) => data.farm.protocol,
+  },
+  {
     key: StrategyColumnKeys.WALLET_BALANCE,
     label: (
       <FormattedMessage
@@ -246,29 +261,6 @@ export const strategyColumnConfigs: StrategyColumnConfig<StrategiesTableVariants
     label: <FormattedMessage description="earn.all-strategies-table.column.chain" defaultMessage="Network" />,
     renderCell: (data) => data.network.name,
     getOrderValue: (data) => data.network.name,
-  },
-  {
-    key: StrategyColumnKeys.YIELD_TYPE,
-    label: <FormattedMessage description="earn.all-strategies-table.column.yield-type" defaultMessage="Yield Type" />,
-    renderCell: (data) => (
-      <ContainerBox>
-        <StyledBoxedLabel>
-          <StyledBodySmallRegularTypo2>{data.formattedYieldType}</StyledBodySmallRegularTypo2>
-        </StyledBoxedLabel>
-      </ContainerBox>
-    ),
-    customSkeleton: (
-      <ContainerBox>
-        <StyledBoxedLabel>
-          <StyledBodySmallRegularTypo2>
-            <Skeleton variant="text" animation="wave" width="6ch" />
-          </StyledBodySmallRegularTypo2>
-        </StyledBoxedLabel>
-      </ContainerBox>
-    ),
-    hiddenProps: {
-      lgDown: true,
-    },
   },
   {
     key: StrategyColumnKeys.TVL,
@@ -370,22 +362,25 @@ export const portfolioColumnConfigs: StrategyColumnConfig<StrategiesTableVariant
   {
     key: StrategyColumnKeys.REWARDS,
     label: <FormattedMessage description="earn.all-strategies-table.column.rewards" defaultMessage="Rewards" />,
-    renderCell: (data) => (
-      <ContainerBox gap={2} flexWrap="wrap" alignItems="flex-start">
-        <StyledRewardsPill>
-          <ContainerBox alignItems="center">
-            <ComposedTokenIcon tokens={data[0].strategy.displayRewards.tokens} size={4.5} />
-          </ContainerBox>
-          <Typography variant="bodyExtraSmall" color={({ palette: { mode } }) => colors[mode].typography.typo2}>
-            $
-            {data[0].balances
-              .filter((balance) => balance.token.address !== data[0].strategy.asset.address)
-              .reduce((acc, balance) => acc + (Number(balance.amount.amountInUSD) ?? 0), 0)
-              .toFixed(2)}
-          </Typography>
-        </StyledRewardsPill>
-      </ContainerBox>
-    ),
+    renderCell: (data) =>
+      data[0].strategy.displayRewards.tokens.length > 1 ? (
+        <ContainerBox gap={2} flexWrap="wrap" alignItems="flex-start">
+          <StyledRewardsPill>
+            <ContainerBox alignItems="center">
+              <ComposedTokenIcon tokens={data[0].strategy.displayRewards.tokens} size={4.5} />
+            </ContainerBox>
+            <Typography variant="bodyExtraSmall" color={({ palette: { mode } }) => colors[mode].typography.typo2}>
+              $
+              {data[0].balances
+                .filter((balance) => balance.token.address !== data[0].strategy.asset.address)
+                .reduce((acc, balance) => acc + (Number(balance.amount.amountInUSD) ?? 0), 0)
+                .toFixed(2)}
+            </Typography>
+          </StyledRewardsPill>
+        </ContainerBox>
+      ) : (
+        <></>
+      ),
     hiddenProps: {
       lgDown: true,
     },
