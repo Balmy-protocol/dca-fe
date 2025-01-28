@@ -53,7 +53,12 @@ const TotalFooter = <T extends StrategiesTableVariants>({
 }: TotalFooterProps<T>) => {
   const totalInvested = React.useMemo(() => {
     if (variant === StrategiesTableVariants.ALL_STRATEGIES) {
-      return { totalInvestedUsd: 0, currentProfitUsd: 0, currentProfitRate: 0, earnings: {} };
+      return {
+        totalInvestedUsd: 0,
+        currentProfitUsd: { asset: 0, total: 0 },
+        currentProfitRate: { asset: 0, total: 0 },
+        earnings: {},
+      };
     }
     const userStrategies = strategies as EarnPosition[][];
 
@@ -78,7 +83,7 @@ const TotalFooter = <T extends StrategiesTableVariants>({
               ) : null}
               {column.key === StrategyColumnKeys.CURRENT_PROFIT ? (
                 <Typography variant="bodyBold" color={isEmptyPortfolio ? 'text.disabled' : 'success.dark'}>
-                  {usdFormatter(totalInvested.currentProfitUsd)}
+                  {usdFormatter(totalInvested.currentProfitUsd.asset)}
                 </Typography>
               ) : null}
             </StyledTotalsTableCell>

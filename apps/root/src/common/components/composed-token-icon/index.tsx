@@ -66,8 +66,9 @@ const ComposedTokenIcon = ({
   maxTokens = 3,
 }: ComposedTokenIconProps) => {
   const theme = useTheme();
-  const marginRightToUse = compact(tokens).length === 1 ? 0 : marginRight;
-  const overlapRatioToUse = compact(tokens).length === 1 ? 0 : overlapRatio;
+  const amountOfTokens = compact(tokens).length;
+  const marginRightToUse = amountOfTokens === 1 ? 0 : marginRight * (amountOfTokens - 1);
+  const overlapRatioToUse = amountOfTokens === 1 ? 0 : overlapRatio;
 
   if (isLoading) {
     const sizeInPx = theme.spacing(size);

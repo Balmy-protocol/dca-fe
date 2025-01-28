@@ -71,6 +71,7 @@ type NavigationProps = React.PropsWithChildren<{
   extraHeaderTools?: React.ReactElement;
   onClickBrandLogo: () => void;
   headerContent?: React.ReactNode;
+  promotedBanner?: React.ReactNode;
 }>;
 
 const drawerWidthLg = 240;
@@ -117,17 +118,14 @@ const StyledDrawerContainer = styled.div`
   flex-direction: column;
 `;
 
-const StyledDrawerFooterContainer = styled.div`
+const StyledDrawerFooterContainer = styled(ContainerBox).attrs({ gap: 12, flexDirection: 'column' })`
   ${({
     theme: {
       space,
       palette: { mode },
     },
   }) => `
-    display: flex;
     margin-bottom: ${space.s05};
-    justify-content: center;
-    gap: ${space.s05};
     margin-top: auto;
     color: ${colors[mode].typography.typo3}
   `}
@@ -138,6 +136,12 @@ const AppBarRightContainer = styled(ContainerBox)`
   align-items: center;
   justify-content: flex-end;
   flex: 1;
+`;
+
+const StyledPromotedBannerContainer = styled(ContainerBox).attrs({ justifyContent: 'center' })`
+  ${({ theme: { spacing } }) => `
+    padding: 0 ${spacing(4)};
+  `}
 `;
 
 const BuiltListItem = ({
@@ -337,6 +341,7 @@ const Navigation = ({
   extraHeaderTools,
   onClickBrandLogo,
   headerContent,
+  promotedBanner,
 }: NavigationProps) => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const {
@@ -367,15 +372,18 @@ const Navigation = ({
       {headerContent}
       <StyledDrawerLinksContainer>{drawerLinks}</StyledDrawerLinksContainer>
       <StyledDrawerFooterContainer>
-        <Link underline="none" target="_blank" href="https://github.com/balmy-protocol">
-          <GithubIcon sx={{ color: colors[mode].typography.typo3 }} />
-        </Link>
-        <Link underline="none" target="_blank" href="https://twitter.com/balmy_xyz">
-          <TwitterIcon sx={{ color: colors[mode].typography.typo3 }} />
-        </Link>
-        <Link underline="none" target="_blank" href="http://discord.balmy.xyz">
-          <DiscordIcon sx={{ color: colors[mode].typography.typo3 }} />
-        </Link>
+        <StyledPromotedBannerContainer>{promotedBanner}</StyledPromotedBannerContainer>
+        <ContainerBox gap={5} justifyContent="center" alignItems="center">
+          <Link underline="none" target="_blank" href="https://github.com/balmy-protocol">
+            <GithubIcon sx={{ color: colors[mode].typography.typo3 }} />
+          </Link>
+          <Link underline="none" target="_blank" href="https://twitter.com/balmy_xyz">
+            <TwitterIcon sx={{ color: colors[mode].typography.typo3 }} />
+          </Link>
+          <Link underline="none" target="_blank" href="http://discord.balmy.xyz">
+            <DiscordIcon sx={{ color: colors[mode].typography.typo3 }} />
+          </Link>
+        </ContainerBox>
       </StyledDrawerFooterContainer>
     </StyledDrawerContainer>
   );

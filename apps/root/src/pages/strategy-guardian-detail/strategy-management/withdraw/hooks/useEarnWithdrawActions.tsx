@@ -12,7 +12,7 @@ import {
   WithdrawType,
 } from 'common-types';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
-import { Hash, parseUnits } from 'viem';
+import { Hash, maxUint256, parseUnits } from 'viem';
 import useAnalytics from '@hooks/useAnalytics';
 import useActiveWallet from '@hooks/useActiveWallet';
 import { shouldTrackError } from '@common/utils/errors';
@@ -64,7 +64,7 @@ const useEarnWithdrawActions = ({ strategy }: UseEarnWithdrawActionsParams) => {
     const rewardsWithdrawAmounts = currentPosition.balances
       .filter((balance) => !isSameToken(balance.token, asset))
       .map((balance) => ({
-        amount: withdrawRewards ? balance.amount.amount : 0n,
+        amount: withdrawRewards ? maxUint256 : 0n,
         token: balance.token,
         convertTo: undefined,
       }));
@@ -72,7 +72,10 @@ const useEarnWithdrawActions = ({ strategy }: UseEarnWithdrawActionsParams) => {
     // Build the list with all the tokens, always asset token first
     const withdrawList = [
       {
-        amount: parseUnits(assetAmountInUnits || '0', asset.decimals),
+        amount:
+          assetAmountInUnits === maxUint256.toString()
+            ? maxUint256
+            : parseUnits(assetAmountInUnits || '0', asset.decimals),
         token: assetIsProtocolToken ? wrappedProtocolToken : asset,
         convertTo: assetIsProtocolToken ? protocolToken.address : undefined,
       },
@@ -175,8 +178,9 @@ const useEarnWithdrawActions = ({ strategy }: UseEarnWithdrawActionsParams) => {
       if (!asset || !activeWallet?.address || !strategy || notWithdrawing || !tokensToWithdraw) return;
 
       const currentPosition = strategy.userPositions?.find((position) => position.owner === activeWallet.address);
+      const assetBalances = currentPosition?.balances.find((balance) => isSameToken(balance.token, asset));
 
-      if (!currentPosition) return;
+      if (!currentPosition || !assetBalances) return;
 
       try {
         setModalLoading({
@@ -187,7 +191,7 @@ const useEarnWithdrawActions = ({ strategy }: UseEarnWithdrawActionsParams) => {
                   description="earn.strategy-management.delayed-withdraw.modal.loading"
                   defaultMessage="Your funds are being queued for withdrawal from {farm}. They'll be ready for you soon! 🕒. {rewards}"
                   values={{
-                    farm: strategy.farm.name,
+                    farm: strategy.farm.protocol,
                     rewards: withdrawRewards
                       ? intl.formatMessage(
                           defineMessage({
@@ -204,7 +208,7 @@ const useEarnWithdrawActions = ({ strategy }: UseEarnWithdrawActionsParams) => {
                 <FormattedMessage
                   description="earn.strategy-management.withdraw.modal.loading"
                   defaultMessage="You are now withdrawing funds from {farm}. Time to enjoy the rewards you've cultivated 🎉"
-                  values={{ farm: strategy.farm.name }}
+                  values={{ farm: strategy.farm.protocol }}
                 />
               </Typography>
             ),
@@ -213,7 +217,8 @@ const useEarnWithdrawActions = ({ strategy }: UseEarnWithdrawActionsParams) => {
         trackEvent(`Earn - Withdraw position submitting`, {
           asset: asset.symbol,
           chainId: strategy.farm.chainId,
-          amount: assetAmountInUnits,
+          amount:
+            assetAmountInUnits === maxUint256.toString() ? assetBalances?.amount.amountInUnits : assetAmountInUnits,
           withdrawRewards,
           withdrawType: assetWithdrawType,
         });
@@ -264,13 +269,18 @@ const useEarnWithdrawActions = ({ strategy }: UseEarnWithdrawActionsParams) => {
 
         const tokensToWithdrawTypeData = parsedTokensToWithdraw.map((withdraw) => ({
           ...withdraw,
-          amount: withdraw.amount.toString(),
+          amount: withdraw.amount === maxUint256 ? assetBalances?.amount.amount.toString() : withdraw.amount.toString(),
           token: isSameToken(withdraw.token, wrappedProtocolToken) ? protocolToken : withdraw.token,
         }));
 
-        const amountInUsd = parsedTokensToWithdraw.reduce((acc, withdraw) => {
+        const amountInUsd = tokensToWithdrawTypeData.reduce((acc, withdraw) => {
           return (
-            acc + parseUsdPrice(withdraw.token, withdraw.amount, parseNumberUsdPriceToBigInt(withdraw.token.price ?? 0))
+            acc +
+            parseUsdPrice(
+              withdraw.token,
+              BigInt(withdraw.amount),
+              parseNumberUsdPriceToBigInt(withdraw.token.price ?? 0)
+            )
           );
         }, 0);
         const typeData: EarnWithdrawTypeData = {
@@ -286,7 +296,8 @@ const useEarnWithdrawActions = ({ strategy }: UseEarnWithdrawActionsParams) => {
         trackEvent(`Earn - Withdraw position submitted`, {
           asset: asset.symbol,
           strategy: strategy.id,
-          amount: assetAmountInUnits,
+          amount:
+            assetAmountInUnits === maxUint256.toString() ? assetBalances?.amount.amountInUnits : assetAmountInUnits,
           withdrawRewards,
           amountInUsd,
           withdrawType: assetWithdrawType,
@@ -392,7 +403,7 @@ const useEarnWithdrawActions = ({ strategy }: UseEarnWithdrawActionsParams) => {
             description: 'earn.strategy-management.withdraw.tx-steps.sign-companion-approval',
             defaultMessage: 'Balmy now needs your explicit authorization to withdraw from your investment on {farm}',
           }),
-          { farm: strategy.farm.name }
+          { farm: strategy.farm.protocol }
         ),
         extraData: {
           signStatus: SignStatus.none,
@@ -417,7 +428,7 @@ const useEarnWithdrawActions = ({ strategy }: UseEarnWithdrawActionsParams) => {
 
       return newSteps;
     },
-    [asset, assetAmountInUnits, intl, onSignCompanionApproval, onWithdraw, strategy?.farm.name]
+    [asset, assetAmountInUnits, intl, onSignCompanionApproval, onWithdraw, strategy?.farm.protocol]
   );
 
   const handleMultiSteps = React.useCallback(

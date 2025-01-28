@@ -34,6 +34,7 @@ import ProviderService from './providerService';
 import ContractService from './contractService';
 import { toToken } from '@common/utils/currency';
 import MeanApiService from './meanApiService';
+import { EarnStrategyStatus } from '@balmy/sdk/dist/services/earn/types';
 jest.mock('./sdkService');
 jest.mock('./accountService');
 jest.mock('./providerService');
@@ -86,12 +87,14 @@ const createStrategyFarmMock = ({
   asset,
   rewards,
   tvl,
+  protocol,
   type,
   apy,
   chainId,
 }: Partial<StrategyFarm>): StrategyFarm => ({
   id: !isUndefined(id) ? id : ('0xvault' as StrategyFarm['id']),
   name: !isUndefined(name) ? name : '0xvault',
+  protocol: !isUndefined(protocol) ? protocol : 'Aave',
   chainId: !isUndefined(chainId) ? chainId : 10,
   asset: !isUndefined(asset) ? asset : createSdkTokenWithWithdrawTypesMock({}),
   rewards: !isUndefined(rewards)
@@ -141,7 +144,9 @@ const createStrategyMock = ({
   lastUpdatedAt,
   userPositions,
   fees,
+  status,
 }: Partial<SavedSdkStrategy> = {}): SavedSdkStrategy => ({
+  status: !isUndefined(status) ? status : EarnStrategyStatus.OK,
   depositTokens: [{ ...(farm?.asset || createStrategyFarmMock({}).asset), type: TokenType.ASSET }],
   id: !isUndefined(id) ? id : ('0xvault' as SavedSdkStrategy['id']),
   farm: !isUndefined(farm) ? createStrategyFarmMock(farm) : createStrategyFarmMock({}),
@@ -1128,6 +1133,7 @@ describe('Earn Service', () => {
           hash: '0xhash',
           type: TransactionTypes.earnCreate,
           chainId: 10,
+          confirmedTime: nowInMillis + 1000,
           typeData: {
             asset: {
               ...createSdkTokenWithWithdrawTypesMock({}),
@@ -1175,7 +1181,8 @@ describe('Earn Service', () => {
           const transaction = {
             hash: '0xhash',
             type: TransactionTypes.earnCreate,
-            addedTime: now + 1000,
+            addedTime: nowInMillis + 1000,
+            confirmedTime: nowInMillis + 1000,
             typeData: {
               positionId: '10-0xvault-10' as SdkEarnPositionId,
               strategyId: '0xvault' as SavedSdkStrategy['id'],
@@ -1192,7 +1199,8 @@ describe('Earn Service', () => {
             const transaction = {
               hash: '0xhash',
               type: TransactionTypes.earnWithdraw,
-              addedTime: now + 1000,
+              addedTime: nowInMillis + 1000,
+              confirmedTime: nowInMillis + 1000,
               typeData: {
                 withdrawn: [
                   {
@@ -1214,7 +1222,8 @@ describe('Earn Service', () => {
             const transaction = {
               hash: '0xhash',
               type: TransactionTypes.earnWithdraw,
-              addedTime: now - 1000,
+              addedTime: nowInMillis - 1000,
+              confirmedTime: nowInMillis - 1000,
               typeData: {
                 positionId: '10-0xvault-10' as SdkEarnPositionId,
                 strategyId: '0xvault' as SavedSdkStrategy['id'],

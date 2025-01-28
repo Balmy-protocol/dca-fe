@@ -261,7 +261,7 @@ const OneClickMigrationConfirmMigrationContent = ({
             <FormattedMessage
               description="earn.one-click-migration.confirm-migration.subtitle"
               defaultMessage="Keep your yield-generating funds in {protocol} under 24/7 watch by top security experts! 🛡"
-              values={{ protocol: selectedFarm.farm.name }}
+              values={{ protocol: selectedFarm.farm.protocol }}
             />
           </Typography>
         </ContainerBox>
@@ -273,7 +273,7 @@ const OneClickMigrationConfirmMigrationContent = ({
                 defaultMessage="Protocol"
               />
             </StyledTitleData>
-            <StyledTitleDataValue>{selectedFarm.farm.name}</StyledTitleDataValue>
+            <StyledTitleDataValue>{selectedFarm.farm.protocol}</StyledTitleDataValue>
           </StyledTitleDataContainer>
           <StyledTitleDataContainer>
             <StyledTitleData>

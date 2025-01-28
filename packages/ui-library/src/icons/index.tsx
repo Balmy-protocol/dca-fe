@@ -112,6 +112,7 @@ import OutlookIcon from './outlook';
 import SuccessTickIcon from './successTick';
 import Money4Icon from './money-4';
 import AnimatedChevronRightIcon from './animated-chevron-right';
+import AnimatedArrowRightIcon from './animated-arrow-right';
 import GlobalIcon from './global';
 import ShieldSearchIcon from './shieldSearch';
 import GraphIcon from './graphIcon';
@@ -329,4 +330,5 @@ export {
   PenAddIcon,
   TagUserIcon,
   QrCodeIcon,
+  AnimatedArrowRightIcon,
 };

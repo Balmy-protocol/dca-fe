@@ -58,6 +58,7 @@ import { resetForm as resetAggregatorForm } from '@state/aggregator/actions';
 import { resetForm as resetTransferForm } from '@state/transfer/actions';
 import { resetDcaForm } from '@state/create-position/actions';
 import { fullyResetEarnForm } from '@state/earn-management/actions';
+import PromotedTierBanner from './promoted-banners/tier-banner';
 
 const helpOptions = [
   {
@@ -455,6 +456,7 @@ const Navigation = ({ children }: React.PropsWithChildren) => {
           type: OptionsMenuOptionType.option,
         }))}
         onClickBrandLogo={onClickBrandLogo}
+        promotedBanner={<PromotedTierBanner />}
       >
         {children}
       </NavigationUI>

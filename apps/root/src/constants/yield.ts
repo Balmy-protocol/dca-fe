@@ -17,6 +17,8 @@ export const DEFAULT_MINIMUM_USD_RATE_FOR_YIELD = 5;
 
 export const PLATFORM_NAMES_FOR_TOKENS: Record<string, string> = {
   'Aave v3': 'AAVE',
+  Aave: 'AAVE',
+  Morpho: 'MORPHO',
   Exactly: 'EXACTLY',
   'Sonne Finance': 'SONNE',
   'Yearn Finance': 'YEARN',

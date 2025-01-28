@@ -1,3 +1,4 @@
+import { EarnStrategyStatus } from '@balmy/sdk/dist/services/earn/types';
 import { nowInSeconds } from '@common/utils/time';
 import { ONE_DAY } from '@constants';
 import {
@@ -38,6 +39,7 @@ function generateAPYData(): { timestamp: number; apy: number; name: string }[] {
 }
 
 export const sdkStrategyMock: SdkStrategy = {
+  status: EarnStrategyStatus.OK,
   depositTokens: [
     {
       address: '0x7f5c764cbc14f9669b88837ca1490cca17c31607',
@@ -52,6 +54,7 @@ export const sdkStrategyMock: SdkStrategy = {
     chainId: 10,
     id: '1-0xaave',
     name: 'AAVE',
+    protocol: 'Aave',
     tvl: 1 * 10 ** 6,
     apy: 8,
     type: StrategyYieldType.LENDING,
@@ -125,10 +128,12 @@ export const sdkDetailedStrategyMock: SdkStrategy = {
 };
 
 export const sdkStrategyMock2: SdkStrategy = {
+  status: EarnStrategyStatus.OK,
   farm: {
     chainId: 137,
     id: '1-0xyearn',
     name: 'yearn.finance',
+    protocol: 'Yearn',
     tvl: 1 * 10 ** 12,
     apy: 10,
     asset: {
