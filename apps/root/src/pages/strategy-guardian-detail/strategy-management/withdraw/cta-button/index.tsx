@@ -2,7 +2,7 @@ import React from 'react';
 import { Button, ContainerBox } from 'ui-library';
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
 import useCurrentNetwork from '@hooks/useCurrentNetwork';
-import { parseUnits } from 'viem';
+import { maxUint256, parseUnits } from 'viem';
 import useWalletService from '@hooks/useWalletService';
 import { useAppDispatch } from '@state/hooks';
 import find from 'lodash/find';
@@ -67,7 +67,9 @@ const EarnWithdrawCTAButton = ({
     !!asset &&
     withdrawAmount &&
     positionBalance &&
-    parseUnits(withdrawAmount, asset.decimals) > positionBalance.amount.amount;
+    parseUnits(withdrawAmount, asset.decimals) > positionBalance.amount.amount &&
+    positionBalance.amount.amount !== 0n &&
+    withdrawAmount !== maxUint256.toString();
 
   const shouldDisableProceedButton =
     !asset ||
