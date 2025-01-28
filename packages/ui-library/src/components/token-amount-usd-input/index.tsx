@@ -91,6 +91,7 @@ interface TokenAmounUsdInputProps {
   value?: string;
   onChange: (newValue: string) => void;
   disabled?: boolean;
+  onMaxCallback?: () => void;
 }
 
 interface InputProps extends TokenAmounUsdInputProps {
@@ -263,7 +264,15 @@ enum InputTypeT {
   token = 'token',
 }
 
-const TokenAmounUsdInput = ({ token, balance, tokenPrice, value, onChange, disabled }: TokenAmounUsdInputProps) => {
+const TokenAmounUsdInput = ({
+  token,
+  balance,
+  tokenPrice,
+  value,
+  onChange,
+  disabled,
+  onMaxCallback,
+}: TokenAmounUsdInputProps) => {
   const [internalValue, setInternalValue] = useState(value);
   const {
     palette: { mode },
@@ -341,6 +350,12 @@ const TokenAmounUsdInput = ({ token, balance, tokenPrice, value, onChange, disab
   const onMaxValueClick = () => {
     if (!balance) {
       throw new Error('should not call on max value without a balance');
+    }
+
+    if (onMaxCallback) {
+      // onChange will be called by the parent component
+      onMaxCallback();
+      return;
     }
 
     if (balance && token && token.address === PROTOCOL_TOKEN_ADDRESS) {

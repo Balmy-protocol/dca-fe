@@ -27,7 +27,7 @@ import { NETWORKS } from '@constants';
 import { IntervalSetActions } from '@constants/timing';
 import AccountService from './accountService';
 import compact from 'lodash/compact';
-import { Address, encodeAbiParameters, formatUnits, Hex, maxUint256, parseAbiParameters } from 'viem';
+import { Address, encodeAbiParameters, formatUnits, Hex, parseAbiParameters } from 'viem';
 import { parseSignatureValues } from '@common/utils/signatures';
 import { getNewEarnPositionFromTxTypeData } from '@common/utils/transactions';
 import { parseUsdPrice, parseNumberUsdPriceToBigInt, toToken, isSameToken } from '@common/utils/currency';
@@ -988,23 +988,10 @@ export class EarnService extends EventsManager<EarnServiceData> {
       }) ||
       undefined;
 
-    const protocolToken = getProtocolToken(strategy.farm.chainId);
-    const wrappedProtocolToken = getWrappedProtocolToken(strategy.farm.chainId);
     const withdrawAmount = withdraw.map((w) => {
-      const addressToFind = isSameAddress(w.token.address, wrappedProtocolToken.address)
-        ? protocolToken.address
-        : w.token.address;
-      const originalTokenBalance = userStrategy.balances.find(
-        (b) => b.token.address.toLowerCase() === addressToFind.toLowerCase()
-      );
-
-      const shouldWithdrawMax =
-        originalTokenBalance?.amount.amount !== 0n && originalTokenBalance?.amount.amount === w.amount;
-
-      const amount = shouldWithdrawMax ? maxUint256 : w.amount;
       return {
         token: w.token.address,
-        amount,
+        amount: w.amount,
         convertTo: w.convertTo,
         type: w.withdrawType,
       };

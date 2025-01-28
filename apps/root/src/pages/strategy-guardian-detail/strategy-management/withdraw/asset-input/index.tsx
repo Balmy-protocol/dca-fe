@@ -18,7 +18,7 @@ import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
 import useActiveWallet from '@hooks/useActiveWallet';
 import useHasFetchedUserStrategies from '@hooks/earn/useHasFetchedUserStrategies';
-import { parseUnits } from 'viem';
+import { formatUnits, maxUint256, parseUnits } from 'viem';
 
 interface WithdrawAssetInputProps {
   strategy?: DisplayStrategy;
@@ -81,6 +81,10 @@ const WithdrawAssetInput = ({ strategy }: WithdrawAssetInputProps) => {
     [depositedBalances, withdrawRewards, strategy]
   );
 
+  const onMaxCallback = () => {
+    setTokenAmount(maxUint256.toString());
+  };
+
   React.useEffect(() => {
     if (hasFetchedUserStrategies && depositedBalances.hasRewardsBalance) {
       dispatch(setWithdrawRewards(true));
@@ -110,12 +114,17 @@ const WithdrawAssetInput = ({ strategy }: WithdrawAssetInputProps) => {
       </ContainerBox>
       <ContainerBox flexDirection="column" gap={4}>
         <TokenAmounUsdInput
-          value={withdrawAmount}
+          value={
+            withdrawAmount === maxUint256.toString()
+              ? formatUnits(depositedBalances.asset?.amount || 0n, strategy?.asset.decimals || 18)
+              : withdrawAmount
+          }
           token={strategy?.asset}
           balance={depositedBalances.asset}
           tokenPrice={fetchedTokenPrice}
           disabled={baseDisableWithdraw || !depositedBalances.asset || depositedBalances.asset.amount === 0n}
           onChange={setTokenAmount}
+          onMaxCallback={onMaxCallback}
         />
         {strategyHasRewards && (
           <FormGroup sx={{ alignItems: 'start' }}>

@@ -12,7 +12,7 @@ import React from 'react';
 import { defineMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 import { ArrowRightIcon, colors, ContainerBox, Typography } from 'ui-library';
-import { formatUnits, parseUnits } from 'viem';
+import { formatUnits, maxUint256, parseUnits } from 'viem';
 
 const StyledCurrentValueBold = styled(Typography).attrs({ variant: 'bodyBold' })`
   ${({ theme: { palette } }) => `
@@ -102,12 +102,21 @@ const ExpectedReturnsChangesSummary = ({
   const activeWallet = useActiveWallet();
   const isWithdraw = operation === EarnOperationVariant.WITHDRAW;
 
+  const assetAmountToUse = React.useMemo(() => {
+    const activeWalletAssetBalances = strategy?.userPositions
+      ?.find((userPosition) => userPosition.owner === activeWallet?.address)
+      ?.balances.find((balance) => balance.token.address === strategy?.asset.address);
+    return isWithdraw && assetAmount === maxUint256.toString()
+      ? activeWalletAssetBalances?.amount.amountInUnits
+      : assetAmount;
+  }, [activeWallet?.address, strategy, assetAmount, isWithdraw]);
+
   const updatedUserPositions = React.useMemo(() => {
     const mainAsset = strategy?.asset;
     let newUpdatedPositions;
     const positions = [...(strategy?.userPositions || [])];
 
-    if (!Number(assetAmount || 0)) {
+    if (!Number(assetAmountToUse || 0)) {
       return positions;
     }
 
@@ -121,7 +130,7 @@ const ExpectedReturnsChangesSummary = ({
         ...(strategy.userPositions?.filter((position) => position.id !== updatedUserStrategy.id) || []),
       ];
       updatedUserStrategy.balances = updatedUserStrategy.balances.map(({ token, amount: tokenAmount, profit }) => {
-        const parsedAssetAmount = BigInt(parseUnits(assetAmount || '0', mainAsset.decimals));
+        const parsedAssetAmount = BigInt(parseUnits(assetAmountToUse || '0', mainAsset.decimals));
         const newAmount = tokenAmount.amount + (isWithdraw ? -parsedAssetAmount : parsedAssetAmount);
 
         return token.address === strategy?.asset.address
