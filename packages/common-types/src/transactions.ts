@@ -197,6 +197,7 @@ export interface EarnWithdrawTypeData {
       token: Token;
       amount: string;
       withdrawType: WithdrawType;
+      intendedWithdrawAmount?: string;
     }[];
   };
 }

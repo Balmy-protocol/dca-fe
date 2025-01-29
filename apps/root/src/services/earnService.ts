@@ -27,7 +27,7 @@ import { NETWORKS } from '@constants';
 import { IntervalSetActions } from '@constants/timing';
 import AccountService from './accountService';
 import compact from 'lodash/compact';
-import { Address, encodeAbiParameters, formatUnits, Hex, parseAbiParameters } from 'viem';
+import { Address, encodeAbiParameters, formatUnits, Hex, maxUint256, parseAbiParameters } from 'viem';
 import { parseSignatureValues } from '@common/utils/signatures';
 import { getNewEarnPositionFromTxTypeData } from '@common/utils/transactions';
 import { parseUsdPrice, parseNumberUsdPriceToBigInt, toToken, isSameToken } from '@common/utils/currency';
@@ -324,6 +324,7 @@ export class EarnService extends EventsManager<EarnServiceData> {
   batchUpdateUserStrategies(userStrategies: SdkEarnPosition[], hasFetchedHistory?: boolean) {
     let storedUserStrategies = [...this.userStrategies];
 
+    console.log('batchUpdateUserStrategies');
     userStrategies.forEach((strategy) => {
       const updatedUserStrategies = this.updateUserStrategy(strategy, storedUserStrategies, hasFetchedHistory);
       storedUserStrategies = updatedUserStrategies;
@@ -381,6 +382,7 @@ export class EarnService extends EventsManager<EarnServiceData> {
       strategiesArray.map((userStrategy) => userStrategy.strategy)
     );
 
+    console.log('fetchUserStrategies batchUpdateUserStrategies');
     this.batchUpdateUserStrategies(strategiesArray);
 
     this.hasFetchedUserStrategies = true;
@@ -440,15 +442,25 @@ export class EarnService extends EventsManager<EarnServiceData> {
       const currentHistory = updatedUserStrategies[userStrategyIndex].history;
       const eventsThatWeHaveThatTheUserStrategyIsMissing = currentHistory?.filter(
         // We keep only events that are after the last updated at timestamp from the api
-        (event) => event.tx.timestamp > userStrategy.lastUpdatedAt
+        (event) => {
+          const isEventInUserStrategy = userStrategy.history?.find((tx) => tx.tx.hash === event.tx.hash);
+          return !isEventInUserStrategy && event.tx.timestamp > userStrategy.lastUpdatedAt;
+        }
       );
 
-      if (eventsThatWeHaveThatTheUserStrategyIsMissing) {
+      if (eventsThatWeHaveThatTheUserStrategyIsMissing && eventsThatWeHaveThatTheUserStrategyIsMissing.length > 0) {
+        console.log('Applying virtual events to balances');
+        console.log('userStrategy', userStrategy);
+        console.log('updatedUserStrategies', updatedUserStrategies[userStrategyIndex]);
+        console.log('updatedBalances', updatedBalances);
+        console.log('eventsThatWeHaveThatTheUserStrategyIsMissing', eventsThatWeHaveThatTheUserStrategyIsMissing);
         updatedBalances = this.applyVirtualEventsToBalances(
           userStrategy.strategy,
           updatedBalances,
           eventsThatWeHaveThatTheUserStrategyIsMissing
         );
+
+        console.log('updated updatedBalances', updatedBalances);
         updatedDelayed = this.applyVirtualEventsToDelayed(updatedDelayed, eventsThatWeHaveThatTheUserStrategyIsMissing);
       }
 
@@ -533,6 +545,7 @@ export class EarnService extends EventsManager<EarnServiceData> {
               };
             }
           });
+          console.log('applyVirtualEventsToBalances withdraw', event.withdrawn, acc);
           return acc;
       }
 
@@ -738,6 +751,7 @@ export class EarnService extends EventsManager<EarnServiceData> {
 
     const results = compact(await Promise.all(promises));
 
+    console.log('fetchMultipleEarnPositionsFromStrategy batchUpdateUserStrategies');
     this.batchUpdateUserStrategies(results, true);
   }
 
@@ -1444,6 +1458,7 @@ export class EarnService extends EventsManager<EarnServiceData> {
             ).toString(),
           },
           withdrawType: withdrawnAmount.withdrawType,
+          intendedWithdrawAmount: withdrawnAmount.intendedWithdrawAmount,
         }));
 
         const newBalances = modifiedStrategy.balances.map((balance) => {
@@ -1454,7 +1469,13 @@ export class EarnService extends EventsManager<EarnServiceData> {
             return balance;
           }
 
-          const newTokenBalanceAmount = balance.amount.amount - withdrawnToken.amount.amount;
+          let newTokenBalanceAmount = balance.amount.amount - withdrawnToken.amount.amount;
+          if (
+            withdrawnToken.intendedWithdrawAmount &&
+            withdrawnToken.intendedWithdrawAmount === maxUint256.toString()
+          ) {
+            newTokenBalanceAmount = 0n;
+          }
 
           return {
             ...balance,
@@ -1469,6 +1490,9 @@ export class EarnService extends EventsManager<EarnServiceData> {
             },
           };
         });
+
+        console.log('newBalances', newBalances);
+        console.log('withdrawnAmounts', withdrawnAmounts);
         modifiedStrategy.lastUpdatedAt = nowInSeconds();
         modifiedStrategy.balances = newBalances;
         modifiedStrategy.historicalBalances.push({

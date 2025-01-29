@@ -269,7 +269,18 @@ const useEarnWithdrawActions = ({ strategy }: UseEarnWithdrawActionsParams) => {
 
         const tokensToWithdrawTypeData = parsedTokensToWithdraw.map((withdraw) => ({
           ...withdraw,
-          amount: withdraw.amount === maxUint256 ? assetBalances?.amount.amount.toString() : withdraw.amount.toString(),
+          intendedWithdrawAmount: withdraw.amount.toString(),
+          amount:
+            withdraw.amount === maxUint256
+              ? currentPosition.balances
+                  .find((balance) =>
+                    isSameToken(
+                      balance.token,
+                      isSameToken(withdraw.token, wrappedProtocolToken) ? protocolToken : withdraw.token
+                    )
+                  )
+                  ?.amount.amount.toString() ?? '0'
+              : withdraw.amount.toString(),
           token: isSameToken(withdraw.token, wrappedProtocolToken) ? protocolToken : withdraw.token,
         }));
 
