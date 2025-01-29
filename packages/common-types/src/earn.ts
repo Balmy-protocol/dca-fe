@@ -136,6 +136,7 @@ type WithdrewAction = DistributiveOmit<SdkWithdrewAction, 'withdrawn'> & {
     token: Token;
     amount: AmountsOfToken;
     withdrawType: WithdrawType;
+    intendedWithdrawAmount?: string;
   }[];
 };
 

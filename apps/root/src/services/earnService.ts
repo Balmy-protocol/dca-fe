@@ -27,7 +27,7 @@ import { NETWORKS } from '@constants';
 import { IntervalSetActions } from '@constants/timing';
 import AccountService from './accountService';
 import compact from 'lodash/compact';
-import { Address, encodeAbiParameters, formatUnits, Hex, parseAbiParameters } from 'viem';
+import { Address, encodeAbiParameters, formatUnits, Hex, maxUint256, parseAbiParameters } from 'viem';
 import { parseSignatureValues } from '@common/utils/signatures';
 import { getNewEarnPositionFromTxTypeData } from '@common/utils/transactions';
 import { parseUsdPrice, parseNumberUsdPriceToBigInt, toToken, isSameToken } from '@common/utils/currency';
@@ -440,15 +440,19 @@ export class EarnService extends EventsManager<EarnServiceData> {
       const currentHistory = updatedUserStrategies[userStrategyIndex].history;
       const eventsThatWeHaveThatTheUserStrategyIsMissing = currentHistory?.filter(
         // We keep only events that are after the last updated at timestamp from the api
-        (event) => event.tx.timestamp > userStrategy.lastUpdatedAt
+        (event) => {
+          const isEventInUserStrategy = userStrategy.history?.find((tx) => tx.tx.hash === event.tx.hash);
+          return !isEventInUserStrategy && event.tx.timestamp > userStrategy.lastUpdatedAt;
+        }
       );
 
-      if (eventsThatWeHaveThatTheUserStrategyIsMissing) {
+      if (eventsThatWeHaveThatTheUserStrategyIsMissing && eventsThatWeHaveThatTheUserStrategyIsMissing.length > 0) {
         updatedBalances = this.applyVirtualEventsToBalances(
           userStrategy.strategy,
           updatedBalances,
           eventsThatWeHaveThatTheUserStrategyIsMissing
         );
+
         updatedDelayed = this.applyVirtualEventsToDelayed(updatedDelayed, eventsThatWeHaveThatTheUserStrategyIsMissing);
       }
 
@@ -517,7 +521,10 @@ export class EarnService extends EventsManager<EarnServiceData> {
           event.withdrawn.forEach((withdrawn) => {
             const withdrawBalanceIndex = acc.findIndex((b) => b.token.address === withdrawn.token.address);
             if (withdrawBalanceIndex !== -1) {
-              const newAmount = acc[withdrawBalanceIndex].amount.amount - withdrawn.amount.amount;
+              const newAmount =
+                'intendedWithdrawAmount' in withdrawn && withdrawn.intendedWithdrawAmount === maxUint256.toString()
+                  ? 0n
+                  : acc[withdrawBalanceIndex].amount.amount - withdrawn.amount.amount;
               const price = withdrawn.token.price;
 
               const amountInUSD = parseUsdPrice(
@@ -1444,6 +1451,7 @@ export class EarnService extends EventsManager<EarnServiceData> {
             ).toString(),
           },
           withdrawType: withdrawnAmount.withdrawType,
+          intendedWithdrawAmount: withdrawnAmount.intendedWithdrawAmount,
         }));
 
         const newBalances = modifiedStrategy.balances.map((balance) => {
@@ -1454,7 +1462,13 @@ export class EarnService extends EventsManager<EarnServiceData> {
             return balance;
           }
 
-          const newTokenBalanceAmount = balance.amount.amount - withdrawnToken.amount.amount;
+          let newTokenBalanceAmount = balance.amount.amount - withdrawnToken.amount.amount;
+          if (
+            withdrawnToken.intendedWithdrawAmount &&
+            withdrawnToken.intendedWithdrawAmount === maxUint256.toString()
+          ) {
+            newTokenBalanceAmount = 0n;
+          }
 
           return {
             ...balance,
@@ -1469,6 +1483,7 @@ export class EarnService extends EventsManager<EarnServiceData> {
             },
           };
         });
+
         modifiedStrategy.lastUpdatedAt = nowInSeconds();
         modifiedStrategy.balances = newBalances;
         modifiedStrategy.historicalBalances.push({

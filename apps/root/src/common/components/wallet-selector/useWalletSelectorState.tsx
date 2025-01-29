@@ -42,6 +42,8 @@ import {
   SuccessOutlineIcon,
   InfoCircleIcon,
   PenAddIcon,
+  Tooltip,
+  KeyIcon,
 } from 'ui-library';
 import { WalletOptionValues, ALL_WALLETS, WalletSelectorBaseProps } from './types';
 import styled from 'styled-components';
@@ -346,6 +348,7 @@ const useWalletSelectorState = ({ options, showWalletCounter }: WalletSelectorBa
         : []),
       ...(wallets
         .filter(({ address }) => selectedOptionValue !== address)
+        .sort((a) => (a.isAuth ? -1 : 1))
         .map((wallet) => {
           const { address, label, ens } = wallet;
           const { primaryLabel, secondaryLabel } = formatWalletLabel(address, label, ens);
@@ -360,6 +363,22 @@ const useWalletSelectorState = ({ options, showWalletCounter }: WalletSelectorBa
               selectedOptionValue !== address ? (
                 <ContainerBox gap={1} alignItems="center">
                   {wallet.isOwner ? <SuccessOutlineIcon /> : <InfoCircleIcon sx={{ transform: 'rotate(180deg)' }} />}
+                  {wallet.isAuth && (
+                    <Tooltip
+                      title={intl.formatMessage(
+                        defineMessage({
+                          defaultMessage: 'This is your main wallet that you use to log in to your account',
+                          description: 'wallet-selector.wallet.auth-tooltip',
+                        })
+                      )}
+                      placement="top"
+                      arrow
+                    >
+                      <ContainerBox>
+                        <KeyIcon />
+                      </ContainerBox>
+                    </Tooltip>
+                  )}
                   <KeyboardArrowRightIcon />
                 </ContainerBox>
               ) : undefined,
