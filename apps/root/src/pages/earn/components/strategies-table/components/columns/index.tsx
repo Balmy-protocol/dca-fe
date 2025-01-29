@@ -371,9 +371,15 @@ export const portfolioColumnConfigs: StrategyColumnConfig<StrategiesTableVariant
             </ContainerBox>
             <Typography variant="bodyExtraSmall" color={({ palette: { mode } }) => colors[mode].typography.typo2}>
               $
-              {data[0].balances
-                .filter((balance) => balance.token.address !== data[0].strategy.asset.address)
-                .reduce((acc, balance) => acc + (Number(balance.amount.amountInUSD) ?? 0), 0)
+              {data
+                .reduce(
+                  (accBalance, strategy) =>
+                    accBalance +
+                    strategy.balances
+                      .filter((balance) => balance.token.address !== data[0].strategy.asset.address)
+                      .reduce((acc, balance) => acc + (Number(balance.amount.amountInUSD) ?? 0), 0),
+                  0
+                )
                 .toFixed(2)}
             </Typography>
           </StyledRewardsPill>
