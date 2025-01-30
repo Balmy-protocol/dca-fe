@@ -5,8 +5,8 @@ import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 import { BackgroundPaper, colors, ContainerBox, Typography } from 'ui-library';
 import EarnPositionTvlGraph from '../tvl-graph';
-import { EarnPosition } from 'common-types';
 import { useShowBalances } from '@state/config/hooks';
+import useEarnPositions from '@hooks/earn/useEarnPositions';
 
 const StyledPaper = styled(BackgroundPaper).attrs({ variant: 'outlined' })`
   ${({ theme: { spacing } }) => `
@@ -26,13 +26,9 @@ const StyledFinancialNumbersContainer = styled(ContainerBox).attrs({ gap: 20 })`
 `}
 `;
 
-const EarnPortfolioFinancialData = ({
-  userStrategies,
-  isLoading,
-}: {
-  userStrategies: EarnPosition[];
-  isLoading: boolean;
-}) => {
+const EarnPortfolioFinancialData = ({}) => {
+  const { userStrategies, hasFetchedUserStrategies } = useEarnPositions();
+  const isLoading = !hasFetchedUserStrategies;
   const showBalances = useShowBalances();
   const intl = useIntl();
 
