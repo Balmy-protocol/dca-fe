@@ -363,7 +363,7 @@ export const portfolioColumnConfigs: StrategyColumnConfig<StrategiesTableVariant
     key: StrategyColumnKeys.REWARDS,
     label: <FormattedMessage description="earn.all-strategies-table.column.rewards" defaultMessage="Rewards" />,
     renderCell: (data) =>
-      data[0].strategy.displayRewards.tokens.length > 1 ? (
+      data[0].strategy.displayRewards.tokens.length > 0 ? (
         <ContainerBox gap={2} flexWrap="wrap" alignItems="flex-start">
           <StyledRewardsPill>
             <ContainerBox alignItems="center">
