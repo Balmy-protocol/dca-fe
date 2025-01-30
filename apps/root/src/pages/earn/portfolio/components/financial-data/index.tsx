@@ -65,7 +65,6 @@ const EarnPortfolioFinancialData = ({}) => {
         <EarnPositionTvlGraph
           isLoading={isLoading}
           userStrategies={userStrategies}
-          showDots={false}
           emptyActionsTitle={intl.formatMessage(
             defineMessage({
               description: 'earn.portfolio.financial-data.tvl-graph.tvl-tooltip',

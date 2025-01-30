@@ -37,7 +37,7 @@ import { calculateDeadline, isSameAddress, PermitData } from '@balmy/sdk';
 import { EarnPermissionData } from '@balmy/sdk/dist/services/earn/types';
 import ContractService from './contractService';
 import { mapPermission } from '@balmy/sdk/dist/services/earn/earn-service';
-import { orderBy, uniqBy } from 'lodash';
+import { find, maxBy, orderBy, uniqBy } from 'lodash';
 import MeanApiService from './meanApiService';
 import { getProtocolToken, getWrappedProtocolToken } from '@common/mocks/tokens';
 import { CustomTransactionErrorNames } from '@common/utils/errors';
@@ -344,11 +344,11 @@ export class EarnService extends EventsManager<EarnServiceData> {
     this.updateStrategy({ strategy: { ...this.updateStrategyToken(strategy), hasFetchedHistoricalData: true } });
   }
 
-  async fetchUserStrategies(): Promise<SdkEarnPosition[]> {
+  async fetchUserStrategies({ includeHistory }: { includeHistory: boolean }): Promise<SdkEarnPosition[]> {
     this.hasFetchedUserStrategies = false;
     const accounts = this.accountService.getWallets();
     const addresses = accounts.map((account) => account.address);
-    const fetchedUserStrategies = await this.sdkService.getUserStrategies({ accounts: addresses });
+    const fetchedUserStrategies = await this.sdkService.getUserStrategies({ accounts: addresses, includeHistory });
     const userStrategies = Object.fromEntries(
       Object.entries(fetchedUserStrategies).map(([key, strategies]) => [
         key,
@@ -380,7 +380,6 @@ export class EarnService extends EventsManager<EarnServiceData> {
     this.earnPositionsParameters = this.processStrategyParameters(
       strategiesArray.map((userStrategy) => userStrategy.strategy)
     );
-
     this.batchUpdateUserStrategies(strategiesArray);
 
     this.hasFetchedUserStrategies = true;
@@ -409,15 +408,22 @@ export class EarnService extends EventsManager<EarnServiceData> {
     const updatedUserStrategies = [...savedUserStrategies];
 
     if (userStrategyIndex === -1) {
+      const updatedHistoricalBalances = this.applyNewerEventsToHistoricalBalances(
+        userStrategy.historicalBalances || [],
+        userStrategy.history || [],
+        userStrategy.strategy
+      );
+
       const newStrat: SavedSdkEarnPosition = {
         ...userStrategy,
         lastUpdatedAt: nowInSeconds(),
         lastUpdatedAtFromApi: userStrategy.lastUpdatedAt,
         strategy: userStrategy.strategy.id,
-        historicalBalances: userStrategy.historicalBalances || [],
+        historicalBalances: updatedHistoricalBalances,
         hasFetchedHistory: hasFetchedHistory || false,
         history: userStrategy.history || [],
       };
+
       updatedUserStrategies.push(newStrat);
     } else {
       let updatedBalances = userStrategy.balances.map((balance) => ({
@@ -428,13 +434,6 @@ export class EarnService extends EventsManager<EarnServiceData> {
       }));
 
       let updatedDelayed = userStrategy.delayed || [];
-
-      // Preserve locally stored historical balances
-      const mergedHistoricalBalances = [
-        ...(updatedUserStrategies[userStrategyIndex].historicalBalances || []),
-        ...(userStrategy.historicalBalances || []),
-      ];
-      const updatedHistoricalBalances = orderBy(uniqBy(mergedHistoricalBalances, 'timestamp'), 'timestamp', 'desc');
 
       // it can happen that the fetched user strategy is still not indexed with our virtual events, so we need to apply the changes to the balances based on the different events that we had locally
       const currentHistory = updatedUserStrategies[userStrategyIndex].history;
@@ -465,6 +464,15 @@ export class EarnService extends EventsManager<EarnServiceData> {
         uniqBy(mergedHistory, (tx) => `${tx.tx.hash}-${tx.action}`),
         'timestamp',
         'desc'
+      );
+
+      const sortedHistoricalBalances = orderBy(userStrategy.historicalBalances || [], 'timestamp', 'asc');
+
+      // This are not 'virtual' events, because they can be in the api, but not applied to the historical balances (24 hs snapshot)
+      const updatedHistoricalBalances = this.applyNewerEventsToHistoricalBalances(
+        sortedHistoricalBalances,
+        updatedHistory,
+        userStrategy.strategy
       );
 
       updatedUserStrategies[userStrategyIndex] = {
@@ -604,6 +612,143 @@ export class EarnService extends EventsManager<EarnServiceData> {
     }, updatedDelayed);
 
     return updatedDelayed;
+  }
+
+  applyNewerEventsToHistoricalBalances(
+    historicalBalances: NonNullable<SdkEarnPosition['historicalBalances']>,
+    updatedHistory: NonNullable<SdkEarnPosition['history']>,
+    strategy: SdkStrategy
+  ): NonNullable<SdkEarnPosition['historicalBalances']> {
+    const mostRecentHistoricalBalanceTimestamp = maxBy(historicalBalances, 'timestamp')?.timestamp || 0;
+    const eventsThatAreNotAppliedToHistoricalBalances = updatedHistory.filter(
+      (event) => event.tx.timestamp > mostRecentHistoricalBalanceTimestamp
+    );
+
+    // Finally, we apply filter events to the historical balances
+    const updatedHistoricalBalances = eventsThatAreNotAppliedToHistoricalBalances.reduce<
+      NonNullable<SdkEarnPosition['historicalBalances']>
+    >((acc, event) => {
+      const asset = toToken({ ...strategy.farm.asset, chainId: strategy.farm.chainId });
+
+      // 1. Picking the last historical balance (array is sorted by timestamp descending)
+      const lastHistoricalBalance = find(acc, (b) => b.timestamp <= event.tx.timestamp);
+      if (!lastHistoricalBalance) return acc;
+
+      // 2. Apply the event based on that last historical balance
+      let updatedBalances = lastHistoricalBalance.balances;
+      switch (event.action) {
+        case EarnPositionActionType.CREATED:
+        case EarnPositionActionType.INCREASED:
+          const currentAssetBalance = find(lastHistoricalBalance.balances, (balance) =>
+            isSameToken(toToken({ ...balance.token, chainId: strategy.farm.chainId }), asset)
+          );
+
+          if (!currentAssetBalance) {
+            // New position, or position with empty balance
+            const newHistoricalBalance = {
+              timestamp: event.tx.timestamp,
+              balances: [
+                {
+                  token: asset,
+                  amount: {
+                    amount: event.deposited.amount,
+                    amountInUnits: formatUnits(event.deposited.amount, asset.decimals),
+                    amountInUSD: parseUsdPrice(
+                      asset,
+                      event.deposited.amount,
+                      parseNumberUsdPriceToBigInt(event.assetPrice)
+                    ).toFixed(2),
+                  },
+                  profit: {
+                    amount: 0n,
+                    amountInUnits: '0',
+                  },
+                },
+              ],
+            };
+
+            acc.unshift(newHistoricalBalance);
+            break;
+          }
+
+          const newDepositAmount = currentAssetBalance.amount.amount + event.deposited.amount;
+
+          const updatedBalance = {
+            ...currentAssetBalance,
+            amount: {
+              amount: newDepositAmount,
+              amountInUnits: formatUnits(newDepositAmount, currentAssetBalance.token.decimals),
+              amountInUSD: parseUsdPrice(
+                asset,
+                newDepositAmount,
+                parseNumberUsdPriceToBigInt(event.assetPrice)
+              ).toFixed(2),
+            },
+          };
+
+          updatedBalances = updatedBalances.map((balance) =>
+            isSameToken(toToken({ ...balance.token, chainId: strategy.farm.chainId }), asset) ? updatedBalance : balance
+          );
+
+          acc.unshift({
+            timestamp: event.tx.timestamp,
+            balances: updatedBalances,
+          });
+          break;
+
+        case EarnPositionActionType.WITHDREW:
+        case EarnPositionActionType.SPECIAL_WITHDREW:
+          event.withdrawn.forEach((withdrawn) => {
+            const currentTokenWithdrawBalance = lastHistoricalBalance.balances.find((balance) =>
+              isSameToken(
+                toToken({ ...balance.token, chainId: strategy.farm.chainId }),
+                toToken({ ...withdrawn.token, chainId: strategy.farm.chainId })
+              )
+            );
+
+            // This should never happen, but we check just in case
+            if (!currentTokenWithdrawBalance) return;
+
+            const currentTokenBalance = currentTokenWithdrawBalance.amount.amount;
+            const newAmount = currentTokenBalance - withdrawn.amount.amount;
+
+            const updatedWithdrawBalance = {
+              ...currentTokenWithdrawBalance,
+              amount: {
+                amount: newAmount,
+                amountInUnits: formatUnits(newAmount, currentTokenWithdrawBalance.token.decimals),
+                amountInUSD: parseUsdPrice(
+                  toToken({ ...currentTokenWithdrawBalance.token, chainId: strategy.farm.chainId }),
+                  newAmount,
+                  parseNumberUsdPriceToBigInt(withdrawn.token.price)
+                ).toFixed(2),
+              },
+            };
+
+            // Update the balance for the current token
+            updatedBalances = updatedBalances.map((balance) =>
+              isSameToken(
+                toToken({ ...balance.token, chainId: strategy.farm.chainId }),
+                toToken({ ...withdrawn.token, chainId: strategy.farm.chainId })
+              )
+                ? updatedWithdrawBalance
+                : balance
+            );
+          });
+
+          acc.unshift({
+            timestamp: event.tx.timestamp,
+            balances: updatedBalances,
+          });
+          break;
+        default:
+          break;
+      }
+
+      return acc;
+    }, historicalBalances);
+
+    return updatedHistoricalBalances;
   }
 
   updateStrategyToken(strategy: SdkStrategy) {

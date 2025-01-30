@@ -5,7 +5,7 @@ import {
   PERMITTED_ACTIONS,
 } from '@common/components/earn/action-graph-components';
 import { formatUsdAmount } from '@common/utils/currency';
-import { compact, maxBy, orderBy } from 'lodash';
+import { compact, findLast, maxBy, orderBy } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { colors } from 'ui-library';
 import { EarnPosition, EarnPositionActionType, Timestamp } from 'common-types';
@@ -102,12 +102,29 @@ export const getDataForTVLGraph = ({
   const { earnings, totalInvestedUsd: currentTvl } = parseUserStrategiesFinancialData(userStrategies);
 
   const tvlKey: Record<Timestamp, number> = {};
+
+  // Get all unique timestamps from historical balances
+  const allTimestamps = new Set<number>();
+
   userStrategies.forEach((strategy) => {
     strategy.historicalBalances.forEach((balance) => {
-      const totalTvl = balance.balances.reduce((acc, b) => acc + Number(b.amount.amountInUSD || 0), 0);
-      if (!tvlKey[balance.timestamp]) tvlKey[balance.timestamp] = 0;
+      allTimestamps.add(balance.timestamp);
+    });
+  });
 
-      tvlKey[balance.timestamp] += totalTvl;
+  // For each timestamp, calculate total TVL
+  Array.from(allTimestamps).forEach((timestamp) => {
+    tvlKey[timestamp] = 0;
+
+    userStrategies.forEach((strategy) => {
+      // Timestamps added from recent transactions would not be available for all user strategies
+      // We find the exact match or the first previous balance
+      const matchingBalance = findLast(strategy.historicalBalances, (b) => b.timestamp <= timestamp);
+
+      if (matchingBalance) {
+        const balanceSum = matchingBalance.balances.reduce((acc, b) => acc + Number(b.amount.amountInUSD || 0), 0);
+        tvlKey[timestamp] += balanceSum;
+      }
     });
   });
 

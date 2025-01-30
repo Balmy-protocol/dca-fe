@@ -217,9 +217,15 @@ const useWalletSelectorState = ({ options, showWalletCounter }: WalletSelectorBa
         }).then(() => void dispatch(processConfirmedTransactionsForDca()));
 
         if (hasEarnAccess) {
-          void timeoutPromise(earnService.fetchUserStrategies(), TimeoutPromises.COMMON, {
-            description: ApiErrorKeys.EARN,
-          }).then(() => void dispatch(processConfirmedTransactionsForEarn()));
+          void timeoutPromise(
+            earnService.fetchUserStrategies({
+              includeHistory: true,
+            }),
+            TimeoutPromises.COMMON,
+            {
+              description: ApiErrorKeys.EARN,
+            }
+          ).then(() => void dispatch(processConfirmedTransactionsForEarn()));
         }
 
         void timeoutPromise(labelService.fetchManyEns(wallets.map((w) => w.address)), TimeoutPromises.COMMON, {
