@@ -1,14 +1,11 @@
 import { formatUsdAmount } from '@common/utils/currency';
-import { parseUserStrategiesFinancialData } from '@common/utils/earn/parsing';
-import { nowInSeconds } from '@common/utils/time';
-import { ONE_DAY } from '@constants';
 import { GraphSkeleton } from '@pages/strategy-guardian-detail/vault-data/components/data-historical-rate';
 import { useThemeMode } from '@state/config/hooks';
-import { EarnPosition, EarnPositionActionType, Timestamp } from 'common-types';
-import { compact, isUndefined, maxBy, orderBy } from 'lodash';
+import { EarnPosition } from 'common-types';
+import { isUndefined } from 'lodash';
 import { DateTime } from 'luxon';
 import React from 'react';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { useIntl } from 'react-intl';
 import {
   ResponsiveContainer,
   ComposedChart,
@@ -20,87 +17,10 @@ import {
   ReferenceDot,
   Tooltip,
 } from 'recharts';
-import {
-  CustomDot,
-  DataItemAction,
-  findClosestTimestamp,
-  GraphTooltip,
-  PERMITTED_ACTIONS,
-} from '@common/components/earn/action-graph-components';
+import { CustomDot, GraphTooltip } from '@common/components/earn/action-graph-components';
 import { ContainerBox, GraphContainer, colors, AvailableDatePeriods } from 'ui-library';
 import { buildTypographyVariant } from 'ui-library/src/theme/typography';
-
-type DataItem = {
-  tvl?: number;
-  timestamp: number;
-  name: string;
-  estReturn?: number;
-  actions: DataItemAction[];
-  mode: 'light' | 'dark';
-};
-
-function calculateExpectedTVL(currentTVL: number, apy: number, durationDays: number): number {
-  const ratePerDay = apy / 100 / 365;
-  return currentTVL * Math.pow(1 + ratePerDay, durationDays);
-}
-
-// 3 months of data
-const DAYS = 90;
-
-const findXPoint = (data: DataItem[]) => {
-  const reversedData = data.slice().reverse();
-
-  return reversedData.find((d) => !!d.tvl)?.timestamp;
-};
-
-const findYPoint = (data: DataItem[]) => {
-  const reversedData = data.slice().reverse();
-
-  const lastTvl = reversedData.find((d) => !!d.tvl)?.tvl || 0;
-
-  const maxTvl = maxBy(data, (d) => d.tvl)?.tvl || 0;
-
-  return lastTvl + (maxTvl - lastTvl) / 2;
-};
-
-const estReturnLabel = (
-  { viewBox: { x } }: { viewBox: { x: number } },
-  data: DataItem[],
-  intl: ReturnType<typeof useIntl>,
-  mode: 'light' | 'dark'
-) => {
-  // eslint-disable-next-line react/destructuring-assignment
-  const expectedReturn = data[data.length - 1]?.estReturn;
-  return (
-    <>
-      <text
-        fontSize="0.75rem"
-        fontWeight={500}
-        fontFamily="Inter"
-        color={colors[mode].typography.typo3}
-        x={x + 12}
-        y={20}
-        fill={colors[mode].typography.typo3}
-      >
-        <FormattedMessage
-          description="earn.portfolio.tvl-graph.projected-portfolio-value"
-          defaultMessage="Projected Portfolio Value"
-        />
-      </text>
-      <text
-        fontSize="0.875rem"
-        fontWeight={600}
-        fontFamily="Inter"
-        color={colors[mode].semantic.success.darker}
-        x={x + 12}
-        y={44}
-        fill={colors[mode].semantic.success.darker}
-      >
-        ${formatUsdAmount({ amount: expectedReturn, intl })}
-      </text>
-    </>
-  );
-};
+import { estReturnLabel, findXPoint, findYPoint, getDataForTVLGraph, TVLDataItem } from './tvl-utils';
 
 const CUSTOM_DAYS_BACK_MAP = {
   [AvailableDatePeriods.day]: 3,
@@ -124,134 +44,19 @@ const EarnPositionTvlGraph = ({
   const mode = useThemeMode();
   const intl = useIntl();
 
-  const mappedData = React.useMemo(() => {
-    const { earnings, totalInvestedUsd: currentTvl } = parseUserStrategiesFinancialData(userStrategies);
-
-    const tvlKey: Record<Timestamp, number> = {};
-    userStrategies.forEach((strategy) => {
-      strategy.historicalBalances.forEach((balance) => {
-        const totalTvl = balance.balances.reduce((acc, b) => acc + Number(b.amount.amountInUSD || 0), 0);
-        if (!tvlKey[balance.timestamp]) tvlKey[balance.timestamp] = 0;
-
-        tvlKey[balance.timestamp] += totalTvl;
-      });
-    });
-
-    const actualData = orderBy(
-      Object.entries(tvlKey).map(([timestamp, tvl]) => ({
-        timestamp: Number(timestamp),
-        tvl,
-        name: DateTime.fromSeconds(Number(timestamp)).toFormat('MMM d t'),
-        actions: [],
+  const mappedData = React.useMemo(
+    () =>
+      getDataForTVLGraph({
+        userStrategies,
         mode,
-      })) as DataItem[],
-      'timestamp',
-      'asc'
-      // Now lets merge all the data that has the same name
-    ).reduce<DataItem[]>((acc, item) => {
-      const existingItem = acc.find((i) => i.name === item.name);
-      if (existingItem) {
-        existingItem.tvl = (existingItem.tvl ?? 0) + (item.tvl ?? 0);
-      } else {
-        acc.push(item);
-      }
-      return acc;
-    }, []);
+        extendExpectedReturns,
+        showDots,
+        minPoints,
+      }),
+    [userStrategies, extendExpectedReturns, showDots, minPoints]
+  );
 
-    if (actualData.length < minPoints) {
-      return [];
-    }
-
-    if (showDots) {
-      const userActions = compact(
-        userStrategies?.map((position) => {
-          if (position.history.length === 0) {
-            return null;
-          }
-
-          return compact(
-            position.history
-              ?.filter((action) => PERMITTED_ACTIONS.includes(action.action as EarnPositionActionType))
-              .map<DataItemAction | null>((state) => {
-                if (
-                  state.action !== EarnPositionActionType.CREATED &&
-                  state.action !== EarnPositionActionType.WITHDREW &&
-                  state.action !== EarnPositionActionType.INCREASED
-                ) {
-                  return null;
-                }
-
-                const value: DataItemAction['value'] | undefined =
-                  state.action === EarnPositionActionType.WITHDREW
-                    ? state.withdrawn.find(({ token }) => token.address === position.strategy.asset.address)
-                    : { amount: state.deposited, token: position.strategy.asset };
-
-                if (!value) return null;
-
-                return {
-                  user: position.owner,
-                  type:
-                    state.action === EarnPositionActionType.CREATED
-                      ? EarnPositionActionType.INCREASED
-                      : (state.action as EarnPositionActionType.INCREASED | EarnPositionActionType.WITHDREW),
-                  value,
-                  timestamp: state.tx.timestamp,
-                } satisfies DataItemAction;
-              })
-          );
-        }) || []
-      ).reduce<DataItemAction[]>((acc, userPos) => [...acc, ...userPos], []);
-
-      const timestamps = actualData.map(({ timestamp }) => timestamp);
-
-      userActions.forEach((action) => {
-        const closestTimestamp = findClosestTimestamp(timestamps, action.timestamp);
-
-        const dataItemIndex = actualData.findIndex(({ timestamp }) => timestamp === closestTimestamp);
-
-        if (dataItemIndex !== -1) {
-          actualData[dataItemIndex].actions.push(action);
-        }
-      });
-    }
-
-    const lastTimestamp = nowInSeconds() - 1; // Prevent to be considered as future data
-    actualData.push({
-      timestamp: lastTimestamp,
-      tvl: currentTvl,
-      name: DateTime.fromSeconds(lastTimestamp).toFormat('MMM d t'),
-      actions: [],
-      mode,
-    });
-
-    if (currentTvl === 0 || !extendExpectedReturns) {
-      return actualData;
-    }
-
-    const apy = (earnings.year.total / currentTvl) * 100;
-
-    const estReturns = orderBy(
-      Array.from(Array(DAYS).keys()).reduce<DataItem[]>((acc, i) => {
-        const nextTimestamp = lastTimestamp + Number(ONE_DAY) * i;
-        const expectedTVL = calculateExpectedTVL(currentTvl, apy, i);
-
-        acc.push({
-          timestamp: nextTimestamp,
-          estReturn: expectedTVL,
-          name: DateTime.fromSeconds(Number(nextTimestamp)).toFormat('MMM d t'),
-          mode,
-          actions: [],
-        });
-        return acc;
-      }, []),
-      'timestamp',
-      'asc'
-    );
-
-    return [...actualData, ...estReturns];
-  }, [userStrategies, extendExpectedReturns, showDots, minPoints]);
-
-  const organicGrowers: (keyof DataItem)[] = React.useMemo(() => ['estReturn'], []);
+  const organicGrowers: (keyof TVLDataItem)[] = React.useMemo(() => ['estReturn'], []);
 
   return (
     <ContainerBox>
@@ -305,7 +110,6 @@ const EarnPositionTvlGraph = ({
                     />
                     <ReferenceDot
                       label={(props: { viewBox: { x: number } }) => estReturnLabel(props, data, intl, mode)}
-                      // label="Estimated return"
                       x={findXPoint(data)}
                       y={findYPoint(data)}
                       r={1}
