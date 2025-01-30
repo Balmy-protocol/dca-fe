@@ -159,17 +159,46 @@ function addOrganicVariation<T extends DataItem>(data: T[], keys: (keyof T)[], v
 
   const organicItems = keys.map((key) => {
     const itemsWithData = data.filter((dataPoint) => key in dataPoint && typeof dataPoint[key] === 'number');
+
+    let highestValue = -Infinity;
+    const lastPointValue = itemsWithData[itemsWithData.length - 1]?.[key];
+    const firstPointValue = itemsWithData[0]?.[key];
+
     const organicEstReturns = itemsWithData.map((dataPoint, index, arr) => {
-      if (index === arr.length - 1 || index === 0) return dataPoint; // Keep the first and last point exact
+      const currentValue = dataPoint[key];
 
-      const dataPointData = dataPoint[keys[0]];
-
-      if (typeof dataPointData !== 'number') {
+      if (index === 0) {
+        if (typeof currentValue === 'number') {
+          highestValue = currentValue;
+        }
         return dataPoint;
       }
 
-      const randomVariation = Math.random() * variationFactor * dataPointData;
-      return { ...dataPoint, [key]: dataPointData + randomVariation };
+      if (index === arr.length - 1) return dataPoint;
+
+      if (
+        typeof currentValue !== 'number' ||
+        typeof lastPointValue !== 'number' ||
+        typeof firstPointValue !== 'number'
+      ) {
+        return dataPoint;
+      }
+
+      // More random base curve
+      const position = index / (arr.length - 1);
+      const randomCurve = Math.pow(position, 1 + Math.random()); // Random exponential between 1 and 2
+      const baseValue = firstPointValue + (lastPointValue - firstPointValue) * randomCurve;
+
+      // Larger random variation early on
+      const variationRange = (lastPointValue - firstPointValue) * variationFactor;
+      const randomVariation = Math.random() * variationRange * (1 - Math.pow(position, 0.5));
+      const newValue = Math.min(lastPointValue, baseValue + randomVariation);
+
+      // Ensure we never go below previous highest
+      const boundedValue = Math.max(highestValue, newValue);
+      highestValue = boundedValue;
+
+      return { ...dataPoint, [key]: boundedValue };
     });
 
     return organicEstReturns;
