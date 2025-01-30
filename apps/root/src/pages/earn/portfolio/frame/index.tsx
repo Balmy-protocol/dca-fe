@@ -38,7 +38,7 @@ const EarnPortfolioFrame = () => {
             </StyledPageTitleDescription>
           </ContainerBox>
           <ContainerBox flexDirection="column" gap={16}>
-            <EarnPortfolioFinancialData isLoading={!hasFetchedUserStrategies} userStrategies={activeUserStrategies} />
+            <EarnPortfolioFinancialData />
             <EarnPositionsTable isLoading={!hasFetchedUserStrategies} userStrategies={activeUserStrategies} />
           </ContainerBox>
         </ContainerBox>
