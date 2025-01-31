@@ -20,7 +20,12 @@ const TokenProfileHeader = ({ token }: TokenProfileHeaderProps) => {
         <Typography variant="h1Bold">{token?.name}</Typography>
       </ContainerBox>
       {(price !== undefined || isLoading) && (
-        <NetWorthNumber variant="bodyLargeBold" value={parseBaseUsdPriceToNumber(price)} isLoading={isLoading} />
+        <NetWorthNumber
+          variant="bodyLargeBold"
+          value={parseBaseUsdPriceToNumber(price)}
+          isLoading={isLoading}
+          disableHiddenNumber
+        />
       )}
     </ContainerBox>
   );

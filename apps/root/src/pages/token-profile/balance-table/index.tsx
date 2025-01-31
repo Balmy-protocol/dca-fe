@@ -372,12 +372,15 @@ const BalanceTable = ({ token }: BalanceTableProps) => {
       totalValue={totalAssetValue}
       widgetId="TokenProfileBalanceTable"
       title={<FormattedMessage defaultMessage="All wallets" description="allWallets" />}
-      subtitle={`${formatCurrencyAmount({
-        amount: parseUnits(totalAmountInUnits, token.decimals),
-        token,
-        sigFigs: 3,
-        intl,
-      })} ${token.symbol}`}
+      subtitle={
+        showBalances &&
+        `${formatCurrencyAmount({
+          amount: parseUnits(totalAmountInUnits, token.decimals),
+          token,
+          sigFigs: 3,
+          intl,
+        })} ${token.symbol}`
+      }
       solid
     >
       {isLoggedIn ? (
