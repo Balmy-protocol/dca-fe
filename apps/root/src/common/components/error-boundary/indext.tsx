@@ -21,6 +21,7 @@ const StyledErrorContainer = styled.div`
   flex-direction: column;
   text-align: center;
   gap: 10px;
+  word-break: break-word;
 `;
 
 interface Props {
