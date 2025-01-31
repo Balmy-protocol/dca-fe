@@ -16,7 +16,7 @@ import TokenIcon from '@common/components/token-icon';
 import ComposedTokenIcon from '@common/components/composed-token-icon';
 import { usdFormatter } from '@common/utils/parsing';
 import { emptyTokenWithAddress, emptyTokenWithLogoURI } from '@common/utils/currency';
-import { parseUserStrategiesFinancialData } from '@common/utils/earn/parsing';
+import { getTokensWithBalanceAndApy, parseUserStrategiesFinancialData } from '@common/utils/earn/parsing';
 import styled from 'styled-components';
 import { StrategiesTableVariants } from '@state/strategies-filters/reducer';
 import { Address as ViemAddress } from 'viem';
@@ -362,31 +362,24 @@ export const portfolioColumnConfigs: StrategyColumnConfig<StrategiesTableVariant
   {
     key: StrategyColumnKeys.REWARDS,
     label: <FormattedMessage description="earn.all-strategies-table.column.rewards" defaultMessage="Rewards" />,
-    renderCell: (data) =>
-      data[0].strategy.displayRewards.tokens.length > 0 ? (
+    renderCell: (data) => {
+      const rewardTokensData = React.useMemo(() => getTokensWithBalanceAndApy(data[0].strategy, data), [data]);
+      // If the user either has balances or there are reward tokens show the rewards pill
+      return rewardTokensData.tokens.length > 0 ? (
         <ContainerBox gap={2} flexWrap="wrap" alignItems="flex-start">
           <StyledRewardsPill>
             <ContainerBox alignItems="center">
-              <ComposedTokenIcon tokens={data[0].strategy.displayRewards.tokens} size={4.5} />
+              <ComposedTokenIcon tokens={rewardTokensData.tokens} size={4.5} />
             </ContainerBox>
             <Typography variant="bodyExtraSmall" color={({ palette: { mode } }) => colors[mode].typography.typo2}>
-              $
-              {data
-                .reduce(
-                  (accBalance, strategy) =>
-                    accBalance +
-                    strategy.balances
-                      .filter((balance) => balance.token.address !== data[0].strategy.asset.address)
-                      .reduce((acc, balance) => acc + (Number(balance.amount.amountInUSD) ?? 0), 0),
-                  0
-                )
-                .toFixed(2)}
+              ${rewardTokensData.totalRewardsTvl.toFixed(2)}
             </Typography>
           </StyledRewardsPill>
         </ContainerBox>
       ) : (
         <></>
-      ),
+      );
+    },
     hiddenProps: {
       lgDown: true,
     },

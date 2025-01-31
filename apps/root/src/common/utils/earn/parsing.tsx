@@ -21,7 +21,7 @@ import {
   StrategyId,
   SdkEarnPositionId,
 } from 'common-types';
-import { compact, find, isNil, isUndefined } from 'lodash';
+import { compact, find, isNil, isUndefined, uniqBy } from 'lodash';
 import { NETWORKS } from '@constants';
 import { defineMessage, useIntl } from 'react-intl';
 import { isSameToken, parseNumberUsdPriceToBigInt, parseUsdPrice, toToken } from '../currency';
@@ -749,4 +749,39 @@ export const getSdkEarnPositionId = ({
   positionId: string | bigint;
 }): SdkEarnPositionId => {
   return `${chainId}-${vault}-${Number(positionId)}`;
+};
+
+export const getTokensWithBalanceAndApy = (strategy: Strategy | DisplayStrategy, userPositions?: EarnPosition[]) => {
+  const rewardTokens =
+    userPositions?.reduce<Record<Address, { token: Token; tvl: number; amount: bigint }>>((acc, position) => {
+      position.balances.forEach((balance) => {
+        if (!isSameToken(balance.token, strategy.asset)) {
+          if (!acc[balance.token.address]) {
+            // eslint-disable-next-line no-param-reassign
+            acc[balance.token.address] = {
+              token: balance.token,
+              tvl: Number(balance.amount.amountInUSD) ?? 0,
+              amount: balance.amount.amount,
+            };
+          } else {
+            // eslint-disable-next-line no-param-reassign
+            acc[balance.token.address].tvl += Number(balance.amount.amountInUSD) ?? 0;
+            // eslint-disable-next-line no-param-reassign
+            acc[balance.token.address].amount += balance.amount.amount;
+          }
+        }
+      });
+      return acc;
+    }, {}) ?? {};
+
+  const totalRewardsTvl = Object.values(rewardTokens).reduce((acc, reward) => acc + reward.tvl, 0);
+  const tokens = Object.values(rewardTokens)
+    .filter((reward) => reward.amount > 0n)
+    .map((reward) => reward.token);
+  const tokensToShow = uniqBy([...tokens, ...strategy.displayRewards.tokens], 'address');
+
+  return {
+    totalRewardsTvl,
+    tokens: tokensToShow,
+  };
 };

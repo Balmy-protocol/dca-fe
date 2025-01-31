@@ -1,6 +1,7 @@
 import Address from '@common/components/address';
 import ComposedTokenIcon from '@common/components/composed-token-icon';
 import { formatUsdAmount, isSameToken } from '@common/utils/currency';
+import { getTokensWithBalanceAndApy } from '@common/utils/earn/parsing';
 import { BalanceToken } from '@hooks/useMergedTokensBalances';
 import { TokenNetworksTooltipTitle } from '@pages/home/components/token-icon-multichain';
 import { useShowBalances } from '@state/config/hooks';
@@ -90,6 +91,10 @@ const WalletBreakdownTableBody = ({ strategy, showRewards }: WalletBreakdownProp
       });
   }, [strategy.userPositions]);
 
+  const rewardTokensData = React.useMemo(
+    () => getTokensWithBalanceAndApy(strategy, strategy.userPositions),
+    [strategy]
+  );
   return walletItems?.map(({ mainBalance, profit, dailyEarnings, balanceTokens, position }, index) => (
     <StyledRow key={position.id} $isFirst={index === 0}>
       <StyledCell size="medium">
@@ -126,7 +131,7 @@ const WalletBreakdownTableBody = ({ strategy, showRewards }: WalletBreakdownProp
             <Tooltip title={<TokenNetworksTooltipTitle balanceTokens={balanceTokens} />}>
               <ComposedTokenIcon
                 size={6}
-                tokens={strategy.displayRewards.tokens}
+                tokens={rewardTokensData.tokens}
                 overlapRatio={0.6}
                 marginRight={1.75}
                 withShadow
@@ -140,7 +145,12 @@ const WalletBreakdownTableBody = ({ strategy, showRewards }: WalletBreakdownProp
 };
 
 const WalletBreakdown = ({ strategy }: WalletBreakdownProps) => {
-  const showRewards = !!strategy.displayRewards.tokens.length;
+  const rewardTokensData = React.useMemo(
+    () => getTokensWithBalanceAndApy(strategy, strategy.userPositions),
+    [strategy]
+  );
+
+  const showRewards = !!rewardTokensData.tokens.length;
   return (
     <Accordion disableGutters defaultExpanded sx={{ padding: ({ spacing }) => spacing(4) }} variant="outlined">
       <AccordionSummary>
