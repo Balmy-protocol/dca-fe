@@ -61,13 +61,11 @@ const useEarnWithdrawActions = ({ strategy }: UseEarnWithdrawActionsParams) => {
     // Protocol tokens will be unwrapped
     const assetIsProtocolToken = isSameToken(protocolToken, asset);
 
-    const rewardsWithdrawAmounts = currentPosition.balances
-      .filter((balance) => !isSameToken(balance.token, asset))
-      .map((balance) => ({
-        amount: withdrawRewards ? maxUint256 : 0n,
-        token: balance.token,
-        convertTo: undefined,
-      }));
+    const rewardsWithdrawAmounts = strategy.rewards.tokens.map((token) => ({
+      amount: withdrawRewards ? maxUint256 : 0n,
+      token,
+      convertTo: undefined,
+    }));
 
     // Build the list with all the tokens, always asset token first
     const withdrawList = [
