@@ -465,7 +465,7 @@ export function parseUserStrategiesFinancialData(userPositions: EarnPosition[] =
           };
 
           // eslint-disable-next-line no-param-reassign
-          periodAcc.total += newAmountInUsd;
+          periodAcc.total += newRatiodUsdAmount;
           return periodAcc;
         },
         { total: 0, byToken: {} }
