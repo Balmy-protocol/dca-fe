@@ -5,7 +5,7 @@ import {
   PERMITTED_ACTIONS,
 } from '@common/components/earn/action-graph-components';
 import { formatUsdAmount } from '@common/utils/currency';
-import { compact, findLast, maxBy, orderBy } from 'lodash';
+import { compact, find, maxBy, orderBy } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { colors } from 'ui-library';
 import { EarnPosition, EarnPositionActionType, Timestamp } from 'common-types';
@@ -119,7 +119,7 @@ export const getDataForTVLGraph = ({
     userStrategies.forEach((strategy) => {
       // Timestamps added from recent transactions would not be available for all user strategies
       // We find the exact match or the first previous balance
-      const matchingBalance = findLast(strategy.historicalBalances, (b) => b.timestamp <= timestamp);
+      const matchingBalance = find(strategy.historicalBalances, (b) => b.timestamp <= timestamp);
 
       if (matchingBalance) {
         const balanceSum = matchingBalance.balances.reduce((acc, b) => acc + Number(b.amount.amountInUSD || 0), 0);

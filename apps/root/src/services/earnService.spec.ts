@@ -1375,5 +1375,250 @@ describe('Earn Service', () => {
       });
     });
   });
+
+  describe('applyNewerEventsToHistoricalBalances', () => {
+    const baseToken = createSdkTokenMock({});
+    const baseStrategy = createStrategyMock({});
+
+    describe('Event filtering', () => {
+      it('should only process events newer than most recent historical balance', () => {
+        const historicalBalances = [
+          {
+            timestamp: now - 100,
+            balances: [
+              {
+                token: baseToken,
+                amount: {
+                  amount: 1000000000000000000n,
+                  amountInUnits: '1',
+                  amountInUSD: '1',
+                },
+                profit: {
+                  amount: 0n,
+                  amountInUnits: '0',
+                },
+              },
+            ],
+          },
+        ];
+
+        const history: SdkEarnPosition['history'] = [
+          {
+            action: EarnPositionActionType.INCREASED,
+            deposited: {
+              amount: 1000000000000000000n,
+              amountInUnits: '1',
+              amountInUSD: '1',
+            },
+            assetPrice: 1,
+            tx: { hash: '0xhash1', timestamp: now - 200 }, // Older event
+          },
+          {
+            action: EarnPositionActionType.INCREASED,
+            deposited: {
+              amount: 1000000000000000000n,
+              amountInUnits: '1',
+              amountInUSD: '1',
+            },
+            assetPrice: 1,
+            tx: { hash: '0xhash2', timestamp: now }, // Newer event
+          },
+        ];
+
+        const result = earnService.applyNewerEventsToHistoricalBalances(historicalBalances, history, baseStrategy);
+
+        expect(result).toHaveLength(2); // Original + 1 new entry
+        expect(result[0].timestamp).toBe(now); // Most recent first
+        expect(result[0].balances[0].amount.amount).toBe(2000000000000000000n);
+      });
+    });
+
+    describe('CREATED/INCREASED events', () => {
+      it('should create new historical balance for position creation', () => {
+        const historicalBalances: SavedSdkEarnPosition['historicalBalances'] = [];
+        const history: SavedSdkEarnPosition['history'] = [
+          {
+            action: EarnPositionActionType.CREATED,
+            deposited: {
+              amount: 1000000000000000000n,
+              amountInUnits: '1',
+              amountInUSD: '1',
+            },
+            assetPrice: 1,
+            tx: { hash: '0xhash', timestamp: now },
+            owner: '0xwallet-1',
+            permissions: {},
+          },
+        ];
+
+        const result = earnService.applyNewerEventsToHistoricalBalances(historicalBalances, history, baseStrategy);
+
+        expect(result).toHaveLength(1);
+        expect(result[0].balances[0].amount.amount).toBe(1000000000000000000n);
+        expect(result[0].balances[0].profit.amount).toBe(0n);
+      });
+
+      it('should add to existing balance for increase events', () => {
+        const historicalBalances: SavedSdkEarnPosition['historicalBalances'] = [
+          {
+            timestamp: now - 100,
+            balances: [
+              {
+                token: baseToken,
+                amount: {
+                  amount: 1000000000000000000n,
+                  amountInUnits: '1',
+                  amountInUSD: '1',
+                },
+                profit: {
+                  amount: 0n,
+                  amountInUnits: '0',
+                },
+              },
+            ],
+          },
+        ];
+
+        const history: SavedSdkEarnPosition['history'] = [
+          {
+            action: EarnPositionActionType.INCREASED,
+            deposited: {
+              amount: 1000000000000000000n,
+              amountInUnits: '1',
+              amountInUSD: '1',
+            },
+            assetPrice: 1,
+            tx: { hash: '0xhash', timestamp: now },
+          },
+        ];
+
+        const result = earnService.applyNewerEventsToHistoricalBalances(historicalBalances, history, baseStrategy);
+
+        expect(result).toHaveLength(2);
+        expect(result[0].balances[0].amount.amount).toBe(2000000000000000000n);
+      });
+    });
+
+    describe('WITHDREW events', () => {
+      it('should subtract from balance for withdraw events', () => {
+        const historicalBalances = [
+          {
+            timestamp: now - 100,
+            balances: [
+              {
+                token: baseToken,
+                amount: {
+                  amount: 2000000000000000000n,
+                  amountInUnits: '2',
+                  amountInUSD: '2',
+                },
+                profit: {
+                  amount: 0n,
+                  amountInUnits: '0',
+                },
+              },
+            ],
+          },
+        ];
+
+        const history: SdkEarnPosition['history'] = [
+          {
+            action: EarnPositionActionType.WITHDREW,
+            withdrawn: [
+              {
+                token: baseToken,
+                amount: {
+                  amount: 1000000000000000000n,
+                  amountInUnits: '1',
+                  amountInUSD: '1',
+                },
+                withdrawType: WithdrawType.IMMEDIATE,
+              },
+            ],
+            recipient: '0xwallet-1',
+            tx: { hash: '0xhash', timestamp: now },
+          },
+        ];
+
+        const result = earnService.applyNewerEventsToHistoricalBalances(historicalBalances, history, baseStrategy);
+
+        expect(result).toHaveLength(2);
+        expect(result[0].balances[0].amount.amount).toBe(1000000000000000000n);
+      });
+    });
+
+    describe('Complex scenarios', () => {
+      it('should handle multiple sequential events correctly', () => {
+        const historicalBalances = [
+          {
+            timestamp: now - 300,
+            balances: [
+              {
+                token: baseToken,
+                amount: {
+                  amount: 1000000000000000000n,
+                  amountInUnits: '1',
+                  amountInUSD: '1',
+                },
+                profit: {
+                  amount: 0n,
+                  amountInUnits: '0',
+                },
+              },
+            ],
+          },
+        ];
+
+        const history: SdkEarnPosition['history'] = [
+          {
+            action: EarnPositionActionType.INCREASED,
+            deposited: {
+              amount: 1000000000000000000n,
+              amountInUnits: '1',
+              amountInUSD: '1',
+            },
+            assetPrice: 1,
+            tx: { hash: '0xhash1', timestamp: now - 200 },
+          },
+          {
+            action: EarnPositionActionType.WITHDREW,
+            withdrawn: [
+              {
+                token: baseToken,
+                amount: {
+                  amount: 500000000000000000n,
+                  amountInUnits: '0.5',
+                  amountInUSD: '0.5',
+                },
+                withdrawType: WithdrawType.IMMEDIATE,
+              },
+            ],
+            recipient: '0xwallet-1',
+            tx: { hash: '0xhash2', timestamp: now - 100 },
+          },
+          {
+            action: EarnPositionActionType.INCREASED,
+            deposited: {
+              amount: 1000000000000000000n,
+              amountInUnits: '1',
+              amountInUSD: '1',
+            },
+            assetPrice: 1,
+            tx: { hash: '0xhash3', timestamp: now },
+          },
+        ];
+
+        const result = earnService.applyNewerEventsToHistoricalBalances(historicalBalances, history, baseStrategy);
+
+        expect(result).toHaveLength(4);
+        // Check final balance
+        expect(result[0].balances[0].amount.amount).toBe(2500000000000000000n);
+        // Check intermediate balances
+        expect(result[1].balances[0].amount.amount).toBe(1500000000000000000n);
+        expect(result[2].balances[0].amount.amount).toBe(2000000000000000000n);
+        expect(result[3].balances[0].amount.amount).toBe(1000000000000000000n);
+      });
+    });
+  });
 });
 /* eslint-enable @typescript-eslint/unbound-method */

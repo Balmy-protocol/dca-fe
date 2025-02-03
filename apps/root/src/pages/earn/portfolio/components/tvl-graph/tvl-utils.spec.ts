@@ -26,12 +26,13 @@ const TIMESTAMP_3 = 1677628900;
 const TIMESTAMP_4 = 1677629000;
 const uniqueTimestampsCount = 4;
 
+// Input is sorted by timestamp asc, output is sorted by timestamp desc
 const mockedStrategies = [
   {
     historicalBalances: [
-      { timestamp: TIMESTAMP_1, balances: [{ amount: { amountInUSD: '100' } }] },
-      { timestamp: TIMESTAMP_2, balances: [{ amount: { amountInUSD: '200' } }] },
       { timestamp: TIMESTAMP_4, balances: [{ amount: { amountInUSD: '300' } }] },
+      { timestamp: TIMESTAMP_2, balances: [{ amount: { amountInUSD: '200' } }] },
+      { timestamp: TIMESTAMP_1, balances: [{ amount: { amountInUSD: '100' } }] },
     ],
     history: [],
     balances: [
@@ -48,9 +49,9 @@ const mockedStrategies = [
   },
   {
     historicalBalances: [
-      { timestamp: TIMESTAMP_1, balances: [{ amount: { amountInUSD: '100' } }] },
-      { timestamp: TIMESTAMP_2, balances: [{ amount: { amountInUSD: '100' } }] },
       { timestamp: TIMESTAMP_3, balances: [{ amount: { amountInUSD: '100' } }] },
+      { timestamp: TIMESTAMP_2, balances: [{ amount: { amountInUSD: '100' } }] },
+      { timestamp: TIMESTAMP_1, balances: [{ amount: { amountInUSD: '100' } }] },
     ],
     history: [],
     balances: [

@@ -158,7 +158,7 @@ const EarnPositionTvlGraph = ({
                   tickMargin={4}
                   width={30}
                   strokeWidth="0px"
-                  domain={[0, 'auto']}
+                  domain={['auto', 'auto']}
                   axisLine={false}
                   tickLine={false}
                   tickFormatter={(value: string) =>

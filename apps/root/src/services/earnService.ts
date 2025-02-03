@@ -466,11 +466,9 @@ export class EarnService extends EventsManager<EarnServiceData> {
         'desc'
       );
 
-      const sortedHistoricalBalances = orderBy(userStrategy.historicalBalances || [], 'timestamp', 'asc');
-
       // This are not 'virtual' events, because they can be in the api, but not applied to the historical balances (24 hs snapshot)
       const updatedHistoricalBalances = this.applyNewerEventsToHistoricalBalances(
-        sortedHistoricalBalances,
+        userStrategy.historicalBalances || [],
         updatedHistory,
         userStrategy.strategy
       );
@@ -631,7 +629,10 @@ export class EarnService extends EventsManager<EarnServiceData> {
       const asset = toToken({ ...strategy.farm.asset, chainId: strategy.farm.chainId });
 
       // 1. Picking the last historical balance (array is sorted by timestamp descending)
-      const lastHistoricalBalance = find(acc, (b) => b.timestamp <= event.tx.timestamp);
+      const lastHistoricalBalance = find(acc, (b) => b.timestamp <= event.tx.timestamp) || {
+        timestamp: event.tx.timestamp,
+        balances: [],
+      };
       if (!lastHistoricalBalance) return acc;
 
       // 2. Apply the event based on that last historical balance
@@ -710,8 +711,8 @@ export class EarnService extends EventsManager<EarnServiceData> {
             if (!currentTokenWithdrawBalance) return;
 
             const currentTokenBalance = currentTokenWithdrawBalance.amount.amount;
-            const newAmount = currentTokenBalance - withdrawn.amount.amount;
-
+            const newAmount =
+              currentTokenBalance < withdrawn.amount.amount ? 0n : currentTokenBalance - withdrawn.amount.amount;
             const updatedWithdrawBalance = {
               ...currentTokenWithdrawBalance,
               amount: {
