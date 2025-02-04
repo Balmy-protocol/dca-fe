@@ -102,7 +102,7 @@ const PromisesInitializer = () => {
         description: ApiErrorKeys.HISTORY,
       }).catch(handleError);
       if (hasEarnAccess) {
-        timeoutPromise(earnService.fetchUserStrategies(), TimeoutPromises.COMMON, {
+        timeoutPromise(earnService.fetchUserStrategies({ includeHistory: true }), TimeoutPromises.COMMON, {
           description: ApiErrorKeys.EARN,
         })
           .then(() => void dispatch(processConfirmedTransactionsForEarn()))
