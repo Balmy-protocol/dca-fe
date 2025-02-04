@@ -633,7 +633,6 @@ export class EarnService extends EventsManager<EarnServiceData> {
         timestamp: event.tx.timestamp,
         balances: [],
       };
-      if (!lastHistoricalBalance) return acc;
 
       // 2. Apply the event based on that last historical balance
       let updatedBalances = lastHistoricalBalance.balances;
