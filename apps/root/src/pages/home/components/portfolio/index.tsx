@@ -210,10 +210,8 @@ const PortfolioBodyItem: ItemContent<BalanceItem, Context> = (
           <StyledBodySmallRegularTypo2>
             {isLoadingPrice && !price ? (
               <Skeleton variant="text" animation="wave" />
-            ) : showBalances ? (
-              `$${formatUsdAmount({ amount: price, intl })}`
             ) : (
-              <HiddenNumber size="small" />
+              `$${formatUsdAmount({ amount: price, intl })}`
             )}
           </StyledBodySmallRegularTypo2>
         </TableCell>

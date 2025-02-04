@@ -465,7 +465,7 @@ export function parseUserStrategiesFinancialData(userPositions: EarnPosition[] =
           };
 
           // eslint-disable-next-line no-param-reassign
-          periodAcc.total += newAmountInUsd;
+          periodAcc.total += newRatiodUsdAmount;
           return periodAcc;
         },
         { total: 0, byToken: {} }
@@ -494,14 +494,13 @@ export function parseUserStrategiesFinancialData(userPositions: EarnPosition[] =
       .filter((balance) => balance.timestamp < today - 30 * 24 * 60 * 60)
       .map((balance) => balance.timestamp);
     // Should always be ordered as descending
-    const latestBalance = position.historicalBalances[0];
+    const currentBalances = position.balances;
     const closestTimestamp = findClosestTimestamp(timestamps, today);
 
     const historicalBalance = position.historicalBalances.find((balance) => balance.timestamp === closestTimestamp);
 
     if (!historicalBalance) {
-      if (!latestBalance) return acc;
-      latestBalance.balances.forEach((balance) => {
+      currentBalances.forEach((balance) => {
         if (!acc[balance.token.address]) {
           // eslint-disable-next-line no-param-reassign
           acc[balance.token.address] = {
@@ -521,7 +520,6 @@ export function parseUserStrategiesFinancialData(userPositions: EarnPosition[] =
       });
     } else {
       const balances = historicalBalance.balances;
-      const currentBalances = latestBalance.balances;
 
       balances.forEach((balance) => {
         const currentBalanceToken = currentBalances.find((b) => isSameToken(b.token, balance.token));

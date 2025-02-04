@@ -20,29 +20,29 @@ const EarnPositionsDashboard = ({ selectedWalletOption }: EarnPositionsDashboard
   const { userStrategies, hasFetchedUserStrategies } = useEarnPositions();
   const showBalances = useShowBalances();
 
-  const userStrategiesWithBalancesOrDelayedAmount = React.useMemo(
+  const filteredPositionsByWallet = React.useMemo(
     () =>
       userStrategies.filter(
+        (strategy) => selectedWalletOption === ALL_WALLETS || strategy.owner === selectedWalletOption
+      ),
+    [userStrategies, selectedWalletOption]
+  );
+
+  const userStrategiesWithBalancesOrDelayedAmount = React.useMemo(
+    () =>
+      filteredPositionsByWallet.filter(
         (userStrategy) =>
           userStrategy.balances.some((balance) => balance.amount.amount > 0n) ||
           userStrategy.delayed?.some(
             (delayedBalance) => delayedBalance.ready.amount > 0n || delayedBalance.pending.amount > 0n
           )
       ),
-    [userStrategies]
-  );
-
-  const filteredPositions = React.useMemo(
-    () =>
-      userStrategiesWithBalancesOrDelayedAmount.filter(
-        (strategy) => selectedWalletOption === ALL_WALLETS || strategy.owner === selectedWalletOption
-      ),
-    [userStrategiesWithBalancesOrDelayedAmount, selectedWalletOption]
+    [filteredPositionsByWallet]
   );
 
   const groupedPositionsByStrategyCount = React.useMemo(
-    () => groupPositionsByStrategy(filteredPositions).length,
-    [filteredPositions]
+    () => groupPositionsByStrategy(userStrategiesWithBalancesOrDelayedAmount).length,
+    [userStrategiesWithBalancesOrDelayedAmount]
   );
 
   if (!userStrategiesWithBalancesOrDelayedAmount.length) {
@@ -86,7 +86,7 @@ const EarnPositionsDashboard = ({ selectedWalletOption }: EarnPositionsDashboard
                 />
               </Typography>
               <FinancialOverview
-                userPositions={filteredPositions}
+                userPositions={filteredPositionsByWallet}
                 size="small"
                 isLoading={!hasFetchedUserStrategies}
                 isFiat
@@ -102,14 +102,17 @@ const EarnPositionsDashboard = ({ selectedWalletOption }: EarnPositionsDashboard
                 />
               </Typography>
               <ExpectedReturns
-                userPositions={filteredPositions}
+                userPositions={filteredPositionsByWallet}
                 isLoading={!hasFetchedUserStrategies}
                 hidePeriods={[StrategyReturnPeriods.WEEK]}
                 isFiat
               />
             </Grid>
           </Grid>
-          <DelayedWithdrawalsContainer filteredPositions={filteredPositions} isLoading={!hasFetchedUserStrategies} />
+          <DelayedWithdrawalsContainer
+            filteredPositions={userStrategiesWithBalancesOrDelayedAmount}
+            isLoading={!hasFetchedUserStrategies}
+          />
         </ContainerBox>
       ) : (
         <Typography variant="bodyRegular">

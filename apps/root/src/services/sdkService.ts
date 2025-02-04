@@ -518,7 +518,13 @@ export default class SdkService {
     return strategy;
   }
 
-  async getUserStrategies({ accounts }: { accounts: Address[] }): Promise<Record<ChainId, SdkEarnPosition[]>> {
+  async getUserStrategies({
+    accounts,
+    includeHistory,
+  }: {
+    accounts: Address[];
+    includeHistory: boolean;
+  }): Promise<Record<ChainId, SdkEarnPosition[]>> {
     if (accounts.length === 0) {
       return {};
     }
@@ -526,6 +532,7 @@ export default class SdkService {
     const positionsByAccount = await this.sdk.earnService.getPositionsByAccount({
       accounts: accounts as ArrayOneOrMore<Address>,
       includeHistoricalBalancesFrom: nowInSeconds() - Number(THREE_MONTHS),
+      includeHistory,
     });
 
     return positionsByAccount;

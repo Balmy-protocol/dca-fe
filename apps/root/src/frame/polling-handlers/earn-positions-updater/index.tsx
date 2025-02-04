@@ -8,7 +8,7 @@ const EarnPositionsUpdater = () => {
   const updateInterval = IntervalSetActions.earnPositionsUpdate;
 
   const updateUserStrategies = React.useCallback(async () => {
-    await earnService.fetchUserStrategies();
+    await earnService.fetchUserStrategies({ includeHistory: false });
   }, []);
 
   useInterval(updateUserStrategies, updateInterval);
