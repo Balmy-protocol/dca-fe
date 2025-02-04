@@ -198,6 +198,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError, missingQ
 
   const onResetForm = React.useCallback(() => {
     dispatch(resetForm());
+    setCurrentQuoteStatus(QuoteStatus.None);
   }, [dispatch]);
 
   const handleApproveToken = React.useCallback(
