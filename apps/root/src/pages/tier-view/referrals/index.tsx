@@ -2,7 +2,6 @@ import React from 'react';
 import { FormattedMessage } from 'react-intl';
 import { ContainerBox, Grid, Typography } from 'ui-library';
 import ReferralCard from './card';
-import ReferralsTable from './table';
 
 const Referrals = () => {
   return (
@@ -19,10 +18,6 @@ const Referrals = () => {
         </Typography>
       </ContainerBox>
       <Grid container rowSpacing={6} columnSpacing={6}>
-        <Grid item xs={12} md={8}>
-          {/* Referral table */}
-          <ReferralsTable />
-        </Grid>
         <Grid item xs={12} md={4}>
           {/* Referral card */}
           <ReferralCard />

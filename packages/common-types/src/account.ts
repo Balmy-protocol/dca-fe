@@ -47,7 +47,7 @@ export interface AccountLabelsAndContactList {
 // Mapping of achievement IDs to specific requirements
 export enum AchievementKeys {
   SWAP_VOLUME = 'agg-swaps',
-  TWEET = 'tweet_shared',
+  TWEET = 'earn-early-access-twitter-share',
   MIGRATED_VOLUME = 'migrations',
   REFERRALS = 'referrals',
 }
@@ -69,4 +69,16 @@ export type Account = {
   wallets: ApiWallet[];
   contacts: { wallet: string }[];
   labels: Record<string, string>;
+};
+
+export type AccountResponse = Account & {
+  referrals: {
+    id: string;
+    activated: number;
+    referred: number;
+  };
+  achievements: {
+    wallets: Record<Address, Achievement[]>;
+    account: Achievement[];
+  };
 };

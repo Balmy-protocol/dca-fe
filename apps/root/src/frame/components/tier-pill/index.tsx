@@ -1,12 +1,12 @@
 import React from 'react';
 import useTierLevel from '@hooks/tiers/useTierLevel';
-import useEarnAccess from '@hooks/useEarnAccess';
 import styled from 'styled-components';
 import { ActiveTiersIcons, AnimatedChevronRightIcon, colors, ContainerBox, Typography } from 'ui-library';
 import { TIER_LEVEL_OPTIONS } from '@pages/tier-view/constants';
 import { FormattedMessage, useIntl } from 'react-intl';
 import usePushToHistory from '@hooks/usePushToHistory';
 import useAnalytics from '@hooks/useAnalytics';
+import useUser from '@hooks/useUser';
 
 const StyledTierPill = styled(ContainerBox).attrs({ gap: 2, alignItems: 'center' })<{ $needsToVerifyWallets: boolean }>`
   ${({
@@ -88,19 +88,17 @@ const LeveledTierPill = ({ tierLevel }: { tierLevel: number }) => {
 
 const TierPill = () => {
   const { tierLevel, walletsToVerify, progress } = useTierLevel();
-  const { hasEarnAccess } = useEarnAccess();
   const [hovered, setHovered] = React.useState(false);
   const pushToHistory = usePushToHistory();
   const { trackEvent } = useAnalytics();
-
-  if (!hasEarnAccess) {
-    return null;
-  }
+  const user = useUser();
 
   const onClick = () => {
     trackEvent('Navigation - Tier Pill Clicked');
     pushToHistory('/tier-view');
   };
+
+  if (!user) return null;
 
   const canLevelUp = progress >= 100;
   const needsToVerifyWallets = walletsToVerify.length > 0 && canLevelUp;

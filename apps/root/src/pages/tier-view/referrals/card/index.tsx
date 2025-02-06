@@ -1,4 +1,4 @@
-import useInviteCodes from '@hooks/tiers/useInviteCodes';
+import useReferrals from '@hooks/tiers/useReferrals';
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
@@ -58,10 +58,7 @@ const GraphCard = ({ referrals }: { referrals: number }) => (
 );
 
 const ReferralCard = () => {
-  const inviteCodes = useInviteCodes();
-
-  const totalInviteCodes = inviteCodes.length;
-  const availableInviteCodes = totalInviteCodes - inviteCodes.filter((inviteCode) => inviteCode.claimedBy).length;
+  const referrals = useReferrals();
 
   return (
     <StyledReferralCard>
@@ -93,7 +90,7 @@ const ReferralCard = () => {
             </Typography>
           </ContainerBox>
         </ContainerBox>
-        <GraphCard referrals={availableInviteCodes} />
+        <GraphCard referrals={referrals.referred} />
       </ContainerBox>
     </StyledReferralCard>
   );
