@@ -10,7 +10,6 @@ import useWallets from './useWallets';
 import useEarnPositions from './earn/useEarnPositions';
 import { getIsSameOrTokenEquivalent } from '@common/utils/currency';
 import { calculatePositionTotalDelayedAmountsUsd } from '@common/utils/earn/parsing';
-import useEarnAccess from './useEarnAccess';
 
 interface NetWorthProps {
   walletSelector?: WalletOptionValues;
@@ -27,7 +26,6 @@ const useNetWorth = ({ walletSelector, chainId, tokens }: NetWorthProps) => {
   const { userStrategies, hasFetchedUserStrategies } = useEarnPositions();
   const wallets = useWallets();
   const authWallet = find(wallets, { isAuth: true })?.address;
-  const { hasEarnAccess } = useEarnAccess();
 
   const walletBalances = React.useMemo<WalletBalances>(
     () =>
@@ -177,7 +175,7 @@ const useNetWorth = ({ walletSelector, chainId, tokens }: NetWorthProps) => {
   }, [tokens, userStrategies, walletSelector, chainId, walletAddressToEvaluate]);
 
   const isLoadingSomePrices =
-    (activeWallet && (!hasFetchedCurrentPositions || (hasEarnAccess && !hasFetchedUserStrategies))) ||
+    (activeWallet && (!hasFetchedCurrentPositions || !hasFetchedUserStrategies)) ||
     isLoadingAllBalances ||
     Object.values(allBalances).some(
       (balances) =>

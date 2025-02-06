@@ -712,6 +712,15 @@ describe('Account Service', () => {
                 },
               ],
               config: {},
+              referrals: {
+                id: '123',
+                activated: 0,
+                referred: 0,
+              },
+              achievements: {
+                wallets: {},
+                account: [],
+              },
             },
             {
               id: '50f9ef37-7c9a-4e28-a421-d73288e75236',
@@ -719,6 +728,15 @@ describe('Account Service', () => {
               labels: {},
               contacts: [],
               config: {},
+              referrals: {
+                id: '123',
+                activated: 0,
+                referred: 0,
+              },
+              achievements: {
+                wallets: {},
+                account: [],
+              },
               wallets: [
                 {
                   address: '0xaddress',
@@ -762,6 +780,15 @@ describe('Account Service', () => {
             labels: {},
             config: {},
             contacts: [],
+            referrals: {
+              id: '123',
+              activated: 0,
+              referred: 0,
+            },
+            achievements: {
+              wallets: {},
+              account: [],
+            },
             wallets: [
               {
                 address: '0xaddress',
@@ -781,6 +808,15 @@ describe('Account Service', () => {
             labels: {},
             contacts: [],
             config: {},
+            referrals: {
+              id: '123',
+              activated: 0,
+              referred: 0,
+            },
+            achievements: {
+              wallets: {},
+              account: [],
+            },
             wallets: [
               {
                 address: '0xaddress',
