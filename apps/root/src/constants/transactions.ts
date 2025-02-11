@@ -1,6 +1,7 @@
 import { Chains } from '@balmy/sdk';
 
 export const DEFAULT_TRANSACTION_RETRIES = 10;
+export const RABBY_GAS_ACCOUNT_RETRIES = 60;
 
 export const TRANSACTION_RETRIES_PER_NETWORK = {
   [Chains.ROOTSTOCK.chainId]: 90,

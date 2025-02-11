@@ -171,6 +171,39 @@ export function useStoredNativeBalance(chainId: number) {
   }));
 }
 
+export function useNativeBalancesSnapshot() {
+  const allBalances = useAppSelector((state: RootState) => state.balances);
+  const [snapshot, setSnapshot] = React.useState<Record<ChainId, { [walletAddress: Address]: bigint }>>({});
+
+  const balances: Record<ChainId, { [walletAddress: Address]: bigint }> = {};
+
+  Object.entries(allBalances.balances).forEach(([chainId, chainBalances]) => {
+    const protocolTokenBalances = chainBalances.balancesAndPrices?.[PROTOCOL_TOKEN_ADDRESS];
+    balances[Number(chainId)] = {
+      ...balances[Number(chainId)],
+      ...(protocolTokenBalances?.balances || {}),
+    };
+  });
+
+  const updateNativeBalancesSnapshot = () => {
+    setSnapshot(balances);
+  };
+
+  React.useEffect(() => {
+    if (Object.keys(balances).length > 0 && Object.keys(snapshot).length === 0) {
+      updateNativeBalancesSnapshot();
+    }
+  }, [balances]);
+
+  return React.useMemo(
+    () => ({
+      nativeBalancesSnapshot: snapshot,
+      updateNativeBalancesSnapshot,
+    }),
+    [snapshot, updateNativeBalancesSnapshot]
+  );
+}
+
 export function useTotalTokenBalance(token?: Token) {
   const intl = useIntl();
   const allBalances = useAppSelector((state: RootState) => state.balances);

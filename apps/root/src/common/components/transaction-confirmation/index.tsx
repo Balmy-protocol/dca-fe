@@ -27,6 +27,21 @@ import useAnalytics from '@hooks/useAnalytics';
 import { useThemeMode } from '@state/config/hooks';
 import { isUndefined } from 'lodash';
 import useTransactionReceipt from '@hooks/useTransactionReceipt';
+import { Chains } from '@balmy/sdk';
+import { isUsingRabbyGasAccount } from '@common/utils/transactions';
+import useActiveWallet from '@hooks/useActiveWallet';
+import { useNativeBalancesSnapshot } from '@state/balances/hooks';
+
+const TIMES_PER_NETWORK = {
+  [Chains.ARBITRUM.chainId]: 10,
+  [Chains.POLYGON.chainId]: 20,
+  [Chains.OPTIMISM.chainId]: 10,
+  [Chains.BASE.chainId]: 10,
+  [Chains.ETHEREUM.chainId]: 40,
+  [Chains.ROOTSTOCK.chainId]: 90,
+};
+
+export const DEFAULT_TIME_PER_NETWORK = 30;
 
 type CustomBalanceChanges = UITransactionConfirmationprops['balanceChanges'];
 
@@ -65,6 +80,8 @@ const TransactionConfirmation = ({
   const { confettiParticleCount } = useAggregatorSettingsState();
   const isTransactionPending = useIsTransactionPending(transaction?.hash);
   const walletService = useWalletService();
+  const activeWallet = useActiveWallet();
+  const { nativeBalancesSnapshot, updateNativeBalancesSnapshot } = useNativeBalancesSnapshot();
   const [success, setSuccess] = React.useState(false);
   const [balanceAfter, setBalanceAfter] = React.useState<bigint | null>(null);
   const previousTransactionPending = usePrevious(isTransactionPending);
@@ -81,6 +98,7 @@ const TransactionConfirmation = ({
 
   React.useEffect(() => {
     setSuccess(false);
+    updateNativeBalancesSnapshot();
   }, [transaction]);
 
   React.useEffect(() => {
@@ -254,6 +272,19 @@ const TransactionConfirmation = ({
     }
   }
 
+  const maxWaitingTime = React.useMemo(() => {
+    if (!transactionReceipt || !activeWallet) return DEFAULT_TIME_PER_NETWORK;
+    const usingRabbyGasAccount = isUsingRabbyGasAccount({
+      chainId: transactionReceipt.chainId,
+      activeWallet,
+      nativeBalances: nativeBalancesSnapshot[transactionReceipt.chainId],
+      txToCheck: transactionReceipt,
+    });
+    const standardWaitingTime = TIMES_PER_NETWORK[transactionReceipt.chainId] || DEFAULT_TIME_PER_NETWORK;
+
+    return usingRabbyGasAccount ? standardWaitingTime * 3 : standardWaitingTime;
+  }, [transactionReceipt?.chainId, activeWallet, nativeBalancesSnapshot]);
+
   const submitSatisfactionHandler = (value: number) => {
     trackEvent(`${txIdentifierForSatisfaction} satisfaction`, {
       sender: transactionReceipt?.from,
@@ -284,6 +315,7 @@ const TransactionConfirmation = ({
       }
       balanceChanges={[...(customBalanceChanges ? customBalanceChanges : []), ...balanceChanges]}
       onClickSatisfactionOption={submitSatisfactionHandler}
+      maxWaitingTime={maxWaitingTime}
     />
   );
 };

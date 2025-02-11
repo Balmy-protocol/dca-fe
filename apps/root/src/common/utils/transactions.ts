@@ -14,11 +14,12 @@ import {
   TransactionDetails,
   TransactionTypes,
 } from '@types';
-import { emptyTokenWithAddress, parseNumberUsdPriceToBigInt, parseUsdPrice } from './currency';
+import { emptyTokenWithAddress, isSameToken, parseNumberUsdPriceToBigInt, parseUsdPrice } from './currency';
 import { sortTokens } from './parsing';
 import { Address, formatUnits, parseUnits } from 'viem';
-import { LATEST_VERSION } from '@constants';
+import { getMaxDeduction, getTransactionRetries, LATEST_VERSION, RABBY_GAS_ACCOUNT_RETRIES } from '@constants';
 import { nowInSeconds } from './time';
+import { DisplayWallet } from '@hooks/useWallets';
 
 export const getImpactedTokensByTxType = (tx: TransactionDetails, positions: Positions): Token[] => {
   switch (tx.type) {
@@ -299,4 +300,103 @@ export const getNewEarnPositionFromTxTypeData = ({
       },
     ],
   };
+};
+
+export const getProtocolTokenTransactionAmount = (txToCheck: TransactionDetails) => {
+  const protocolToken = getProtocolToken(txToCheck.chainId);
+  let protocolTokenTransactionAmount = 0n;
+
+  switch (txToCheck.type) {
+    // Others
+    case TransactionTypes.transferToken:
+      if (!isSameToken(txToCheck.typeData.token, protocolToken)) break;
+      protocolTokenTransactionAmount = BigInt(txToCheck.typeData.amount);
+      break;
+    case TransactionTypes.approveToken:
+    case TransactionTypes.approveTokenExact:
+      break;
+    // DCA
+    case TransactionTypes.newPosition:
+      if (!isSameToken(txToCheck.typeData.from, protocolToken)) break;
+      protocolTokenTransactionAmount = BigInt(txToCheck.typeData.fromValue);
+      break;
+    case TransactionTypes.modifyRateAndSwapsPosition:
+      if (!txToCheck.position || !isSameToken(txToCheck.position.from, protocolToken)) break;
+      const newAmount = BigInt(txToCheck.typeData.newRate) * BigInt(txToCheck.typeData.newSwaps);
+      const increasingAmount = newAmount - txToCheck.position.remainingLiquidity.amount;
+      protocolTokenTransactionAmount = increasingAmount > 0n ? increasingAmount : 0n;
+      break;
+    case TransactionTypes.transferPosition:
+    case TransactionTypes.approveCompanion:
+    case TransactionTypes.modifyPermissions:
+    case TransactionTypes.migratePosition:
+    case TransactionTypes.migratePositionYield:
+    case TransactionTypes.withdrawFunds:
+    case TransactionTypes.terminatePosition:
+    case TransactionTypes.withdrawPosition:
+      break;
+    // Aggregator
+    case TransactionTypes.swap:
+      if (!isSameToken(txToCheck.typeData.from, protocolToken)) break;
+      protocolTokenTransactionAmount = BigInt(txToCheck.typeData.amountFrom);
+      break;
+    // Earn
+    case TransactionTypes.earnCreate:
+      if (!isSameToken(txToCheck.typeData.asset, protocolToken)) break;
+      protocolTokenTransactionAmount = BigInt(txToCheck.typeData.assetAmount);
+      break;
+    case TransactionTypes.earnIncrease:
+      if (!isSameToken(txToCheck.typeData.asset, protocolToken)) break;
+      protocolTokenTransactionAmount = BigInt(txToCheck.typeData.assetAmount);
+      break;
+    case TransactionTypes.earnWithdraw:
+    case TransactionTypes.earnSpecialWithdraw:
+    case TransactionTypes.earnClaimDelayedWithdraw:
+      break;
+  }
+  return protocolTokenTransactionAmount;
+};
+
+export const isUsingRabbyGasAccount = ({
+  chainId,
+  activeWallet,
+  nativeBalances = {},
+  txToCheck,
+}: {
+  chainId: number;
+  activeWallet: DisplayWallet;
+  nativeBalances: { [walletAddress: Address]: bigint };
+  txToCheck: TransactionDetails;
+}) => {
+  const protocolTokenTransactionAmount = getProtocolTokenTransactionAmount(txToCheck);
+
+  const userBalance = BigInt(nativeBalances[activeWallet.address] || 0n);
+  const requiredGas = getMaxDeduction(chainId);
+  const totalRequired = protocolTokenTransactionAmount + requiredGas;
+
+  const hasEnoughGas = userBalance >= totalRequired;
+
+  // If user doesn't have enough gas, we asume it's using the Rabby gas account
+  return activeWallet.providerInfo?.id === 'rabby' && !hasEnoughGas;
+};
+
+export const getMaxTransactionRetries = ({
+  chainId,
+  activeWallet,
+  nativeBalances = {},
+  txToCheck,
+}: {
+  chainId: number;
+  activeWallet: DisplayWallet;
+  nativeBalances: { [walletAddress: Address]: bigint };
+  txToCheck: TransactionDetails;
+}) => {
+  const maxRetries = getTransactionRetries(chainId);
+
+  // Rabby gas account waits for new gas to be available if needed
+  if (isUsingRabbyGasAccount({ chainId, activeWallet, nativeBalances, txToCheck })) {
+    return RABBY_GAS_ACCOUNT_RETRIES;
+  }
+
+  return maxRetries;
 };
