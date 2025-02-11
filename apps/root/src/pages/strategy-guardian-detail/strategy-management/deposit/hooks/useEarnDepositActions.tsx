@@ -685,28 +685,6 @@ const useEarnDepositActions = ({ strategy }: UseEarnDepositActionParams) => {
     const assetAmount = parseUnits(assetAmountInUnits, asset.decimals);
     const newSteps: TransactionStep[] = [];
 
-    if (!isIncrease && strategy?.tos) {
-      newSteps.push({
-        hash: '',
-        chainId: strategy.network.chainId,
-        onAction: onSignEarnToS,
-        checkForPending: false,
-        done: false,
-        type: TRANSACTION_ACTION_SIGN_TOS_EARN,
-        explanation: intl.formatMessage(
-          defineMessage({
-            description: 'earn.strategy-management.deposit.tx-steps.sign-tos',
-            // TODO: Agregar un link aca
-            defaultMessage: 'You need to sign the ToS of balmy to continue',
-          })
-        ),
-        extraData: {
-          tos: strategy.tos,
-          signStatus: SignStatus.none,
-        },
-      });
-    }
-
     if (!isApproved) {
       // Here we need to check if the token is from compound
       let allowsExactApproval = true;
@@ -762,6 +740,27 @@ const useEarnDepositActions = ({ strategy }: UseEarnDepositActionParams) => {
         extraData: {
           asset,
           assetAmount,
+          signStatus: SignStatus.none,
+        },
+      });
+    }
+
+    if (!isIncrease && strategy?.tos) {
+      newSteps.push({
+        hash: '',
+        chainId: strategy.network.chainId,
+        onAction: onSignEarnToS,
+        checkForPending: false,
+        done: false,
+        type: TRANSACTION_ACTION_SIGN_TOS_EARN,
+        explanation: intl.formatMessage(
+          defineMessage({
+            description: 'earn.strategy-management.deposit.tx-steps.sign-tos',
+            defaultMessage: 'You need to sign the ToS of balmy to continue',
+          })
+        ),
+        extraData: {
+          tos: strategy.tos,
           signStatus: SignStatus.none,
         },
       });
