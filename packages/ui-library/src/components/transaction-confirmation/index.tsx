@@ -18,7 +18,6 @@ import { colors } from '../../theme';
 import { Address } from 'viem';
 import { FormattedMessage, MessageDescriptor, defineMessage, useIntl } from 'react-intl';
 import { SuccessCircleIcon } from '../../icons';
-import { Chains } from '@balmy/sdk';
 import { SPACING } from '../../theme/constants';
 import CustomerSatisfaction, { FeedbackOption } from '../customer-satisfaction';
 import capitalize from 'lodash/capitalize';
@@ -90,16 +89,6 @@ export const satisfactionOptions: FeedbackOption[] = [
   GrinningFaceWithBigEyesEmoji,
   SmilingFaceWithHeartEyesEmoji,
 ].map((Emoji, i) => ({ label: <Emoji key={i} size={SPACING(7)} />, value: i + 1 }));
-
-const TIMES_PER_NETWORK = {
-  [Chains.ARBITRUM.chainId]: 10,
-  [Chains.POLYGON.chainId]: 20,
-  [Chains.OPTIMISM.chainId]: 10,
-  [Chains.ETHEREUM.chainId]: 40,
-  [Chains.ROOTSTOCK.chainId]: 90,
-};
-
-export const DEFAULT_TIME_PER_NETWORK = 30;
 
 interface CostBalanceChangeProps {
   cost: AmountsOfToken;
@@ -312,19 +301,19 @@ const SuccessTransactionConfirmation = ({
 interface PendingTransactionConfirmationProps {
   onGoToEtherscan: () => void;
   mode: 'light' | 'dark';
-  chainId?: number;
   loadingSubtitle?: string;
   loadingTitle?: React.ReactNode;
+  maxWaitingTime: number;
 }
 
 const PendingTransactionConfirmation = ({
   onGoToEtherscan,
   mode,
-  chainId,
   loadingSubtitle,
   loadingTitle,
+  maxWaitingTime,
 }: PendingTransactionConfirmationProps) => {
-  const [timer, setTimer] = useState(TIMES_PER_NETWORK[chainId || 1] || DEFAULT_TIME_PER_NETWORK);
+  const [timer, setTimer] = useState(maxWaitingTime);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
@@ -361,7 +350,7 @@ const PendingTransactionConfirmation = ({
         <CircularProgress
           size={232}
           variant="determinate"
-          value={(1 - timer / (TIMES_PER_NETWORK[chainId || 1] || DEFAULT_TIME_PER_NETWORK)) * 100}
+          value={(1 - timer / maxWaitingTime) * 100}
           thickness={4}
           sx={{
             [`& .${circularProgressClasses.circle}`]: {
@@ -426,6 +415,7 @@ interface TransactionConfirmationProps {
   successSubtitle?: React.ReactNode;
   onClickSatisfactionOption: (value: number) => void;
   setHeight?: (a?: number) => void;
+  maxWaitingTime: number;
 }
 
 const StyledContainer = styled(ContainerBox).attrs({ gap: 10, fullWidth: true, flexDirection: 'column' })<{
@@ -453,7 +443,6 @@ const StyledContainer = styled(ContainerBox).attrs({ gap: 10, fullWidth: true, f
 const TransactionConfirmation = ({
   shouldShow,
   success,
-  chainId,
   onGoToEtherscan,
   balanceChanges,
   gasUsed,
@@ -466,6 +455,7 @@ const TransactionConfirmation = ({
   loadingSubtitle,
   loadingTitle,
   setHeight,
+  maxWaitingTime,
 }: TransactionConfirmationProps) => {
   const {
     palette: { mode },
@@ -507,9 +497,9 @@ const TransactionConfirmation = ({
             <PendingTransactionConfirmation
               loadingSubtitle={loadingSubtitle}
               loadingTitle={loadingTitle}
-              chainId={chainId}
               onGoToEtherscan={onGoToEtherscan}
               mode={mode}
+              maxWaitingTime={maxWaitingTime}
             />
           )}
         </StyledOverlay>
