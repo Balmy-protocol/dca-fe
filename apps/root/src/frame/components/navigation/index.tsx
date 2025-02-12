@@ -8,9 +8,6 @@ import {
   EARN_ROUTE,
   EARN_PORTFOLIO,
   EARN_GROUP,
-  NON_NAVIGABLE_EARN_ROUTES,
-  EARN_SUBSCRIBE_ROUTE,
-  EARN_ACCESS_NOW_ROUTE,
 } from '@constants/routes';
 import { useAppDispatch } from '@hooks/state';
 import usePushToHistory from '@hooks/usePushToHistory';
@@ -37,7 +34,6 @@ import {
   TrashIcon,
   MovingStarIcon,
   DollarSquareIcon,
-  LinkSection,
 } from 'ui-library';
 // import { setSwitchActiveWalletOnConnectionThunk, toggleTheme } from '@state/config/actions';
 // import { useSwitchActiveWalletOnConnection, useThemeMode } from '@state/config/hooks';
@@ -49,9 +45,6 @@ import useChangeLanguage from '@hooks/useChangeLanguage';
 import useAnalytics from '@hooks/useAnalytics';
 import NetWorth, { NetWorthVariants } from '@common/components/net-worth';
 import { WalletOptionValues, ALL_WALLETS, WalletSelectorVariants } from '@common/components/wallet-selector/types';
-import GuardianListSubscribeModal from '../guardian-list-subscribe-modal';
-import EarnGainAccessModal from '../earn-gain-access-modal';
-import useEarnAccess from '@hooks/useEarnAccess';
 import TierPill from '../tier-pill';
 import LevelUpModal from '@common/components/level-up-modal';
 import { resetForm as resetAggregatorForm } from '@state/aggregator/actions';
@@ -128,9 +121,7 @@ const Navigation = ({ children }: React.PropsWithChildren) => {
   const { trackEvent } = useAnalytics();
   const useUnlimitedApproval = useUseUnlimitedApproval();
   const [selectedWalletOption, setSelectedWalletOption] = React.useState<WalletOptionValues>(ALL_WALLETS);
-  const [showEarnModal, setShowEarnModal] = React.useState(false);
   // const switchActiveWalletOnConnection = useSwitchActiveWalletOnConnection();
-  const { isEarnEnabled, hasEarnAccess } = useEarnAccess();
 
   React.useEffect(() => {
     if (HOME_ROUTES.includes(location.pathname)) {
@@ -174,16 +165,7 @@ const Navigation = ({ children }: React.PropsWithChildren) => {
 
   const onSectionClick = useCallback(
     (section: Section, openInNewTab?: boolean) => {
-      if (section.type === SectionType.link && section.key === EARN_GROUP.key) {
-        setShowEarnModal(true);
-      }
-
-      if (
-        section.type === SectionType.divider ||
-        section.type === SectionType.group ||
-        // section.key === currentRoute ||
-        (!hasEarnAccess && NON_NAVIGABLE_EARN_ROUTES.includes(section.key))
-      ) {
+      if (section.type === SectionType.divider || section.type === SectionType.group) {
         return;
       }
       if (openInNewTab) {
@@ -194,7 +176,7 @@ const Navigation = ({ children }: React.PropsWithChildren) => {
       pushToHistory(`/${section.key}`);
       trackEvent('Main - Changed active app', { newSection: section.key, oldSection: currentRoute });
     },
-    [dispatch, pushToHistory, currentRoute, hasEarnAccess]
+    [dispatch, pushToHistory, currentRoute]
   );
 
   const openExternalLink = (url: string) => {
@@ -306,15 +288,7 @@ const Navigation = ({ children }: React.PropsWithChildren) => {
 
   return (
     <>
-      {isEarnEnabled ? (
-        <>
-          <LevelUpModal />
-          <EarnGainAccessModal isOpen={showEarnModal} onClose={() => setShowEarnModal(false)} />
-        </>
-      ) : (
-        <GuardianListSubscribeModal isOpen={showEarnModal} onClose={() => setShowEarnModal(false)} />
-      )}
-
+      <LevelUpModal />
       <NavigationUI
         extraHeaderTools={<TierPill />}
         headerContent={
@@ -359,35 +333,26 @@ const Navigation = ({ children }: React.PropsWithChildren) => {
               //   label: intl.formatMessage(EARN_ROUTE.label),
               //   type: SectionType.link,
               // },
-              ...((hasEarnAccess
-                ? [
-                    {
-                      ...EARN_GROUP,
-                      label: intl.formatMessage(EARN_GROUP.label),
-                      type: SectionType.link,
-                      activeKeys: [EARN_ROUTE.key, EARN_PORTFOLIO.key],
-                      options: [
-                        {
-                          ...EARN_ROUTE,
-                          label: intl.formatMessage(EARN_ROUTE.label),
-                          type: SectionType.link,
-                        },
-                        {
-                          ...EARN_PORTFOLIO,
-                          label: intl.formatMessage(EARN_PORTFOLIO.label),
-                          type: SectionType.link,
-                        },
-                      ],
-                    },
-                  ]
-                : [
-                    {
-                      ...EARN_SUBSCRIBE_ROUTE,
-                      label: intl.formatMessage(EARN_SUBSCRIBE_ROUTE.label),
-                      activeKeys: [EARN_ACCESS_NOW_ROUTE.key],
-                      type: SectionType.link,
-                    },
-                  ]) satisfies LinkSection[]),
+
+              {
+                ...EARN_GROUP,
+                label: intl.formatMessage(EARN_GROUP.label),
+                type: SectionType.link,
+                activeKeys: [EARN_ROUTE.key, EARN_PORTFOLIO.key],
+                options: [
+                  {
+                    ...EARN_ROUTE,
+                    label: intl.formatMessage(EARN_ROUTE.label),
+                    type: SectionType.link,
+                  },
+                  {
+                    ...EARN_PORTFOLIO,
+                    label: intl.formatMessage(EARN_PORTFOLIO.label),
+                    type: SectionType.link,
+                  },
+                ],
+              },
+
               {
                 ...DCA_ROUTE,
                 label: intl.formatMessage(DCA_ROUTE.label),

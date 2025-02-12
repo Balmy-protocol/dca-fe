@@ -17,7 +17,6 @@ import usePositionService from '@hooks/usePositionService';
 import { processConfirmedTransactionsForDca, processConfirmedTransactionsForEarn } from '@state/transactions/actions';
 import useEarnService from '@hooks/earn/useEarnService';
 import useLabelService from '@hooks/useLabelService';
-import useEarnAccess from '@hooks/useEarnAccess';
 
 const PromisesInitializer = () => {
   const dispatch = useAppDispatch();
@@ -33,7 +32,6 @@ const PromisesInitializer = () => {
   const snackbar = useSnackbar();
   const navigate = useNavigate();
   const { trackEvent } = useAnalytics();
-  const { hasEarnAccess } = useEarnAccess();
 
   const handleError = React.useCallback(
     (error: unknown) => {
@@ -101,13 +99,11 @@ const PromisesInitializer = () => {
       timeoutPromise(positionService.fetchUserHasPositions(), TimeoutPromises.COMMON, {
         description: ApiErrorKeys.HISTORY,
       }).catch(handleError);
-      if (hasEarnAccess) {
-        timeoutPromise(earnService.fetchUserStrategies({ includeHistory: true }), TimeoutPromises.COMMON, {
-          description: ApiErrorKeys.EARN,
-        })
-          .then(() => void dispatch(processConfirmedTransactionsForEarn()))
-          .catch(handleError);
-      }
+      timeoutPromise(earnService.fetchUserStrategies({ includeHistory: true }), TimeoutPromises.COMMON, {
+        description: ApiErrorKeys.EARN,
+      })
+        .then(() => void dispatch(processConfirmedTransactionsForEarn()))
+        .catch(handleError);
       timeoutPromise(positionService.fetchCurrentPositions(), TimeoutPromises.COMMON, {
         description: ApiErrorKeys.DCA_POSITIONS,
       })

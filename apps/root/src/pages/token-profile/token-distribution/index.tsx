@@ -22,7 +22,6 @@ import useIsLoggingUser from '@hooks/useIsLoggingUser';
 import { useShowBalances, useThemeMode } from '@state/config/hooks';
 import { Cell, Label, Pie, PieChart, ResponsiveContainer } from 'recharts';
 import { formatUsdAmount } from '@common/utils/currency';
-import useEarnAccess from '@hooks/useEarnAccess';
 
 const StyledNoWallet = styled(ContainerBox).attrs({
   flexDirection: 'column',
@@ -169,6 +168,7 @@ const TokenDistributionLabelsSkeleton = () => (
   </>
 );
 
+const DATA_KEYS_TO_SHOW = ['wallet', 'dca', 'earn'];
 const TokenDistribution = ({ token }: TokenDistributionProps) => {
   const { assetsTotalValue, totalAssetValue, isLoadingAllBalances, isLoadingSomePrices } = useNetWorth({
     walletSelector: 'allWallets',
@@ -179,14 +179,8 @@ const TokenDistribution = ({ token }: TokenDistributionProps) => {
   const isLoggingUser = useIsLoggingUser();
   const showBalances = useShowBalances();
   const mode = useThemeMode();
-  const { hasEarnAccess } = useEarnAccess();
 
   const isLoading = isLoadingAllBalances || isLoadingSomePrices;
-
-  const DATA_KEYS_TO_SHOW = React.useMemo(
-    () => ['wallet', 'dca', ...(hasEarnAccess ? ['earn'] : [])].filter(Boolean),
-    [hasEarnAccess]
-  );
 
   const mappedData = isLoading
     ? [

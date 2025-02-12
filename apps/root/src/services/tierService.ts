@@ -1,6 +1,4 @@
 import {
-  AccountId,
-  EarnInviteCode,
   User,
   AchievementKeys,
   Achievement,
@@ -10,6 +8,7 @@ import {
   TierConditionalRequirement,
   TransactionDetails,
   TransactionTypes,
+  AccountResponse,
 } from '@types';
 import { EventsManager } from './eventsManager';
 import Web3Service from './web3Service';
@@ -24,12 +23,15 @@ export const WALLET_SIGNATURE_KEY = 'wallet_auth_signature';
 export const LATEST_SIGNATURE_VERSION = '1.0.2';
 export interface TierServiceData {
   tier?: number;
-  inviteCodes: EarnInviteCode[];
-  referrals: AccountId[];
+  referrals: AccountResponse['referrals'];
   achievements: Record<Address, { achievement: Achievement; lastUpdated: number }[]>;
 }
 
-const initialState: TierServiceData = { tier: undefined, inviteCodes: [], referrals: [], achievements: {} };
+const initialState: TierServiceData = {
+  tier: undefined,
+  referrals: { activated: 0, referred: 0, id: '' },
+  achievements: {},
+};
 export default class TierService extends EventsManager<TierServiceData> {
   web3Service: Web3Service;
 
@@ -49,19 +51,11 @@ export default class TierService extends EventsManager<TierServiceData> {
     this.serviceData = { ...this.serviceData, tier };
   }
 
-  get inviteCodes() {
-    return this.serviceData.inviteCodes;
-  }
-
-  set inviteCodes(inviteCodes: EarnInviteCode[]) {
-    this.serviceData = { ...this.serviceData, inviteCodes };
-  }
-
   get referrals() {
     return this.serviceData.referrals;
   }
 
-  set referrals(referrals: AccountId[]) {
+  set referrals(referrals: AccountResponse['referrals']) {
     this.serviceData = { ...this.serviceData, referrals };
   }
 
@@ -81,15 +75,7 @@ export default class TierService extends EventsManager<TierServiceData> {
     return this.tier;
   }
 
-  setInviteCodes(inviteCodes: EarnInviteCode[]) {
-    this.inviteCodes = inviteCodes;
-  }
-
-  getInviteCodes() {
-    return this.inviteCodes;
-  }
-
-  setReferrals(referrals: AccountId[]) {
+  setReferrals(referrals: AccountResponse['referrals']) {
     this.referrals = referrals;
   }
 
@@ -164,7 +150,7 @@ export default class TierService extends EventsManager<TierServiceData> {
       }
     }
 
-    const referrals = this.referrals.length;
+    const referrals = this.referrals.activated;
     totalAchievements[AchievementKeys.REFERRALS] = referrals;
 
     return totalAchievements;
@@ -378,12 +364,11 @@ export default class TierService extends EventsManager<TierServiceData> {
     const accounts = await this.meanApiService.getAccounts({ signature });
     const account = accounts.accounts[0];
 
-    this.setReferrals(account.earn?.referrals || []);
-    this.setInviteCodes(account.earn?.inviteCodes || []);
+    this.setReferrals(account.referrals);
     this.setAchievements(
       account.wallets.map((wallet) => wallet.address),
-      account.earn?.achievements || {},
-      account.earn?.twitterShare || false
+      account.achievements.wallets,
+      !!account.achievements.account.find((achievement) => achievement.id === AchievementKeys.TWEET)?.achieved
     );
     this.calculateAndSetUserTier();
   }
