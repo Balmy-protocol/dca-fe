@@ -247,7 +247,7 @@ const Row = <T extends StrategiesTableVariants>({
 
   const strategy = getStrategyFromTableObject(rowData, variant);
   const needsTier = getNeedsTierFromTableObject(rowData, variant);
-  const isLocked = !isNil(needsTier);
+  const isLocked = !isNil(needsTier) && needsTier !== 0;
 
   const condition = isLocked ? StrategyConditionType.LOCKED : undefined;
   // If TierIcon is rendered, needsTier is defined
