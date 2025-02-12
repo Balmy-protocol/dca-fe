@@ -28,17 +28,22 @@ import useActiveWallet from '@hooks/useActiveWallet';
 import { updateTokensAfterTransaction } from '@state/balances/actions';
 import useWallets from '@hooks/useWallets';
 import { isUndefined, map } from 'lodash';
-import { getImpactedTokensByTxType, getImpactedTokenForOwnWallet } from '@common/utils/transactions';
+import {
+  getImpactedTokensByTxType,
+  getImpactedTokenForOwnWallet,
+  getMaxTransactionRetries,
+} from '@common/utils/transactions';
 import { Chains } from '@balmy/sdk';
 import useDcaIndexingBlocks from '@hooks/useDcaIndexingBlocks';
 // import useEarnIndexingBlocks from '@hooks/useEarnIndexingBlocks';
-import { ONE_DAY, SUPPORTED_NETWORKS_DCA, getTransactionRetries } from '@constants';
+import { ONE_DAY, SUPPORTED_NETWORKS_DCA } from '@constants';
 import usePriceService from '@hooks/usePriceService';
 import { parseUsdPrice } from '@common/utils/currency';
 import useEarnService from '@hooks/earn/useEarnService';
 import useHasFetchedUserStrategies from '@hooks/earn/useHasFetchedUserStrategies';
 import { getSdkEarnPositionId } from '@common/utils/earn/parsing';
 import useTierService from '@hooks/tiers/useTierService';
+import { useNativeBalancesSnapshot } from '@state/balances/hooks';
 
 export default function Updater(): null {
   const transactionService = useTransactionService();
@@ -52,6 +57,8 @@ export default function Updater(): null {
   const dcaIndexingBlocks = useDcaIndexingBlocks();
   const hasFetchedUserStrategies = useHasFetchedUserStrategies();
   const tierService = useTierService();
+  const { nativeBalancesSnapshot, updateNativeBalancesSnapshot } = useNativeBalancesSnapshot();
+
   // const earnIndexingBlocks = useEarnIndexingBlocks();
 
   const dispatch = useAppDispatch();
@@ -86,7 +93,17 @@ export default function Updater(): null {
         const lastBlockNumberForChain = await transactionService.getBlockNumber(chainId);
         if (!tx) {
           const txToCheck = transactions[hash];
-          if (txToCheck.retries > getTransactionRetries(chainId)) {
+          const currentRetries = txToCheck.retries;
+          // Only refresh balances in the first retry
+          if (currentRetries === 0) updateNativeBalancesSnapshot();
+          const maxRetries = getMaxTransactionRetries({
+            chainId,
+            activeWallet,
+            nativeBalances: nativeBalancesSnapshot[chainId],
+            txToCheck,
+          });
+
+          if (currentRetries > maxRetries) {
             positionService.handleTransactionRejection({
               ...txToCheck,
               typeData: {
@@ -136,7 +153,7 @@ export default function Updater(): null {
         }
       });
     },
-    [transactions, dispatch, activeWallet?.address]
+    [transactions, dispatch, activeWallet?.address, nativeBalancesSnapshot, updateNativeBalancesSnapshot]
   );
 
   const parseTxExtendedTypeData = useCallback(async (tx: TransactionDetails) => {
