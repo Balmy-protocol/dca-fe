@@ -2,7 +2,7 @@ import useReferrals from '@hooks/tiers/useReferrals';
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
-import { ContainerBox, Typography, colors, TickSquareIcon } from 'ui-library';
+import { ContainerBox, Typography, colors, TickSquareIcon, DividerBorder1, Tooltip, InfoCircleIcon } from 'ui-library';
 
 const StyledReferralCard = styled(ContainerBox).attrs({ gap: 4, flexDirection: 'column' })`
   ${({ theme: { palette, spacing } }) => `
@@ -13,52 +13,8 @@ const StyledReferralCard = styled(ContainerBox).attrs({ gap: 4, flexDirection: '
   `}
 `;
 
-const getGradientColor = (mode: 'light' | 'dark') => {
-  return mode === 'light'
-    ? 'linear-gradient(180deg, #EBE4F5 0%, #BAB2FF 100%)'
-    : 'linear-gradient(180deg, #2E2040 0%, #181122 100%)';
-};
-
-const StyledGraphCard = styled(ContainerBox).attrs({ gap: 2, flexDirection: 'column' })`
-  ${({ theme: { palette, spacing } }) => `
-    padding: ${spacing(6)} ${spacing(6)} ${spacing(19)};
-    border-radius: ${spacing(4)};
-    background: ${getGradientColor(palette.mode)};
-    height: 100%;
-    position: relative;
-    overflow: hidden;
-    border: 1px solid ${colors[palette.mode].border.border1};
-  `}
-`;
-
-const FeatureAsset = styled.div`
-  position: absolute;
-  background: url('https://ipfs.io/ipfs/QmRvtfXtN9R7ERLuSuf6TatGBj3p6Dd1b1g9KGWMpzau8w') 50% / contain no-repeat;
-  width: 255px;
-  height: 255px;
-  transform: rotate(64.979deg);
-  left: -120px;
-  bottom: -110px;
-`;
-
-const GraphCard = ({ referrals }: { referrals: number }) => (
-  <StyledGraphCard>
-    <Typography variant="labelExtraLarge" color={({ palette }) => colors[palette.mode].typography.typo1}>
-      <FormattedMessage description="tier-view.referrals.card.graph.title" defaultMessage="Make each invite count" />
-    </Typography>
-    <Typography variant="bodySmallRegular" color={({ palette }) => colors[palette.mode].typography.typo2}>
-      <FormattedMessage
-        description="tier-view.referrals.card.graph.description"
-        defaultMessage="Make every code count! You have <b>{referrals} referral codes left</b> to share. Use them wisely to invite the right people and maximize your rewards."
-        values={{ b: (chunks) => <b>{chunks}</b>, referrals }}
-      />
-    </Typography>
-    <FeatureAsset />
-  </StyledGraphCard>
-);
-
 const ReferralCard = () => {
-  const referrals = useReferrals();
+  const { referred, activated } = useReferrals();
 
   return (
     <StyledReferralCard>
@@ -90,7 +46,52 @@ const ReferralCard = () => {
             </Typography>
           </ContainerBox>
         </ContainerBox>
-        <GraphCard referrals={referrals.referred} />
+      </ContainerBox>
+      <DividerBorder1 />
+      <ContainerBox gap={4}>
+        <ContainerBox gap={1} flexDirection="column">
+          <ContainerBox gap={1} alignItems="center">
+            <Typography variant="bodySmallRegular">
+              <FormattedMessage description="tier-view.referrals.card.totalReferrals" defaultMessage="Referrals" />
+            </Typography>
+            <Tooltip
+              title={
+                <FormattedMessage
+                  description="tier-view.referrals.card.totalReferrals.tooltip"
+                  defaultMessage="Total users that have used your referral link."
+                />
+              }
+            >
+              <ContainerBox>
+                <InfoCircleIcon sx={({ palette: { mode } }) => ({ color: colors[mode].typography.typo3 })} />
+              </ContainerBox>
+            </Tooltip>
+          </ContainerBox>
+          <Typography variant="bodyBold">{referred}</Typography>
+        </ContainerBox>
+        <ContainerBox gap={1} flexDirection="column">
+          <ContainerBox gap={1} alignItems="center">
+            <Typography variant="bodySmallRegular">
+              <FormattedMessage
+                description="tier-view.referrals.card.activeReferrals"
+                defaultMessage="Active Referrals"
+              />
+            </Typography>
+            <Tooltip
+              title={
+                <FormattedMessage
+                  description="tier-view.referrals.card.activeReferrals.tooltip"
+                  defaultMessage="Active Referrals are referrals that have deposited at least $100 in Earn Strategies and kept it for 48 hours."
+                />
+              }
+            >
+              <ContainerBox>
+                <InfoCircleIcon sx={({ palette: { mode } }) => ({ color: colors[mode].typography.typo3 })} />
+              </ContainerBox>
+            </Tooltip>
+          </ContainerBox>
+          <Typography variant="bodyBold">{activated}</Typography>
+        </ContainerBox>
       </ContainerBox>
     </StyledReferralCard>
   );

@@ -9,7 +9,7 @@ import { useThemeMode } from '@state/config/hooks';
 interface ShareQRModalProps {
   isOpen: boolean;
   onClose: () => void;
-  inviteCode: string | null;
+  refId: string;
 }
 
 const DEFAULT_QR_CODE_WIDTH = 300;
@@ -19,7 +19,7 @@ const StyledImage = styled.img`
   height: ${DEFAULT_QR_CODE_WIDTH}px;
 `;
 
-const ShareQRModal = ({ isOpen, onClose, inviteCode }: ShareQRModalProps) => {
+const ShareQRModal = ({ isOpen, onClose, refId }: ShareQRModalProps) => {
   const { trackEvent } = useAnalytics();
   const [qrCodeDataUri, setQrCodeDataUri] = React.useState<string | null>(null);
   const mode = useThemeMode();
@@ -31,8 +31,8 @@ const ShareQRModal = ({ isOpen, onClose, inviteCode }: ShareQRModalProps) => {
   }, [isOpen]);
 
   React.useEffect(() => {
-    if (isOpen && inviteCode) {
-      toDataURL(`https://app.balmy.xyz/earn/access-now?inviteCode=${encodeURIComponent(inviteCode)}`, {
+    if (isOpen) {
+      toDataURL(`https://app.balmy.xyz?refId=${encodeURIComponent(refId)}`, {
         width: DEFAULT_QR_CODE_WIDTH,
         margin: 0,
         color: {
@@ -43,7 +43,7 @@ const ShareQRModal = ({ isOpen, onClose, inviteCode }: ShareQRModalProps) => {
         .then(setQrCodeDataUri)
         .catch((e) => console.error('Error generating QR code', e));
     }
-  }, [isOpen, inviteCode, mode]);
+  }, [isOpen, refId, mode]);
 
   return (
     <Modal open={isOpen} onClose={onClose} showCloseButton showCloseIcon maxWidth="sm" actionsAlignment="horizontal">
@@ -58,8 +58,8 @@ const ShareQRModal = ({ isOpen, onClose, inviteCode }: ShareQRModalProps) => {
           <Typography variant="h6Bold">
             <FormattedMessage
               description="tier-view.referrals.share-qr-modal.description"
-              defaultMessage="Share your referral code with your friends and family to earn rewards. Optionally they can copy this code to redeem it: {inviteCode}"
-              values={{ inviteCode }}
+              defaultMessage="Share your referral code with your friends and family to earn rewards. Optionally they can copy this code to redeem it: {refId}"
+              values={{ refId }}
             />
           </Typography>
         </ContainerBox>
