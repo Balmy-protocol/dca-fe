@@ -10,9 +10,11 @@ function useCurrentNetwork() {
 
   const foundNetwork = React.useMemo(() => find(NETWORKS, { chainId: activeWallet?.chainId }), [activeWallet?.chainId]);
 
-  return (
-    foundNetwork ||
-    (network && { ...network, isSet: true }) || { ...DEFAULT_NETWORK_FOR_VERSION[LATEST_VERSION], isSet: false }
+  return React.useMemo(
+    () =>
+      foundNetwork ||
+      (network && { ...network, isSet: true }) || { ...DEFAULT_NETWORK_FOR_VERSION[LATEST_VERSION], isSet: false },
+    [foundNetwork, network]
   );
 }
 
