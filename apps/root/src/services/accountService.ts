@@ -28,6 +28,7 @@ export const LAST_LOGIN_KEY = 'last_logged_in_with';
 export const WALLET_SIGNATURE_KEY = 'wallet_auth_signature';
 export const LATEST_SIGNATURE_VERSION = '1.0.2';
 export const LATEST_SIGNATURE_VERSION_KEY = 'wallet_auth_signature_key';
+export const REFERRED_BY_ID_KEY = 'referred_by_id';
 export interface AccountServiceData {
   user?: User;
   activeWallet?: Address;
@@ -426,10 +427,17 @@ export default class AccountService extends EventsManager<AccountServiceData> {
   }
 
   async createUser({ label, signature, wallet }: { label: string; wallet?: Wallet; signature: WalletSignature }) {
+    const referredWithId = localStorage.getItem(REFERRED_BY_ID_KEY) || undefined;
+
     const newAccountId = await this.meanApiService.createAccount({
       label,
       signature,
+      referredWithId,
     });
+
+    if (referredWithId) {
+      localStorage.removeItem(REFERRED_BY_ID_KEY);
+    }
 
     const walletToSet: Wallet = wallet || {
       address: signature.signer,
