@@ -6,7 +6,6 @@ import { TIER_LEVEL_OPTIONS } from '@pages/tier-view/constants';
 import { FormattedMessage, useIntl } from 'react-intl';
 import usePushToHistory from '@hooks/usePushToHistory';
 import useAnalytics from '@hooks/useAnalytics';
-import useUser from '@hooks/useUser';
 
 const StyledTierPill = styled(ContainerBox).attrs({ gap: 2, alignItems: 'center' })<{ $needsToVerifyWallets: boolean }>`
   ${({
@@ -91,14 +90,11 @@ const TierPill = () => {
   const [hovered, setHovered] = React.useState(false);
   const pushToHistory = usePushToHistory();
   const { trackEvent } = useAnalytics();
-  const user = useUser();
 
   const onClick = () => {
     trackEvent('Navigation - Tier Pill Clicked');
     pushToHistory('/tier-view');
   };
-
-  if (!user) return null;
 
   const canLevelUp = progress >= 100;
   const needsToVerifyWallets = walletsToVerify.length > 0 && canLevelUp;

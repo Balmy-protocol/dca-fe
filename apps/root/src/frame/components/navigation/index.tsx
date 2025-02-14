@@ -45,7 +45,7 @@ import useChangeLanguage from '@hooks/useChangeLanguage';
 import useAnalytics from '@hooks/useAnalytics';
 import NetWorth, { NetWorthVariants } from '@common/components/net-worth';
 import { WalletOptionValues, ALL_WALLETS, WalletSelectorVariants } from '@common/components/wallet-selector/types';
-import TierPill from '../tier-pill';
+import TierPills from '../tier-pills';
 import LevelUpModal from '@common/components/level-up-modal';
 import { resetForm as resetAggregatorForm } from '@state/aggregator/actions';
 import { resetForm as resetTransferForm } from '@state/transfer/actions';
@@ -290,7 +290,7 @@ const Navigation = ({ children }: React.PropsWithChildren) => {
     <>
       <LevelUpModal />
       <NavigationUI
-        extraHeaderTools={<TierPill />}
+        extraHeaderTools={<TierPills />}
         headerContent={
           <NetWorth
             variant={NetWorthVariants.nav}

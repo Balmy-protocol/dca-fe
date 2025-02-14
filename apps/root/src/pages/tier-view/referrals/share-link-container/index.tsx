@@ -36,13 +36,22 @@ const StyledLinkContainer = styled(ContainerBox).attrs({
   justifyContent: 'space-between',
   alignItems: 'center',
   fullWidth: true,
-})`
-  ${({ theme }) => `
+})<{ isReferralModal?: boolean }>`
+  ${({ theme, isReferralModal }) => `
     padding: ${theme.spacing(3)} ${theme.spacing(12)} ${theme.spacing(3)} ${theme.spacing(3)};
     border: 1.25px solid ${colors[theme.palette.mode].border.border1};
     border-radius: ${theme.spacing(2)};
     position: relative;
     overflow: hidden;
+    ${
+      isReferralModal
+        ? `
+    background: ${colors[theme.palette.mode].background.secondary};
+    `
+        : `
+    border: 1.25px solid ${colors[theme.palette.mode].border.border1};
+    `
+    }
     ${theme.breakpoints.up('md')} {
       width: auto;
     }
@@ -73,11 +82,15 @@ const StyledLinkItemsContainer = styled(ContainerBox).attrs({
 const StyledLinkItem = styled(ContainerBox).attrs({
   justifyContent: 'center',
   alignItems: 'center',
-})`
+})<{ isReferralModal?: boolean }>`
   padding: ${({ theme }) => theme.spacing(1.5)};
   border-radius: 100px;
-  border: 1px solid ${({ theme }) => colors[theme.palette.mode].border.border1};
-  background: ${({ theme }) => colors[theme.palette.mode].background.secondary};
+  ${({ theme, isReferralModal }) =>
+    !isReferralModal &&
+    `
+    border: 1px solid ${colors[theme.palette.mode].border.border1};
+    background: ${colors[theme.palette.mode].background.secondary};
+    `}
   cursor: pointer;
 `;
 
@@ -104,12 +117,21 @@ const StyledContentCopyIcon = styled(ContentCopyIcon)`
   color: ${({ theme }) => colors[theme.palette.mode].typography.typo3};
 `;
 
-const ShareLinkContainer = () => {
+type ShareLinkContainerProps = {
+  isReferralModal?: boolean;
+};
+
+export const ShareReferralLinkContent = ({ isReferralModal }: ShareLinkContainerProps) => {
   const [isShareQRModalOpen, setIsShareQRModalOpen] = React.useState(false);
   const { id: refId } = useReferrals();
   const intl = useIntl();
   const snackbar = useSnackbar();
   const { trackEvent } = useAnalytics();
+
+  const onOpenQRModal = () => {
+    setIsShareQRModalOpen(true);
+  };
+
   const onCopy = () => {
     trackEvent('Referral link copied to clipboard');
     copyTextToClipboard(
@@ -152,53 +174,57 @@ const ShareLinkContainer = () => {
   return (
     <>
       <ShareQRModal isOpen={isShareQRModalOpen} onClose={() => setIsShareQRModalOpen(false)} refId={refId} />
-      <StyledShareLinkContainer>
-        <ContainerBox flexDirection="column" gap={2}>
-          <Typography variant="h3Bold">
+      <ContainerBox flexDirection="column" gap={2} alignItems={isReferralModal ? 'center' : 'stretch'}>
+        <Typography variant="h3Bold">
+          <FormattedMessage
+            id="tier-view.referrals.share-link-container.title.prefix"
+            defaultMessage="Refer a Friend & Upgrade your"
+          />{' '}
+          <StyledTierLevelSpan>
             <FormattedMessage
-              id="tier-view.referrals.share-link-container.title.prefix"
-              defaultMessage="Refer a Friend & Upgrade your"
-            />{' '}
-            <StyledTierLevelSpan>
-              <FormattedMessage
-                id="tier-view.referrals.share-link-container.title.highlight"
-                defaultMessage="Tier level"
-              />
-            </StyledTierLevelSpan>
-          </Typography>
-          <Typography variant="bodyRegular" sx={{ maxWidth: { md: '70%' } }}>
-            <FormattedMessage
-              id="tier-view.referrals.share-link-container.description"
-              defaultMessage="Invite your friends to join and unlock exclusive benefits as you climb the tier system. Access to premium strategies, reduced fees, and other exciting perks."
+              id="tier-view.referrals.share-link-container.title.highlight"
+              defaultMessage="Tier level"
             />
-          </Typography>
+          </StyledTierLevelSpan>
+        </Typography>
+        <Typography variant="bodyRegular" sx={{ maxWidth: { md: !isReferralModal ? '70%' : '100%' } }}>
+          <FormattedMessage
+            id="tier-view.referrals.share-link-container.description"
+            defaultMessage="Invite your friends to join and unlock exclusive benefits as you climb the tier system. Access to premium strategies, reduced fees, and other exciting perks."
+          />
+        </Typography>
+      </ContainerBox>
+      <StyledLinkItemsContainer>
+        <StyledLinkContainer isReferralModal={isReferralModal}>
+          <TextWrapper>
+            <Typography
+              variant="bodySemibold"
+              color={({ palette }) => colors[palette.mode].typography.typo1}
+              whiteSpace="nowrap"
+            >
+              {`app.balmy.xyz?refId=${refId}`}
+            </Typography>
+          </TextWrapper>
+          <StyledContentCopyIcon fontSize="large" onClick={onCopy} />
+        </StyledLinkContainer>
+        <ContainerBox gap={4} alignItems="center">
+          <StyledLinkItem onClick={onOpenQRModal} isReferralModal={isReferralModal}>
+            <QrCodeIcon fontSize="large" sx={({ palette }) => ({ color: colors[palette.mode].typography.typo3 })} />
+          </StyledLinkItem>
+          <StyledLinkItem onClick={onShareTwitter} isReferralModal={isReferralModal}>
+            <TwitterIcon fontSize="large" sx={({ palette }) => ({ color: colors[palette.mode].typography.typo3 })} />
+          </StyledLinkItem>
         </ContainerBox>
-        <StyledLinkItemsContainer>
-          <StyledLinkContainer>
-            <TextWrapper>
-              <Typography
-                variant="bodySemibold"
-                color={({ palette }) => colors[palette.mode].typography.typo1}
-                whiteSpace="nowrap"
-              >
-                {`app.balmy.xyz?refId=${refId}`}
-              </Typography>
-            </TextWrapper>
-            <StyledContentCopyIcon fontSize="large" onClick={onCopy} />
-          </StyledLinkContainer>
-          <ContainerBox gap={4} alignItems="center">
-            <StyledLinkItem onClick={() => setIsShareQRModalOpen(true)}>
-              <QrCodeIcon fontSize="large" sx={({ palette }) => ({ color: colors[palette.mode].typography.typo3 })} />
-            </StyledLinkItem>
-            <StyledLinkItem onClick={onShareTwitter}>
-              <TwitterIcon fontSize="large" sx={({ palette }) => ({ color: colors[palette.mode].typography.typo3 })} />
-            </StyledLinkItem>
-          </ContainerBox>
-        </StyledLinkItemsContainer>
-        <FeatureAsset />
-      </StyledShareLinkContainer>
+      </StyledLinkItemsContainer>
     </>
   );
 };
+
+const ShareLinkContainer = () => (
+  <StyledShareLinkContainer>
+    <ShareReferralLinkContent />
+    <FeatureAsset />
+  </StyledShareLinkContainer>
+);
 
 export default ShareLinkContainer;
