@@ -352,12 +352,21 @@ export default class MeanApiService {
     });
   }
 
-  async createAccount({ label, signature }: { label: string; signature: WalletSignature }) {
+  async createAccount({
+    label,
+    signature,
+    referredWithId,
+  }: {
+    label: string;
+    signature: WalletSignature;
+    referredWithId?: string;
+  }) {
     return this.authorizedRequest<{ accountId: AccountId }>({
       method: 'POST',
       url: `${MEAN_API_URL}/v1/accounts`,
       data: {
         label,
+        referredWithId,
       },
       signature,
     });

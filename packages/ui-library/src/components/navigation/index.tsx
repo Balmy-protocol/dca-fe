@@ -72,6 +72,7 @@ type NavigationProps = React.PropsWithChildren<{
   onClickBrandLogo: () => void;
   headerContent?: React.ReactNode;
   promotedBanner?: React.ReactNode;
+  shareReferralLink?: React.ReactNode;
 }>;
 
 const drawerWidthLg = 240;
@@ -144,6 +145,12 @@ const StyledPromotedBannerContainer = styled(ContainerBox).attrs({ justifyConten
   `}
 `;
 
+const ShareReferralLinkContainer = styled(ContainerBox).attrs({ gap: 3, flexDirection: 'column' })`
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+`;
+
 const BuiltListItem = ({
   section,
   isSelected,
@@ -205,7 +212,7 @@ const CollapsableItems = ({
 
 const StyledGroupContainer = styled(ContainerBox).attrs({ gap: 2, flexDirection: 'column' })``;
 
-const StyledDrawerLinksContainer = styled(ContainerBox).attrs({ gap: 8, flexDirection: 'column' })`
+const StyledDrawerLinksContainer = styled(ContainerBox).attrs({ gap: 4, flexDirection: 'column' })`
   ${({ theme: { spacing } }) => `
     padding: ${spacing(8)} ${spacing(4)};
   `}
@@ -342,6 +349,7 @@ const Navigation = ({
   onClickBrandLogo,
   headerContent,
   promotedBanner,
+  shareReferralLink,
 }: NavigationProps) => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const {
@@ -350,7 +358,7 @@ const Navigation = ({
     breakpoints,
   } = useTheme();
   const isDownLg = useMediaQuery(breakpoints.down('lg'));
-
+  const isDownMd = useMediaQuery(breakpoints.down('md'));
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
   };
@@ -370,7 +378,15 @@ const Navigation = ({
     <StyledDrawerContainer>
       <StyledIconToolbar sx={{ padding: `${spacing(4)} ${spacing(6)}` }}>{icon}</StyledIconToolbar>
       {headerContent}
-      <StyledDrawerLinksContainer>{drawerLinks}</StyledDrawerLinksContainer>
+      <StyledDrawerLinksContainer>
+        {drawerLinks}
+        {isDownMd && (
+          <ShareReferralLinkContainer>
+            <DividerBorder2 />
+            {shareReferralLink}
+          </ShareReferralLinkContainer>
+        )}
+      </StyledDrawerLinksContainer>
       <StyledDrawerFooterContainer>
         <StyledPromotedBannerContainer>{promotedBanner}</StyledPromotedBannerContainer>
         <ContainerBox gap={5} justifyContent="center" alignItems="center">

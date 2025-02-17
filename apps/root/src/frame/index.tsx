@@ -27,6 +27,7 @@ import useWeb3Service from '@hooks/useWeb3Service';
 import { SavedCustomConfig } from '@state/base-types';
 import PollingHandlers from './polling-handlers';
 import DarkBackgroundGrid from './components/background-grid/dark';
+import ReferredByHandler from './components/referred-by-handler';
 
 const Home = lazy(() => import('@pages/home'));
 const DCA = lazy(() => import('@pages/dca'));
@@ -125,6 +126,7 @@ const AppFrame = ({ config: { wagmiClient } }: AppFrameProps) => {
                     </StyledGridBg>
                   )}
                   <PromisesInitializer />
+                  <ReferredByHandler />
                   <Navigation>
                     <StyledGridContainer container direction="row" justifyContent="center">
                       <StyledAppGridContainer item xs={12} sm={10} lg={11} xl={12}>
