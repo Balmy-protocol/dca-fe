@@ -62,7 +62,7 @@ const TextWrapper = styled.div`
   overflow: hidden;
   text-overflow: ellipsis;
   ${({ theme }) => theme.breakpoints.down('md')} {
-    max-width: 26ch;
+    max-width: clamp(10ch, 50vw + 0ch, 28ch);
   }
 `;
 
