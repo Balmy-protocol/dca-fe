@@ -459,7 +459,8 @@ export default class AccountService extends EventsManager<AccountServiceData> {
 
     this.changeUser(newAccountId.accountId, signature, walletToSet);
 
-    this.tierService.calculateAndSetUserTier();
+    // Get new created data, such as referralId
+    await this.tierService.pollUser();
   }
 
   changeUser(userId: string, signature?: WalletSignature, signedInWallet?: Wallet) {

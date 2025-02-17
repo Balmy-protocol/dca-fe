@@ -145,12 +145,6 @@ const StyledPromotedBannerContainer = styled(ContainerBox).attrs({ justifyConten
   `}
 `;
 
-const ShareReferralLinkContainer = styled(ContainerBox).attrs({ gap: 3, flexDirection: 'column' })`
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-`;
-
 const BuiltListItem = ({
   section,
   isSelected,
@@ -380,12 +374,7 @@ const Navigation = ({
       {headerContent}
       <StyledDrawerLinksContainer>
         {drawerLinks}
-        {isDownMd && (
-          <ShareReferralLinkContainer>
-            <DividerBorder2 />
-            {shareReferralLink}
-          </ShareReferralLinkContainer>
-        )}
+        {isDownMd && shareReferralLink}
       </StyledDrawerLinksContainer>
       <StyledDrawerFooterContainer>
         <StyledPromotedBannerContainer>{promotedBanner}</StyledPromotedBannerContainer>
