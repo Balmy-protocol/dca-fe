@@ -1,6 +1,6 @@
 import React, { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { Grid, ThemeProvider, SnackbarProvider } from 'ui-library';
+import { Grid, ThemeProvider, SnackbarProvider, Modal } from 'ui-library';
 import styled from 'styled-components';
 import TransactionModalProvider from '@common/components/transaction-modal';
 import { useAppDispatch } from '@hooks/state';
@@ -28,6 +28,7 @@ import { SavedCustomConfig } from '@state/base-types';
 import PollingHandlers from './polling-handlers';
 import DarkBackgroundGrid from './components/background-grid/dark';
 import useEarnAccess from '@hooks/useEarnAccess';
+import { FormattedMessage } from 'react-intl';
 
 const Home = lazy(() => import('@pages/home'));
 const DCA = lazy(() => import('@pages/dca'));
@@ -41,7 +42,27 @@ const PositionDetail = lazy(() => import('@pages/position-detail'));
 const StrategyGuardianDetail = lazy(() => import('@pages/strategy-guardian-detail'));
 const TokenProfile = lazy(() => import('@pages/token-profile'));
 const TierView = lazy(() => import('@pages/tier-view'));
-
+const DowntimeModal: React.FC = () => (
+  <Modal
+    maxWidth="xs"
+    open={true}
+    onClose={() => {}}
+    title={
+      <Grid container alignItems="center" gap={1}>
+        <Grid item>🔧</Grid>
+        <Grid item>
+          <FormattedMessage id="downtime.banner.title" defaultMessage="Quick maintenance" />
+        </Grid>
+      </Grid>
+    }
+    subtitle={
+      <FormattedMessage
+        id="downtime.banner.message"
+        defaultMessage="We're performing a quick 5-minute update to improve our services. We'll be back shortly!"
+      />
+    }
+  ></Modal>
+);
 const StyledGridContainer = styled(Grid)<{ isSmall?: boolean }>`
   flex-wrap: nowrap;
   position: relative;
@@ -133,6 +154,7 @@ const AppFrame = ({ config: { wagmiClient } }: AppFrameProps) => {
                       <StyledAppGridContainer item xs={12} sm={10} lg={11} xl={12}>
                         <ErrorBoundary>
                           <Suspense fallback={<CenteredLoadingIndicator />}>
+                            <DowntimeModal />
                             <Routes>
                               {HOME_ROUTES.map((path, i) => (
                                 <Route path={path} key={i} element={<Home />} />
