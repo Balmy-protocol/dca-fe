@@ -1,8 +1,10 @@
 import useAnalytics from '@hooks/useAnalytics';
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
-import { colors, ContainerBox, TagUserIcon, Typography } from 'ui-library';
+import { colors, ContainerBox, DividerBorder2, TagUserIcon, Typography } from 'ui-library';
 import ReferralModal from '../referral-modal';
+import styled from 'styled-components';
+import useUser from '@hooks/useUser';
 
 const ReferralCTA = () => {
   const { trackEvent } = useAnalytics();
@@ -25,6 +27,24 @@ const ReferralCTA = () => {
         </Typography>
       </ContainerBox>
     </>
+  );
+};
+
+const ShareReferralLinkContainer = styled(ContainerBox).attrs({ gap: 3, flexDirection: 'column' })`
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+`;
+
+export const ReferralCTANavigation = () => {
+  const user = useUser();
+  if (!user) return null;
+
+  return (
+    <ShareReferralLinkContainer>
+      <DividerBorder2 />
+      <ReferralCTA />
+    </ShareReferralLinkContainer>
   );
 };
 
