@@ -138,9 +138,9 @@ export const ShareReferralLinkContent = ({ isReferralModal }: ShareLinkContainer
       intl.formatMessage(
         defineMessage({
           description: 'tier-view.referrals.share-link-container.copy.code',
-          defaultMessage: 'Hey I want to invite you to balmy!, you can use this code: {refId}',
+          defaultMessage: 'Hey I want to invite you to balmy!, you can use my referral link: {refId}',
         }),
-        { refId }
+        { refId: `https://app.balmy.xyz?refId=${refId}` }
       )
     );
     snackbar.enqueueSnackbar(
