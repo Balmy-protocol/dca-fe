@@ -9,6 +9,7 @@ import {
   ApiNewWallet,
   WalletSignature,
   ApiWallet,
+  AchievementKeys,
 } from '@types';
 import { find, findIndex, isEqual, uniqBy } from 'lodash';
 import Web3Service from './web3Service';
@@ -27,12 +28,12 @@ export const LAST_LOGIN_KEY = 'last_logged_in_with';
 export const WALLET_SIGNATURE_KEY = 'wallet_auth_signature';
 export const LATEST_SIGNATURE_VERSION = '1.0.2';
 export const LATEST_SIGNATURE_VERSION_KEY = 'wallet_auth_signature_key';
+export const REFERRED_BY_ID_KEY = 'referred_by_id';
 export interface AccountServiceData {
   user?: User;
   activeWallet?: Address;
   accounts: Account[];
   isLoggingUser: boolean;
-  earlyAccessEnabled?: boolean;
 }
 
 function timeout(ms: number) {
@@ -111,14 +112,6 @@ export default class AccountService extends EventsManager<AccountServiceData> {
     this.serviceData = { ...this.serviceData, isLoggingUser };
   }
 
-  get earlyAccessEnabled() {
-    return this.serviceData.earlyAccessEnabled;
-  }
-
-  set earlyAccessEnabled(earlyAccessEnabled) {
-    this.serviceData = { ...this.serviceData, earlyAccessEnabled };
-  }
-
   setWalletActionType(walletActionType: WalletActionType) {
     this.walletActionType = walletActionType;
   }
@@ -129,10 +122,6 @@ export default class AccountService extends EventsManager<AccountServiceData> {
 
   getIsLoggingUser() {
     return this.serviceData.isLoggingUser;
-  }
-
-  getEarlyAccessEnabled() {
-    return this.serviceData.earlyAccessEnabled;
   }
 
   getWallets(): Wallet[] {
@@ -407,21 +396,14 @@ export default class AccountService extends EventsManager<AccountServiceData> {
         this.web3Service.onUpdateConfig(config);
       }
 
-      const earn = accounts[0].earn;
-      if (earn) {
-        this.earlyAccessEnabled = earn.earlyAccess;
-      }
-
-      if (earn?.inviteCodes) {
-        this.tierService.setReferrals(earn.referrals);
-        this.tierService.setInviteCodes(earn.inviteCodes);
-        this.tierService.setAchievements(
-          parsedWallets.map((parsedWallet) => parsedWallet.address),
-          earn.achievements,
-          earn.twitterShare
-        );
-        this.tierService.calculateAndSetUserTier();
-      }
+      this.tierService.setReferrals(accounts[0].referrals);
+      this.tierService.setAchievements(
+        parsedWallets.map((parsedWallet) => parsedWallet.address),
+        accounts[0].achievements.wallets,
+        !!accounts[0].achievements.account.find((achievement) => achievement.id === AchievementKeys.TWEET)?.achieved ??
+          false
+      );
+      this.tierService.calculateAndSetUserTier();
 
       try {
         void this.web3Service.analyticsService.identifyUser(this.user.id);
@@ -445,10 +427,17 @@ export default class AccountService extends EventsManager<AccountServiceData> {
   }
 
   async createUser({ label, signature, wallet }: { label: string; wallet?: Wallet; signature: WalletSignature }) {
+    const referredWithId = localStorage.getItem(REFERRED_BY_ID_KEY) || undefined;
+
     const newAccountId = await this.meanApiService.createAccount({
       label,
       signature,
+      referredWithId,
     });
+
+    if (referredWithId) {
+      localStorage.removeItem(REFERRED_BY_ID_KEY);
+    }
 
     const walletToSet: Wallet = wallet || {
       address: signature.signer,
@@ -470,7 +459,8 @@ export default class AccountService extends EventsManager<AccountServiceData> {
 
     this.changeUser(newAccountId.accountId, signature, walletToSet);
 
-    this.tierService.calculateAndSetUserTier();
+    // Get new created data, such as referralId
+    await this.tierService.pollUser();
   }
 
   changeUser(userId: string, signature?: WalletSignature, signedInWallet?: Wallet) {
@@ -715,7 +705,6 @@ export default class AccountService extends EventsManager<AccountServiceData> {
 
     try {
       await this.meanApiService.claimEarnInviteCode({ inviteCode, accountId: user.id, signature });
-      this.earlyAccessEnabled = true;
       this.web3Service.earnService.hasFetchedUserStrategies = true;
 
       void this.tierService.pollUser();
@@ -785,35 +774,5 @@ export default class AccountService extends EventsManager<AccountServiceData> {
     }
 
     this.tierService.calculateAndSetUserTier();
-  }
-
-  async claimEarnEarlyAccess(elegibleAndOwnedAddress: Address) {
-    const user = this.getUser();
-    if (!user) return;
-
-    const signature = await this.getWalletVerifyingSignature({});
-
-    await this.meanApiService.claimEarnEarlyAccess({
-      accountId: user.id,
-      signature,
-      elegibleAndOwnedAddress,
-    });
-
-    this.earlyAccessEnabled = true;
-    this.web3Service.earnService.hasFetchedUserStrategies = true;
-    void this.tierService.pollUser();
-  }
-
-  async getElegibilityAchievements() {
-    const user = this.getUser();
-    if (!user) {
-      throw new Error('User not found');
-    }
-
-    const signature = await this.getWalletVerifyingSignature({});
-    return this.meanApiService.getElegibilityAchievements({
-      signature,
-      addresses: user.wallets.map((wallet) => wallet.address),
-    });
   }
 }

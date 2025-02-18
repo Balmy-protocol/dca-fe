@@ -1,6 +1,3 @@
-import GuardianListSubscribeModal from '@frame/components/guardian-list-subscribe-modal';
-import useEarnAccess from '@hooks/useEarnAccess';
-import EarnGainAccessModal from '@frame/components/earn-gain-access-modal';
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
@@ -51,27 +48,16 @@ const EarnGuardianPill = () => (
 );
 
 const LMEarnBanner = () => {
-  const [showEarnModal, setShowEarnModal] = React.useState(false);
-  const { isEarnEnabled, hasEarnAccess } = useEarnAccess();
   const { trackEvent } = useAnalytics();
   const pushToHistory = usePushToHistory();
 
   const handleClick = () => {
-    trackEvent('Earn - Click earn banner', { hasEarnAccess });
-    if (hasEarnAccess) {
-      pushToHistory(`/${EARN_ROUTE.key}`);
-    } else {
-      setShowEarnModal(true);
-    }
+    trackEvent('Earn - Click earn banner');
+    pushToHistory(`/${EARN_ROUTE.key}`);
   };
 
   return (
     <>
-      {isEarnEnabled ? (
-        <EarnGainAccessModal isOpen={showEarnModal} onClose={() => setShowEarnModal(false)} />
-      ) : (
-        <GuardianListSubscribeModal isOpen={showEarnModal} onClose={() => setShowEarnModal(false)} />
-      )}
       <StyledBannerContainer onClick={handleClick}>
         <EarnGuardianPill />
         <Typography variant="h6Bold" color="#FFF" style={{ maxWidth: '40%', textWrap: 'wrap' }}>

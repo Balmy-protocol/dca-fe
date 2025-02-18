@@ -1,6 +1,5 @@
 import React from 'react';
 import useTierLevel from '@hooks/tiers/useTierLevel';
-import useEarnAccess from '@hooks/useEarnAccess';
 import styled from 'styled-components';
 import { ActiveTiersIcons, AnimatedChevronRightIcon, colors, ContainerBox, Typography } from 'ui-library';
 import { TIER_LEVEL_OPTIONS } from '@pages/tier-view/constants';
@@ -88,14 +87,9 @@ const LeveledTierPill = ({ tierLevel }: { tierLevel: number }) => {
 
 const TierPill = () => {
   const { tierLevel, walletsToVerify, progress } = useTierLevel();
-  const { hasEarnAccess } = useEarnAccess();
   const [hovered, setHovered] = React.useState(false);
   const pushToHistory = usePushToHistory();
   const { trackEvent } = useAnalytics();
-
-  if (!hasEarnAccess) {
-    return null;
-  }
 
   const onClick = () => {
     trackEvent('Navigation - Tier Pill Clicked');

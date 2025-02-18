@@ -13,7 +13,6 @@ import {
   AccountLabelsAndContactList,
   ContactList,
   PostContacts,
-  Account,
   AccountId,
   ApiNewWallet,
   ApiWalletAdminConfig,
@@ -25,7 +24,7 @@ import {
   IndexerUnits,
   TokenListId,
   User,
-  EarnEarlyAccess,
+  AccountResponse,
   StrategyId,
 } from '@types';
 import { CLAIM_ABIS } from '@constants/campaigns';
@@ -34,11 +33,9 @@ import { CLAIM_ABIS } from '@constants/campaigns';
 import { getProtocolToken, getWrappedProtocolToken } from '@common/mocks/tokens';
 import { Address, Hex, PublicClient, getContract } from 'viem';
 import { SavedCustomConfig } from '@state/base-types';
-import { ElegibilityAchievementsResponse } from '@hooks/earn/useElegibilityCriteria';
 
-export type AccountWithConfig = Account & {
+export type AccountWithConfig = AccountResponse & {
   config: Partial<SavedCustomConfig>;
-  earn?: EarnEarlyAccess;
 };
 
 const DEFAULT_SAFE_DEADLINE_SLIPPAGE = {
@@ -355,12 +352,21 @@ export default class MeanApiService {
     });
   }
 
-  async createAccount({ label, signature }: { label: string; signature: WalletSignature }) {
+  async createAccount({
+    label,
+    signature,
+    referredWithId,
+  }: {
+    label: string;
+    signature: WalletSignature;
+    referredWithId?: string;
+  }) {
     return this.authorizedRequest<{ accountId: AccountId }>({
       method: 'POST',
       url: `${MEAN_API_URL}/v1/accounts`,
       data: {
         label,
+        referredWithId,
       },
       signature,
     });
@@ -588,36 +594,6 @@ export default class MeanApiService {
         isAuth: false,
         signature: verifyingSignature,
         expiration,
-      },
-    });
-  }
-
-  async claimEarnEarlyAccess({
-    accountId,
-    signature,
-    elegibleAndOwnedAddress,
-  }: {
-    accountId: string;
-    signature: WalletSignature;
-    elegibleAndOwnedAddress: Address;
-  }) {
-    return this.authorizedRequest({
-      method: 'POST',
-      url: `${MEAN_API_URL}/v1/accounts/${accountId}/earn/eligibility/claim`,
-      signature,
-      data: {
-        address: elegibleAndOwnedAddress,
-      },
-    });
-  }
-
-  async getElegibilityAchievements({ signature, addresses }: { signature: WalletSignature; addresses: string[] }) {
-    return this.authorizedRequest<ElegibilityAchievementsResponse>({
-      method: 'GET',
-      url: `${MEAN_API_URL}/v1/earn/eligibility/achievements`,
-      signature,
-      params: {
-        addresses,
       },
     });
   }

@@ -7,11 +7,8 @@ import {
   MoneyAddIcon,
   WalletMoneyIcon,
   ShieldSearchIcon,
-  colors,
-  ContainerBox,
 } from 'ui-library';
-import { defineMessage, FormattedMessage } from 'react-intl';
-import styled from 'styled-components';
+import { defineMessage } from 'react-intl';
 
 export const HOME_ROUTES = ['/', '/home', '/dashboard'];
 
@@ -71,40 +68,4 @@ export const TIER_VIEW_ROUTE = {
   key: 'tier-view',
 };
 
-const StyledComingSoonContainer = styled(ContainerBox)`
-  ${({
-    theme: {
-      palette: { mode },
-      spacing,
-    },
-  }) => `
-    color: ${colors[mode].accent.accent100};
-    background-color: ${colors[mode].accent.primary};
-    padding: ${spacing(1)} ${spacing(2)};
-  `}
-  font-family: Inter;
-  font-size: 0.75rem;
-  font-weight: 600;
-  line-height: 1.21;
-  border-radius: 100px;
-`;
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const ComingSoon = () => (
-  <StyledComingSoonContainer>
-    <FormattedMessage defaultMessage="Join now!" description="navigation.earn.join-now" />
-  </StyledComingSoonContainer>
-);
-
-export const EARN_SUBSCRIBE_ROUTE = {
-  label: defineMessage({ description: 'earn', defaultMessage: 'Earn' }),
-  key: 'earn-group',
-  icon: <MoneyAddIcon />,
-  endContent: <ComingSoon />,
-};
-
 export const NON_NAVIGABLE_EARN_ROUTES: string[] = [EARN_GROUP.key, EARN_ROUTE.key, EARN_PORTFOLIO.key];
-
-export const EARN_ACCESS_NOW_ROUTE = {
-  key: 'earn/access-now',
-};

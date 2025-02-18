@@ -50,9 +50,6 @@ module.exports = {
     new webpack.DefinePlugin({
       'process.env.HOTJAR_PAGE_ID': JSON.stringify(process.env.HOTJAR_PAGE_ID),
     }),
-    new webpack.DefinePlugin({
-      'process.env.EARN_ENABLED': JSON.stringify(process.env.EARN_ENABLED),
-    }),
     new WebpackBar(),
     new ForkTsCheckerWebpackPlugin({
       typescript: {

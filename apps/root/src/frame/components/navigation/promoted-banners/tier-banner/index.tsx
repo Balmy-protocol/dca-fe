@@ -9,6 +9,7 @@ import { TIER_VIEW_ROUTE } from '@constants/routes';
 import { useAppDispatch } from '@state/hooks';
 import usePushToHistory from '@hooks/usePushToHistory';
 import useAnalytics from '@hooks/useAnalytics';
+import useUser from '@hooks/useUser';
 
 const StyledPromotedBanner = styled(ContainerBox).attrs({ flex: 1, gap: 1, flexDirection: 'column' })`
   ${({
@@ -73,12 +74,15 @@ const PromotedTierBanner = () => {
   const dispatch = useAppDispatch();
   const pushToHistory = usePushToHistory();
   const { trackEvent } = useAnalytics();
+  const user = useUser();
 
   const onClick = () => {
     dispatch(changeRoute(TIER_VIEW_ROUTE.key));
     pushToHistory(`/${TIER_VIEW_ROUTE.key}`);
     trackEvent('Tier Promoted banner - Go to tier view');
   };
+
+  if (!user) return null;
 
   return (
     <StyledPromotedBanner
