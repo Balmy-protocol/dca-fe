@@ -165,7 +165,7 @@ export const ShareReferralLinkContent = ({ isReferralModal }: ShareLinkContainer
     trackEvent('Referral link shared on Twitter');
 
     const twitterRef = `https://twitter.com/intent/tweet?text=${encodeURIComponent(
-      `I want to invite you to Balmy (@balmy_xyz), you can use this code: ${refId}`
+      `I want to invite you to Balmy (@balmy_xyz), you can use my referral link:`
     )}&url=${encodeURIComponent(`https://app.balmy.xyz?refId=${refId}`)}`;
 
     window.open(twitterRef, '_blank');
