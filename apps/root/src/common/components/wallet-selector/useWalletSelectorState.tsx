@@ -48,7 +48,6 @@ import {
 import { WalletOptionValues, ALL_WALLETS, WalletSelectorBaseProps } from './types';
 import styled from 'styled-components';
 import Address from '../address';
-import useEarnAccess from '@hooks/useEarnAccess';
 
 const StyledCounter = styled(ContainerBox)`
   ${({
@@ -87,7 +86,6 @@ const useWalletSelectorState = ({ options, showWalletCounter }: WalletSelectorBa
   const [selectedWallet, setSelectedWallet] = React.useState<Wallet | undefined>(undefined);
   const openConnectModal = useOpenConnectModal();
   const walletClientService = useWalletClientService();
-  const { hasEarnAccess } = useEarnAccess();
 
   const selectedOptionValue =
     selectedWalletOption || activeWallet?.address || find(wallets, { isAuth: true })?.address || '';
@@ -216,17 +214,15 @@ const useWalletSelectorState = ({ options, showWalletCounter }: WalletSelectorBa
           description: ApiErrorKeys.DCA_POSITIONS,
         }).then(() => void dispatch(processConfirmedTransactionsForDca()));
 
-        if (hasEarnAccess) {
-          void timeoutPromise(
-            earnService.fetchUserStrategies({
-              includeHistory: true,
-            }),
-            TimeoutPromises.COMMON,
-            {
-              description: ApiErrorKeys.EARN,
-            }
-          ).then(() => void dispatch(processConfirmedTransactionsForEarn()));
-        }
+        void timeoutPromise(
+          earnService.fetchUserStrategies({
+            includeHistory: true,
+          }),
+          TimeoutPromises.COMMON,
+          {
+            description: ApiErrorKeys.EARN,
+          }
+        ).then(() => void dispatch(processConfirmedTransactionsForEarn()));
 
         void timeoutPromise(labelService.fetchManyEns(wallets.map((w) => w.address)), TimeoutPromises.COMMON, {
           description: ApiErrorKeys.ENS,

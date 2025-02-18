@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/unbound-method, jest/no-commented-out-tests */
 import { createMockInstance } from '@common/utils/tests';
-import AccountService, { WALLET_SIGNATURE_KEY, WalletActionType } from './accountService';
+import AccountService, { REFERRED_BY_ID_KEY, WALLET_SIGNATURE_KEY, WalletActionType } from './accountService';
 import Web3Service from './web3Service';
 import { Wallet, WalletStatus, WalletType, User, UserStatus, Account, WalletSignature } from '@types';
 import { toWallet } from '@common/utils/accounts';
@@ -639,6 +639,27 @@ describe('Account Service', () => {
         isOwner: true,
       });
     });
+
+    it('should create a user with a referral code', async () => {
+      localStorage.setItem(REFERRED_BY_ID_KEY, 'referral-code');
+      await accountService.createUser({
+        label: 'new user',
+        signature: {
+          message: 'saved signature',
+          signer: '0xanother id',
+        },
+      });
+
+      expect(meanApiService.createAccount).toHaveBeenCalledTimes(1);
+      expect(meanApiService.createAccount).toHaveBeenCalledWith({
+        label: 'new user',
+        signature: {
+          message: 'saved signature',
+          signer: '0xanother id',
+        },
+        referredWithId: 'referral-code',
+      });
+    });
   });
 
   describe('logInUser', () => {
@@ -712,6 +733,15 @@ describe('Account Service', () => {
                 },
               ],
               config: {},
+              referrals: {
+                id: '123',
+                activated: 0,
+                referred: 0,
+              },
+              achievements: {
+                wallets: {},
+                account: [],
+              },
             },
             {
               id: '50f9ef37-7c9a-4e28-a421-d73288e75236',
@@ -719,6 +749,15 @@ describe('Account Service', () => {
               labels: {},
               contacts: [],
               config: {},
+              referrals: {
+                id: '123',
+                activated: 0,
+                referred: 0,
+              },
+              achievements: {
+                wallets: {},
+                account: [],
+              },
               wallets: [
                 {
                   address: '0xaddress',
@@ -762,6 +801,15 @@ describe('Account Service', () => {
             labels: {},
             config: {},
             contacts: [],
+            referrals: {
+              id: '123',
+              activated: 0,
+              referred: 0,
+            },
+            achievements: {
+              wallets: {},
+              account: [],
+            },
             wallets: [
               {
                 address: '0xaddress',
@@ -781,6 +829,15 @@ describe('Account Service', () => {
             labels: {},
             contacts: [],
             config: {},
+            referrals: {
+              id: '123',
+              activated: 0,
+              referred: 0,
+            },
+            achievements: {
+              wallets: {},
+              account: [],
+            },
             wallets: [
               {
                 address: '0xaddress',

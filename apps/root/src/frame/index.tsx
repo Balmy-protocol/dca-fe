@@ -27,14 +27,13 @@ import useWeb3Service from '@hooks/useWeb3Service';
 import { SavedCustomConfig } from '@state/base-types';
 import PollingHandlers from './polling-handlers';
 import DarkBackgroundGrid from './components/background-grid/dark';
-import useEarnAccess from '@hooks/useEarnAccess';
+import ReferredByHandler from './components/referred-by-handler';
 
 const Home = lazy(() => import('@pages/home'));
 const DCA = lazy(() => import('@pages/dca'));
 const Transfer = lazy(() => import('@pages/transfer'));
 const EarnHome = lazy(() => import('@pages/earn/home'));
 const EarnPortfolio = lazy(() => import('@pages/earn/portfolio'));
-const EarnAccessNowFrame = lazy(() => import('@pages/earn-access-now/frame'));
 const Aggregator = lazy(() => import('@pages/aggregator'));
 const History = lazy(() => import('@pages/history'));
 const PositionDetail = lazy(() => import('@pages/position-detail'));
@@ -89,7 +88,6 @@ const AppFrame = ({ config: { wagmiClient } }: AppFrameProps) => {
   const pairService = usePairService();
   const web3Service = useWeb3Service();
   const themeMode = useThemeMode();
-  const { isEarnEnabled, hasEarnAccess } = useEarnAccess();
 
   const dispatch = useAppDispatch();
 
@@ -128,6 +126,7 @@ const AppFrame = ({ config: { wagmiClient } }: AppFrameProps) => {
                     </StyledGridBg>
                   )}
                   <PromisesInitializer />
+                  <ReferredByHandler />
                   <Navigation>
                     <StyledGridContainer container direction="row" justifyContent="center">
                       <StyledAppGridContainer item xs={12} sm={10} lg={11} xl={12}>
@@ -138,24 +137,15 @@ const AppFrame = ({ config: { wagmiClient } }: AppFrameProps) => {
                                 <Route path={path} key={i} element={<Home />} />
                               ))}
                               <Route path="/history" element={<History />} />
-
-                              {isEarnEnabled && !hasEarnAccess && (
-                                <Route path="/earn/access-now" element={<EarnAccessNowFrame />} />
-                              )}
-                              {hasEarnAccess && (
-                                <>
-                                  <Route path="/earn" element={<EarnHome />} />
-                                  <Route path="/earn/:assetTokenId?/:rewardTokenId?" element={<EarnHome />} />
-                                  <Route path={`/${EARN_PORTFOLIO.key}`} element={<EarnPortfolio />} />
-                                  <Route
-                                    path="/earn/vaults/:chainId/:strategyGuardianId"
-                                    element={<StrategyGuardianDetail />}
-                                  />
-                                </>
-                              )}
+                              <Route path="/earn" element={<EarnHome />} />
+                              <Route path="/earn/:assetTokenId?/:rewardTokenId?" element={<EarnHome />} />
+                              <Route path={`/${EARN_PORTFOLIO.key}`} element={<EarnPortfolio />} />
+                              <Route
+                                path="/earn/vaults/:chainId/:strategyGuardianId"
+                                element={<StrategyGuardianDetail />}
+                              />
                               <Route path="/invest/positions/:positionId" element={<PositionDetail />} />
-                              {/* TODO: Remove this conditional below when the early access ends */}
-                              {hasEarnAccess && <Route path="/tier-view" element={<TierView />} />}
+                              <Route path="/tier-view" element={<TierView />} />
                               {/* // TODO: Remove this route below it's no longer used (@mixpanel) */}
                               <Route
                                 path="/positions/:positionId"

@@ -73,7 +73,11 @@ describe('Tier Service', () => {
         },
         false
       );
-      tierService.setReferrals(['0x123', '0x456']); // 2 referrals
+      tierService.setReferrals({
+        id: '123',
+        activated: 2,
+        referred: 2,
+      }); // 2 referrals
 
       const result = tierService.calculateTotalAchievements(user);
       expect(result).toEqual({
@@ -96,7 +100,11 @@ describe('Tier Service', () => {
         ],
       } as User;
 
-      tierService.setReferrals(['0x123', '0x456', '0x789', '0x101', '0x102']); // 5 referrals
+      tierService.setReferrals({
+        id: '123',
+        activated: 5,
+        referred: 5,
+      }); // 5 referrals
       tierService.setAchievements(
         ['0x1', '0x2'],
         {
@@ -124,7 +132,11 @@ describe('Tier Service', () => {
         ],
       } as User;
 
-      tierService.setReferrals([]); // 0 referrals
+      tierService.setReferrals({
+        id: '123',
+        activated: 0,
+        referred: 0,
+      }); // 0 referrals
 
       tierService.setAchievements(['0x1'], {}, false);
       const result = tierService.calculateUserTier(user);
@@ -141,7 +153,11 @@ describe('Tier Service', () => {
         ],
       } as User;
 
-      tierService.setReferrals([]); // Tier 1 can be reached with just swap volume
+      tierService.setReferrals({
+        id: '123',
+        activated: 0,
+        referred: 0,
+      }); // Tier 1 can be reached with just swap volume
       tierService.setAchievements(
         ['0x1'],
         {
@@ -163,7 +179,11 @@ describe('Tier Service', () => {
         ],
       } as User;
 
-      tierService.setReferrals(['0x1']); // 1 referral for tier 2
+      tierService.setReferrals({
+        id: '123',
+        activated: 1,
+        referred: 1,
+      }); // 1 referral for tier 2
 
       tierService.setAchievements(['0xaddress'], {}, true);
       const result = tierService.calculateUserTier(user);
@@ -180,7 +200,11 @@ describe('Tier Service', () => {
         ],
       } as User;
 
-      tierService.setReferrals(['0x1']); // 1 referral for tier 2
+      tierService.setReferrals({
+        id: '123',
+        activated: 1,
+        referred: 1,
+      }); // 1 referral for tier 2
       tierService.setAchievements(
         ['0x1'],
         {
@@ -202,7 +226,11 @@ describe('Tier Service', () => {
         ],
       } as User;
 
-      tierService.setReferrals(['0x1', '0x2', '0x3']); // 3 referrals for tier 3
+      tierService.setReferrals({
+        id: '123',
+        activated: 3,
+        referred: 3,
+      }); // 3 referrals for tier 3
       tierService.setAchievements(
         ['0x1'],
         {
@@ -224,7 +252,11 @@ describe('Tier Service', () => {
         ],
       } as User;
 
-      tierService.setReferrals(['0x1', '0x2', '0x3', '0x4', '0x5']); // 5 referrals
+      tierService.setReferrals({
+        id: '123',
+        activated: 5,
+        referred: 5,
+      }); // 5 referrals
       tierService.setAchievements(
         ['0x1'],
         {
@@ -252,7 +284,11 @@ describe('Tier Service', () => {
       } as AccountService;
 
       web3Service.accountService = mockAccountService;
-      tierService.setReferrals(['0x1']); // 1 referral
+      tierService.setReferrals({
+        id: '123',
+        activated: 1,
+        referred: 1,
+      }); // 1 referral
     });
 
     it('should return empty objects when no user is set', () => {
@@ -313,7 +349,11 @@ describe('Tier Service', () => {
         false
       );
       web3Service.accountService = mockAccountService;
-      tierService.setReferrals(['0x1', '0x2', '0x3']); // 3 referrals (meets the AND condition)
+      tierService.setReferrals({
+        id: '123',
+        activated: 3,
+        referred: 3,
+      }); // 3 referrals (meets the AND condition)
       tierService.setUserTier(1);
 
       const result = tierService.calculateMissingForNextTier();
@@ -346,7 +386,11 @@ describe('Tier Service', () => {
       } as AccountService;
 
       web3Service.accountService = mockAccountService;
-      tierService.setReferrals([]); // 0 referrals
+      tierService.setReferrals({
+        id: '123',
+        activated: 0,
+        referred: 0,
+      }); // 0 referrals
       tierService.setAchievements(
         ['0x1'],
         {
@@ -386,7 +430,11 @@ describe('Tier Service', () => {
       } as AccountService;
 
       web3Service.accountService = mockAccountService;
-      tierService.setReferrals([]); // 0 referrals
+      tierService.setReferrals({
+        id: '123',
+        activated: 0,
+        referred: 0,
+      }); // 0 referrals
       tierService.setAchievements(['0x1'], {}, false);
       tierService.setUserTier(0);
       const result = tierService.getProgressPercentageToNextTier();
@@ -409,12 +457,16 @@ describe('Tier Service', () => {
       const mockAccounts = {
         accounts: [
           {
-            earn: {
-              referrals: ['0x123'],
-              inviteCodes: ['CODE1'],
-              achievements: {
+            referrals: {
+              id: '123',
+              activated: 1,
+              referred: 1,
+            },
+            achievements: {
+              wallets: {
                 '0x1': [{ id: AchievementKeys.SWAP_VOLUME, achieved: 1000 }],
               },
+              account: [],
             },
             wallets: [
               createTestWallet({
@@ -435,8 +487,11 @@ describe('Tier Service', () => {
 
       await tierService.pollUser();
 
-      expect(tierService.getReferrals()).toEqual(['0x123']);
-      expect(tierService.getInviteCodes()).toEqual(['CODE1']);
+      expect(tierService.getReferrals()).toEqual({
+        id: '123',
+        activated: 1,
+        referred: 1,
+      });
       expect(tierService.getAchievements()).toEqual({
         '0x1': [{ id: AchievementKeys.SWAP_VOLUME, achieved: 1000 }],
       });
