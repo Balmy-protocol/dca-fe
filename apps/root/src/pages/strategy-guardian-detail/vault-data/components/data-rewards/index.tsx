@@ -49,10 +49,11 @@ const RewardsContainer = ({ strategy }: { strategy?: DisplayStrategy }) => {
         ) : (
           <FormattedMessage
             description="earn.strategy-details.vault-about.rewards-description"
-            defaultMessage="For each {asset} deposited, you will earn {apy}% APY in {rewards}."
+            defaultMessage="For each {asset} deposited, you will earn {assetApy}% APY in {asset}, and additionally you will earn {rewardsApy}% APY in {rewards}."
             values={{
               asset: asset?.symbol,
-              apy: rewards?.apy.toFixed(2),
+              assetApy: strategy.farm.apy.toFixed(2),
+              rewardsApy: rewards?.apy.toFixed(2),
               rewards: formatListMessage({
                 items: rewards?.tokens.map((token) => token.symbol),
                 intl,
