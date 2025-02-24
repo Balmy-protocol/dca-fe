@@ -55,7 +55,17 @@ const StyledGridContainer = styled(Grid)<{ isSmall?: boolean }>`
   `}
 `;
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      enabled: false,
+      refetchOnWindowFocus: false,
+      retryOnMount: false,
+      staleTime: Infinity,
+      retry: false,
+    },
+  },
+});
 
 const StyledAppGridContainer = styled(Grid)`
   ${({ theme: { spacing, breakpoints } }) => `
