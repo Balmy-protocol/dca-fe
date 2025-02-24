@@ -27,6 +27,7 @@ import TokenAmount from '@common/components/token-amount';
 import { PROMOTED_STRATEGIES_IDS, STRATEGIES_WITH_LM_REWARDS } from '@constants/earn';
 import { isNil } from 'lodash';
 import { PLATFORM_NAMES_FOR_TOKENS } from '@constants/yield';
+import NetWorthNumber from '@common/components/networth-number';
 
 export enum StrategyColumnKeys {
   IS_PROMOTED = 'isPromoted',
@@ -371,9 +372,14 @@ export const portfolioColumnConfigs: StrategyColumnConfig<StrategiesTableVariant
             <ContainerBox alignItems="center">
               <ComposedTokenIcon tokens={rewardTokensData.tokens} size={4.5} />
             </ContainerBox>
-            <Typography variant="bodyExtraSmall" color={({ palette: { mode } }) => colors[mode].typography.typo2}>
-              ${rewardTokensData.totalRewardsTvl.toFixed(2)}
-            </Typography>
+            <NetWorthNumber
+              value={rewardTokensData.totalRewardsTvl}
+              variant="bodyExtraSmall"
+              colorVariant="typo2"
+              size="small"
+              isFiat
+              fontWeight={500}
+            />
           </StyledRewardsPill>
         </ContainerBox>
       ) : (
