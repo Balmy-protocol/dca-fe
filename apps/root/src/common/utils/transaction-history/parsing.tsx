@@ -1081,6 +1081,8 @@ const transformNonIndexedEvent = ({
 
       if (!allTokensAreInTokenList) return null;
 
+      const withdrawnTokens = event.typeData.withdrawn.filter((withdrawnToken) => BigInt(withdrawnToken.amount) > 0n);
+
       baseEventData = buildBaseEarnPendingEventData(event);
 
       parsedEvent = {
@@ -1088,7 +1090,7 @@ const transformNonIndexedEvent = ({
         unit: IndexerUnits.EARN,
         data: {
           ...baseEventData,
-          withdrawn: event.typeData.withdrawn.map((withdrawnToken) => {
+          withdrawn: withdrawnTokens.map((withdrawnToken) => {
             const tokenId = getTokenListId({
               tokenAddress: withdrawnToken.token.address,
               chainId: event.chainId,
@@ -1107,7 +1109,7 @@ const transformNonIndexedEvent = ({
                       parseNumberUsdPriceToBigInt(withdrawnToken.token.price)
                     ),
               },
-              token,
+              token: { ...token, icon: <TokenIcon size={8} token={token} /> },
               withdrawType: withdrawnToken.withdrawType,
             };
           }),

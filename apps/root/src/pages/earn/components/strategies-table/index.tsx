@@ -385,6 +385,7 @@ const StrategiesTable = <T extends StrategiesTableVariants>({
             variant={variant}
             strategies={strategies}
             isEmptyPortfolio={isEmptyPortfolio}
+            showBalances={showBalances}
           />
         )}
       </Table>

@@ -401,7 +401,7 @@ export const SUPPORTED_NETWORKS_DCA = [
   Chains.BASE.chainId,
 ];
 
-export const SUPPORTED_NETWORKS_EARN = [Chains.BASE.chainId, Chains.OPTIMISM.chainId];
+export const SUPPORTED_NETWORKS_EARN = [Chains.BASE.chainId, Chains.OPTIMISM.chainId, Chains.ARBITRUM.chainId];
 
 export const DEFAULT_NETWORK_FOR_VERSION: Record<PositionVersions, NetworkStruct> = {
   [POSITION_VERSION_1]: NETWORKS.optimism,
@@ -563,16 +563,19 @@ export const SMOL_DOMAIN_ADDRESS: Record<number, Address> = {
 export const EARN_COMPANION_ADDRESS: Record<number, Address> = {
   [Chains.OPTIMISM.chainId]: '0x5cb7667a29d2029ac2e38aa43f0608b620fad087',
   [Chains.BASE.chainId]: '0x5cb7667a29d2029ac2e38aa43f0608b620fad087',
+  [Chains.ARBITRUM.chainId]: '0x5cb7667a29d2029ac2e38aa43f0608b620fad087',
 };
 
 export const EARN_VAULT_ADDRESS: Record<number, Lowercase<Address>> = {
   [Chains.OPTIMISM.chainId]: '0x0990a4a641636d437af9aa214a1a580377ef1954',
   [Chains.BASE.chainId]: '0x0990a4a641636d437af9aa214a1a580377ef1954',
+  [Chains.ARBITRUM.chainId]: '0x0990a4a641636d437af9aa214a1a580377ef1954',
 };
 
 export const EARN_STRATEGY_REGISTRY: Record<number, Lowercase<Address>> = {
   [Chains.OPTIMISM.chainId]: '0xc0571929c21b71fc7579ec7159b1e88a2199bc78',
   [Chains.BASE.chainId]: '0xc0571929c21b71fc7579ec7159b1e88a2199bc78',
+  [Chains.ARBITRUM.chainId]: '0xc0571929c21b71fc7579ec7159b1e88a2199bc78',
 };
 
 export const EXPLORER_URL = getAllChains().reduce<Record<number, string>>(
