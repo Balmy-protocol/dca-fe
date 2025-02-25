@@ -2,7 +2,17 @@ import React from 'react';
 import { StrategiesTableVariants } from '@state/strategies-filters/reducer';
 import { StrategyColumnConfig, StrategyColumnKeys } from '../columns';
 import { TableStrategy } from '../..';
-import { TableFooter, TableRow, ContainerBox, TableCell, Typography, Hidden, DividerBorder1, colors } from 'ui-library';
+import {
+  TableFooter,
+  TableRow,
+  ContainerBox,
+  TableCell,
+  Typography,
+  Hidden,
+  DividerBorder1,
+  colors,
+  HiddenNumber,
+} from 'ui-library';
 import styled from 'styled-components';
 import { EarnPosition } from 'common-types';
 import { flatten } from 'lodash';
@@ -15,6 +25,7 @@ interface TotalFooterProps<T extends StrategiesTableVariants> {
   strategies: TableStrategy<T>[];
   variant: T;
   isEmptyPortfolio: boolean;
+  showBalances: boolean;
 }
 
 const StyledTableFooter = styled(TableFooter)<{ $isPortfolio?: boolean }>`
@@ -50,6 +61,7 @@ const TotalFooter = <T extends StrategiesTableVariants>({
   strategies,
   variant,
   isEmptyPortfolio,
+  showBalances,
 }: TotalFooterProps<T>) => {
   const totalInvested = React.useMemo(() => {
     if (variant === StrategiesTableVariants.ALL_STRATEGIES) {
@@ -77,14 +89,22 @@ const TotalFooter = <T extends StrategiesTableVariants>({
           <Hidden {...column.hiddenProps} key={column.key}>
             <StyledTotalsTableCell key={column.key}>
               {column.key === StrategyColumnKeys.TOTAL_INVESTED ? (
-                <Typography variant="bodyBold" color={isEmptyPortfolio ? 'text.disabled' : undefined}>
-                  {`$${usdFormatter(totalInvested.totalInvestedUsd)}`}
-                </Typography>
+                showBalances ? (
+                  <Typography variant="bodyBold" color={isEmptyPortfolio ? 'text.disabled' : undefined}>
+                    {`$${usdFormatter(totalInvested.totalInvestedUsd)}`}
+                  </Typography>
+                ) : (
+                  <HiddenNumber size="small" />
+                )
               ) : null}
               {column.key === StrategyColumnKeys.CURRENT_PROFIT ? (
-                <Typography variant="bodyBold" color={isEmptyPortfolio ? 'text.disabled' : 'success.dark'}>
-                  {usdFormatter(totalInvested.currentProfitUsd.asset)}
-                </Typography>
+                showBalances ? (
+                  <Typography variant="bodyBold" color={isEmptyPortfolio ? 'text.disabled' : 'success.dark'}>
+                    {usdFormatter(totalInvested.currentProfitUsd.asset)}
+                  </Typography>
+                ) : (
+                  <HiddenNumber size="small" />
+                )
               ) : null}
             </StyledTotalsTableCell>
           </Hidden>

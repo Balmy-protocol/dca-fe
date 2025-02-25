@@ -9,8 +9,9 @@ import isUndefined from 'lodash/isUndefined';
 
 type ColorVariant = keyof (typeof colors)[keyof typeof colors]['typography'];
 
-const StyledNetWorth = styled(Typography).attrs({ fontWeight: 700 })<{ $colorVariant?: ColorVariant }>`
-  ${({ theme: { palette }, $colorVariant }) => `
+const StyledNetWorth = styled(Typography)<{ $colorVariant?: ColorVariant; $fontWeight?: number }>`
+  ${({ theme: { palette }, $colorVariant, $fontWeight }) => `
+    font-weight: ${$fontWeight || 700};
     color: ${colors[palette.mode].typography[$colorVariant || 'typo2']};
   `}
 `;
@@ -32,6 +33,7 @@ export interface NetWorthNumberProps {
   isFiat?: boolean;
   colorVariant?: ColorVariant;
   disableHiddenNumber?: boolean;
+  fontWeight?: number;
 }
 
 const NetWorthNumber = ({
@@ -43,6 +45,7 @@ const NetWorthNumber = ({
   isFiat = true,
   colorVariant, // Overrides all colors
   disableHiddenNumber = false,
+  fontWeight,
 }: NetWorthNumberProps) => {
   const animatedNetWorth = useCountingAnimation(value);
   const networthToUse = withAnimation ? animatedNetWorth : value;
@@ -54,7 +57,7 @@ const NetWorthNumber = ({
   const [totalInteger, totalDecimal] = fixedWorth.split('.');
 
   return (
-    <StyledNetWorth variant={variant} $colorVariant={colorVariant}>
+    <StyledNetWorth variant={variant} $colorVariant={colorVariant} $fontWeight={fontWeight}>
       {isLoading ? (
         <Skeleton variant="text" animation="wave" width="6ch" />
       ) : (

@@ -389,6 +389,9 @@ export function parseUserStrategiesFinancialData(userPositions: EarnPosition[] =
     return acc + Number(amount.amountInUSD) || 0;
   }, 0);
 
+  let currentProfitAssetUsd = 0;
+  let currentProfitTotalUsd = 0;
+
   const currentProfit = userPositions.reduce<Record<Address, AmountsOfToken>>((acc, position) => {
     position.balances.forEach((tokenBalance) => {
       if (!acc[tokenBalance.token.address]) {
@@ -403,6 +406,14 @@ export function parseUserStrategiesFinancialData(userPositions: EarnPosition[] =
       const newAmount = tokenBalance.profit.amount + acc[tokenBalance.token.address].amount;
       const newAmountInUsd =
         Number(tokenBalance.profit.amountInUSD) + Number(acc[tokenBalance.token.address].amountInUSD);
+
+      // Asset tracking
+      if (isSameToken(tokenBalance.token, position.strategy.asset)) {
+        currentProfitAssetUsd += Number(newAmountInUsd);
+      }
+      // Totals tracking
+      currentProfitTotalUsd += Number(newAmountInUsd);
+
       // eslint-disable-next-line no-param-reassign
       acc[tokenBalance.token.address] = {
         amount: newAmount,
@@ -412,17 +423,6 @@ export function parseUserStrategiesFinancialData(userPositions: EarnPosition[] =
     });
     return acc;
   }, {});
-
-  const currentProfitAssetUsd = userPositions.reduce((acc, position) => {
-    const assetAddress = position.strategy.asset.address;
-    const assetProfit = currentProfit[assetAddress]?.amountInUSD || 0;
-    return acc + Number(assetProfit);
-  }, 0);
-
-  const currentProfitTotalUsd = Object.values(currentProfit).reduce((acc, amount) => {
-    // eslint-disable-next-line no-param-reassign
-    return acc + Number(amount.amountInUSD) || 0;
-  }, 0);
 
   const currentProfitUsd = {
     asset: currentProfitAssetUsd,
