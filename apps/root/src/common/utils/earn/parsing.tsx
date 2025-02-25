@@ -409,10 +409,10 @@ export function parseUserStrategiesFinancialData(userPositions: EarnPosition[] =
 
       // Asset tracking
       if (isSameToken(tokenBalance.token, position.strategy.asset)) {
-        currentProfitAssetUsd += Number(newAmountInUsd);
+        currentProfitAssetUsd += Number(tokenBalance.profit.amountInUSD);
       }
       // Totals tracking
-      currentProfitTotalUsd += Number(newAmountInUsd);
+      currentProfitTotalUsd += Number(tokenBalance.profit.amountInUSD);
 
       // eslint-disable-next-line no-param-reassign
       acc[tokenBalance.token.address] = {
