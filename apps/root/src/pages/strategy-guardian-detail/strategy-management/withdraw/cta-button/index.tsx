@@ -17,7 +17,7 @@ import useAnalytics from '@hooks/useAnalytics';
 import { useEarnManagementState } from '@state/earn-management/hooks';
 import useHasFetchedUserStrategies from '@hooks/earn/useHasFetchedUserStrategies';
 import { isSameToken } from '@common/utils/currency';
-import { getWrappedProtocolToken } from '@common/mocks/tokens';
+import { getProtocolToken } from '@common/mocks/tokens';
 import { WalletActionType } from '@services/accountService';
 import useContractService from '@hooks/useContractService';
 
@@ -39,7 +39,6 @@ const EarnWithdrawCTAButton = ({
   const activeWallet = useActiveWallet();
   const hasFetchedUserStrategies = useHasFetchedUserStrategies();
   const network = strategy?.network;
-
   const actualCurrentNetwork = useCurrentNetwork();
   const isOnCorrectNetwork = actualCurrentNetwork.chainId === network?.chainId;
   const walletService = useWalletService();
@@ -81,7 +80,7 @@ const EarnWithdrawCTAButton = ({
   // User can just withdraw if they have rewards
   const shouldDisabledButton = !withdrawRewards && shouldDisableProceedButton;
 
-  const wrappedProtocolToken = strategy && getWrappedProtocolToken(strategy.farm.chainId);
+  const protocolToken = strategy && getProtocolToken(strategy.farm.chainId);
   const companionAddress = strategy && contractService.getEarnCompanionAddress(strategy.network.chainId);
   const companionHasPermission =
     strategy &&
@@ -89,7 +88,8 @@ const EarnWithdrawCTAButton = ({
     companionAddress &&
     position.permissions[companionAddress]?.includes(EarnPermission.WITHDRAW);
   const requireCompanionSignature =
-    wrappedProtocolToken?.address === strategy?.asset.address &&
+    // Since this is the underlying the wrapped protocol token we need to check for protocol token
+    protocolToken?.address === strategy?.asset.address &&
     !!withdrawAmount &&
     !companionHasPermission &&
     !!companionAddress;
@@ -120,6 +120,7 @@ const EarnWithdrawCTAButton = ({
 
     openConnectModal(WalletActionType.reconnect);
   };
+
   const NoWalletButton = (
     <Button size="large" variant="contained" fullWidth onClick={onConnectWallet}>
       <FormattedMessage
@@ -234,7 +235,7 @@ const EarnWithdrawCTAButton = ({
     (activeWallet && activeWallet.status === WalletStatus.disconnected)
   ) {
     ButtonToShow = ReconnectWalletButton;
-  } else if (!isOnCorrectNetwork) {
+  } else if (!isOnCorrectNetwork && !activeWallet?.canAutomaticallyChangeNetwork) {
     ButtonToShow = IncorrectNetworkButton;
   } else if (notEnoughPositionAssetBalance) {
     ButtonToShow = NoEnoughPositionBalanceButton;
