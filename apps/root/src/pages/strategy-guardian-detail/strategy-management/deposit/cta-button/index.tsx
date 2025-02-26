@@ -175,7 +175,7 @@ const EarnDepositCTAButton = ({
     (activeWallet && activeWallet.status === WalletStatus.disconnected)
   ) {
     ButtonToShow = ReconnectWalletButton;
-  } else if (!isOnCorrectNetwork) {
+  } else if (!isOnCorrectNetwork && !activeWallet?.canAutomaticallyChangeNetwork) {
     ButtonToShow = IncorrectNetworkButton;
   } else if (cantFund) {
     ButtonToShow = NoFundsButton;
