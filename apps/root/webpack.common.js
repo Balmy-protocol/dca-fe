@@ -102,27 +102,6 @@ module.exports = {
           singleton: true,
           requiredVersion: packageJson.dependencies['styled-components'],
         },
-        '@rainbow-me/rainbowkit': {
-          singleton: true,
-          eager: false,
-          requiredVersion: packageJson.dependencies['@rainbow-me/rainbowkit'],
-        },
-        'ui-library': {
-          singleton: true,
-          requiredVersion: packageJson.dependencies['ui-library'],
-        },
-        '@mui/material': {
-          singleton: true,
-          requiredVersion: uiLibraryPackageJson.dependencies['@mui/material'],
-        },
-        '@mui/icons-material': {
-          singleton: true,
-          requiredVersion: uiLibraryPackageJson.dependencies['@mui/icons-material'],
-        },
-        recharts: {
-          singleton: true,
-          requiredVersion: packageJson.dependencies.recharts,
-        },
       },
     }),
   ],
