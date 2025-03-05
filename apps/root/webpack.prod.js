@@ -3,14 +3,26 @@ const webpack = require('webpack');
 const common = require('./webpack.common.js');
 const dotenv = require('dotenv');
 const TerserPlugin = require('terser-webpack-plugin');
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 const env = dotenv.config();
 
 module.exports = merge(common, {
   mode: 'production',
-  plugins: [],
+  plugins: [
+    new webpack.DefinePlugin({
+      'process.env.NODE_ENV': JSON.stringify('production'),
+      'process.env.REACT_APP_ENV': JSON.stringify('production'),
+    }),
+    new webpack.optimize.AggressiveMergingPlugin(),
+    new BundleAnalyzerPlugin({
+      analyzerMode: process.env.ANALYZE === 'true' ? 'server' : 'disabled',
+    }),
+  ],
   optimization: {
     minimize: true,
+    moduleIds: 'deterministic',
+    chunkIds: 'deterministic',
     minimizer: [
       // This is only used in production mode
       new TerserPlugin({
@@ -36,6 +48,9 @@ module.exports = merge(common, {
             // Pending further investigation:
             // https://github.com/terser-js/terser/issues/120
             inline: 2,
+            drop_console: true,
+            drop_debugger: true,
+            pure_funcs: ['console.log'],
           },
           mangle: {
             safari10: true,

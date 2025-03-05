@@ -9,12 +9,22 @@ const WebpackBar = require('webpackbar');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const CompressionPlugin = require('compression-webpack-plugin');
 const PreloadWebpackPlugin = require('preload-webpack-plugin');
+const ModuleFederationPlugin = require('webpack/lib/container/ModuleFederationPlugin');
+const packageJson = require('./package.json');
+const uiLibraryPackageJson = require('../../packages/ui-library/package.json');
 
 const styledComponentsTransformer = createStyledComponentsTransformer();
 
 module.exports = {
   entry: {
     app: './src/index.tsx',
+  },
+  cache: {
+    type: 'filesystem',
+    buildDependencies: {
+      config: [__filename],
+    },
+    name: 'production-cache',
   },
   plugins: [
     new HtmlWebpackPlugin({
@@ -73,6 +83,49 @@ module.exports = {
         if (/\.woff2?$/.test(entry)) return 'font';
         if (/\.(png|svg|jpg|jpeg|gif)$/.test(entry)) return 'image';
         return 'script';
+      },
+    }),
+    new ModuleFederationPlugin({
+      name: 'dca_fe',
+      shared: {
+        react: {
+          singleton: true,
+          eager: true,
+          requiredVersion: packageJson.dependencies.react,
+        },
+        'react-dom': {
+          singleton: true,
+          eager: true,
+          requiredVersion: packageJson.dependencies['react-dom'],
+        },
+        'styled-components': {
+          singleton: true,
+          requiredVersion: packageJson.dependencies['styled-components'],
+        },
+        '@rainbow-me/rainbowkit': {
+          singleton: true,
+          requiredVersion: packageJson.dependencies['@rainbow-me/rainbowkit'],
+        },
+        wagmi: {
+          singleton: true,
+          requiredVersion: packageJson.dependencies.wagmi,
+        },
+        'ui-library': {
+          singleton: true,
+          requiredVersion: packageJson.dependencies['ui-library'],
+        },
+        '@mui/material': {
+          singleton: true,
+          requiredVersion: uiLibraryPackageJson.dependencies['@mui/material'],
+        },
+        '@mui/icons-material': {
+          singleton: true,
+          requiredVersion: uiLibraryPackageJson.dependencies['@mui/icons-material'],
+        },
+        recharts: {
+          singleton: true,
+          requiredVersion: packageJson.dependencies.recharts,
+        },
       },
     }),
   ],
@@ -159,10 +212,35 @@ module.exports = {
         use: ['style-loader', 'css-loader'],
       },
       {
-        test: /\.(png|jpe?g|gif)$/i,
+        test: /\.(png|jpe?g|gif|webp)$/i,
         use: [
           {
             loader: 'file-loader',
+            options: {
+              name: 'images/[name].[contenthash].[ext]',
+            },
+          },
+          {
+            loader: 'image-webpack-loader',
+            options: {
+              mozjpeg: {
+                progressive: true,
+                quality: 65,
+              },
+              optipng: {
+                enabled: true,
+              },
+              pngquant: {
+                quality: [0.65, 0.9],
+                speed: 4,
+              },
+              gifsicle: {
+                interlaced: false,
+              },
+              webp: {
+                quality: 75,
+              },
+            },
           },
         ],
       },
@@ -172,5 +250,12 @@ module.exports = {
     hints: 'warning',
     maxEntrypointSize: 512000,
     maxAssetSize: 512000,
+  },
+  optimization: {
+    moduleIds: 'deterministic',
+    chunkIds: 'deterministic',
+    concatenateModules: true,
+    innerGraph: true,
+    sideEffects: true,
   },
 };
