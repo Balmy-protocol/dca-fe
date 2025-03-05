@@ -15,7 +15,6 @@ module.exports =
       port: 3000,
       historyApiFallback: true,
       hot: true,
-      https: true,
       client: {
         overlay: false,
       },

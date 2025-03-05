@@ -5,16 +5,12 @@ const CACHE_NAME = 'balmy-cache-v1';
 const PRECACHE_ASSETS = [
   '/',
   '/index.html',
-  '/manifest.json',
-  // Static assets
+  '/site.webmanifest',
+  // Static assets from public_metadata
   '/android-chrome-192x192.png',
   '/android-chrome-512x512.png',
-  '/maskable_icon.png',
-  // Add your main CSS/JS bundles
-  '/main.js',
-  '/main.css',
-  // Fonts if you're hosting them locally
-  // '/fonts/your-font.woff2',
+  // Webpack bundles - using pattern matching
+  '/app.*.bundle.js', // This will match your webpack output
 ];
 
 // Runtime caching strategies
@@ -26,31 +22,50 @@ const RUNTIME_CACHING_RULES = [
     maxAgeSeconds: 30 * 24 * 60 * 60, // 30 days
   },
   {
-    // API calls that can be served from cache
-    urlPattern: /\/api\/static\//,
+    // Any missed JavaScript and CSS bundles
+    urlPattern: /\.(js|css)$/,
     strategy: 'StaleWhileRevalidate',
+  },
+  {
+    // API endpoints that can be cached
+    urlPattern: new RegExp(`${MEAN_API_URL}/v2/transforms/to-underlying`),
+    strategy: 'NetworkFirst',
+    maxAgeSeconds: 60 * 5, // 5 minutes
+  },
+  {
+    // NFT data
+    urlPattern: /\/nft\/data\//,
+    strategy: 'NetworkFirst',
     maxAgeSeconds: 60 * 60, // 1 hour
   },
   {
-    // Token lists, pairs, etc.
-    urlPattern: /\/api\/tokens/,
+    // Token lists
+    urlPattern: /(tokens\.uniswap\.org|tokens\.coingecko\.com)/,
     strategy: 'NetworkFirst',
-    maxAgeSeconds: 5 * 60, // 5 minutes
+    maxAgeSeconds: 60 * 60, // 1 hour
   },
 ];
 
-// Install event - precache static assets
-self.addEventListener('install', (event) => {
-  event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(PRECACHE_ASSETS)));
-});
+// Never cache these patterns
+const EXCLUDE_FROM_CACHE = [
+  // Wallet and Web3 requests
+  /wallet/i,
+  /eth-/i,
+  // API endpoints that should never be cached
+  new RegExp(`${MEAN_API_URL}/v1/accounts/.*/balances`), // Always fresh balances
+  new RegExp(`${MEAN_API_URL}/v1/simulate-blowfish-transaction`), // Transaction simulations
+  new RegExp(`${MEAN_API_URL}/v1/error-reporting`), // Error reports
+  // Chain RPC endpoints
+  /infura\.io/,
+  /alchemy\.com/,
+  /ankr\.com/,
+  /rpc\./,
+];
 
 // Fetch event - handle runtime caching
 self.addEventListener('fetch', (event) => {
-  // Don't cache:
-  // 1. Wallet connection requests
-  // 2. Web3 RPC calls
-  // 3. Transaction requests
-  if (event.request.url.includes('wallet') || event.request.url.includes('eth-') || event.request.method !== 'GET') {
+  // Check exclusion patterns first
+  if (event.request.method !== 'GET' || EXCLUDE_FROM_CACHE.some((pattern) => pattern.test(event.request.url))) {
     return;
   }
 
@@ -73,7 +88,17 @@ self.addEventListener('fetch', (event) => {
         )
       );
     } else if (matchingRule.strategy === 'NetworkFirst') {
-      event.respondWith(fetch(event.request).catch(() => caches.match(event.request)));
+      event.respondWith(
+        fetch(event.request)
+          .then((response) => {
+            const responseClone = response.clone();
+            caches.open(CACHE_NAME).then((cache) => {
+              cache.put(event.request, responseClone);
+            });
+            return response;
+          })
+          .catch(() => caches.match(event.request))
+      );
     } else if (matchingRule.strategy === 'StaleWhileRevalidate') {
       event.respondWith(
         caches.match(event.request).then((cachedResponse) => {
