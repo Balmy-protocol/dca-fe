@@ -28,7 +28,7 @@ const RUNTIME_CACHING_RULES = [
   },
   {
     // API endpoints that can be cached
-    urlPattern: new RegExp(`${MEAN_API_URL}/v2/transforms/to-underlying`),
+    urlPattern: /\/v2\/transforms\/to-underlying$/,
     strategy: 'NetworkFirst',
     maxAgeSeconds: 60 * 5, // 5 minutes
   },
@@ -52,9 +52,9 @@ const EXCLUDE_FROM_CACHE = [
   /wallet/i,
   /eth-/i,
   // API endpoints that should never be cached
-  new RegExp(`${MEAN_API_URL}/v1/accounts/.*/balances`), // Always fresh balances
-  new RegExp(`${MEAN_API_URL}/v1/simulate-blowfish-transaction`), // Transaction simulations
-  new RegExp(`${MEAN_API_URL}/v1/error-reporting`), // Error reports
+  /\/v1\/accounts\/.*\/balances$/,
+  /\/v1\/simulate-blowfish-transaction$/,
+  /\/v1\/error-reporting$/,
   // Chain RPC endpoints
   /infura\.io/,
   /alchemy\.com/,
