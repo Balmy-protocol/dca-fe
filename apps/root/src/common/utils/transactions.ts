@@ -318,7 +318,7 @@ export const getProtocolTokenTransactionAmount = (txToCheck: TransactionDetails)
     // DCA
     case TransactionTypes.newPosition:
       if (!isSameToken(txToCheck.typeData.from, protocolToken)) break;
-      protocolTokenTransactionAmount = BigInt(txToCheck.typeData.fromValue);
+      protocolTokenTransactionAmount = parseUnits(txToCheck.typeData.fromValue, txToCheck.typeData.from.decimals);
       break;
     case TransactionTypes.modifyRateAndSwapsPosition:
       if (!txToCheck.position || !isSameToken(txToCheck.position.from, protocolToken)) break;
