@@ -52,7 +52,45 @@ module.exports = merge(common, {
     ],
     splitChunks: {
       chunks: 'all',
-      maxSize: 5 * 1024 * 1024,
+      maxInitialRequests: 25,
+      minSize: 20000,
+      maxSize: 244000,
+      cacheGroups: {
+        vendor: {
+          test: /[\\/]node_modules[\\/]/,
+          name(module) {
+            const packageName = module.context.match(/[\\/]node_modules[\\/](.*?)([\\/]|$)/)[1];
+            return `vendor.${packageName.replace('@', '')}`;
+          },
+          priority: -10,
+          reuseExistingChunk: true,
+        },
+        react: {
+          test: /[\\/]node_modules[\\/](react|react-dom|react-router|react-redux|@rainbow-me)[\\/]/,
+          name: 'vendor.react',
+          chunks: 'all',
+          priority: 1,
+        },
+        ui: {
+          test: /[\\/]node_modules[\\/](@emotion|styled-components|recharts|ui-library)[\\/]/,
+          name: 'vendor.ui',
+          chunks: 'all',
+          priority: 1,
+        },
+        pages: {
+          test: /[\\/]src[\\/]pages[\\/]/,
+          name: 'pages',
+          chunks: 'async',
+          minChunks: 1,
+          priority: 5,
+        },
+        default: {
+          minChunks: 2,
+          priority: -20,
+          reuseExistingChunk: true,
+        },
+      },
     },
+    runtimeChunk: 'single',
   },
 });

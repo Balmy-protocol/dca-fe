@@ -7,6 +7,8 @@ const CopyPlugin = require('copy-webpack-plugin');
 const createStyledComponentsTransformer = require('typescript-plugin-styled-components').default;
 const WebpackBar = require('webpackbar');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
+const CompressionPlugin = require('compression-webpack-plugin');
+const PreloadWebpackPlugin = require('preload-webpack-plugin');
 
 const styledComponentsTransformer = createStyledComponentsTransformer();
 
@@ -54,6 +56,23 @@ module.exports = {
     new ForkTsCheckerWebpackPlugin({
       typescript: {
         memoryLimit: 4096,
+      },
+    }),
+    new CompressionPlugin({
+      algorithm: 'gzip',
+      test: /\.(js|css|html|svg)$/,
+      threshold: 10240,
+      minRatio: 0.8,
+    }),
+    new PreloadWebpackPlugin({
+      rel: 'preload',
+      include: ['initial', 'asyncChunks'],
+      fileBlacklist: [/\.map$/, /hot-update\.js$/, /runtime.*.js$/],
+      as(entry) {
+        if (/\.css$/.test(entry)) return 'style';
+        if (/\.woff2?$/.test(entry)) return 'font';
+        if (/\.(png|svg|jpg|jpeg|gif)$/.test(entry)) return 'image';
+        return 'script';
       },
     }),
   ],
@@ -148,5 +167,10 @@ module.exports = {
         ],
       },
     ],
+  },
+  performance: {
+    hints: 'warning',
+    maxEntrypointSize: 512000,
+    maxAssetSize: 512000,
   },
 };
