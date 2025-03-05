@@ -42,6 +42,10 @@ function loadLocaleData(locale: SupportedLanguages) {
 const App: React.FunctionComponent<AppProps> = ({ locale, web3Service, config, store }: AppProps) => {
   const [selectedLocale, setSelectedLocale] = React.useState(locale || SupportedLanguages.english);
 
+  React.useEffect(() => {
+    document.documentElement.setAttribute('lang', locale);
+  }, [locale]);
+
   return (
     <LanguageContext.Provider
       value={{

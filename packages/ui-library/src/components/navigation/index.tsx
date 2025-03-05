@@ -379,13 +379,13 @@ const Navigation = ({
       <StyledDrawerFooterContainer>
         <StyledPromotedBannerContainer>{promotedBanner}</StyledPromotedBannerContainer>
         <ContainerBox gap={5} justifyContent="center" alignItems="center">
-          <Link underline="none" target="_blank" href="https://github.com/balmy-protocol">
+          <Link underline="none" target="_blank" href="https://github.com/balmy-protocol" aria-label="GitHub">
             <GithubIcon sx={{ color: colors[mode].typography.typo3 }} />
           </Link>
-          <Link underline="none" target="_blank" href="https://twitter.com/balmy_xyz">
+          <Link underline="none" target="_blank" href="https://twitter.com/balmy_xyz" aria-label="Twitter">
             <TwitterIcon sx={{ color: colors[mode].typography.typo3 }} />
           </Link>
-          <Link underline="none" target="_blank" href="http://discord.balmy.xyz">
+          <Link underline="none" target="_blank" href="http://discord.balmy.xyz" aria-label="Discord">
             <DiscordIcon sx={{ color: colors[mode].typography.typo3 }} />
           </Link>
         </ContainerBox>
@@ -417,13 +417,18 @@ const Navigation = ({
             <AppBarRightContainer alignItems="center" justifyContent="flex-end" flex={1} gap={2}>
               <OptionsMenu
                 options={helpOptions}
+                dataAttrs={{ 'aria-label': 'Help' }}
                 mainDisplay={
                   <StyledBeamerContainer className="beamer-whats-new" data-beamer-click="false">
                     <HelpIcon />
                   </StyledBeamerContainer>
                 }
               />
-              <OptionsMenu options={settingsOptions} mainDisplay={<CogIcon />} />
+              <OptionsMenu
+                options={settingsOptions}
+                mainDisplay={<CogIcon />}
+                dataAttrs={{ 'aria-label': 'Settings' }}
+              />
               {extraHeaderTools}
             </AppBarRightContainer>
           </Toolbar>

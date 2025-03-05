@@ -9,6 +9,7 @@ import useIsLoggingUser from '@hooks/useIsLoggingUser';
 import { useAppDispatch } from '@state/hooks';
 import { toggleShowBalances } from '@state/config/actions';
 import { useShowBalances } from '@state/config/hooks';
+import useUser from '@hooks/useUser';
 
 export enum NetWorthVariants {
   main = 'main',
@@ -49,6 +50,8 @@ const NetWorth = ({ walletSelector, chainId, variant = NetWorthVariants.main }: 
     chainId,
   });
   const isLoggingUser = useIsLoggingUser();
+  const user = useUser();
+  const isUserLoggedIn = !!user;
 
   const onToggleShowBalances = () => {
     dispatch(toggleShowBalances());
@@ -74,11 +77,13 @@ const NetWorth = ({ walletSelector, chainId, variant = NetWorthVariants.main }: 
     <StyledNetWorthContainer variant="outlined" $size={walletSelector.size} $netWorthVariant={variant}>
       <ContainerBox alignItems="center">
         <WalletSelector {...walletSelector} />
-        <IconButton onClick={onToggleShowBalances} sx={{ padding: 0, margin: 0 }}>
-          <Typography variant="bodyLargeRegular" sx={{ display: 'inline-flex' }}>
-            {showBalances ? <EyeIcon /> : <EyeSlashIcon />}
-          </Typography>
-        </IconButton>
+        {isUserLoggedIn && (
+          <IconButton onClick={onToggleShowBalances} sx={{ padding: 0, margin: 0 }}>
+            <Typography variant="bodyLargeRegular" sx={{ display: 'inline-flex' }}>
+              {showBalances ? <EyeIcon /> : <EyeSlashIcon />}
+            </Typography>
+          </IconButton>
+        )}
       </ContainerBox>
       <NetWorthNumber
         isLoading={isLoadingSomePrices || isLoggingUser}
