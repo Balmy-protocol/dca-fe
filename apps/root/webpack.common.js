@@ -100,6 +100,7 @@ module.exports = {
         },
         'styled-components': {
           singleton: true,
+          eager: true,
           requiredVersion: packageJson.dependencies['styled-components'],
         },
       },
