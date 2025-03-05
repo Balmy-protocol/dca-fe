@@ -48,6 +48,9 @@ const RUNTIME_CACHING_RULES = [
 
 // Never cache these patterns
 const EXCLUDE_FROM_CACHE = [
+  // Browser extensions
+  /^chrome-extension:\/\//,
+  /^moz-extension:\/\//,
   // Wallet and Web3 requests
   /wallet/i,
   /eth-/i,
@@ -62,10 +65,25 @@ const EXCLUDE_FROM_CACHE = [
   /rpc\./,
 ];
 
+// Helper function to check if URL should be cached
+const shouldHandleRequest = (request) => {
+  // Only handle GET requests
+  if (request.method !== 'GET') return false;
+
+  // Check the URL scheme
+  const url = new URL(request.url);
+  if (!['http:', 'https:'].includes(url.protocol)) return false;
+
+  // Check exclusion patterns
+  if (EXCLUDE_FROM_CACHE.some((pattern) => pattern.test(request.url))) return false;
+
+  return true;
+};
+
 // Fetch event - handle runtime caching
 self.addEventListener('fetch', (event) => {
-  // Check exclusion patterns first
-  if (event.request.method !== 'GET' || EXCLUDE_FROM_CACHE.some((pattern) => pattern.test(event.request.url))) {
+  // Check if we should handle this request
+  if (!shouldHandleRequest(event.request)) {
     return;
   }
 
