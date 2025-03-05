@@ -86,6 +86,12 @@ module.exports = merge(common, {
           chunks: 'all',
           priority: 1,
         },
+        web3: {
+          test: /[\\/]node_modules[\\/](wagmi|@wagmi|viem)[\\/]/,
+          name: 'vendor.web3',
+          chunks: 'all',
+          priority: 2,
+        },
         ui: {
           test: /[\\/]node_modules[\\/](@emotion|styled-components|recharts|ui-library)[\\/]/,
           name: 'vendor.ui',
