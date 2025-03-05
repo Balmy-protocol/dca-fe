@@ -104,11 +104,23 @@ module.exports = {
         },
         '@rainbow-me/rainbowkit': {
           singleton: true,
+          eager: false,
           requiredVersion: packageJson.dependencies['@rainbow-me/rainbowkit'],
         },
         wagmi: {
           singleton: true,
+          eager: false,
           requiredVersion: packageJson.dependencies.wagmi,
+        },
+        '@wagmi/core': {
+          singleton: true,
+          eager: false,
+          requiredVersion: packageJson.dependencies['@wagmi/core'],
+        },
+        viem: {
+          singleton: true,
+          eager: false,
+          requiredVersion: packageJson.dependencies.viem,
         },
         'ui-library': {
           singleton: true,
