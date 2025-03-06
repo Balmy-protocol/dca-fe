@@ -74,6 +74,8 @@ const App: React.FunctionComponent<AppProps> = ({ locale, web3Service, config, s
 };
 
 function bootstrapApplication(locale: SupportedLanguages) {
+  const startTime = Date.now();
+  console.log('bootstrapApplication', startTime);
   const container = document.getElementById('root');
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const root = createRoot(container!);
@@ -82,6 +84,7 @@ function bootstrapApplication(locale: SupportedLanguages) {
   const store = createStore(web3Service);
 
   const config = web3Service.setUpModal();
+  console.log('bootstrapApplication render', Date.now() - startTime);
   root.render(
     <React.StrictMode>
       <App locale={locale} web3Service={web3Service} config={config} store={store} />
@@ -89,6 +92,7 @@ function bootstrapApplication(locale: SupportedLanguages) {
   );
 }
 
+console.log('bootstrapApplication start', Date.now());
 // eslint-disable-next-line @typescript-eslint/no-floating-promises
 bootstrapApplication(SupportedLanguages.english);
 

@@ -287,6 +287,7 @@ const Navigation = ({ children }: React.PropsWithChildren) => {
         ]
       : [];
 
+  console.log('Navigation', Date.now());
   return (
     <>
       <LevelUpModal />

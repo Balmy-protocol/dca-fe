@@ -5,3 +5,4 @@ coverage
 yarn-error.log
 .DS_Store
 .env
+.webpack-cache

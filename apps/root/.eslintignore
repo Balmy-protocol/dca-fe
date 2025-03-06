@@ -1,2 +1,10 @@
 # don't lint providerInfo since its a copy from another repo
 src/common/utils/provider-info
+
+# Webpack config files
+webpack.*.js
+
+# Build directories
+dist/
+build/
+.webpack-cache/

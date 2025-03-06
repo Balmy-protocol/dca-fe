@@ -101,20 +101,22 @@ const AppFrame = ({ config: { wagmiClient } }: AppFrameProps) => {
 
   const dispatch = useAppDispatch();
 
-  React.useEffect(() => {
-    providerService.setChainChangedCallback((chainId) => {
-      const networkToSet = find(NETWORKS, { chainId });
-      if (networkToSet) {
-        dispatch(setNetwork(networkToSet));
-      }
-    });
-    // First promises to be executed for every session
-    void dispatch(startFetchingTokenLists());
-    void pairService.fetchAvailablePairs();
-    web3Service.setOnUpdateConfig((config: SavedCustomConfig) => {
-      void dispatch(hydrateStoreFromSavedConfig(config));
-    });
-  }, []);
+  // React.useEffect(() => {
+  //   providerService.setChainChangedCallback((chainId) => {
+  //     const networkToSet = find(NETWORKS, { chainId });
+  //     if (networkToSet) {
+  //       dispatch(setNetwork(networkToSet));
+  //     }
+  //   });
+  //   // First promises to be executed for every session
+  //   void dispatch(startFetchingTokenLists());
+  //   void pairService.fetchAvailablePairs();
+  //   web3Service.setOnUpdateConfig((config: SavedCustomConfig) => {
+  //     void dispatch(hydrateStoreFromSavedConfig(config));
+  //   });
+  // }, []);
+
+  console.log('AppFrame', Date.now());
 
   return (
     <WagmiProvider config={wagmiClient}>

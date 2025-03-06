@@ -4,7 +4,9 @@
   "description": "FE for Mean Finance",
   "private": true,
   "scripts": {
-    "build": "webpack --config webpack.prod.js",
+    "build": "NODE_ENV=production webpack --config webpack.prod.js",
+    "build:optimized": "NODE_ENV=production webpack --config webpack.prod.js",
+    "build:profile": "NODE_ENV=production PROFILE=true webpack --config webpack.prod.js",
     "analyze": "ANALYZE=true webpack --config webpack.prod.js",
     "start": "TS_NODE_SKIP_IGNORE=true webpack serve --config webpack.dev.js",
     "lint": "run-p lint-es",

@@ -21,10 +21,14 @@ module.exports = {
   },
   cache: {
     type: 'filesystem',
+    compression: 'gzip',
+    name: process.env.NODE_ENV === 'production' ? 'production-cache' : 'development-cache',
     buildDependencies: {
       config: [__filename],
     },
-    name: 'production-cache',
+    cacheDirectory: path.resolve(__dirname, '.webpack-cache'),
+    version: '1.1',
+    maxMemoryGenerations: 1,
   },
   plugins: [
     new HtmlWebpackPlugin({
@@ -76,14 +80,14 @@ module.exports = {
     }),
     new PreloadWebpackPlugin({
       rel: 'preload',
-      include: ['initial', 'asyncChunks'],
-      fileBlacklist: [/\.map$/, /hot-update\.js$/, /runtime.*.js$/],
+      include: ['initial'],
       as(entry) {
         if (/\.css$/.test(entry)) return 'style';
         if (/\.woff2?$/.test(entry)) return 'font';
         if (/\.(png|svg|jpg|jpeg|gif)$/.test(entry)) return 'image';
         return 'script';
       },
+      fileBlacklist: [/\.map$/, /hot-update\.js$/],
     }),
     new ModuleFederationPlugin({
       name: 'dca_fe',
@@ -102,6 +106,16 @@ module.exports = {
           singleton: true,
           eager: true,
           requiredVersion: packageJson.dependencies['styled-components'],
+        },
+        '@reduxjs/toolkit': {
+          singleton: true,
+          eager: true,
+          requiredVersion: packageJson.dependencies['@reduxjs/toolkit'],
+        },
+        'react-router-dom': {
+          singleton: true,
+          eager: true,
+          requiredVersion: packageJson.dependencies['react-router-dom'],
         },
       },
     }),
@@ -129,6 +143,8 @@ module.exports = {
       '@types': path.resolve(__dirname, 'src/types'),
     },
     extensions: ['.*', '.js', '.jsx', '.ts', '.tsx'],
+    enforceExtension: false,
+    mainFields: ['browser', 'module', 'main'],
     fallback: {
       stream: require.resolve('stream-browserify'),
       crypto: require.resolve('crypto-browserify'),
@@ -162,7 +178,7 @@ module.exports = {
             // Without this it derives it from the file extension
             mimetype: 'application/font-woff',
             // Output below fonts directory
-            name: 'fonts/[name].[ext]',
+            name: 'fonts/[name].[contenthash].[ext]',
           },
         },
       },
@@ -203,19 +219,25 @@ module.exports = {
               mozjpeg: {
                 progressive: true,
                 quality: 65,
+                dcScanOpt: 2,
               },
               optipng: {
                 enabled: true,
+                optimizationLevel: 7,
               },
               pngquant: {
                 quality: [0.65, 0.9],
                 speed: 4,
+                strip: true,
               },
               gifsicle: {
                 interlaced: false,
+                optimizationLevel: 3,
               },
               webp: {
-                quality: 75,
+                quality: 80,
+                method: 6,
+                autoFilter: true,
               },
             },
           },
@@ -225,8 +247,11 @@ module.exports = {
   },
   performance: {
     hints: 'warning',
-    maxEntrypointSize: 512000,
-    maxAssetSize: 512000,
+    maxEntrypointSize: 600000,
+    maxAssetSize: 550000,
+    assetFilter: function (assetFilename) {
+      return !/\.map$/.test(assetFilename) && !/node_modules/.test(assetFilename);
+    },
   },
   optimization: {
     moduleIds: 'deterministic',
