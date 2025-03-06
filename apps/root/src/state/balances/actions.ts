@@ -3,7 +3,7 @@ import { BalancesState, TokenBalancesAndPrices } from './reducer';
 import { createAppAsyncThunk } from '@state/createAppAsyncThunk';
 import { createAction, unwrapResult } from '@reduxjs/toolkit';
 
-import { keyBy, set, union } from 'lodash';
+import { groupBy, keyBy, set, union } from 'lodash';
 import { fetchTokenDetails } from '@state/token-lists/actions';
 import { parseTokenList } from '@common/utils/parsing';
 import { MAIN_NETWORKS } from '@constants';
@@ -107,7 +107,8 @@ export const fetchInitialBalances = createAppAsyncThunk<BalancesState['balances'
         ...tokensLists,
         'custom-tokens': customTokens,
       },
-      curateList: true,
+      // We allow all tokens to be in the balances redux state
+      curateList: false,
     });
 
     for (const [walletAddress, chainBalances] of Object.entries(mergedBalances)) {
@@ -212,22 +213,61 @@ export const updateBalancesPeriodically = createAppAsyncThunk<
   }
 );
 
-export const fetchCustomTokenBalance = createAppAsyncThunk<
-  Promise<Token | undefined>,
-  { tokenAddress: Address; chainId: number }
->('balances/fetchCustomTokenBalance', async ({ tokenAddress, chainId }, { dispatch, extra: { web3Service } }) => {
-  const accountService = web3Service.getAccountService();
-  const wallets = accountService.getWallets();
+export const fetchSpecificTokensBalances = createAppAsyncThunk<
+  Promise<Token[] | undefined>,
+  { tokenAddresses: Address[]; chainId: number; usingCuratedList?: boolean }
+>(
+  'balances/fetchSpecificTokensBalances',
+  async ({ tokenAddresses, chainId, usingCuratedList = true }, { dispatch, getState, extra: { web3Service } }) => {
+    const accountService = web3Service.getAccountService();
+    const wallets = accountService.getWallets();
 
-  try {
-    const token = await dispatch(fetchTokenDetails({ tokenAddress, chainId })).unwrap();
-    const specificTokensPromises = wallets.map((wallet) =>
-      dispatch(updateTokens({ tokens: [token], chainId, walletAddress: wallet.address }))
-    );
+    const { byUrl: tokensLists, customTokens } = getState().tokenLists;
 
-    await Promise.all(specificTokensPromises);
-    return token;
-  } catch (e) {
-    console.error('Failed to add custom token with balance', tokenAddress, chainId, e);
+    const completeTokenList = parseTokenList({
+      tokensLists: {
+        ...tokensLists,
+        'custom-tokens': customTokens,
+      },
+      chainId,
+      curateList: usingCuratedList,
+    });
+
+    try {
+      const tokens = await Promise.all(
+        tokenAddresses.map((tokenAddress) => {
+          const id = `${chainId}-${tokenAddress.toLowerCase()}` as TokenListId;
+          const token = completeTokenList[id];
+          if (token) return token;
+
+          return dispatch(fetchTokenDetails({ tokenAddress, chainId })).unwrap();
+        })
+      );
+      const specificTokensPromises = wallets.map((wallet) =>
+        dispatch(updateTokens({ tokens, chainId, walletAddress: wallet.address }))
+      );
+
+      await Promise.all(specificTokensPromises);
+      return tokens;
+    } catch (e) {
+      console.error('Failed to fetch specific tokens balances', tokenAddresses, chainId, e);
+    }
   }
+);
+
+export const bulkFetchSpecificTokensBalances = createAppAsyncThunk<
+  void,
+  { tokens: Token[]; usingCuratedList?: boolean }
+>('balances/bulkFetchSpecificTokensBalances', async ({ tokens, usingCuratedList = true }, { dispatch }) => {
+  const tokensByChain = groupBy(tokens, 'chainId');
+  const promises = Object.entries(tokensByChain).map(([chainId, sameChainTokens]) =>
+    dispatch(
+      fetchSpecificTokensBalances({
+        tokenAddresses: sameChainTokens.map((token) => token.address),
+        chainId: Number(chainId),
+        usingCuratedList,
+      })
+    )
+  );
+  await Promise.all(promises);
 });

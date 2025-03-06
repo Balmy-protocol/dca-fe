@@ -12,6 +12,7 @@ import { Strategy } from 'common-types';
 import { debounce } from 'lodash';
 import { setSearch } from '@state/strategies-filters/actions';
 import AllStrategiesTableToolbar from '../strategies-table/components/toolbar';
+import { FarmsWithAvailableDepositTokens } from '@hooks/earn/useAvailableDepositTokens';
 
 const ROWS_PER_PAGE = 7;
 
@@ -22,6 +23,8 @@ interface StrategiesTableProps<T extends StrategiesTableVariants> {
   isLoading: boolean;
   withPagination?: boolean;
   showBalances?: boolean;
+  updateFarmTokensBalances?: () => Promise<void>;
+  farmsWithDepositableTokens?: FarmsWithAvailableDepositTokens;
 }
 
 const StrategiesDisplayWrapper = <T extends StrategiesTableVariants>({
@@ -31,6 +34,8 @@ const StrategiesDisplayWrapper = <T extends StrategiesTableVariants>({
   variant,
   withPagination,
   showBalances = true,
+  updateFarmTokensBalances,
+  farmsWithDepositableTokens,
 }: StrategiesTableProps<T>) => {
   const [page, setPage] = React.useState(0);
   const pushToHistory = usePushToHistory();
@@ -68,6 +73,8 @@ const StrategiesDisplayWrapper = <T extends StrategiesTableVariants>({
         handleSearchChange={handleSearchChange}
         variant={variant}
         setPage={setPage}
+        updateFarmTokensBalances={updateFarmTokensBalances}
+        farmsWithDepositableTokens={farmsWithDepositableTokens}
       />
       {shouldShowMobileList ? (
         <StrategiesList

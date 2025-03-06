@@ -11,12 +11,13 @@ import useHasFetchedAllStrategies from '@hooks/earn/useHasFetchedAllStrategies';
 import { FormattedMessage } from 'react-intl';
 import OneClickMigrationCard from '../components/one-click-migration-card';
 import { useIsEarnMobile } from '@hooks/earn/useIsEarnMobile';
+import useAvailableDepositTokens from '@hooks/earn/useAvailableDepositTokens';
 
 const EarnFrame = () => {
   const dispatch = useAppDispatch();
   const earnService = useEarnService();
   const hasFetchedAllStrategies = useHasFetchedAllStrategies();
-
+  const { farmsWithDepositableTokens, updateFarmTokensBalances } = useAvailableDepositTokens();
   React.useEffect(() => {
     dispatch(changeRoute(EARN_ROUTE.key));
   }, []);
@@ -49,12 +50,18 @@ const EarnFrame = () => {
                   />
                 </StyledPageTitleDescription>
               </ContainerBox>
-              <OneClickMigrationCard />
+              <OneClickMigrationCard
+                farmsWithDepositableTokens={farmsWithDepositableTokens}
+                updateFarmTokensBalances={updateFarmTokensBalances}
+              />
             </ContainerBox>
             <EarnWizard />
           </ContainerBox>
           <ContainerBox flex="1">
-            <AllStrategiesTable />
+            <AllStrategiesTable
+              updateFarmTokensBalances={updateFarmTokensBalances}
+              farmsWithDepositableTokens={farmsWithDepositableTokens}
+            />
           </ContainerBox>
         </ContainerBox>
         <EarnFAQ />
