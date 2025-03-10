@@ -283,6 +283,35 @@ export const MNT: Token = {
   chainAddresses: [],
 };
 
+export const SONIC: Token = {
+  chainId: Chains.SONIC.chainId,
+  decimals: 18,
+  address: PROTOCOL_TOKEN_ADDRESS,
+  name: 'Sonic',
+  symbol: 'S',
+  type: TokenType.BASE,
+  logoURI:
+    'https://raw.githubusercontent.com/balmy-protocol/token-list/main/assets/chains/146/0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee.svg',
+  underlyingTokens: [],
+  chainAddresses: [
+    {
+      chainId: Chains.SONIC.chainId,
+      address: PROTOCOL_TOKEN_ADDRESS,
+    },
+  ],
+};
+
+export const WRAPPED_SONIC: Token = {
+  chainId: Chains.SONIC.chainId,
+  decimals: 18,
+  address: '0x039e2fb66102314ce7b64ce5ce3e5183bc94ad38',
+  name: 'Wrapped Sonic',
+  symbol: 'wS',
+  type: TokenType.BASE,
+  underlyingTokens: [],
+  chainAddresses: [],
+};
+
 const generateChainBasedTokens = (chains: number[], token: (chainId: number) => Token) => {
   return chains.reduce<Record<ChainId, (chainId: number) => Token>>((acc, chainId) => {
     // eslint-disable-next-line no-param-reassign
@@ -302,6 +331,7 @@ export const PROTOCOL_TOKEN = {
   [NETWORKS.xdai.chainId]: XDAI,
   [Chains.ROOTSTOCK.chainId]: () => RBTC,
   [Chains.MANTLE.chainId]: () => MNT,
+  [Chains.SONIC.chainId]: () => SONIC,
 };
 
 export const WRAPPED_PROTOCOL_TOKEN = {
@@ -312,6 +342,7 @@ export const WRAPPED_PROTOCOL_TOKEN = {
   [NETWORKS.moonbeam.chainId]: WGLMR,
   [Chains.ROOTSTOCK.chainId]: () => WRBTC,
   [Chains.MANTLE.chainId]: () => WMNT,
+  [Chains.SONIC.chainId]: () => WRAPPED_SONIC,
 };
 
 export const getProtocolToken = (chainId: number) => {
