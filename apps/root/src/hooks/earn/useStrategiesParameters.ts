@@ -8,6 +8,7 @@ import { sdkStrategyTokenToToken, yieldTypeFormatter } from '@common/utils/earn/
 import { useIntl } from 'react-intl';
 import { removeEquivalentFromTokensArray } from '@common/utils/currency';
 import { StrategiesTableVariants } from '@state/strategies-filters/reducer';
+import { SUPPORTED_NETWORKS_EARN } from '@constants';
 
 interface ParsedStrategiesParameters {
   protocols: string[];
@@ -54,7 +55,9 @@ export function useStrategiesParameters(variant: StrategiesTableVariants): Parse
 
     return {
       protocols: parameters.protocols,
-      networks: Object.values(parameters.networks),
+      networks: Object.values(parameters.networks).filter((network) =>
+        SUPPORTED_NETWORKS_EARN.includes(network.chainId)
+      ),
       assets: removeEquivalentFromTokensArray(assets),
       rewards: removeEquivalentFromTokensArray(rewards),
       yieldTypes,
