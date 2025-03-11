@@ -386,6 +386,7 @@ export const SUPPORTED_NETWORKS = [
   Chains.BASE.chainId,
   Chains.MODE.chainId,
   Chains.MANTLE.chainId,
+  Chains.SONIC.chainId,
 ];
 
 export const SUPPORTED_NETWORKS_DCA = [
@@ -604,27 +605,9 @@ export const EXPLORER_URL = getAllChains().reduce<Record<number, string>>(
     [NETWORKS.harmony.chainId]: 'https://explorer.harmony.one/#/',
     [NETWORKS.xdai.chainId]: 'https://gnosisscan.io/',
     [NETWORKS.baseGoerli.chainId]: 'https://goerli.basescan.org/',
+    [Chains.SONIC.chainId]: 'https://sonicscan.org/',
   }
 );
-
-export const TOKEN_LISTS = {
-  'tokens.1inch.eth': {
-    name: '1inch',
-    homepage: '',
-  },
-  'https://www.gemini.com/uniswap/manifest.json': {
-    name: 'Gemini Token List',
-    homepage: 'https://www.gemini.com/',
-  },
-  'https://gateway.ipfs.io/ipns/tokens.uniswap.org': {
-    name: 'Uniswap Default List',
-    homepage: '',
-  },
-  'https://tokens.coingecko.com/uniswap/all.json': {
-    name: 'CoinGecko',
-    homepage: '',
-  },
-};
 
 export const STABLE_COINS = [
   // Common
