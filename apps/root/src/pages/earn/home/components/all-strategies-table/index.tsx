@@ -11,10 +11,10 @@ const variant = StrategiesTableVariants.ALL_STRATEGIES;
 
 const AllStrategiesTable = ({
   farmsWithDepositableTokens,
-  updateFarmTokensBalances,
+  handleMigrationModalOpen,
 }: {
   farmsWithDepositableTokens: FarmsWithAvailableDepositTokens;
-  updateFarmTokensBalances: () => Promise<void>;
+  handleMigrationModalOpen: () => void;
 }) => {
   const hasFetchedAllStrategies = useHasFetchedAllStrategies();
   const strategies = useAllStrategiesForTable();
@@ -33,8 +33,8 @@ const AllStrategiesTable = ({
       strategies={filteredStrategies}
       isLoading={!hasFetchedAllStrategies}
       withPagination
-      updateFarmTokensBalances={updateFarmTokensBalances}
       farmsWithDepositableTokens={farmsWithDepositableTokens}
+      handleMigrationModalOpen={handleMigrationModalOpen}
     />
   );
 };

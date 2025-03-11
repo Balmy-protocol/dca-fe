@@ -14,7 +14,7 @@ interface OneClickMigrationModalProps {
   open: boolean;
   onClose: () => void;
   farmsWithDepositableTokens: FarmsWithAvailableDepositTokens;
-  updateFarmTokensBalances?: () => Promise<void>;
+  isFetchingDepositTokenBalances: boolean;
 }
 
 enum OneClickMigrationModalStep {
@@ -26,13 +26,12 @@ const OneClickMigrationModal = ({
   open,
   onClose,
   farmsWithDepositableTokens,
-  updateFarmTokensBalances,
+  isFetchingDepositTokenBalances,
 }: OneClickMigrationModalProps) => {
   const [step, setStep] = React.useState<OneClickMigrationModalStep>(OneClickMigrationModalStep.SELECT_VAULTS);
   const [selectedFarm, setSelectedFarm] = React.useState<FarmWithAvailableDepositTokens | null>(null);
   const pushToHistory = usePushToHistory();
   const { trackEvent } = useAnalytics();
-  const [isFetchingDepositTokenBalances, setIsFetchingDepositTokenBalances] = React.useState(false);
 
   const handleClose = React.useCallback(() => {
     onClose();
@@ -54,17 +53,6 @@ const OneClickMigrationModal = ({
     },
     [pushToHistory, trackEvent, handleClose]
   );
-
-  React.useEffect(() => {
-    const fetchDepositTokens = async () => {
-      if (open && updateFarmTokensBalances) {
-        setIsFetchingDepositTokenBalances(true);
-        await updateFarmTokensBalances();
-        setIsFetchingDepositTokenBalances(false);
-      }
-    };
-    void fetchDepositTokens();
-  }, [open]);
 
   const handleOnGoToDetails = (farm: FarmWithAvailableDepositTokens) => {
     setStep(OneClickMigrationModalStep.CONFIRM_MIGRATION);

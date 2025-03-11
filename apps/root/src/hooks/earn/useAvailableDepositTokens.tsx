@@ -4,15 +4,11 @@ import { Address, AmountsOfToken, FarmId, Strategy, StrategyFarm, Token, TokenTy
 import React from 'react';
 import useAllStrategies from './useAllStrategies';
 import { formatUnits } from 'viem';
-import useEarnService from './useEarnService';
 import useTierLevel from '@hooks/tiers/useTierLevel';
-import { compact, isNil, uniqBy } from 'lodash';
-import usePriceService from '@hooks/usePriceService';
+import { isNil, uniqBy } from 'lodash';
 import useHasFetchedAllStrategies from './useHasFetchedAllStrategies';
-import { bulkFetchSpecificTokensBalances } from '@state/balances/actions';
+import { updateAndParseEarnDepositTokenBalances } from '@state/balances/actions';
 import { useAppDispatch } from '@state/hooks';
-import useTokenList from '@hooks/useTokenList';
-import { getTokenListId } from '@common/utils/parsing';
 
 export interface TokenWithStrategy extends Token {
   strategy: Strategy;
@@ -31,23 +27,26 @@ export type FarmWithAvailableDepositTokens = {
 
 export type FarmsWithAvailableDepositTokens = FarmWithAvailableDepositTokens[];
 
-type DepositTokenWithBalance = {
+export type DepositTokenWithBalance = {
   token: TokenWithStrategy;
   balances: [string, bigint][];
   price?: number;
 };
 
-type UnderlyingTokens = Record<string, { underlying: Token; underlyingAmount: string; price: number }>;
+export type EarnDepositTokenUnderlyingTokens = Record<
+  string,
+  { underlying: Token; underlyingAmount: string; price: number }
+>;
 
 type State = {
   // The key is chainId-tokenAddress-amount
-  resultsWithPrices: UnderlyingTokens;
+  resultsWithPrices: EarnDepositTokenUnderlyingTokens;
   farmsWithDepositableTokens: FarmsWithAvailableDepositTokens;
 };
 
 const parseTokensWithBalanceToFarmsWithDepositableTokens = (
   depositTokensWithBalance: DepositTokenWithBalance[],
-  underlyingTokens: UnderlyingTokens
+  underlyingTokens: EarnDepositTokenUnderlyingTokens
 ) => {
   return Object.values(
     depositTokensWithBalance.reduce<Record<`${FarmId}-${Address}`, FarmWithAvailableDepositTokens>>(
@@ -111,17 +110,12 @@ const parseTokensWithBalanceToFarmsWithDepositableTokens = (
 
 const useAvailableDepositTokens = () => {
   const strategies = useAllStrategies();
-  const isLoadingStrategies = !useHasFetchedAllStrategies();
+  const hasFetchedAllStrategies = useHasFetchedAllStrategies();
+  const { isLoadingAllBalances } = useAllBalances();
   const fetchedInitialBalances = React.useRef(false);
+  const fetchedDepositTokens = React.useRef(false);
+  const [isFetchingDepositTokenBalances, setIsFetchingDepositTokenBalances] = React.useState(true);
   const dispatch = useAppDispatch();
-  const completeTokenList = useTokenList({ curateList: false });
-
-  const allBalances = useAllBalances();
-
-  const earnService = useEarnService();
-
-  const priceService = usePriceService();
-
   const { tierLevel } = useTierLevel();
 
   const [{ resultsWithPrices, farmsWithDepositableTokens }, setState] = React.useState<State>({
@@ -130,7 +124,7 @@ const useAvailableDepositTokens = () => {
   });
 
   const depositTokens = React.useMemo(() => {
-    if (isLoadingStrategies) return [];
+    if (!hasFetchedAllStrategies) return [];
     const depositTokenList = strategies
       .filter((strategy) => isNil(strategy.needsTier) || isNil(tierLevel) || strategy.needsTier <= tierLevel)
       .reduce<TokenWithStrategy[]>((acc, strategy) => {
@@ -145,114 +139,48 @@ const useAvailableDepositTokens = () => {
       }, []);
 
     return uniqBy(depositTokenList, (token) => `${token.chainId}-${token.address}`);
-  }, [strategies, tierLevel]);
+  }, [strategies, hasFetchedAllStrategies, tierLevel]);
 
-  const depositTokensWithBalance = React.useMemo<DepositTokenWithBalance[]>(
-    () =>
-      depositTokens
-        .filter((token) => {
-          const chainBalancesAndPrices = allBalances.balances[token.chainId];
-          if (!chainBalancesAndPrices) return false;
-
-          const tokenBalances = chainBalancesAndPrices.balancesAndPrices[token.address];
-          if (!tokenBalances) return false;
-
-          const walletBalances = Object.entries(tokenBalances.balances).filter(([, balance]) => balance > 0n);
-          return walletBalances.length > 0;
-        })
-        .map((token) => {
-          const chainBalancesAndPrices = allBalances.balances[token.chainId];
-          const tokenBalances = chainBalancesAndPrices.balancesAndPrices[token.address];
-          const balances = Object.entries(tokenBalances.balances);
-          return {
-            token,
-            balances,
-            price: tokenBalances.price,
-          };
-        }),
-    [depositTokens, allBalances]
-  );
-
-  const processFarmTokensBalances = React.useCallback(async () => {
-    const tokensToTransform = depositTokensWithBalance
-      .reduce(
-        (acc, { token, balances }) => {
-          balances.forEach(([, balance]) => {
-            acc.push({ token, amount: balance });
-          });
-          return acc;
-        },
-        [] as { token: Token; amount: bigint }[]
-      )
-      // Exclude tokens that have already been transformed
-      .filter(
-        ({ token, amount }) =>
-          !Object.keys(resultsWithPrices).includes(`${token.chainId}-${token.address}-${amount}`) && amount > 0n
-      );
-    if (tokensToTransform.length === 0) return;
-
-    try {
-      const response = await earnService.transformVaultTokensToUnderlying(tokensToTransform);
-      const underlyingTokens = tokensToTransform.map(({ token, amount }) => {
-        const underlying = response[`${token.chainId}-${token.address}-${amount}`];
-        if (!underlying) {
-          return null;
-        }
-        return completeTokenList[getTokenListId({ tokenAddress: underlying.underlying, chainId: token.chainId })];
-      });
-      const priceResponse = await priceService.getUsdCurrentPrices(compact(underlyingTokens));
-      const updatedResultsWithPrices = Object.fromEntries(
-        compact(
-          Object.entries(response).map(([key, value]) => {
-            const underlyingChainId = underlyingTokens.find((token) => token?.address === value.underlying)?.chainId;
-            if (!underlyingChainId) return null;
-
-            const chainPrices = priceResponse[underlyingChainId];
-            if (!chainPrices) return null;
-
-            const underlyingPrice = chainPrices[value.underlying];
-            if (!underlyingPrice) return null;
-
-            const underlyingToken =
-              completeTokenList[getTokenListId({ tokenAddress: value.underlying, chainId: underlyingChainId })];
-            if (!underlyingToken) return null;
-
-            return [
-              key,
-              { underlying: underlyingToken, underlyingAmount: value.underlyingAmount, price: underlyingPrice.price },
-            ];
-          })
-        )
-      );
+  const onUpdateDepositTokens = React.useCallback(
+    async ({ shouldUpdateBalances }: { shouldUpdateBalances?: boolean }) => {
+      const response = await dispatch(
+        updateAndParseEarnDepositTokenBalances({ depositTokens, resultsWithPrices, shouldUpdateBalances })
+      ).unwrap();
+      if (!response) return;
 
       setState((prev) => ({
-        resultsWithPrices: { ...prev.resultsWithPrices, ...updatedResultsWithPrices },
-        farmsWithDepositableTokens: parseTokensWithBalanceToFarmsWithDepositableTokens(depositTokensWithBalance, {
-          ...prev.resultsWithPrices,
-          ...updatedResultsWithPrices,
-        }),
+        resultsWithPrices: { ...prev.resultsWithPrices, ...response.updatedResultsWithPrices },
+        farmsWithDepositableTokens: parseTokensWithBalanceToFarmsWithDepositableTokens(
+          response.depositTokensWithBalance,
+          {
+            ...prev.resultsWithPrices,
+            ...response.updatedResultsWithPrices,
+          }
+        ),
       }));
-    } catch (e) {
-      console.error(e);
-    }
-  }, [depositTokensWithBalance, earnService, priceService, resultsWithPrices, completeTokenList]);
+
+      setIsFetchingDepositTokenBalances(false);
+    },
+    [dispatch, depositTokens]
+  );
 
   React.useEffect(() => {
-    if (depositTokensWithBalance.length > 0 && !fetchedInitialBalances.current) {
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      processFarmTokensBalances();
+    if (hasFetchedAllStrategies && !isLoadingAllBalances && !fetchedInitialBalances.current) {
       fetchedInitialBalances.current = true;
+      void onUpdateDepositTokens({ shouldUpdateBalances: false });
     }
-  }, [depositTokensWithBalance, processFarmTokensBalances]);
+  }, [hasFetchedAllStrategies, isLoadingAllBalances]);
 
   const updateFarmTokensBalances = React.useCallback(async () => {
-    await dispatch(bulkFetchSpecificTokensBalances({ tokens: depositTokens, usingCuratedList: false }));
-    await processFarmTokensBalances();
-  }, [processFarmTokensBalances, dispatch, depositTokens]);
+    if (fetchedDepositTokens.current) return;
+    fetchedDepositTokens.current = true;
+    setIsFetchingDepositTokenBalances(true);
+    await onUpdateDepositTokens({ shouldUpdateBalances: true });
+  }, [dispatch, fetchedDepositTokens, depositTokens]);
 
   return React.useMemo(
-    () => ({ farmsWithDepositableTokens, updateFarmTokensBalances }),
-    [farmsWithDepositableTokens, updateFarmTokensBalances]
+    () => ({ farmsWithDepositableTokens, updateFarmTokensBalances, isFetchingDepositTokenBalances }),
+    [farmsWithDepositableTokens, updateFarmTokensBalances, isFetchingDepositTokenBalances]
   );
 };
 

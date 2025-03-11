@@ -23,8 +23,8 @@ interface StrategiesTableProps<T extends StrategiesTableVariants> {
   isLoading: boolean;
   withPagination?: boolean;
   showBalances?: boolean;
-  updateFarmTokensBalances?: () => Promise<void>;
   farmsWithDepositableTokens?: FarmsWithAvailableDepositTokens;
+  handleMigrationModalOpen?: () => void;
 }
 
 const StrategiesDisplayWrapper = <T extends StrategiesTableVariants>({
@@ -34,8 +34,8 @@ const StrategiesDisplayWrapper = <T extends StrategiesTableVariants>({
   variant,
   withPagination,
   showBalances = true,
-  updateFarmTokensBalances,
   farmsWithDepositableTokens,
+  handleMigrationModalOpen,
 }: StrategiesTableProps<T>) => {
   const [page, setPage] = React.useState(0);
   const pushToHistory = usePushToHistory();
@@ -73,8 +73,8 @@ const StrategiesDisplayWrapper = <T extends StrategiesTableVariants>({
         handleSearchChange={handleSearchChange}
         variant={variant}
         setPage={setPage}
-        updateFarmTokensBalances={updateFarmTokensBalances}
         farmsWithDepositableTokens={farmsWithDepositableTokens}
+        handleMigrationModalOpen={handleMigrationModalOpen}
       />
       {shouldShowMobileList ? (
         <StrategiesList

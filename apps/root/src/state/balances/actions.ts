@@ -3,10 +3,17 @@ import { BalancesState, TokenBalancesAndPrices } from './reducer';
 import { createAppAsyncThunk } from '@state/createAppAsyncThunk';
 import { createAction, unwrapResult } from '@reduxjs/toolkit';
 
-import { groupBy, keyBy, set, union } from 'lodash';
+import { compact, groupBy, keyBy, set, union } from 'lodash';
 import { fetchTokenDetails } from '@state/token-lists/actions';
-import { parseTokenList } from '@common/utils/parsing';
+import { getTokenListId, parseTokenList } from '@common/utils/parsing';
 import { MAIN_NETWORKS } from '@constants';
+
+import { getDepositTokensWithBalances } from '@common/utils/earn/parsing';
+import {
+  DepositTokenWithBalance,
+  EarnDepositTokenUnderlyingTokens,
+  TokenWithStrategy,
+} from '@hooks/earn/useAvailableDepositTokens';
 
 export const cleanBalances = createAction('balances/cleanBalances');
 
@@ -102,7 +109,7 @@ export const fetchInitialBalances = createAppAsyncThunk<BalancesState['balances'
     const mergedBalances = accountBalancesResponse?.balances || {};
     const { byUrl: tokensLists, customTokens } = getState().tokenLists;
 
-    const curatedTokenList = parseTokenList({
+    const tokenList = parseTokenList({
       tokensLists: {
         ...tokensLists,
         'custom-tokens': customTokens,
@@ -118,7 +125,7 @@ export const fetchInitialBalances = createAppAsyncThunk<BalancesState['balances'
         for (const [tokenAddress, balance] of Object.entries(tokenBalance)) {
           try {
             const id = `${chainId}-${tokenAddress.toLowerCase()}` as TokenListId;
-            let token = curatedTokenList[id];
+            let token = tokenList[id];
 
             if (!token) {
               token = unwrapResult(
@@ -214,7 +221,7 @@ export const updateBalancesPeriodically = createAppAsyncThunk<
 );
 
 export const fetchSpecificTokensBalances = createAppAsyncThunk<
-  Promise<Token[] | undefined>,
+  Token[] | undefined,
   { tokenAddresses: Address[]; chainId: number; usingCuratedList?: boolean }
 >(
   'balances/fetchSpecificTokensBalances',
@@ -234,7 +241,7 @@ export const fetchSpecificTokensBalances = createAppAsyncThunk<
     });
 
     try {
-      const tokens = await Promise.all(
+      const tokenResults = await Promise.allSettled(
         tokenAddresses.map((tokenAddress) => {
           const id = `${chainId}-${tokenAddress.toLowerCase()}` as TokenListId;
           const token = completeTokenList[id];
@@ -242,12 +249,14 @@ export const fetchSpecificTokensBalances = createAppAsyncThunk<
 
           return dispatch(fetchTokenDetails({ tokenAddress, chainId })).unwrap();
         })
-      );
+      ).then((results) => results.map((result) => (result.status === 'fulfilled' ? result.value : undefined)));
+      const tokens = compact(tokenResults);
+
       const specificTokensPromises = wallets.map((wallet) =>
         dispatch(updateTokens({ tokens, chainId, walletAddress: wallet.address }))
       );
 
-      await Promise.all(specificTokensPromises);
+      await Promise.allSettled(specificTokensPromises);
       return tokens;
     } catch (e) {
       console.error('Failed to fetch specific tokens balances', tokenAddresses, chainId, e);
@@ -269,5 +278,108 @@ export const bulkFetchSpecificTokensBalances = createAppAsyncThunk<
       })
     )
   );
-  await Promise.all(promises);
+  await Promise.allSettled(promises);
 });
+
+export const updateAndParseEarnDepositTokenBalances = createAppAsyncThunk<
+  | {
+      depositTokensWithBalance: DepositTokenWithBalance[];
+      updatedResultsWithPrices: EarnDepositTokenUnderlyingTokens;
+    }
+  | undefined,
+  {
+    depositTokens: TokenWithStrategy[];
+    resultsWithPrices: EarnDepositTokenUnderlyingTokens;
+    shouldUpdateBalances?: boolean;
+  }
+>(
+  'balances/updateAndParseEarnDepositTokenBalances',
+  async (
+    { depositTokens, resultsWithPrices, shouldUpdateBalances = true },
+    { dispatch, getState, extra: { web3Service } }
+  ) => {
+    const earnService = web3Service.getEarnService();
+    const priceService = web3Service.getPriceService();
+
+    if (shouldUpdateBalances) {
+      await dispatch(bulkFetchSpecificTokensBalances({ tokens: depositTokens }));
+    }
+
+    // Now we get the recent balances that where just updated
+    const { balances: updatedAllBalances, tokenLists } = getState();
+
+    const depositTokensWithBalance = getDepositTokensWithBalances(depositTokens, updatedAllBalances);
+
+    const tokensToTransform = depositTokensWithBalance
+      .reduce(
+        (acc, { token, balances }) => {
+          balances.forEach(([, balance]) => {
+            acc.push({ token, amount: balance });
+          });
+          return acc;
+        },
+        [] as { token: Token; amount: bigint }[]
+      )
+      // Exclude tokens that have already been transformed
+      .filter(
+        ({ token, amount }) =>
+          !Object.keys(resultsWithPrices).includes(`${token.chainId}-${token.address}-${amount}`) && amount > 0n
+      );
+    if (tokensToTransform.length === 0)
+      return {
+        depositTokensWithBalance,
+        updatedResultsWithPrices: {},
+      };
+
+    const { byUrl: tokensLists, customTokens } = tokenLists;
+    const completeTokenList = parseTokenList({
+      tokensLists: {
+        ...tokensLists,
+        'custom-tokens': customTokens,
+      },
+      curateList: false,
+    });
+
+    try {
+      const response = await earnService.transformVaultTokensToUnderlying(tokensToTransform);
+      const underlyingTokens = tokensToTransform.map(({ token, amount }) => {
+        const underlying = response[`${token.chainId}-${token.address}-${amount}`];
+        if (!underlying) {
+          return null;
+        }
+        return completeTokenList[getTokenListId({ tokenAddress: underlying.underlying, chainId: token.chainId })];
+      });
+      const priceResponse = await priceService.getUsdCurrentPrices(compact(underlyingTokens));
+      const updatedResultsWithPrices = Object.fromEntries(
+        compact(
+          Object.entries(response).map(([key, value]) => {
+            const underlyingChainId = underlyingTokens.find((token) => token?.address === value.underlying)?.chainId;
+            if (!underlyingChainId) return null;
+
+            const chainPrices = priceResponse[underlyingChainId];
+            if (!chainPrices) return null;
+
+            const underlyingPrice = chainPrices[value.underlying];
+            if (!underlyingPrice) return null;
+
+            const underlyingToken =
+              completeTokenList[getTokenListId({ tokenAddress: value.underlying, chainId: underlyingChainId })];
+            if (!underlyingToken) return null;
+
+            return [
+              key,
+              { underlying: underlyingToken, underlyingAmount: value.underlyingAmount, price: underlyingPrice.price },
+            ];
+          })
+        )
+      );
+
+      return {
+        depositTokensWithBalance,
+        updatedResultsWithPrices,
+      };
+    } catch (e) {
+      console.error(e);
+    }
+  }
+);

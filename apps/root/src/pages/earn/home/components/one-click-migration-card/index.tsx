@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
 import { useThemeMode } from '@state/config/hooks';
 import { FarmsWithAvailableDepositTokens } from '@hooks/earn/useAvailableDepositTokens';
-import OneClickMigrationModal from '../one-click-migration-modal';
+import useAnalytics from '@hooks/useAnalytics';
 
 const StyledOneClickMigrationCard = styled(ContainerBox).attrs(() => ({ gap: 2, alignItems: 'center' }))`
   ${({
@@ -24,13 +24,18 @@ const StyledOneClickMigrationCard = styled(ContainerBox).attrs(() => ({ gap: 2, 
 
 const OneClickMigrationCard = ({
   farmsWithDepositableTokens,
-  updateFarmTokensBalances,
+  handleMigrationModalOpen,
 }: {
   farmsWithDepositableTokens: FarmsWithAvailableDepositTokens;
-  updateFarmTokensBalances: () => Promise<void>;
+  handleMigrationModalOpen: () => void;
 }) => {
   const mode = useThemeMode();
-  const [open, setOpen] = React.useState(false);
+  const { trackEvent } = useAnalytics();
+
+  const onMigrationModalOpen = () => {
+    trackEvent('Earn - One click migration card - Open migration modal');
+    handleMigrationModalOpen();
+  };
 
   const filteredFarmsWithDepositableTokens = React.useMemo(() => {
     return farmsWithDepositableTokens.filter((farm) => Number(farm.balance.amountInUSD) > 1);
@@ -41,47 +46,36 @@ const OneClickMigrationCard = ({
   }
 
   return (
-    <>
-      <OneClickMigrationModal
-        open={open}
-        onClose={() => setOpen(false)}
-        farmsWithDepositableTokens={filteredFarmsWithDepositableTokens}
-        updateFarmTokensBalances={updateFarmTokensBalances}
-      />
-      <StyledOneClickMigrationCard>
-        <ContainerBox>
-          <InfoCircleIcon fontSize="large" sx={{ color: colors[mode].semantic.informative.primary }} />
-        </ContainerBox>
-        <ContainerBox gap={1} flexDirection="column" flex={1}>
-          <Typography variant="bodySmallBold">
-            <FormattedMessage
-              defaultMessage="Migrate Your Vaults for Full Protection and Tracking"
-              description="earn.one-click-migration-card.title"
-            />
-          </Typography>
-          <Typography variant="bodySmallRegular">
-            <FormattedMessage
-              defaultMessage="We've detected <span>({amount})</span> investments on external platforms. Migrate them for Guardian protection, improved tracking, and detailed performance insights."
-              description="earn.one-click-migration-card.description"
-              values={{
-                amount: farmsWithDepositableTokens.length,
-                span: (chunks) => (
-                  <Typography variant="bodySmallBold" color={colors[mode].semantic.informative.primary}>
-                    {chunks}
-                  </Typography>
-                ),
-              }}
-            />
-          </Typography>
-        </ContainerBox>
-        <Button variant="text" color="primary" onClick={() => setOpen(true)}>
+    <StyledOneClickMigrationCard>
+      <ContainerBox>
+        <InfoCircleIcon fontSize="large" sx={{ color: colors[mode].semantic.informative.primary }} />
+      </ContainerBox>
+      <ContainerBox gap={1} flexDirection="column" flex={1}>
+        <Typography variant="bodySmallBold">
           <FormattedMessage
-            defaultMessage="View vaults"
-            description="earn.one-click-migration-card.view-vaults-button"
+            defaultMessage="Migrate Your Vaults for Full Protection and Tracking"
+            description="earn.one-click-migration-card.title"
           />
-        </Button>
-      </StyledOneClickMigrationCard>
-    </>
+        </Typography>
+        <Typography variant="bodySmallRegular">
+          <FormattedMessage
+            defaultMessage="We've detected <span>({amount})</span> investments on external platforms. Migrate them for Guardian protection, improved tracking, and detailed performance insights."
+            description="earn.one-click-migration-card.description"
+            values={{
+              amount: farmsWithDepositableTokens.length,
+              span: (chunks) => (
+                <Typography variant="bodySmallBold" color={colors[mode].semantic.informative.primary}>
+                  {chunks}
+                </Typography>
+              ),
+            }}
+          />
+        </Typography>
+      </ContainerBox>
+      <Button variant="text" color="primary" onClick={onMigrationModalOpen}>
+        <FormattedMessage defaultMessage="View vaults" description="earn.one-click-migration-card.view-vaults-button" />
+      </Button>
+    </StyledOneClickMigrationCard>
   );
 };
 

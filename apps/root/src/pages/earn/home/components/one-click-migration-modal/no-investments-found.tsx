@@ -1,5 +1,5 @@
 import React from 'react';
-import { colors, ContainerBox, MigrationEmptyWallet, Typography } from 'ui-library';
+import { colors, ContainerBox, MigrationEmptyWallet, SPACING, Typography } from 'ui-library';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
@@ -17,7 +17,7 @@ const StyledContainer = styled(ContainerBox).attrs({
 
 const NoInvestmentsFound = () => (
   <StyledContainer>
-    <MigrationEmptyWallet width="90px" height="70px" />
+    <MigrationEmptyWallet width={SPACING(22.5)} height={SPACING(17.5)} />
     <ContainerBox flexDirection="column" gap={2} alignItems="center">
       <Typography variant="h5Bold" color={({ palette }) => colors[palette.mode].typography.typo1}>
         <FormattedMessage

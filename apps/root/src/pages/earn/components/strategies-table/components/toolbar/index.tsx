@@ -18,7 +18,7 @@ interface AllStrategiesTableToolbarProps {
   strategiesCount: number;
   setPage: (page: number) => void;
   farmsWithDepositableTokens?: FarmsWithAvailableDepositTokens;
-  updateFarmTokensBalances?: () => Promise<void>;
+  handleMigrationModalOpen?: () => void;
 }
 
 const StyledTextField = styled(TextField)`
@@ -35,7 +35,7 @@ const AllStrategiesTableToolbar = ({
   strategiesCount,
   setPage,
   farmsWithDepositableTokens,
-  updateFarmTokensBalances,
+  handleMigrationModalOpen,
 }: AllStrategiesTableToolbarProps) => {
   const intl = useIntl();
   const dispatch = useAppDispatch();
@@ -56,7 +56,7 @@ const AllStrategiesTableToolbar = ({
       {variant === StrategiesTableVariants.ALL_STRATEGIES ? (
         <AllStrategiesHeading
           farmsWithDepositableTokens={farmsWithDepositableTokens}
-          updateFarmTokensBalances={updateFarmTokensBalances}
+          handleMigrationModalOpen={handleMigrationModalOpen}
         />
       ) : (
         <ContainerBox alignItems="center" gap={2}>
