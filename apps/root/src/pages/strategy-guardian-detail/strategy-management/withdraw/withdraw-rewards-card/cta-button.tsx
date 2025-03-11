@@ -31,6 +31,7 @@ const WithdrawRewardsCardCTAButton = ({
       variant="text"
       color="primary"
       onClick={handleWithdraw}
+      size="small"
       endIcon={requireCompanionSignature ? <ArrowForwardIcon /> : undefined}
     >
       <FormattedMessage
@@ -41,7 +42,7 @@ const WithdrawRewardsCardCTAButton = ({
   );
 
   const IncorrectNetworkButton = (
-    <Button variant="text" color="primary" onClick={() => onChangeNetwork(network?.chainId)} fullWidth>
+    <Button variant="text" size="small" color="primary" onClick={() => onChangeNetwork(network?.chainId)}>
       <FormattedMessage
         description="earn.strategy-management.withdraw-rewards-card.button.wrong-network"
         defaultMessage="Change to {network}"
@@ -57,7 +58,7 @@ const WithdrawRewardsCardCTAButton = ({
   };
 
   const ReconnectWalletButton = (
-    <Button size="large" variant="contained" fullWidth onClick={onReconnectWallet}>
+    <Button size="small" variant="contained" onClick={onReconnectWallet}>
       <FormattedMessage
         description="earn.strategy-management.withdraw-rewards-card.button.reconnect-wallet"
         defaultMessage="Connect {wallet}"
