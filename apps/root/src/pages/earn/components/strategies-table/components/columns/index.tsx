@@ -14,7 +14,6 @@ import {
 } from 'ui-library';
 import TokenIcon from '@common/components/token-icon';
 import ComposedTokenIcon from '@common/components/composed-token-icon';
-import { usdFormatter } from '@common/utils/parsing';
 import { emptyTokenWithAddress, emptyTokenWithLogoURI } from '@common/utils/currency';
 import { getTokensWithBalanceAndApy, parseUserStrategiesFinancialData } from '@common/utils/earn/parsing';
 import styled from 'styled-components';
@@ -263,12 +262,12 @@ export const strategyColumnConfigs: StrategyColumnConfig<StrategiesTableVariants
     renderCell: (data) => data.network.name,
     getOrderValue: (data) => data.network.name,
   },
-  {
-    key: StrategyColumnKeys.TVL,
-    label: <FormattedMessage description="earn.all-strategies-table.column.tvl" defaultMessage="TVL" />,
-    renderCell: (data) => `$${usdFormatter(data.farm.tvl)}`,
-    getOrderValue: (data) => data.farm.tvl,
-  },
+  // {
+  //   key: StrategyColumnKeys.TVL,
+  //   label: <FormattedMessage description="earn.all-strategies-table.column.tvl" defaultMessage="TVL" />,
+  //   renderCell: (data) => `$${usdFormatter(data.farm.tvl)}`,
+  //   getOrderValue: (data) => data.farm.tvl,
+  // },
   {
     key: StrategyColumnKeys.APY,
     label: <FormattedMessage description="earn.all-strategies-table.column.apy" defaultMessage="APY" />,
