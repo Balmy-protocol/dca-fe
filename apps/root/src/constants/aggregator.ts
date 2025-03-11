@@ -146,4 +146,5 @@ export const AGGREGATOR_SUPPORTED_CHAINS: ChainId[] = [
   Chains.BLAST.chainId,
   Chains.CRONOS.chainId,
   Chains.MANTLE.chainId,
+  Chains.SONIC.chainId,
 ].filter((chainId) => aggSupportedChains.includes(chainId));

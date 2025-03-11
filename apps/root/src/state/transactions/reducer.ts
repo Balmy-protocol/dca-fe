@@ -61,6 +61,7 @@ export default createReducer(initialState, (builder) => {
     .addCase(checkedTransaction, (state, { payload: { hash, chainId } }) => {
       if (!state[chainId] || !state[chainId][hash]) {
         console.error('Attempted to check inexisting transaction.');
+        return;
       }
 
       state[chainId][hash].checking = false;

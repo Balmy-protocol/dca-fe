@@ -6,6 +6,7 @@ import useServiceEvents from '@hooks/useServiceEvents';
 import { EarnService, EarnServiceData } from '@services/earnService';
 import { Strategy } from 'common-types';
 import { useIntl } from 'react-intl';
+import { SUPPORTED_NETWORKS_EARN } from '@constants';
 
 export default function useAllStrategies() {
   const earnService = useEarnService();
@@ -18,7 +19,10 @@ export default function useAllStrategies() {
   );
 
   return React.useMemo<Strategy[]>(
-    () => parseAllStrategies({ strategies: allStrategies, tokenList, intl }),
+    () =>
+      parseAllStrategies({ strategies: allStrategies, tokenList, intl }).filter((strategy) =>
+        SUPPORTED_NETWORKS_EARN.includes(strategy.network.chainId)
+      ),
     [allStrategies, tokenList, intl]
   );
 }
