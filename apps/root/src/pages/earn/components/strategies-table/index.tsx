@@ -64,6 +64,7 @@ const StyledBackgroundPaper = styled(BackgroundPaper).attrs({ variant: 'outlined
   flex-direction: column;
   align-items: center;
   position: relative;
+  overflow: visible;
 `;
 
 const StyledTableRow = styled(TableRow)<{ $condition?: StrategyConditionType }>`

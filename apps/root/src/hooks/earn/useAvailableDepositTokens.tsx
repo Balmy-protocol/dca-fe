@@ -4,10 +4,11 @@ import { Address, AmountsOfToken, FarmId, Strategy, StrategyFarm, Token, TokenTy
 import React from 'react';
 import useAllStrategies from './useAllStrategies';
 import { formatUnits } from 'viem';
-import useEarnService from './useEarnService';
 import useTierLevel from '@hooks/tiers/useTierLevel';
-import { compact, isNil } from 'lodash';
-import usePriceService from '@hooks/usePriceService';
+import { isNil, uniqBy } from 'lodash';
+import useHasFetchedAllStrategies from './useHasFetchedAllStrategies';
+import { updateAndParseEarnDepositTokenBalances } from '@state/balances/actions';
+import { useAppDispatch } from '@state/hooks';
 
 export interface TokenWithStrategy extends Token {
   strategy: Strategy;
@@ -26,25 +27,105 @@ export type FarmWithAvailableDepositTokens = {
 
 export type FarmsWithAvailableDepositTokens = FarmWithAvailableDepositTokens[];
 
-const useAvailableDepositTokens = ({ filterSmallValues = false }: { filterSmallValues?: boolean } = {}) => {
+export type DepositTokenWithBalance = {
+  token: TokenWithStrategy;
+  balances: [string, bigint][];
+  price?: number;
+};
+
+export type EarnDepositTokenUnderlyingTokens = Record<
+  string,
+  { underlying: Token; underlyingAmount: string; price: number }
+>;
+
+type State = {
+  // The key is chainId-tokenAddress-amount
+  resultsWithPrices: EarnDepositTokenUnderlyingTokens;
+  farmsWithDepositableTokens: FarmsWithAvailableDepositTokens;
+};
+
+const parseTokensWithBalanceToFarmsWithDepositableTokens = (
+  depositTokensWithBalance: DepositTokenWithBalance[],
+  underlyingTokens: EarnDepositTokenUnderlyingTokens
+) => {
+  return Object.values(
+    depositTokensWithBalance.reduce<Record<`${FarmId}-${Address}`, FarmWithAvailableDepositTokens>>(
+      (acc, { token, balances, price }) => {
+        balances.forEach(([walletAddress, balance]: [Address, bigint]) => {
+          // eslint-disable-next-line no-param-reassign
+          if (!acc[`${token.strategy.farm.id}-${walletAddress}`]) {
+            const underlying = underlyingTokens[`${token.chainId}-${token.address}-${balance}`];
+            if (!underlying) {
+              return acc;
+            }
+
+            if (!underlying.price) {
+              return acc;
+            }
+            const underlyingPrice = underlying.price;
+            const underlyingToken = toToken({ ...underlying.underlying, price: underlyingPrice });
+            const underlyingAmount = BigInt(underlying.underlyingAmount);
+            const underlyingAmountUSD = parseUsdPrice(
+              underlyingToken,
+              underlyingAmount,
+              parseNumberUsdPriceToBigInt(underlyingPrice)
+            ).toFixed(2);
+            const underlyingAmountUnits = formatUnits(underlyingAmount, underlyingToken.decimals);
+
+            if (Number.isNaN(Number(underlyingAmountUSD)) || Number(underlyingAmountUSD) < 1) {
+              return acc;
+            }
+
+            // eslint-disable-next-line no-param-reassign
+            acc[`${token.strategy.farm.id}-${walletAddress}`] = {
+              id: token.strategy.farm.id,
+              farm: token.strategy.farm,
+              token: { ...toToken({ ...token, price }) },
+              wallet: walletAddress,
+              strategies: [token.strategy],
+              underlying: underlyingToken,
+              underlyingAmount: {
+                amount: underlyingAmount,
+                amountInUSD: underlyingAmountUSD,
+                amountInUnits: underlyingAmountUnits,
+              },
+              balance: {
+                amount: balance,
+                amountInUSD: parseUsdPrice(token, balance, parseNumberUsdPriceToBigInt(price)).toFixed(2),
+                amountInUnits: formatUnits(balance, token.decimals),
+              },
+            };
+          } else {
+            // eslint-disable-next-line no-param-reassign
+            acc[`${token.strategy.farm.id}-${walletAddress}`].strategies.push(token.strategy);
+          }
+        });
+
+        return acc;
+      },
+      {}
+    )
+  );
+};
+
+const useAvailableDepositTokens = () => {
   const strategies = useAllStrategies();
-
-  const allBalances = useAllBalances();
-
-  const earnService = useEarnService();
-
-  const priceService = usePriceService();
-
+  const hasFetchedAllStrategies = useHasFetchedAllStrategies();
+  const { isLoadingAllBalances } = useAllBalances();
+  const fetchedInitialBalances = React.useRef(false);
+  const fetchedDepositTokens = React.useRef(false);
+  const [isFetchingDepositTokenBalances, setIsFetchingDepositTokenBalances] = React.useState(true);
+  const dispatch = useAppDispatch();
   const { tierLevel } = useTierLevel();
 
-  const [{ result, isLoading }, setState] = React.useState<{
-    isLoading: boolean;
-    // The key is chainId-tokenAddress-amount
-    result: Record<string, { underlying: string; underlyingAmount: string; price: number }>;
-  }>({ isLoading: false, result: {} });
+  const [{ resultsWithPrices, farmsWithDepositableTokens }, setState] = React.useState<State>({
+    resultsWithPrices: {},
+    farmsWithDepositableTokens: [],
+  });
 
   const depositTokens = React.useMemo(() => {
-    return strategies
+    if (!hasFetchedAllStrategies) return [];
+    const depositTokenList = strategies
       .filter((strategy) => isNil(strategy.needsTier) || isNil(tierLevel) || strategy.needsTier <= tierLevel)
       .reduce<TokenWithStrategy[]>((acc, strategy) => {
         return acc.concat(
@@ -56,166 +137,51 @@ const useAvailableDepositTokens = ({ filterSmallValues = false }: { filterSmallV
             }))
         );
       }, []);
-  }, [strategies]);
 
-  const depositTokensWithBalance = React.useMemo(() => {
-    return depositTokens
-      .filter((token) => {
-        const chainBalancesAndPrices = allBalances.balances[token.chainId];
-        if (!chainBalancesAndPrices) {
-          return false;
-        }
-        const tokenBalances = chainBalancesAndPrices.balancesAndPrices[token.address];
+    return uniqBy(depositTokenList, (token) => `${token.chainId}-${token.address}`);
+  }, [strategies, hasFetchedAllStrategies, tierLevel]);
 
-        if (!tokenBalances) {
-          return false;
-        }
+  const onUpdateDepositTokens = React.useCallback(
+    async ({ shouldUpdateBalances }: { shouldUpdateBalances?: boolean }) => {
+      const response = await dispatch(
+        updateAndParseEarnDepositTokenBalances({ depositTokens, resultsWithPrices, shouldUpdateBalances })
+      ).unwrap();
+      if (!response) return;
 
-        const price = tokenBalances.price;
-        const walletBalances = Object.entries(tokenBalances.balances).filter(([, balance]) => {
-          if (filterSmallValues) {
-            const amountInUSD = parseUsdPrice(token, balance, parseNumberUsdPriceToBigInt(price));
-            return amountInUSD > 1;
+      setState((prev) => ({
+        resultsWithPrices: { ...prev.resultsWithPrices, ...response.updatedResultsWithPrices },
+        farmsWithDepositableTokens: parseTokensWithBalanceToFarmsWithDepositableTokens(
+          response.depositTokensWithBalance,
+          {
+            ...prev.resultsWithPrices,
+            ...response.updatedResultsWithPrices,
           }
-          return balance > 0n;
-        });
+        ),
+      }));
 
-        return walletBalances.length > 0;
-      })
-      .map((token) => {
-        const chainBalancesAndPrices = allBalances.balances[token.chainId];
-        const tokenBalances = chainBalancesAndPrices.balancesAndPrices[token.address];
-        const balances = tokenBalances.balances;
-        const walletBalances = Object.entries(balances).filter(([, balance]) => balance > 0n);
-        return {
-          token,
-          balances: walletBalances,
-          price: tokenBalances.price,
-        };
-      });
-  }, [depositTokens, allBalances]);
+      setIsFetchingDepositTokenBalances(false);
+    },
+    [dispatch, depositTokens]
+  );
 
   React.useEffect(() => {
-    async function callPromise() {
-      const tokensToTransform = depositTokensWithBalance.reduce(
-        (acc, { token, balances }) => {
-          balances.forEach(([, balance]) => {
-            acc.push({ token, amount: balance });
-          });
-          return acc;
-        },
-        [] as { token: Token; amount: bigint }[]
-      );
-      try {
-        const response = await earnService.transformVaultTokensToUnderlying(tokensToTransform);
-        const underlyingTokens = tokensToTransform.map(({ token, amount }) => {
-          const underlying = response[`${token.chainId}-${token.address}-${amount}`];
-          if (!underlying) {
-            return null;
-          }
-          return toToken({ address: underlying.underlying, chainId: token.chainId });
-        });
-        const priceResponse = await priceService.getUsdCurrentPrices(compact(underlyingTokens));
-        const reultsWithPrice = Object.fromEntries(
-          compact(
-            Object.entries(response).map(([key, value]) => {
-              const underlyingChainId = underlyingTokens.find((token) => token?.address === value.underlying)?.chainId;
-              if (!underlyingChainId) {
-                return null;
-              }
-              const chainPrices = priceResponse[underlyingChainId];
-              if (!chainPrices) {
-                return null;
-              }
-
-              const underlyingPrice = chainPrices[value.underlying];
-              if (!underlyingPrice) {
-                return null;
-              }
-              return [key, { ...value, price: underlyingPrice.price }];
-            })
-          )
-        );
-
-        setState({ result: reultsWithPrice, isLoading: false });
-      } catch (e) {
-        console.error(e);
-      }
+    if (hasFetchedAllStrategies && !isLoadingAllBalances && !fetchedInitialBalances.current) {
+      fetchedInitialBalances.current = true;
+      void onUpdateDepositTokens({ shouldUpdateBalances: false });
     }
-    if (depositTokensWithBalance.length > 0 && !isLoading) {
-      setState({ isLoading: true, result: {} });
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      callPromise();
-    }
-  }, [depositTokensWithBalance]);
+  }, [hasFetchedAllStrategies, isLoadingAllBalances]);
 
-  const tokensWithBalance = React.useMemo(() => {
-    return Object.values(
-      depositTokensWithBalance.reduce<Record<`${FarmId}-${Address}`, FarmWithAvailableDepositTokens>>(
-        (acc, { token, balances, price }) => {
-          balances.forEach(([walletAddress, balance]: [Address, bigint]) => {
-            // eslint-disable-next-line no-param-reassign
-            if (!acc[`${token.strategy.farm.id}-${walletAddress}`]) {
-              const underlying = result[`${token.chainId}-${token.address}-${balance}`];
-              if (!underlying) {
-                return acc;
-              }
+  const updateFarmTokensBalances = React.useCallback(async () => {
+    if (fetchedDepositTokens.current) return;
+    fetchedDepositTokens.current = true;
+    setIsFetchingDepositTokenBalances(true);
+    await onUpdateDepositTokens({ shouldUpdateBalances: true });
+  }, [dispatch, fetchedDepositTokens, depositTokens]);
 
-              if (!underlying.price) {
-                return acc;
-              }
-              const underlyingPrice = underlying.price;
-              const underlyingToken = toToken({
-                address: underlying.underlying,
-                price: underlyingPrice,
-                chainId: token.chainId,
-                decimals: token.decimals,
-              });
-              const underlyingAmount = BigInt(underlying.underlyingAmount);
-              const underlyingAmountUSD = parseUsdPrice(
-                underlyingToken,
-                underlyingAmount,
-                parseNumberUsdPriceToBigInt(underlyingPrice)
-              ).toFixed(2);
-              const underlyingAmountUnits = formatUnits(underlyingAmount, underlyingToken.decimals);
-
-              if (Number.isNaN(Number(underlyingAmountUSD)) || Number(underlyingAmountUSD) < 1) {
-                return acc;
-              }
-
-              // eslint-disable-next-line no-param-reassign
-              acc[`${token.strategy.farm.id}-${walletAddress}`] = {
-                id: token.strategy.farm.id,
-                farm: token.strategy.farm,
-                token: { ...toToken({ ...token, price }) },
-                wallet: walletAddress,
-                strategies: [token.strategy],
-                underlying: underlyingToken,
-                underlyingAmount: {
-                  amount: underlyingAmount,
-                  amountInUSD: underlyingAmountUSD,
-                  amountInUnits: underlyingAmountUnits,
-                },
-                balance: {
-                  amount: balance,
-                  amountInUSD: parseUsdPrice(token, balance, parseNumberUsdPriceToBigInt(price)).toFixed(2),
-                  amountInUnits: formatUnits(balance, token.decimals),
-                },
-              };
-            } else {
-              // eslint-disable-next-line no-param-reassign
-              acc[`${token.strategy.farm.id}-${walletAddress}`].strategies.push(token.strategy);
-            }
-          });
-
-          return acc;
-        },
-        {}
-      )
-    );
-  }, [allBalances, depositTokens, result]);
-
-  return tokensWithBalance;
+  return React.useMemo(
+    () => ({ farmsWithDepositableTokens, updateFarmTokensBalances, isFetchingDepositTokenBalances }),
+    [farmsWithDepositableTokens, updateFarmTokensBalances, isFetchingDepositTokenBalances]
+  );
 };
 
 export default useAvailableDepositTokens;

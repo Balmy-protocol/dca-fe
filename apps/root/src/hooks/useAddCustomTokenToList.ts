@@ -1,6 +1,6 @@
 import React from 'react';
 import { useAppDispatch } from './state';
-import { fetchCustomTokenBalance } from '@state/balances/actions';
+import { fetchSpecificTokensBalances } from '@state/balances/actions';
 import { Address } from 'viem';
 import { useCustomTokens } from '@state/token-lists/hooks';
 import { getTokenListId } from '@common/utils/parsing';
@@ -21,8 +21,10 @@ function useAddCustomTokenToList() {
       try {
         setIsLoadingCustomToken(true);
 
-        const newCustomToken = await dispatch(fetchCustomTokenBalance({ tokenAddress, chainId })).unwrap();
-
+        const newCustomTokens = await dispatch(
+          fetchSpecificTokensBalances({ tokenAddresses: [tokenAddress], chainId })
+        ).unwrap();
+        const newCustomToken = newCustomTokens?.find((token) => token.address === tokenAddress);
         if (newCustomToken) {
           trackEvent('Add custom token', {
             tokenSymbol: newCustomToken.symbol,

@@ -28,10 +28,11 @@ import { isSameToken, parseNumberUsdPriceToBigInt, parseUsdPrice, toToken } from
 import { TableStrategy } from '@pages/earn/components/strategies-table';
 import { StrategiesTableVariants } from '@state/strategies-filters/reducer';
 import { Address, formatUnits, parseUnits } from 'viem';
-import { FarmWithAvailableDepositTokens } from '@hooks/earn/useAvailableDepositTokens';
+import { FarmWithAvailableDepositTokens, TokenWithStrategy } from '@hooks/earn/useAvailableDepositTokens';
 import { nowInSeconds } from '../time';
 import { findClosestTimestamp } from '@common/components/earn/action-graph-components';
 import { createEmptyEarnPosition } from '@common/mocks/earn';
+import { RootState } from '@state';
 
 export const sdkStrategyTokenToToken = (
   sdkToken: SdkStrategyToken,
@@ -783,3 +784,26 @@ export const getTokensWithBalanceAndApy = (strategy: Strategy | DisplayStrategy,
     tokens: tokensToShow,
   };
 };
+
+export const getDepositTokensWithBalances = (depositTokens: TokenWithStrategy[], allBalances: RootState['balances']) =>
+  depositTokens
+    .filter((token) => {
+      const chainBalancesAndPrices = allBalances.balances[token.chainId];
+      if (!chainBalancesAndPrices) return false;
+
+      const tokenBalances = chainBalancesAndPrices.balancesAndPrices[token.address];
+      if (!tokenBalances) return false;
+
+      const walletBalances = Object.entries(tokenBalances.balances).filter(([, balance]) => balance > 0n);
+      return walletBalances.length > 0;
+    })
+    .map((token) => {
+      const chainBalancesAndPrices = allBalances.balances[token.chainId];
+      const tokenBalances = chainBalancesAndPrices.balancesAndPrices[token.address];
+      const balances = Object.entries(tokenBalances.balances);
+      return {
+        token,
+        balances,
+        price: tokenBalances.price,
+      };
+    });

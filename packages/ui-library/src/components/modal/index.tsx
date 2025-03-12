@@ -27,8 +27,7 @@ const StyledDialogContent = styled(DialogContent)<{ withTitle: boolean }>`
     padding: 0px;
     ${withTitle && 'flex-direction: column;'}
     overflow-y: visible;
-    gap: ${space.s05}
-    position: relative;
+    gap: ${space.s05};
   `}
 `;
 
