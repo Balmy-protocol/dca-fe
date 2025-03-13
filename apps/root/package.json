@@ -78,7 +78,9 @@
     "webpack-cli": "^4.7.0",
     "webpack-dev-server": "^4.9.2",
     "webpack-merge": "^5.7.3",
-    "webpackbar": "^5.0.2"
+    "webpackbar": "^5.0.2",
+    "cypress": "12.17.4",
+    "cypress-hardhat": "2.5.3"
   },
   "dependencies": {
     "@balmy/sdk": "*",
