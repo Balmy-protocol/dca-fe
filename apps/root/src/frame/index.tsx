@@ -28,6 +28,7 @@ import { SavedCustomConfig } from '@state/base-types';
 import PollingHandlers from './polling-handlers';
 import DarkBackgroundGrid from './components/background-grid/dark';
 import ReferredByHandler from './components/referred-by-handler';
+import UpdateNotification from '@common/components/update-notification';
 
 const Home = lazy(() => import('@pages/home'));
 const DCA = lazy(() => import('@pages/dca'));
@@ -115,6 +116,15 @@ const AppFrame = ({ config: { wagmiClient } }: AppFrameProps) => {
       void dispatch(hydrateStoreFromSavedConfig(config));
     });
   }, []);
+
+  const handleServiceWorkerUpdate = () => {
+    // This will trigger the service worker to skip waiting and activate the new version
+    if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+      navigator.serviceWorker.controller.postMessage({ type: 'SKIP_WAITING' });
+    }
+    // Reload the page to ensure the new version is used
+    window.location.reload();
+  };
 
   return (
     <WagmiProvider config={wagmiClient}>
@@ -215,6 +225,7 @@ const AppFrame = ({ config: { wagmiClient } }: AppFrameProps) => {
                     </StyledGridContainer>
                   </Navigation>
                 </Router>
+                <UpdateNotification onUpdate={handleServiceWorkerUpdate} />
               </TransactionModalProvider>
             </SnackbarProvider>
           </ThemeProvider>

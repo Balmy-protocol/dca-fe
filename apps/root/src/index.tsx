@@ -15,6 +15,7 @@ import { Settings } from 'luxon';
 import LanguageContext from '@common/components/language-context';
 import { SupportedLanguages } from '@constants/lang';
 import MainApp from './frame';
+import * as serviceWorkerRegistration from './serviceWorkerRegistration';
 
 type AppProps = {
   locale: SupportedLanguages;
@@ -87,6 +88,27 @@ function bootstrapApplication(locale: SupportedLanguages) {
 
 // eslint-disable-next-line @typescript-eslint/no-floating-promises
 bootstrapApplication(SupportedLanguages.english);
+
+// Register the service worker for PWA support
+serviceWorkerRegistration.register({
+  onUpdate: (registration) => {
+    // When a new version is available, show a notification or update UI
+    const waitingServiceWorker = registration.waiting;
+
+    if (waitingServiceWorker) {
+      waitingServiceWorker.addEventListener('statechange', (event) => {
+        // @ts-expect-error - event.target might not have state property
+        if (event.target?.state === 'activated') {
+          window.location.reload();
+        }
+      });
+      waitingServiceWorker.postMessage({ type: 'SKIP_WAITING' });
+    }
+  },
+  onSuccess: (registration) => {
+    console.log('Service Worker registered successfully:', registration);
+  },
+});
 
 if (module.hot) {
   module.hot.accept();

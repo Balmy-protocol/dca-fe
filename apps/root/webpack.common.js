@@ -24,7 +24,14 @@ module.exports = {
       process: 'process/browser.js',
     }),
     new CopyPlugin({
-      patterns: [{ from: './public_metadata' }],
+      patterns: [
+        { from: './public_metadata' },
+        { from: './public/service-worker.js', to: 'service-worker.js' },
+        { from: './public/offline.html', to: 'offline.html' },
+        { from: './public_metadata/apple-splash-*.png', to: '[name][ext]' },
+        { from: './public_metadata/icons', to: 'icons' },
+        { from: './public_metadata/screenshots', to: 'screenshots' },
+      ],
     }),
     new webpack.DefinePlugin({
       'process.env.ETHPLORER_KEY': JSON.stringify(process.env.ETHPLORER_KEY),

@@ -1,6 +1,7 @@
 {
     "name": "Balmy — Your Decentralized Home Banking",
     "short_name": "Balmy",
+    "description": "Swap, Invest and Transfer your assets with ease. Rest assured, we've got your back as you dive into the exciting world of the future of finance.",
     "icons": [
         {
             "src": "/android-chrome-192x192.png",
@@ -22,5 +23,41 @@
     "theme_color": "#FBFAFF",
     "background_color": "#FBFAFF",
     "display": "standalone",
-    "start_url": "/"
+    "orientation": "portrait",
+    "start_url": "/",
+    "scope": "/",
+    "lang": "en-US",
+    "dir": "ltr",
+    "prefer_related_applications": false,
+    "categories": ["finance", "cryptocurrency", "banking"],
+    "screenshots": [
+        {
+            "src": "/screenshots/desktop.png",
+            "sizes": "1280x800",
+            "type": "image/png",
+            "platform": "wide"
+        },
+        {
+            "src": "/screenshots/mobile.png",
+            "sizes": "750x1334",
+            "type": "image/png",
+            "platform": "narrow"
+        }
+    ],
+    "shortcuts": [
+        {
+            "name": "Swap Assets",
+            "short_name": "Swap",
+            "description": "Quickly swap between different assets",
+            "url": "/swap",
+            "icons": [{ "src": "/icons/swap.png", "sizes": "192x192" }]
+        },
+        {
+            "name": "Portfolio",
+            "short_name": "Portfolio",
+            "description": "View your portfolio",
+            "url": "/home",
+            "icons": [{ "src": "/icons/portfolio.png", "sizes": "192x192" }]
+        }
+    ]
 }
