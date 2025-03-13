@@ -2,16 +2,19 @@
     "name": "Balmy — Your Decentralized Home Banking",
     "short_name": "Balmy",
     "description": "Swap, Invest and Transfer your assets with ease. Rest assured, we've got your back as you dive into the exciting world of the future of finance.",
+    "id": "xyz.balmy.app",
     "icons": [
         {
             "src": "/android-chrome-192x192.png",
             "sizes": "192x192",
-            "type": "image/png"
+            "type": "image/png",
+            "purpose": "any"
         },
         {
             "src": "/android-chrome-512x512.png",
             "sizes": "512x512",
-            "type": "image/png"
+            "type": "image/png",
+            "purpose": "any"
         },
         {
             "purpose": "maskable",
@@ -26,6 +29,23 @@
     "orientation": "portrait",
     "start_url": "/",
     "scope": "/",
+    "scope_extensions": [
+        {
+            "origin": "https://app.balmy.xyz"
+        },
+        {
+            "origin": "https://staging.app.balmy.xyz"
+        },
+        {
+            "origin": "https://dev.app.balmy.xyz"
+        },
+        {
+            "origin": "https://adhoc.app.balmy.xyz"
+        }
+    ],
+    "launch_handler": {
+        "client_mode": ["navigate-existing", "auto"]
+    },
     "lang": "en-US",
     "dir": "ltr",
     "prefer_related_applications": false,

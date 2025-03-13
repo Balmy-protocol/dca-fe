@@ -36,15 +36,19 @@ The application is configured as a Progressive Web App (PWA) with the following 
 - **Path-Independent**: Automatically detects the base path, no configuration needed
 - **App Shortcuts**: Quick access to key features through home screen shortcuts
 - **Comprehensive Manifest**: Complete PWA manifest with all recommended fields
+- **Smart Launch Handling**: Controls how the app launches when links are clicked
+- **Cross-Origin Support**: Works across multiple domains with scope extensions
 
 ### Web App Manifest
 
 The PWA manifest (`public_metadata/site.webmanifest`) includes:
 
 - Basic information: name, short_name, description
-- Icons in various sizes with maskable support
+- Unique app ID for identification across platforms
+- Icons in various sizes with both "any" and "maskable" purpose support
 - Display preferences: standalone mode, orientation
-- Navigation: start_url, scope
+- Navigation: start_url, scope, and scope_extensions for cross-origin support
+- Launch handler for controlling how the app opens from links
 - Metadata: language, categories
 - Screenshots for app stores
 - Home screen shortcuts for quick access to key features
@@ -89,6 +93,7 @@ To test the PWA features:
 5. To test environment-specific caching, access the app through different hostnames
 6. To test installation, click the install icon in the browser's address bar
 7. To test shortcuts, install the app and right-click on its icon (desktop) or long-press (mobile)
+8. To test launch handling, open the app and then click links to the app from other tabs
 
 ## 📖 Docs
 
