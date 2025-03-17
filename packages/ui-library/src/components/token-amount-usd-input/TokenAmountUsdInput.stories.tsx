@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 
-import { PROTOCOL_TOKEN_ADDRESS, TokenAmounUsdInput } from '.';
+import { TokenAmounUsdInput } from '.';
+import { PROTOCOL_TOKEN_ADDRESS } from './useTokenAmountUsd';
 import type { TokenAmounUsdInputProps } from '.';
 import { TokenType } from 'common-types';
 
