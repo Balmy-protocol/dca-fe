@@ -52,6 +52,7 @@ export default createReducer(initialState, (builder) => {
       payload.forEach(({ hash, chainId }) => {
         if (!state[chainId] || !state[chainId][hash]) {
           console.error('Attempted to check inexisting transaction.');
+          return;
         }
 
         state[chainId][hash].checking = true;
