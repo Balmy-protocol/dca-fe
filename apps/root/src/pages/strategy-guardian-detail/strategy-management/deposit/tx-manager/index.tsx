@@ -45,6 +45,8 @@ const EarnDepositTransactionManager = ({ balance, strategy, setHeight }: EarnDep
     tokenAddress: params.get('assetToDeposit') ?? undefined,
     checkForSymbol: true,
     filterForDca: false,
+    // Allow farm tokens that are not in the curated token list
+    curateList: false,
   });
   const paramUnderlyingAsset = useToken({
     chainId: strategy?.network.chainId,

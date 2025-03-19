@@ -9,13 +9,16 @@ import useEarnPositions from '@hooks/earn/useEarnPositions';
 import { getDelayedWithdrawals } from '@common/utils/earn/parsing';
 import { useAppDispatch } from '@state/hooks';
 import { resetFilters } from '@state/strategies-filters/actions';
-
+import AllStrategiesHeading from './all-strategies-heading';
+import { FarmsWithAvailableDepositTokens } from '@hooks/earn/useAvailableDepositTokens';
 interface AllStrategiesTableToolbarProps {
   isLoading: boolean;
   handleSearchChange: (search: string) => void;
   variant: StrategiesTableVariants;
   strategiesCount: number;
   setPage: (page: number) => void;
+  farmsWithDepositableTokens?: FarmsWithAvailableDepositTokens;
+  handleMigrationModalOpen?: () => void;
 }
 
 const StyledTextField = styled(TextField)`
@@ -31,6 +34,8 @@ const AllStrategiesTableToolbar = ({
   variant,
   strategiesCount,
   setPage,
+  farmsWithDepositableTokens,
+  handleMigrationModalOpen,
 }: AllStrategiesTableToolbarProps) => {
   const intl = useIntl();
   const dispatch = useAppDispatch();
@@ -49,9 +54,10 @@ const AllStrategiesTableToolbar = ({
   return (
     <ContainerBox justifyContent="space-between" alignItems="end" flexWrap="wrap" gap={3}>
       {variant === StrategiesTableVariants.ALL_STRATEGIES ? (
-        <Typography variant="h2Bold" color={({ palette: { mode } }) => colors[mode].typography.typo1}>
-          <FormattedMessage description="earn.all-strategies-table.title" defaultMessage="All Vaults" />
-        </Typography>
+        <AllStrategiesHeading
+          farmsWithDepositableTokens={farmsWithDepositableTokens}
+          handleMigrationModalOpen={handleMigrationModalOpen}
+        />
       ) : (
         <ContainerBox alignItems="center" gap={2}>
           <Typography variant="h3Bold" color={({ palette: { mode } }) => colors[mode].typography.typo1}>
