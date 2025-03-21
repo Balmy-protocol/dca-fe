@@ -14,7 +14,7 @@ import { parseUsdPrice } from '@common/utils/currency';
 function useEstimateTransferFee(): [AmountsOfToken | undefined, boolean, string | undefined] {
   const walletService = useWalletService();
   const activeWallet = useActiveWallet();
-  const { token, amount, recipient } = useTransferState();
+  const { token, amount, recipientAddress } = useTransferState();
   const providerService = useProviderService();
   const [{ result, isLoading, error }, setResults] = React.useState<{
     isLoading: boolean;
@@ -24,12 +24,12 @@ function useEstimateTransferFee(): [AmountsOfToken | undefined, boolean, string 
   const prevNetworkFee = usePrevious(result, false);
   const prevToken = usePrevious(token);
   const prevAmount = usePrevious(amount);
-  const prevRecipient = usePrevious(recipient);
+  const prevRecipient = usePrevious(recipientAddress);
   const priceService = usePriceService();
 
   React.useEffect(() => {
     async function fetchNetworkFee() {
-      if (token && amount && recipient && activeWallet?.address) {
+      if (token && amount && recipientAddress && activeWallet?.address) {
         try {
           const isProtocolToken = token.address === PROTOCOL_TOKEN_ADDRESS;
           const parsedToken: Token = { ...token, type: isProtocolToken ? TokenType.NATIVE : TokenType.ERC20_TOKEN };
@@ -37,7 +37,7 @@ function useEstimateTransferFee(): [AmountsOfToken | undefined, boolean, string 
 
           const tx = await walletService.getTransferTokenTx({
             from: activeWallet.address,
-            to: recipient as Address,
+            to: recipientAddress as Address,
             token: parsedToken,
             amount: parsedAmount,
           });
@@ -68,13 +68,13 @@ function useEstimateTransferFee(): [AmountsOfToken | undefined, boolean, string 
       (!isLoading && !result && !error) ||
       !isEqual(prevToken, token) ||
       !isEqual(prevAmount, amount) ||
-      !isEqual(prevRecipient, recipient)
+      !isEqual(prevRecipient, recipientAddress)
     ) {
       setResults({ result: undefined, error: undefined, isLoading: true });
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       fetchNetworkFee();
     }
-  }, [prevToken, token, prevAmount, amount, prevRecipient, recipient, priceService, isLoading, result, error]);
+  }, [prevToken, token, prevAmount, amount, prevRecipient, recipientAddress, priceService, isLoading, result, error]);
 
   return [result || prevNetworkFee, isLoading, error];
 }
