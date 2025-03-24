@@ -151,6 +151,8 @@ export const EarnWithdrawReceipt: Story = {
       },
       data: {
         tokenFlow: TransactionEventIncomingTypes.INCOMING,
+        positionId: '1-0x1-1',
+        strategyId: '1-1-1',
         withdrawn: [
           {
             token: {

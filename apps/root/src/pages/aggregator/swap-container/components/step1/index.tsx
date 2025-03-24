@@ -1,5 +1,5 @@
 import React from 'react';
-import { Grid, Alert, Button, ContainerBox, Typography, colors } from 'ui-library';
+import { Grid, Alert, Button, ContainerBox, Typography, colors, TokenPickerAmountUsdInput } from 'ui-library';
 import isUndefined from 'lodash/isUndefined';
 import { AmountsOfToken, SetStateCallback, SwapOption, Token } from '@types';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
@@ -13,17 +13,15 @@ import QuoteData from '../quote-data';
 import TransferTo from '../transfer-to';
 import QuoteSimulation from '../quote-simulation';
 import AdvancedSettings from '../advanced-settings';
-import TokenPickerWithAmount from '@common/components/token-amount-input';
 import ToggleButton from '../toggle-button';
 import QuoteSelection from '../quote-selection';
 import SwapNetworkSelector from '../swap-network-selector';
 import SwapButton from '../swap-button';
-import { usePortfolioPrices } from '@state/balances/hooks';
-import { compact } from 'lodash';
-import { parseNumberUsdPriceToBigInt, parseUsdPrice } from '@common/utils/currency';
+import { emptyTokenWithAddress, parseUsdPrice } from '@common/utils/currency';
 import { ContactListActiveModal } from '@common/components/contact-modal';
 import FormWalletSelector from '@common/components/form-wallet-selector';
-
+import TokenIcon from '@common/components/token-icon';
+import useRawUsdPrice from '@hooks/useUsdRawPrice';
 interface SwapFirstStepProps {
   from: Token | null;
   fromValue: string;
@@ -87,7 +85,8 @@ const SwapFirstStep = ({
   const dispatch = useAppDispatch();
   const { trackEvent } = useAnalytics();
   const [transactionWillFail, setTransactionWillFail] = React.useState(false);
-  const prices = usePortfolioPrices(compact([from, to]));
+  const [fromPrice] = useRawUsdPrice(from);
+  const [toPrice] = useRawUsdPrice(to);
 
   let fromValueToUse =
     isBuyOrder && selectedRoute
@@ -107,24 +106,16 @@ const SwapFirstStep = ({
     (fromValueToUse &&
       fromValueToUse !== '' &&
       from &&
-      prices[from?.address] &&
-      parseUsdPrice(
-        from,
-        parseUnits(fromValueToUse, from.decimals),
-        parseNumberUsdPriceToBigInt(prices[from.address].price)
-      )) ||
+      fromPrice &&
+      parseUsdPrice(from, parseUnits(fromValueToUse, from.decimals), fromPrice)) ||
     undefined;
   const toUsdValueToUse =
     selectedRoute?.buyAmount.amountInUSD ||
     (toValueToUse &&
       toValueToUse !== '' &&
       to &&
-      prices[to?.address] &&
-      parseUsdPrice(
-        to,
-        parseUnits(toValueToUse, to.decimals),
-        parseNumberUsdPriceToBigInt(prices[to.address].price)
-      )) ||
+      toPrice &&
+      parseUsdPrice(to, parseUnits(toValueToUse, to.decimals), toPrice)) ||
     undefined;
 
   const selectedNetwork = useSelectedNetwork();
@@ -177,6 +168,20 @@ const SwapFirstStep = ({
       ).toFixed(2)) ||
     undefined;
 
+  const fromTokenWithIcon = from
+    ? {
+        ...from,
+        icon: <TokenIcon token={from} size={5} />,
+      }
+    : undefined;
+
+  const toTokenWithIcon = to
+    ? {
+        ...to,
+        icon: <TokenIcon token={to} size={5} />,
+      }
+    : undefined;
+
   return (
     <Grid container rowSpacing={6} flexDirection="column">
       <AdvancedSettings onShowSettings={onShowSettings} />
@@ -207,33 +212,35 @@ const SwapFirstStep = ({
       </Grid>
       <Grid item xs={12}>
         <Grid item xs={12} position="relative">
-          <TokenPickerWithAmount
+          <TokenPickerAmountUsdInput
             id="from-value"
             label={<FormattedMessage description="youPay" defaultMessage="You pay" />}
             cantFund={cantFund}
-            tokenAmount={fromAmount}
-            isLoadingRoute={isLoadingRoute}
+            value={fromValueToUse}
+            disabled={isLoadingRoute}
             isLoadingBalance={isLoadingFromBalance}
-            startSelectingCoin={(token) => startSelectingCoin(token, 'from')}
-            selectedToken={from || undefined}
-            onSetTokenAmount={onSetFromAmount}
+            startSelectingCoin={(token) => startSelectingCoin(token || emptyTokenWithAddress('from'), 'from')}
+            token={fromTokenWithIcon}
+            onChange={onSetFromAmount}
             balance={balanceFrom}
             maxBalanceBtn
+            tokenPrice={fromPrice}
           />
           <ToggleButton isLoadingRoute={isLoadingRoute} />
         </Grid>
         <Grid item xs={12} sx={{ paddingTop: '8px !important' }}>
-          <TokenPickerWithAmount
+          <TokenPickerAmountUsdInput
             id="to-value"
             label={<FormattedMessage description="youReceive" defaultMessage="You receive" />}
-            tokenAmount={toAmount}
-            isLoadingRoute={isLoadingRoute}
+            value={toValueToUse}
+            disabled={isLoadingRoute}
             isLoadingBalance={isLoadingToBalance}
-            startSelectingCoin={(token) => startSelectingCoin(token, 'to')}
+            startSelectingCoin={(token) => startSelectingCoin(token || emptyTokenWithAddress('to'), 'to')}
             balance={balanceTo}
-            selectedToken={to || undefined}
-            onSetTokenAmount={onSetToAmount}
+            token={toTokenWithIcon}
+            onChange={onSetToAmount}
             priceImpact={priceImpact}
+            tokenPrice={toPrice}
           />
         </Grid>
       </Grid>
