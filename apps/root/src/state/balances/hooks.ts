@@ -153,9 +153,10 @@ export function useStoredNativePrices(chains: number[]): Record<ChainId, number 
   return prices;
 }
 
-export function useStoredNativeBalance(chainId: number) {
+export function useStoredNativeBalance(chainId?: number) {
   const intl = useIntl();
   const allBalances = useAppSelector((state: RootState) => state.balances);
+  if (!chainId) return [];
   const protocolToken = getProtocolToken(chainId);
 
   const protocolTokenBalances = allBalances.balances[chainId]?.balancesAndPrices?.[PROTOCOL_TOKEN_ADDRESS];
