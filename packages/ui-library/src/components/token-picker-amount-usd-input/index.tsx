@@ -78,7 +78,7 @@ const TokenInput = ({
           inputProps={{
             style: {
               ...buildTypographyVariant(mode).h2Bold,
-              color: getInputColor({ disabled, mode, hasValue: !isUndefined(value) }),
+              color: getInputColor({ mode, hasValue: value !== '' && !isUndefined(value) }),
               padding: 0,
               textOverflow: 'ellipsis',
               textAlign: 'right',
@@ -93,7 +93,10 @@ const TokenInput = ({
         <IconButton sx={{ padding: 0 }} disabled={isUndefined(tokenPrice) || disabled} onClick={onChangeType}>
           <ToggleArrowIcon fontSize="small" sx={{ color: colors[mode].accent.primary }} />
         </IconButton>
-        <Typography variant="bodySemibold" color={getSubInputColor({ mode, hasValue: !isUndefined(value) })}>
+        <Typography
+          variant="bodySemibold"
+          color={getSubInputColor({ mode, hasValue: value !== '' && !isUndefined(value) })}
+        >
           {`$${usdAmount}`}
         </Typography>
         {priceImpactLabel}
@@ -135,7 +138,7 @@ const UsdInput = ({
           onFocus={onFocus}
           onBlur={onBlur}
           endAdornment={
-            <Typography variant="h2Bold" color={getInputColor({ disabled, mode, hasValue: !isUndefined(value) })}>
+            <Typography variant="h2Bold" color={getInputColor({ mode, hasValue: value !== '' && !isUndefined(value) })}>
               USD
             </Typography>
           }
@@ -145,7 +148,7 @@ const UsdInput = ({
           disabled={disabled}
           inputProps={{
             style: {
-              color: getInputColor({ disabled, mode, hasValue: !isUndefined(value) }),
+              color: getInputColor({ mode, hasValue: value !== '' && !isUndefined(value) }),
               padding: 0,
               textOverflow: 'ellipsis',
               textAlign: 'right',
@@ -159,7 +162,10 @@ const UsdInput = ({
         <IconButton sx={{ padding: 0 }} disabled={isUndefined(tokenPrice) || disabled} onClick={onChangeType}>
           <ToggleArrowIcon fontSize="small" sx={{ color: colors[mode].accent.primary }} />
         </IconButton>
-        <Typography variant="bodySemibold" color={getSubInputColor({ mode, hasValue: !isUndefined(value) })}>
+        <Typography
+          variant="bodySemibold"
+          color={getSubInputColor({ mode, hasValue: value !== '' && !isUndefined(value) })}
+        >
           ≈{` ${tokenAmount} ${token?.symbol}`}
         </Typography>
         {priceImpactLabel}
@@ -174,9 +180,17 @@ const StyledInputContainer = styled(InputContainer)`
       spacing,
       palette: { mode },
     },
+    disabled,
   }) => `
     padding: ${spacing(6)};
     border: 1px solid ${colors[mode].border.border1};
+    ${
+      disabled &&
+      `
+      opacity: 0.8;
+      pointer-events: none;
+    `
+    }
   `}
 `;
 
@@ -264,7 +278,7 @@ const TokenPickerAmountUsdInput = ({
           <Typography variant="labelSemiBold" color={colors[mode].typography.typo3}>
             {label}
           </Typography>
-          <TokenPickerButton disabled={disabled} token={token} showAction onClick={() => startSelectingCoin(token)} />
+          <TokenPickerButton token={token} showAction onClick={() => startSelectingCoin(token)} />
           {!isUndefined(balance) && token && (
             <ContainerBox alignItems="center" gap={1}>
               <Typography variant="bodySmallRegular" color={colors[mode].typography.typo3}>

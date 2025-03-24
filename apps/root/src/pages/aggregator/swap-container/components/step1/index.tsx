@@ -17,11 +17,13 @@ import ToggleButton from '../toggle-button';
 import QuoteSelection from '../quote-selection';
 import SwapNetworkSelector from '../swap-network-selector';
 import SwapButton from '../swap-button';
-import { emptyTokenWithAddress, parseUsdPrice } from '@common/utils/currency';
+import { emptyTokenWithAddress, parseNumberUsdPriceToBigInt, parseUsdPrice } from '@common/utils/currency';
 import { ContactListActiveModal } from '@common/components/contact-modal';
 import FormWalletSelector from '@common/components/form-wallet-selector';
 import TokenIcon from '@common/components/token-icon';
 import useRawUsdPrice from '@hooks/useUsdRawPrice';
+import { usePortfolioPrices } from '@state/balances/hooks';
+import { compact } from 'lodash';
 interface SwapFirstStepProps {
   from: Token | null;
   fromValue: string;
@@ -85,8 +87,9 @@ const SwapFirstStep = ({
   const dispatch = useAppDispatch();
   const { trackEvent } = useAnalytics();
   const [transactionWillFail, setTransactionWillFail] = React.useState(false);
-  const [fromPrice] = useRawUsdPrice(from);
+  const prices = usePortfolioPrices(compact([from]));
   const [toPrice] = useRawUsdPrice(to);
+  const fromPrice = from ? parseNumberUsdPriceToBigInt(prices[from?.address]?.price) : undefined;
 
   let fromValueToUse =
     isBuyOrder && selectedRoute
@@ -168,19 +171,14 @@ const SwapFirstStep = ({
       ).toFixed(2)) ||
     undefined;
 
-  const fromTokenWithIcon = from
-    ? {
-        ...from,
-        icon: <TokenIcon token={from} size={5} />,
-      }
-    : undefined;
-
-  const toTokenWithIcon = to
-    ? {
-        ...to,
-        icon: <TokenIcon token={to} size={5} />,
-      }
-    : undefined;
+  const fromTokenWithIcon = React.useMemo(
+    () => (from ? { ...from, icon: <TokenIcon token={from} size={5} /> } : undefined),
+    [from]
+  );
+  const toTokenWithIcon = React.useMemo(
+    () => (to ? { ...to, icon: <TokenIcon token={to} size={5} /> } : undefined),
+    [to]
+  );
 
   return (
     <Grid container rowSpacing={6} flexDirection="column">
