@@ -14,14 +14,16 @@ interface UseTokenProps {
   checkForSymbol?: boolean;
   filterForDca?: boolean;
   chainId?: number;
+  curateList?: boolean;
 }
 function useToken({
   tokenAddress: upperTokenAddress,
   checkForSymbol = false,
   filterForDca = false,
   chainId,
+  curateList = true,
 }: UseTokenProps) {
-  const tokenList = useTokenList({ filterForDca, chainId, curateList: true });
+  const tokenList = useTokenList({ filterForDca, chainId, curateList });
   const dispatch = useAppDispatch();
   const { balances } = useAllBalances();
 

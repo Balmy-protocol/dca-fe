@@ -16,7 +16,7 @@ import {
   NewsBannerBackgroundGrid,
   Typography,
   CoinWrapper,
-  RootstockLogoMinimalistic,
+  GalxeLogoMinimalistic,
   AvalancheLogoMinimalistic,
 } from 'ui-library';
 
@@ -60,9 +60,10 @@ interface NewsBannerProps {
   coinIcon: React.ReactNode;
   campaignEventId: string;
   url: LocalUrl | ExternalUrl;
-  chainId: number;
+  chainId?: number;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const avalancheBannerProps: NewsBannerProps = {
   unformattedText: defineMessage({
     description: 'news-banner.text.dca-avalanche',
@@ -81,19 +82,19 @@ const avalancheBannerProps: NewsBannerProps = {
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const rootstockBannerProps: NewsBannerProps = {
   unformattedText: defineMessage({
-    description: 'news-banner.text.rsk-galxe-quest',
-    defaultMessage: 'Join our Rootstock Quest $5,000 Up for Grabs!',
+    description: 'news-banner.text.earn-galxe-quest',
+    defaultMessage: '$1,000 Up for Grabs!{br}Earn Guardian Quest Live!',
   }),
-  coinIcon: <RootstockLogoMinimalistic height={15} width={15} />,
-  campaignEventId: 'RSK Galxe Quest',
+  coinIcon: <GalxeLogoMinimalistic height={18} width={18} />,
+  campaignEventId: 'Earn Galxe Quest',
   url: {
     isExternal: true,
-    url: 'https://app.galxe.com/quest/balmy/GCCHFtv3c5',
+    url: 'https://app.galxe.com/quest/balmy/GC5B6t16yS',
   },
-  chainId: Chains.ROOTSTOCK.chainId,
+  // chainId: Chains.ROOTSTOCK.chainId,
 };
 
-const newsBannerProps = avalancheBannerProps;
+const newsBannerProps = rootstockBannerProps;
 
 const NewsBanner = () => {
   const { unformattedText, coinIcon, campaignEventId, url, chainId } = newsBannerProps;
@@ -103,7 +104,9 @@ const NewsBanner = () => {
   const { trackEvent } = useAnalytics();
   const nativeBalances = useStoredNativeBalance(chainId);
 
-  const text = intl.formatMessage(unformattedText);
+  const text = intl.formatMessage(unformattedText, {
+    br: <br />,
+  });
 
   const onClick = () => {
     trackEvent('Clicked on news banner', {

@@ -153,9 +153,10 @@ export function useStoredNativePrices(chains: number[]): Record<ChainId, number 
   return prices;
 }
 
-export function useStoredNativeBalance(chainId: number) {
+export function useStoredNativeBalance(chainId?: number) {
   const intl = useIntl();
   const allBalances = useAppSelector((state: RootState) => state.balances);
+  if (!chainId) return [];
   const protocolToken = getProtocolToken(chainId);
 
   const protocolTokenBalances = allBalances.balances[chainId]?.balancesAndPrices?.[PROTOCOL_TOKEN_ADDRESS];
@@ -175,15 +176,19 @@ export function useNativeBalancesSnapshot() {
   const allBalances = useAppSelector((state: RootState) => state.balances);
   const [snapshot, setSnapshot] = React.useState<Record<ChainId, { [walletAddress: Address]: bigint }>>({});
 
-  const balances: Record<ChainId, { [walletAddress: Address]: bigint }> = {};
+  const balances = React.useMemo(() => {
+    const updatedBalances: Record<ChainId, { [walletAddress: Address]: bigint }> = {};
 
-  Object.entries(allBalances.balances).forEach(([chainId, chainBalances]) => {
-    const protocolTokenBalances = chainBalances.balancesAndPrices?.[PROTOCOL_TOKEN_ADDRESS];
-    balances[Number(chainId)] = {
-      ...balances[Number(chainId)],
-      ...(protocolTokenBalances?.balances || {}),
-    };
-  });
+    Object.entries(allBalances.balances).forEach(([chainId, chainBalances]) => {
+      const protocolTokenBalances = chainBalances.balancesAndPrices?.[PROTOCOL_TOKEN_ADDRESS];
+      updatedBalances[Number(chainId)] = {
+        ...(updatedBalances[Number(chainId)] || {}),
+        ...(protocolTokenBalances?.balances || {}),
+      };
+    });
+
+    return updatedBalances;
+  }, [allBalances.balances]);
 
   const updateNativeBalancesSnapshot = () => {
     setSnapshot(balances);
