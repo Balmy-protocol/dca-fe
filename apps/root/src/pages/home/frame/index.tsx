@@ -16,7 +16,7 @@ import EarnPositionsDashboard from '../components/earn-positions-dashboard';
 import useUserHasPositions from '@hooks/useUserHasPositions';
 import useUserHasEarnPositions from '@hooks/useUserHasEarnPositions';
 import useIsSomeWalletIndexed from '@hooks/useIsSomeWalletIndexed';
-import NewsBanner from '@common/components/news-banners/donut-banner';
+import LMEarnBanner from '@common/components/news-banners/lm-earn-banner';
 const StyledFeatureTitle = styled(Typography).attrs({
   variant: 'h3Bold',
 })`
@@ -95,7 +95,7 @@ const HomeFrame = () => {
             />
           </Grid>
           <Grid item xs={12} md={4} display="flex">
-            <NewsBanner />
+            <LMEarnBanner />
           </Grid>
         </Grid>
         <Grid container sx={{ flex: 1 }} spacing={6} flexWrap="wrap">
