@@ -31,6 +31,7 @@ import useErrorService from '@hooks/useErrorService';
 import useAnalytics from '@hooks/useAnalytics';
 import useStoredContactList from '@hooks/useStoredContactList';
 import { trimAddress } from '@common/utils/parsing';
+import useEnsAddress from '@hooks/useEnsAddress';
 
 interface ConfirmTransferModalModalProps {
   open: boolean;
@@ -54,15 +55,17 @@ const ConfirmTransferModal = ({
   const activeWallet = useActiveWallet();
   const walletService = useWalletService();
   const intl = useIntl();
-  const { amount, recipient, token } = useTransferState();
+  const { amount, recipient, recipientAddress, token } = useTransferState();
   const tokenPrices = usePortfolioPrices(token ? [token] : []);
   const [, setModalLoading, setModalError, setModalClosed] = useTransactionModal();
   const addTransaction = useTransactionAdder();
   const errorService = useErrorService();
   const { trackEvent, trackTransfer } = useAnalytics();
   const contacts = useStoredContactList();
-  const isRecipientContact = contacts.find(({ address }) => address.toLowerCase() === (recipient || '').toLowerCase());
-
+  const isRecipientContact = contacts.find(
+    ({ address }) => address.toLowerCase() === (recipientAddress || '').toLowerCase()
+  );
+  const { ensAddress } = useEnsAddress(recipient);
   if (!activeWallet || token === null || !network) {
     return null;
   }
@@ -104,7 +107,7 @@ const ConfirmTransferModal = ({
             <FormattedMessage
               description="transferring token"
               defaultMessage="Transferring {amount} {symbol} to {to}"
-              values={{ amount, symbol: token.symbol, to: trimAddress(recipient) }}
+              values={{ amount, symbol: token.symbol, to: ensAddress ? recipient : trimAddress(recipient) }}
             />
           </Typography>
         ),
@@ -119,7 +122,7 @@ const ConfirmTransferModal = ({
 
       const result = await walletService.transferToken({
         from: activeWallet.address,
-        to: recipient as ViemAddress,
+        to: recipientAddress as ViemAddress,
         token: parsedToken,
         amount: parsedAmount,
       });
@@ -141,7 +144,7 @@ const ConfirmTransferModal = ({
         type: TransactionTypes.transferToken,
         typeData: {
           token: parsedToken,
-          to: recipient,
+          to: recipientAddress,
           amount: parsedAmount.toString(),
         },
       };
@@ -158,7 +161,7 @@ const ConfirmTransferModal = ({
       if (shouldTrackError(e as Error)) {
         void errorService.logError('Error transfering token', JSON.stringify(e), {
           from: activeWallet.address,
-          to: recipient,
+          to: recipientAddress,
           amount,
           token,
         });

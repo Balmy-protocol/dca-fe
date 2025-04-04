@@ -21,8 +21,8 @@ import { isEqual, orderBy } from 'lodash';
 import { useAppDispatch } from '@hooks/state';
 import { useTransferState } from '@state/transfer/hooks';
 import { resetForm, setChainId, setRecipient, setToken } from '@state/transfer/actions';
-import { identifyNetwork, validateAddress } from '@common/utils/parsing';
-import { getAllChains } from '@balmy/sdk';
+import { identifyNetwork } from '@common/utils/parsing';
+import { getAllChains, isSameAddress } from '@balmy/sdk';
 import { NETWORKS } from '@constants';
 import useReplaceHistory from '@hooks/useReplaceHistory';
 import { useThemeMode } from '@state/config/hooks';
@@ -42,6 +42,7 @@ import { formatUsdAmount } from '@common/utils/currency';
 import useValidateAddress from '@hooks/useValidateAddress';
 import FormWalletSelector from '@common/components/form-wallet-selector';
 import useCurrentNetwork from '@hooks/useCurrentNetwork';
+import useEnsAddress from '@hooks/useEnsAddress';
 
 const StyledTransferForm = styled(BackgroundPaper)`
   position: relative;
@@ -99,7 +100,7 @@ const TransferForm = () => {
   const replaceHistory = useReplaceHistory();
   const { trackEvent } = useAnalytics();
   const actualCurrentNetwork = useCurrentNetwork();
-  const { token: selectedToken, recipient, amount } = useTransferState();
+  const { token: selectedToken, recipient, recipientAddress, amount } = useTransferState();
   const selectedNetwork = useSelectedNetwork();
   const [openConfirmTxStep, setOpenConfirmTxStep] = React.useState(false);
   const [shouldShowConfirmation, setShouldShowConfirmation] = React.useState(false);
@@ -111,12 +112,16 @@ const TransferForm = () => {
   const [isContactSelection, setIsContactSelection] = React.useState(false);
   const [activeModal, setActiveModal] = React.useState<ContactListActiveModal>(ContactListActiveModal.NONE);
   const {
-    validationResult: { isValidAddress, errorMessage: addressErrorMessage },
+    validationResult: { isValidAddress: isValidAddressString, errorMessage: addressErrorMessage },
     setAddress: setInputAddress,
   } = useValidateAddress({
     restrictActiveWallet: true,
-    defaultValue: recipient,
+    defaultValue: recipientAddress,
   });
+  const { ensAddress, isLoadingEnsAddress, handleEnsNameSearch } = useEnsAddress(recipientAddress);
+
+  const isValidAddress =
+    isValidAddressString || (!isLoadingEnsAddress && !!ensAddress && !isSameAddress(ensAddress, activeWallet?.address));
 
   const parsedAmount = parseUnits(amount || '0', selectedToken?.decimals || 18);
   const disableTransfer = !recipient || !selectedToken || parsedAmount <= 0n || !activeWallet || !isValidAddress;
@@ -141,10 +146,12 @@ const TransferForm = () => {
 
   React.useEffect(() => {
     dispatch(setChainId(networkToSet?.chainId || NETWORKS.mainnet.chainId));
-
-    if (!!recipientParam && validateAddress(recipientParam)) {
-      setInputAddress(recipientParam);
-      dispatch(setRecipient(recipientParam));
+    // Ens may have a dot in the name, so we need to decode it
+    const safeRecipientParam = recipientParam?.replace(/_/g, '.');
+    if (!!safeRecipientParam) {
+      void handleEnsNameSearch(safeRecipientParam);
+      setInputAddress(safeRecipientParam);
+      dispatch(setRecipient(safeRecipientParam));
     }
   }, []);
 
@@ -175,13 +182,13 @@ const TransferForm = () => {
   }, [setShouldShowConfirmation]);
 
   const isRecipientInContactList = React.useMemo(
-    () => contactList.some((contact) => contact.address === recipient),
-    [contactList, recipient]
+    () => contactList.some((contact) => contact.address === recipientAddress),
+    [contactList, recipientAddress]
   );
 
   const onAddFrequentContact = () => {
     setActiveModal(ContactListActiveModal.ADD_CONTACT);
-    setFrequentRecipient(recipient);
+    setFrequentRecipient(recipientAddress);
     trackEvent('Transfer - Added recipient as contact');
   };
 

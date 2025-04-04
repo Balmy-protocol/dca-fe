@@ -9,15 +9,18 @@ import { Address } from 'viem';
 import { NETWORKS } from '@constants';
 
 type EnsNames = Record<Address, string | null | undefined>;
-
+type EnsAddresses = Record<string, Address | null>;
+export const universalResolverAddress: Address = '0xc0497E381f536Be9ce14B0dD3817cBcAe57d2F62';
 export interface LabelServiceData {
   labels: AccountLabels;
   ensNames: EnsNames;
+  ensAddresses: EnsAddresses;
 }
 
 const initialState: LabelServiceData = {
   labels: {},
   ensNames: {},
+  ensAddresses: {},
 };
 export default class LabelService extends EventsManager<LabelServiceData> implements ILabelService {
   meanApiService: MeanApiService;
@@ -145,26 +148,45 @@ export default class LabelService extends EventsManager<LabelServiceData> implem
     this.serviceData = { ...this.serviceData, ensNames };
   }
 
+  get ensAddresses() {
+    return this.serviceData.ensAddresses;
+  }
+
+  set ensAddresses(ensAddresses) {
+    this.serviceData = { ...this.serviceData, ensAddresses };
+  }
+
   getEnsNames() {
-    return this.ensNames;
+    const ensAddresses = { ...this.ensAddresses };
+    const mergedEnsNames = { ...this.ensNames };
+
+    Object.entries(ensAddresses).forEach(([name, address]) => {
+      if (address) {
+        mergedEnsNames[address] = name;
+      }
+    });
+
+    return mergedEnsNames;
   }
 
   async fetchEns(upperAddress: Address): Promise<void> {
     const address = upperAddress.toLowerCase() as Address;
     let ens = null;
 
-    if (!isUndefined(this.ensNames[address])) {
+    const ensNames = { ...this.ensNames };
+
+    if (!isUndefined(ensNames[address])) {
       return;
     }
     // We set the new address as null to avoid multiple calls to the same address
     const updatedEnsNames: EnsNames = { ...this.ensNames, [address]: ens };
     this.ensNames = updatedEnsNames;
-    // First we check if the address has a ENS name in mainnet
+
     try {
       const provider = this.providerService.getProvider(NETWORKS.mainnet.chainId);
       ens = await provider.getEnsName({
         address,
-        universalResolverAddress: '0xc0497E381f536Be9ce14B0dD3817cBcAe57d2F62',
+        universalResolverAddress,
       });
     } catch {}
 
@@ -173,22 +195,31 @@ export default class LabelService extends EventsManager<LabelServiceData> implem
       this.ensNames = updatedEnsNames;
       return;
     }
+  }
 
-    // Then we check on Arbitrum if no ENS name was found
+  async fetchEnsAddress(ens: string): Promise<void> {
+    let address: Address | null = null;
+
+    const hasFetchedEnsAddress = !isUndefined(this.ensAddresses[ens]);
+    const hasResolvedEnsAddress = Object.values(this.getEnsNames()).includes(ens);
+
+    if (hasFetchedEnsAddress || hasResolvedEnsAddress) {
+      return;
+    }
+
+    // We set the new ens address as null to avoid multiple calls to the same ens
+    const updatedEnsAddresses: EnsAddresses = { ...this.ensAddresses, [ens]: address };
+    this.ensAddresses = updatedEnsAddresses;
+
     try {
-      const smolDomainInstance = await this.contractService.getSmolDomainInstance({
-        chainId: NETWORKS.arbitrum.chainId,
-        readOnly: true,
-      });
+      const provider = this.providerService.getProvider(NETWORKS.mainnet.chainId);
 
-      ens = await smolDomainInstance.read.getFirstDefaultDomain([address]);
+      address = await provider.getEnsAddress({ name: ens, universalResolverAddress });
+      if (address) {
+        updatedEnsAddresses[ens] = address.toLowerCase() as Address;
+        this.ensAddresses = updatedEnsAddresses;
+      }
     } catch {}
-
-    if (ens) {
-      updatedEnsNames[address] = ens;
-      this.ensNames = updatedEnsNames;
-      return;
-    }
   }
 
   async fetchManyEns(addresses: Address[]): Promise<void> {
