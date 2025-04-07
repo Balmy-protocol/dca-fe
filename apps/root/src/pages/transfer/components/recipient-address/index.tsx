@@ -87,7 +87,7 @@ const RecipientAddress = ({
     }
   };
 
-  const hasError = !isValidAddress && !!errorMessage;
+  const hasError = !!storedRecipient && !isValidAddress && !!errorMessage && !isLoadingEnsAddress;
 
   return isContactSelection && selectedContact ? (
     <ContactSelectionAutocomplete selectedContact={selectedContact} setIsContactSelection={setIsContactSelection} />
@@ -97,8 +97,8 @@ const RecipientAddress = ({
       value={storedRecipient}
       placeholder={intl.formatMessage(
         defineMessage({
-          defaultMessage: 'Recipient Address',
-          description: 'recipientAddress',
+          defaultMessage: 'Set recipient address or ENS (0x123... or name.eth)',
+          description: 'recipientAddressWithEns',
         })
       )}
       error={hasError}

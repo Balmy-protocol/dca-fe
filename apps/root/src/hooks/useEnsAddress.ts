@@ -27,6 +27,8 @@ function useEnsAddress(rawEnsName: string) {
     debounce(async (value: string) => {
       try {
         await labelService.fetchEnsAddress(value);
+        // We wait for 200ms to ensure the ens address is set in the service and hooks
+        await new Promise((resolve) => setTimeout(resolve, 100));
       } finally {
         setIsLoadingEnsAddress(false);
       }
