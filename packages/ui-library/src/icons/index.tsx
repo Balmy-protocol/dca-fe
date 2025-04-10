@@ -166,6 +166,7 @@ import {
 } from './tiers';
 import TickSquareIcon from './tickSquare';
 import KeyIcon from './key';
+import NotificationIcon from './notification';
 
 export {
   HelpOutline as HelpOutlineIcon,
@@ -334,4 +335,5 @@ export {
   QrCodeIcon,
   AnimatedArrowRightIcon,
   KeyIcon,
+  NotificationIcon,
 };
