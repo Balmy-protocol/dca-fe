@@ -144,7 +144,7 @@ const PositionSummaryControls = ({ show, pendingTransaction, position, ownerWall
     };
 
     try {
-      if (show) void fetchPositionCsv();
+      void fetchPositionCsv();
     } catch (e) {
       console.error('Error fetching CSV content:', e);
     }
@@ -152,7 +152,7 @@ const PositionSummaryControls = ({ show, pendingTransaction, position, ownerWall
     return () => {
       if (downloadUrl) URL.revokeObjectURL(downloadUrl);
     };
-  }, [show]);
+  }, []);
 
   const onTerminate = () => {
     setShowTerminateModal(true);
@@ -446,104 +446,118 @@ const PositionSummaryControls = ({ show, pendingTransaction, position, ownerWall
         onCancel={() => setShowTransferModal(false)}
       />
       <NFTModal open={showNFTModal} nftData={nftData} onCancel={() => setShowNFTModal(false)} />
-      <StyledPositionSummaryControlsContainer show={show}>
-        {position.remainingSwaps > 0 && <AddPositionToCalendarButton position={position} />}
-
-        {shouldDisableArrow && (
-          <Button
-            variant="outlined"
-            disabled={disabledWithdraw || isPending || disabled || position.toWithdraw.amount <= 0n}
-            onClick={() => onWithdraw(!!hasSignSupport && position.to.address === PROTOCOL_TOKEN_ADDRESS)}
+      {!show && position.status === 'TERMINATED' && (
+        <StyledPositionSummaryControlsContainer show>
+          <Link
+            download={`position_${position.chainId}_${position.positionId}.csv`}
+            ref={downloadCsvLinkRef}
+            href={csvUrl}
+            sx={{ textDecoration: 'none !important' }}
           >
-            <FormattedMessage
-              description="withdrawToken"
-              defaultMessage="Withdraw {token}"
-              values={{
-                token:
-                  hasSignSupport || position.to.address !== PROTOCOL_TOKEN_ADDRESS
-                    ? position.to.symbol
-                    : wrappedProtocolToken.symbol,
-              }}
-            />
-          </Button>
-        )}
+            <FormattedMessage description="exportPositionCSV" defaultMessage="Export as CSV" />
+          </Link>
+        </StyledPositionSummaryControlsContainer>
+      )}
+      {show && (
+        <StyledPositionSummaryControlsContainer show>
+          {position.remainingSwaps > 0 && <AddPositionToCalendarButton position={position} />}
 
-        {!shouldDisableArrow && (
-          <>
+          {shouldDisableArrow && (
             <Button
               variant="outlined"
               disabled={disabledWithdraw || isPending || disabled || position.toWithdraw.amount <= 0n}
-              onClick={(e) => setAnchorWithdrawButton(e.currentTarget)}
-              endIcon={<KeyboardArrowDownIcon />}
+              onClick={() => onWithdraw(!!hasSignSupport && position.to.address === PROTOCOL_TOKEN_ADDRESS)}
             >
-              <FormattedMessage defaultMessage="Withdraw" description="withdraw" />
+              <FormattedMessage
+                description="withdrawToken"
+                defaultMessage="Withdraw {token}"
+                values={{
+                  token:
+                    hasSignSupport || position.to.address !== PROTOCOL_TOKEN_ADDRESS
+                      ? position.to.symbol
+                      : wrappedProtocolToken.symbol,
+                }}
+              />
             </Button>
-            <OptionsMenuItems
-              options={options}
-              anchorEl={anchorWithdrawButton}
-              handleClose={() => setAnchorWithdrawButton(null)}
-            />
-          </>
-        )}
-        <StyledDivider />
-        <TwitterShareLinkButton text={tweetContent.text} url={tweetContent.shareUrl} onClick={onClickShare} />
-        <ContainerBox alignSelf="center">
-          <MoreVertButtonIcon onClick={handleClick} disabled={isPending} />
-          <StyledMenu
-            anchorEl={anchorEl}
-            open={open}
-            onClose={handleClose}
-            anchorOrigin={{
-              vertical: 'bottom',
-              horizontal: 'right',
-            }}
-            transformOrigin={{
-              vertical: 'top',
-              horizontal: 'right',
-            }}
-          >
-            <MenuItem
-              onClick={() => {
-                handleClose();
-                void onViewNFT();
-              }}
-              disabled={disabled}
-            >
-              <FormattedMessage description="view nft" defaultMessage="View NFT" />
-            </MenuItem>
-            <MenuItem
-              onClick={() => {
-                handleClose();
-                onTransfer();
-              }}
-              disabled={isPending || disabled}
-            >
-              <FormattedMessage description="transferPosition" defaultMessage="Transfer position" />
-            </MenuItem>
-            <MenuItem
-              onClick={() => {
-                handleClose();
-                onTerminate();
-              }}
-              disabled={isPending || disabled || disabledWithdraw || !showExtendedFunctions}
-            >
-              <FormattedMessage description="terminate position" defaultMessage="Withdraw and close position" />
-            </MenuItem>
-            {csvUrl && (
-              <MenuItem
-                onClick={handleClose}
-                component={Link}
-                download={`position_${position.chainId}_${position.positionId}.csv`}
-                ref={downloadCsvLinkRef}
-                href={csvUrl}
-                sx={{ textDecoration: 'none !important' }}
+          )}
+
+          {!shouldDisableArrow && (
+            <>
+              <Button
+                variant="outlined"
+                disabled={disabledWithdraw || isPending || disabled || position.toWithdraw.amount <= 0n}
+                onClick={(e) => setAnchorWithdrawButton(e.currentTarget)}
+                endIcon={<KeyboardArrowDownIcon />}
               >
-                <FormattedMessage description="exportPositionCSV" defaultMessage="Export as CSV" />
+                <FormattedMessage defaultMessage="Withdraw" description="withdraw" />
+              </Button>
+              <OptionsMenuItems
+                options={options}
+                anchorEl={anchorWithdrawButton}
+                handleClose={() => setAnchorWithdrawButton(null)}
+              />
+            </>
+          )}
+          <StyledDivider />
+          <TwitterShareLinkButton text={tweetContent.text} url={tweetContent.shareUrl} onClick={onClickShare} />
+          <ContainerBox alignSelf="center">
+            <MoreVertButtonIcon onClick={handleClick} disabled={isPending} />
+            <StyledMenu
+              anchorEl={anchorEl}
+              open={open}
+              onClose={handleClose}
+              anchorOrigin={{
+                vertical: 'bottom',
+                horizontal: 'right',
+              }}
+              transformOrigin={{
+                vertical: 'top',
+                horizontal: 'right',
+              }}
+            >
+              <MenuItem
+                onClick={() => {
+                  handleClose();
+                  void onViewNFT();
+                }}
+                disabled={disabled}
+              >
+                <FormattedMessage description="view nft" defaultMessage="View NFT" />
               </MenuItem>
-            )}
-          </StyledMenu>
-        </ContainerBox>
-      </StyledPositionSummaryControlsContainer>
+              <MenuItem
+                onClick={() => {
+                  handleClose();
+                  onTransfer();
+                }}
+                disabled={isPending || disabled}
+              >
+                <FormattedMessage description="transferPosition" defaultMessage="Transfer position" />
+              </MenuItem>
+              <MenuItem
+                onClick={() => {
+                  handleClose();
+                  onTerminate();
+                }}
+                disabled={isPending || disabled || disabledWithdraw || !showExtendedFunctions}
+              >
+                <FormattedMessage description="terminate position" defaultMessage="Withdraw and close position" />
+              </MenuItem>
+              {csvUrl && (
+                <MenuItem
+                  onClick={handleClose}
+                  component={Link}
+                  download={`position_${position.chainId}_${position.positionId}.csv`}
+                  ref={downloadCsvLinkRef}
+                  href={csvUrl}
+                  sx={{ textDecoration: 'none !important' }}
+                >
+                  <FormattedMessage description="exportPositionCSV" defaultMessage="Export as CSV" />
+                </MenuItem>
+              )}
+            </StyledMenu>
+          </ContainerBox>
+        </StyledPositionSummaryControlsContainer>
+      )}
     </>
   );
 };
