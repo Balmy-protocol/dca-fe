@@ -375,7 +375,6 @@ export const SUPPORTED_NETWORKS = [
   NETWORKS.polygon.chainId,
   NETWORKS.arbitrum.chainId,
   NETWORKS.bsc.chainId,
-  NETWORKS.fantom.chainId,
   NETWORKS.avalanche.chainId,
   NETWORKS.heco.chainId,
   NETWORKS.xdai.chainId,
