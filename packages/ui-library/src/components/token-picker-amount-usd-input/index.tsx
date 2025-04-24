@@ -264,8 +264,8 @@ const StyledMaxButtonContainer = styled(ContainerBox)`
   position: absolute;
 
   ${({ theme: { spacing } }) => `
-    right: ${spacing(5)};
-    top: ${spacing(3)};
+    right: ${spacing(3)};
+    top: ${spacing(1)};
   `}
 `;
 
