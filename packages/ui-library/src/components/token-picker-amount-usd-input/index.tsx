@@ -1,5 +1,5 @@
 import styled, { useTheme } from 'styled-components';
-import React from 'react';
+import React, { useRef } from 'react';
 import isUndefined from 'lodash/isUndefined';
 import { FormattedMessage } from 'react-intl';
 
@@ -105,6 +105,11 @@ const TokenInput = ({
   );
 };
 
+/*
+  This is a custom input component that allows the user to input a USD amount.
+  The $ symbol is not part of the input value, but it is displayed to the user.
+  We need to handle the $ symbol manually to ensure the cursor is positioned correctly, for events like focus, click, and drag
+*/
 const UsdInput = ({
   id,
   onChange,
@@ -121,34 +126,95 @@ const UsdInput = ({
     palette: { mode },
   } = useTheme();
   const tokenAmount = calculateTokenAmount({ value, tokenPrice });
+  const inputColor = getInputColor({ mode, hasValue: value !== '' && !isUndefined(value) });
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const handleChange = (evt: React.ChangeEvent<HTMLInputElement>) => {
+    // Remove $ character
+    const numericValue = evt.target.value.replace(/[$,]/g, '');
+
+    amountValidator({
+      onChange,
+      nextValue: numericValue,
+      decimals: 2,
+    });
+  };
+
+  const handleKeyDown = (evt: React.KeyboardEvent<HTMLInputElement>) => {
+    // Prevent cursor from moving before the $ sign
+    if (evt.key === 'ArrowLeft' || evt.key === 'Backspace') {
+      if (inputRef.current) {
+        const cursorPos = inputRef.current.selectionStart;
+        if (cursorPos === 1) {
+          evt.preventDefault();
+        }
+      }
+    }
+
+    // Handle Home key to place cursor after $ sign
+    if (evt.key === 'Home') {
+      evt.preventDefault();
+      if (inputRef.current) {
+        inputRef.current.setSelectionRange(1, 1);
+      }
+    }
+  };
+
+  const handleClick = () => {
+    if (inputRef.current && inputRef.current.selectionStart === 0) {
+      // Move cursor to position 1 (after the $)
+      setTimeout(() => {
+        if (inputRef.current) {
+          inputRef.current.setSelectionRange(1, 1);
+        }
+      }, 0);
+    }
+  };
+
+  const handleSelect = () => {
+    if (inputRef.current) {
+      const { selectionStart, selectionEnd } = inputRef.current;
+
+      // If selection starts at position 0, adjust it to start after the $ symbol
+      if (selectionStart === 0) {
+        setTimeout(() => {
+          if (inputRef.current) {
+            inputRef.current.setSelectionRange(1, selectionEnd || 1);
+          }
+        }, 0);
+      }
+    }
+  };
+
+  const handleFocus = () => {
+    onFocus();
+    setTimeout(() => {
+      if (inputRef.current && inputRef.current.selectionStart === 0) {
+        inputRef.current.setSelectionRange(1, 1);
+      }
+    }, 0);
+  };
 
   return (
     <ContainerBox flexDirection="column" flex={1} alignItems="flex-end">
-      <FormControl variant="standard">
+      <FormControl variant="standard" fullWidth>
         <StyledInput
           id={`${id}-usd`}
-          onChange={(evt) =>
-            amountValidator({
-              onChange,
-              nextValue: evt.target.value,
-              decimals: 2,
-            })
-          }
-          value={value || ''}
-          onFocus={onFocus}
+          onChange={handleChange}
+          value={value ? `$${value}` : ''}
+          onFocus={handleFocus}
+          inputRef={inputRef}
+          onKeyDown={handleKeyDown}
+          onClick={handleClick}
+          onSelect={handleSelect}
           onBlur={onBlur}
-          endAdornment={
-            <Typography variant="h2Bold" color={getInputColor({ mode, hasValue: value !== '' && !isUndefined(value) })}>
-              USD
-            </Typography>
-          }
           autoComplete="off"
-          placeholder="0.00"
+          placeholder="$0.00"
           disableUnderline
           disabled={disabled}
           inputProps={{
             style: {
-              color: getInputColor({ mode, hasValue: value !== '' && !isUndefined(value) }),
+              color: inputColor,
               padding: 0,
               textOverflow: 'ellipsis',
               textAlign: 'right',
