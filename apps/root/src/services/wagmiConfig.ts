@@ -27,7 +27,6 @@ import {
   polygon,
   bsc,
   avalanche,
-  fantom,
   arbitrum,
   optimism,
   celo,
@@ -42,7 +41,6 @@ import {
   moonbeam,
   evmos,
   canto,
-  polygonZkEvm,
 } from 'wagmi/chains';
 // See: https://github.com/wevm/wagmi/issues/3157 & https://github.com/coinbase/coinbase-wallet-sdk/issues/1012
 // Rainbowkit implementation: https://github.com/rainbow-me/rainbowkit/blob/d8c64ee4baf865d3452a6b92e0525c123f680ec1/packages/rainbowkit/src/wallets/walletConnectors/coinbaseWallet/coinbaseWallet.ts
@@ -70,7 +68,6 @@ export default function getWagmiConfig() {
     polygon,
     bsc,
     avalanche,
-    fantom,
     arbitrum,
     optimism,
     celo,
@@ -85,7 +82,6 @@ export default function getWagmiConfig() {
     moonbeam,
     evmos,
     canto,
-    polygonZkEvm,
     ...addedNetworks,
   ];
 
