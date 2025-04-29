@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { Button, ContainerBox, FormControl, IconButton, Typography, InputContainer } from '..';
 import isUndefined from 'lodash/isUndefined';
 import styled from 'styled-components';
@@ -12,11 +12,11 @@ import { useTheme } from '@mui/material';
 import { formatCurrencyAmount } from '../../common/utils/currency';
 import { withStyles } from 'tss-react/mui';
 import useTokenAmountUsd, {
-  amountValidator,
   calculateTokenAmount,
   calculateUsdAmount,
   getInputColor,
   getSubInputColor,
+  handleAmountValidator,
   InputTypeT,
 } from './useTokenAmountUsd';
 
@@ -59,19 +59,24 @@ const TokenInput = ({ onChange, value, token, tokenPrice, onBlur, onFocus, disab
     palette: { mode },
   } = useTheme();
   const usdAmount = calculateUsdAmount({ value, token, tokenPrice });
+  const inputRef = useRef<HTMLInputElement>(null);
 
+  const handleChange = (evt: React.ChangeEvent<HTMLInputElement>) => {
+    handleAmountValidator({
+      onChange,
+      nextValue: evt.target.value,
+      decimals: token?.decimals || 18,
+      currentValue: value,
+      inputRef,
+    });
+  };
   return (
     <ContainerBox flexDirection="column" flex={1}>
       <FormControl variant="standard" fullWidth>
         <StyledInput
           id="component-simple"
-          onChange={(evt) =>
-            amountValidator({
-              onChange,
-              nextValue: evt.target.value,
-              decimals: token?.decimals || 18,
-            })
-          }
+          onChange={handleChange}
+          inputRef={inputRef}
           value={value || ''}
           onFocus={onFocus}
           onBlur={onBlur}
@@ -101,19 +106,24 @@ const UsdInput = ({ onChange, value, token, tokenPrice, onBlur, onFocus, disable
     palette: { mode },
   } = useTheme();
   const tokenAmount = calculateTokenAmount({ value, tokenPrice });
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const handleChange = (evt: React.ChangeEvent<HTMLInputElement>) => {
+    handleAmountValidator({
+      onChange,
+      nextValue: evt.target.value,
+      decimals: 2,
+      currentValue: value,
+      inputRef,
+    });
+  };
 
   return (
     <ContainerBox flexDirection="column" flex={1}>
       <FormControl variant="standard">
         <StyledInput
           id="component-simple"
-          onChange={(evt) =>
-            amountValidator({
-              onChange,
-              nextValue: evt.target.value,
-              decimals: 2,
-            })
-          }
+          onChange={handleChange}
           value={value || ''}
           onFocus={onFocus}
           onBlur={onBlur}

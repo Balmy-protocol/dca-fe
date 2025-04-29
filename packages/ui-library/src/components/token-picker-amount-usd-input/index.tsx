@@ -5,11 +5,11 @@ import { FormattedMessage } from 'react-intl';
 
 import { buildTypographyVariant } from 'ui-library/src/theme/typography';
 import useTokenAmountUsd, {
-  amountValidator,
   calculateTokenAmount,
   calculateUsdAmount,
   getInputColor,
   getSubInputColor,
+  handleAmountValidator,
   InputTypeT,
 } from '../token-amount-usd-input/useTokenAmountUsd';
 import { Token, AmountsOfToken, TokenWithIcon } from 'common-types';
@@ -55,19 +55,25 @@ const TokenInput = ({
     palette: { mode },
   } = useTheme();
   const usdAmount = calculateUsdAmount({ value, token, tokenPrice });
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const handleChange = (evt: React.ChangeEvent<HTMLInputElement>) => {
+    handleAmountValidator({
+      onChange,
+      nextValue: evt.target.value,
+      decimals: token?.decimals || 18,
+      currentValue: value,
+      inputRef,
+    });
+  };
 
   return (
     <ContainerBox flexDirection="column" flex={1} alignItems="flex-end">
       <FormControl variant="standard" fullWidth>
         <StyledInput
           id={`${id}-token`}
-          onChange={(evt) =>
-            amountValidator({
-              onChange,
-              nextValue: evt.target.value,
-              decimals: token?.decimals || 18,
-            })
-          }
+          onChange={handleChange}
+          inputRef={inputRef}
           value={value || ''}
           onFocus={onFocus}
           onBlur={onBlur}
@@ -90,9 +96,6 @@ const TokenInput = ({
         />
       </FormControl>
       <ContainerBox alignItems="center" gap={1}>
-        <IconButton sx={{ padding: 0 }} disabled={isUndefined(tokenPrice) || disabled} onClick={onChangeType}>
-          <ToggleArrowIcon fontSize="small" sx={{ color: colors[mode].accent.primary }} />
-        </IconButton>
         <Typography
           variant="bodySemibold"
           color={getSubInputColor({ mode, hasValue: value !== '' && !isUndefined(value) })}
@@ -100,6 +103,9 @@ const TokenInput = ({
           {`$${usdAmount}`}
         </Typography>
         {priceImpactLabel}
+        <IconButton sx={{ padding: 0 }} disabled={isUndefined(tokenPrice) || disabled} onClick={onChangeType}>
+          <ToggleArrowIcon fontSize="small" sx={{ color: colors[mode].accent.primary }} />
+        </IconButton>
       </ContainerBox>
     </ContainerBox>
   );
@@ -133,10 +139,12 @@ const UsdInput = ({
     // Remove $ character
     const numericValue = evt.target.value.replace(/[$,]/g, '');
 
-    amountValidator({
+    handleAmountValidator({
       onChange,
       nextValue: numericValue,
       decimals: 2,
+      currentValue: value,
+      inputRef,
     });
   };
 
@@ -214,20 +222,17 @@ const UsdInput = ({
           disabled={disabled}
           inputProps={{
             style: {
+              ...buildTypographyVariant(mode).h2Bold,
               color: inputColor,
               padding: 0,
               textOverflow: 'ellipsis',
               textAlign: 'right',
-              gap: 0,
-              ...buildTypographyVariant(mode).h2Bold,
+              height: 'auto',
             },
           }}
         />
       </FormControl>
       <ContainerBox alignItems="center" gap={1}>
-        <IconButton sx={{ padding: 0 }} disabled={isUndefined(tokenPrice) || disabled} onClick={onChangeType}>
-          <ToggleArrowIcon fontSize="small" sx={{ color: colors[mode].accent.primary }} />
-        </IconButton>
         <Typography
           variant="bodySemibold"
           color={getSubInputColor({ mode, hasValue: value !== '' && !isUndefined(value) })}
@@ -235,6 +240,9 @@ const UsdInput = ({
           ≈{` ${tokenAmount} ${token?.symbol}`}
         </Typography>
         {priceImpactLabel}
+        <IconButton sx={{ padding: 0 }} disabled={isUndefined(tokenPrice) || disabled} onClick={onChangeType}>
+          <ToggleArrowIcon fontSize="small" sx={{ color: colors[mode].accent.primary }} />
+        </IconButton>
       </ContainerBox>
     </ContainerBox>
   );
@@ -323,7 +331,7 @@ const TokenPickerAmountUsdInput = ({
     isFinite(Number(priceImpact)) &&
     value !== '...' && (
       <Typography
-        variant="bodySmallRegular"
+        variant="bodyRegular"
         color={
           Number(priceImpact) < -2.5
             ? colors[mode].semantic.error.darker

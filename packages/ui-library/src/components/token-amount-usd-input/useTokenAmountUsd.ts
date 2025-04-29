@@ -50,11 +50,11 @@ export const calculateUsdAmount = ({
     : parseFloat(formatUnits(parseUnits(value, token.decimals) * tokenPrice, token.decimals + 18)).toFixed(2);
 
 export const calculateTokenAmount = ({ value, tokenPrice }: { value?: string; tokenPrice?: bigint }) =>
-  isUndefined(value) || value === '' || isUndefined(tokenPrice)
+  isUndefined(value) || value === '' || isUndefined(tokenPrice) || tokenPrice === BigInt(0)
     ? '0'
     : formatUnits(parseUnits(value, 18 * 2) / tokenPrice, 18).toString();
 
-export const amountValidator = ({
+const amountValidator = ({
   nextValue,
   decimals,
   onChange,
@@ -64,12 +64,54 @@ export const amountValidator = ({
   decimals: number;
 }) => {
   const newNextValue = nextValue.replace(/,/g, '.');
-  // sanitize value
-  const inputRegex = RegExp(`^\\d*(?:\\\\[.])?\\d{0,${decimals}}$`);
 
-  if (inputRegex.test(newNextValue.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))) {
-    onChange(newNextValue.startsWith('.') ? `0${newNextValue}` : newNextValue || '');
+  const inputRegex = RegExp(`^\\d*(?:[.])?\\d*$`); // allow ANY decimals temporarily
+
+  if (inputRegex.test(newNextValue)) {
+    const [integer, decimal] = newNextValue.split('.');
+
+    if (decimal && decimal.length > decimals) {
+      // too many decimals => cut the excess
+      const trimmedValue = `${integer}.${decimal.slice(0, decimals)}`;
+      onChange(trimmedValue.startsWith('.') ? `0${trimmedValue}` : trimmedValue);
+      return;
+    }
+
+    onChange(newNextValue.startsWith('.') ? `0${newNextValue}` : newNextValue);
   }
+};
+
+export const handleAmountValidator = ({
+  nextValue,
+  decimals,
+  onChange,
+  currentValue,
+  inputRef,
+}: {
+  nextValue: string;
+  decimals: number;
+  onChange: (newValue: string) => void;
+  currentValue?: string;
+  inputRef: React.RefObject<HTMLInputElement>;
+}) => {
+  const input = inputRef.current;
+  const newCursorPos = input?.selectionStart ?? 0;
+  // Store the previous value to check if the input is empty.
+  const prevValue = currentValue;
+
+  amountValidator({
+    onChange,
+    nextValue,
+    decimals,
+  });
+
+  // As decimals are replaced, the cursor position is set to the end of the input.
+  // With requestAnimationFrame, we ensure the cursor position is updated after the input is updated.
+  requestAnimationFrame(() => {
+    if (input && prevValue !== '') {
+      input.setSelectionRange(newCursorPos, newCursorPos);
+    }
+  });
 };
 
 export const getInputColor = ({
