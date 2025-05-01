@@ -27,4 +27,5 @@ export const PLATFORM_NAMES_FOR_TOKENS: Record<string, string> = {
   Agave: 'AGAVE',
   Beefy: 'BEEFY',
   Compound: 'COMPOUND',
+  Maker: 'MAKER',
 };

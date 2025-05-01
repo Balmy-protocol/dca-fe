@@ -21,14 +21,6 @@ export const FEE_TYPE_STRING_MAP: Record<FeeType, ReturnType<typeof defineMessag
   }),
 };
 
-// export const EARN_AVAILABLE_CHAINS = [
-//   Chains.POLYGON.chainId,
-//   Chains.ETHEREUM.chainId,
-//   Chains.OPTIMISM.chainId,
-//   Chains.ARBITRUM.chainId,
-//   Chains.BASE.chainId,
-// ];
-
 export const PROMOTED_STRATEGIES_IDS: StrategyId[] = [
   // '137-0xb034a43d1ffe0f88ed3a50fc096179f543fd3f3a-1',
   // '8453-0x020ebf53f4e5ef859e18e2973bd8d8b9af5c9c9f-2',
