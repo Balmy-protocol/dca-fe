@@ -6,16 +6,17 @@ import useAnalytics from '@hooks/useAnalytics';
 import usePushToHistory from '@hooks/usePushToHistory';
 import { EARN_ROUTE } from '@constants/routes';
 
-const EarnBannerShapeUrl = 'url("https://ipfs.io/ipfs/QmUfxE7Zgeja78QuX5UnZ3D3qorFrvK7869NZSf97pbdeB")';
+const EarnBannerShapeUrl = 'url("https://ipfs.io/ipfs/QmfYXVF5qDke64ZSepiSo4z2Pp5o9RTTjQ959VELZQtKrf")';
 
 const StyledBannerContainer = styled(ContainerBox).attrs({
   justifyContent: 'space-between',
-  alignItems: 'center',
+  alignItems: 'flex-start',
   fullWidth: true,
 })`
   ${({ theme: { palette, spacing } }) => `
     padding: ${spacing(4)};
     background: ${EarnBannerShapeUrl} center no-repeat, ${palette.gradient.newsBanner};
+    background-size: cover;
     border-radius: ${spacing(4)};
     overflow: hidden;
     position: relative;
@@ -23,29 +24,6 @@ const StyledBannerContainer = styled(ContainerBox).attrs({
     height: 103px;
   `}
 `;
-
-const StyledEarnGuardianPill = styled(ContainerBox).attrs({
-  justifyContent: 'center',
-  alignItems: 'center',
-})`
-  ${({ theme: { spacing } }) => `
-    padding: ${spacing(0.5)} ${spacing(1)};
-    background: #D0CCFF;
-    border: 0.5px solid #FFFFFF;
-    border-radius: ${spacing(4)};
-    position: absolute;
-    top: 20px;
-    right: 40px;
-  `}
-`;
-
-const EarnGuardianPill = () => (
-  <StyledEarnGuardianPill>
-    <Typography variant="bodyExtraExtraSmallBold" color="#791AFF">
-      <FormattedMessage defaultMessage="Earn Guardian 🛡️" description="earn.banner.earn-guardian-pill" />
-    </Typography>
-  </StyledEarnGuardianPill>
-);
 
 const LMEarnBanner = () => {
   const { trackEvent } = useAnalytics();
@@ -57,17 +35,21 @@ const LMEarnBanner = () => {
   };
 
   return (
-    <>
-      <StyledBannerContainer onClick={handleClick}>
-        <EarnGuardianPill />
-        <Typography variant="h6Bold" color="#FFF" style={{ maxWidth: '40%', textWrap: 'wrap' }}>
-          <FormattedMessage
-            defaultMessage="Don't miss $150k in $OP incentives!"
-            description="earn.banner.lm-rewards-150-op"
-          />
-        </Typography>
-      </StyledBannerContainer>
-    </>
+    <StyledBannerContainer onClick={handleClick}>
+      <Typography variant="h6Bold" color="#FFF" style={{ maxWidth: '35%', textWrap: 'wrap' }}>
+        <FormattedMessage defaultMessage="EARN GUARDIAN" description="earn.banner.earn-guardian" />
+      </Typography>
+      <Typography
+        variant="bodyBold"
+        color="#FFF"
+        textAlign="right"
+        alignSelf="end"
+        lineHeight="1.2"
+        style={{ maxWidth: '35%', textWrap: 'wrap' }}
+      >
+        <FormattedMessage defaultMessage="on GNOSIS!" description="earn.banner.on-gnosis" />
+      </Typography>
+    </StyledBannerContainer>
   );
 };
 
