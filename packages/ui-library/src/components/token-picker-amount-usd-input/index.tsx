@@ -1,5 +1,5 @@
 import styled, { useTheme } from 'styled-components';
-import React, { useRef } from 'react';
+import React, { useCallback, useRef } from 'react';
 import isUndefined from 'lodash/isUndefined';
 import { FormattedMessage } from 'react-intl';
 
@@ -57,15 +57,18 @@ const TokenInput = ({
   const usdAmount = calculateUsdAmount({ value, token, tokenPrice });
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const handleChange = (evt: React.ChangeEvent<HTMLInputElement>) => {
-    handleAmountValidator({
-      onChange,
-      nextValue: evt.target.value,
-      decimals: token?.decimals || 18,
-      currentValue: value,
-      inputRef,
-    });
-  };
+  const handleChange = useCallback(
+    (evt: React.ChangeEvent<HTMLInputElement>) => {
+      handleAmountValidator({
+        onChange,
+        nextValue: evt.target.value,
+        decimals: token?.decimals || 18,
+        currentValue: value,
+        inputRef,
+      });
+    },
+    [onChange, value, inputRef, token?.decimals]
+  );
 
   return (
     <ContainerBox flexDirection="column" flex={1} alignItems="flex-end">
@@ -135,40 +138,46 @@ const UsdInput = ({
   const inputColor = getInputColor({ mode, hasValue: value !== '' && !isUndefined(value) });
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const handleChange = (evt: React.ChangeEvent<HTMLInputElement>) => {
-    // Remove $ character
-    const numericValue = evt.target.value.replace(/[$,]/g, '');
+  const handleChange = useCallback(
+    (evt: React.ChangeEvent<HTMLInputElement>) => {
+      // Remove $ character
+      const numericValue = evt.target.value.replace(/[$,]/g, '');
 
-    handleAmountValidator({
-      onChange,
-      nextValue: numericValue,
-      decimals: 2,
-      currentValue: value,
-      inputRef,
-    });
-  };
+      handleAmountValidator({
+        onChange,
+        nextValue: numericValue,
+        decimals: 2,
+        currentValue: value,
+        inputRef,
+      });
+    },
+    [onChange, value, inputRef]
+  );
 
-  const handleKeyDown = (evt: React.KeyboardEvent<HTMLInputElement>) => {
-    // Prevent cursor from moving before the $ sign
-    if (evt.key === 'ArrowLeft' || evt.key === 'Backspace') {
-      if (inputRef.current) {
-        const cursorPos = inputRef.current.selectionStart;
-        if (cursorPos === 1) {
-          evt.preventDefault();
+  const handleKeyDown = useCallback(
+    (evt: React.KeyboardEvent<HTMLInputElement>) => {
+      // Prevent cursor from moving before the $ sign
+      if (evt.key === 'ArrowLeft' || evt.key === 'Backspace') {
+        if (inputRef.current) {
+          const cursorPos = inputRef.current.selectionStart;
+          if (cursorPos === 1) {
+            evt.preventDefault();
+          }
         }
       }
-    }
 
-    // Handle Home key to place cursor after $ sign
-    if (evt.key === 'Home') {
-      evt.preventDefault();
-      if (inputRef.current) {
-        inputRef.current.setSelectionRange(1, 1);
+      // Handle Home key to place cursor after $ sign
+      if (evt.key === 'Home') {
+        evt.preventDefault();
+        if (inputRef.current) {
+          inputRef.current.setSelectionRange(1, 1);
+        }
       }
-    }
-  };
+    },
+    [inputRef]
+  );
 
-  const handleClick = () => {
+  const handleClick = useCallback(() => {
     if (inputRef.current && inputRef.current.selectionStart === 0) {
       // Move cursor to position 1 (after the $)
       setTimeout(() => {
@@ -177,9 +186,9 @@ const UsdInput = ({
         }
       }, 0);
     }
-  };
+  }, [inputRef]);
 
-  const handleSelect = () => {
+  const handleSelect = useCallback(() => {
     if (inputRef.current) {
       const { selectionStart, selectionEnd } = inputRef.current;
 
@@ -192,16 +201,16 @@ const UsdInput = ({
         }, 0);
       }
     }
-  };
+  }, [inputRef]);
 
-  const handleFocus = () => {
+  const handleFocus = useCallback(() => {
     onFocus();
     setTimeout(() => {
       if (inputRef.current && inputRef.current.selectionStart === 0) {
         inputRef.current.setSelectionRange(1, 1);
       }
     }, 0);
-  };
+  }, [onFocus, inputRef]);
 
   return (
     <ContainerBox flexDirection="column" flex={1} alignItems="flex-end">

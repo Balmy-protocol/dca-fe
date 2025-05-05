@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useCallback, useRef } from 'react';
 import { Button, ContainerBox, FormControl, IconButton, Typography, InputContainer } from '..';
 import isUndefined from 'lodash/isUndefined';
 import styled from 'styled-components';
@@ -61,15 +61,19 @@ const TokenInput = ({ onChange, value, token, tokenPrice, onBlur, onFocus, disab
   const usdAmount = calculateUsdAmount({ value, token, tokenPrice });
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const handleChange = (evt: React.ChangeEvent<HTMLInputElement>) => {
-    handleAmountValidator({
-      onChange,
-      nextValue: evt.target.value,
-      decimals: token?.decimals || 18,
-      currentValue: value,
-      inputRef,
-    });
-  };
+  const handleChange = useCallback(
+    (evt: React.ChangeEvent<HTMLInputElement>) => {
+      handleAmountValidator({
+        onChange,
+        nextValue: evt.target.value,
+        decimals: token?.decimals || 18,
+        currentValue: value,
+        inputRef,
+      });
+    },
+    [onChange, value, inputRef, token?.decimals]
+  );
+
   return (
     <ContainerBox flexDirection="column" flex={1}>
       <FormControl variant="standard" fullWidth>
@@ -108,15 +112,18 @@ const UsdInput = ({ onChange, value, token, tokenPrice, onBlur, onFocus, disable
   const tokenAmount = calculateTokenAmount({ value, tokenPrice });
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const handleChange = (evt: React.ChangeEvent<HTMLInputElement>) => {
-    handleAmountValidator({
-      onChange,
-      nextValue: evt.target.value,
-      decimals: 2,
-      currentValue: value,
-      inputRef,
-    });
-  };
+  const handleChange = useCallback(
+    (evt: React.ChangeEvent<HTMLInputElement>) => {
+      handleAmountValidator({
+        onChange,
+        nextValue: evt.target.value,
+        decimals: 2,
+        currentValue: value,
+        inputRef,
+      });
+    },
+    [onChange, value, inputRef]
+  );
 
   return (
     <ContainerBox flexDirection="column" flex={1}>
