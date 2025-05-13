@@ -95,4 +95,14 @@ export const buildInputBaseVariant = (mode: 'light' | 'dark'): Components => ({
       },
     },
   },
+  MuiInput: {
+    styleOverrides: {
+      input: {
+        '&::placeholder': {
+          color: colors[mode].typography.typo5,
+          opacity: 1,
+        },
+      },
+    },
+  },
 });
