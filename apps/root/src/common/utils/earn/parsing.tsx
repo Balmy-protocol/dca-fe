@@ -375,7 +375,7 @@ export function parseUserStrategiesFinancialData(userPositions: EarnPosition[] =
 
     const newAmount = assetBalance.amount.amount + acc[assetBalance.token.address].amount;
     const newAmountInUsd =
-      Number(assetBalance.amount.amountInUSD) + Number(acc[assetBalance.token.address].amountInUSD);
+      Number(assetBalance.amount.amountInUSD ?? 0) + Number(acc[assetBalance.token.address].amountInUSD ?? 0);
     // eslint-disable-next-line no-param-reassign
     acc[assetBalance.token.address] = {
       amount: newAmount,
@@ -406,14 +406,14 @@ export function parseUserStrategiesFinancialData(userPositions: EarnPosition[] =
 
       const newAmount = tokenBalance.profit.amount + acc[tokenBalance.token.address].amount;
       const newAmountInUsd =
-        Number(tokenBalance.profit.amountInUSD) + Number(acc[tokenBalance.token.address].amountInUSD);
+        Number(tokenBalance.profit.amountInUSD ?? 0) + Number(acc[tokenBalance.token.address].amountInUSD ?? 0);
 
       // Asset tracking
       if (isSameToken(tokenBalance.token, position.strategy.asset)) {
-        currentProfitAssetUsd += Number(tokenBalance.profit.amountInUSD);
+        currentProfitAssetUsd += Number(tokenBalance.profit.amountInUSD ?? 0);
       }
       // Totals tracking
-      currentProfitTotalUsd += Number(tokenBalance.profit.amountInUSD);
+      currentProfitTotalUsd += Number(tokenBalance.profit.amountInUSD ?? 0);
 
       // eslint-disable-next-line no-param-reassign
       acc[tokenBalance.token.address] = {
@@ -457,7 +457,8 @@ export function parseUserStrategiesFinancialData(userPositions: EarnPosition[] =
           const newRatiodUsdAmount =
             Number(assetBalance?.amount.amountInUSD || 0) * (period.annualRatio * (totalApy / 100));
           const newAmount = newRatiodAmount + periodAcc.byToken[assetBalance.token.address].amount;
-          const newAmountInUsd = newRatiodUsdAmount + Number(periodAcc.byToken[assetBalance.token.address].amountInUSD);
+          const newAmountInUsd =
+            newRatiodUsdAmount + Number(periodAcc.byToken[assetBalance.token.address].amountInUSD || 0);
           // eslint-disable-next-line no-param-reassign
           periodAcc.byToken[assetBalance.token.address] = {
             amount: newAmount,
@@ -514,9 +515,9 @@ export function parseUserStrategiesFinancialData(userPositions: EarnPosition[] =
         acc[balance.token.address] = {
           amount: acc[balance.token.address].amount + balance.profit.amount,
           amountInUnits: formatUnits(acc[balance.token.address].amount + balance.profit.amount, balance.token.decimals),
-          amountInUSD: (Number(acc[balance.token.address].amountInUSD) + Number(balance.profit.amountInUSD)).toFixed(
-            18
-          ),
+          amountInUSD: (
+            Number(acc[balance.token.address].amountInUSD ?? 0) + Number(balance.profit.amountInUSD ?? 0)
+          ).toFixed(18),
         };
       });
     } else {
@@ -536,13 +537,14 @@ export function parseUserStrategiesFinancialData(userPositions: EarnPosition[] =
         }
 
         const amountProfit = currentBalanceToken.profit.amount - balance.profit.amount;
-        const amountProfitInUsd = Number(currentBalanceToken.profit.amountInUSD) - Number(balance.profit.amountInUSD);
+        const amountProfitInUsd =
+          Number(currentBalanceToken.profit.amountInUSD ?? 0) - Number(balance.profit.amountInUSD ?? 0);
 
         // eslint-disable-next-line no-param-reassign
         acc[balance.token.address] = {
           amount: acc[balance.token.address].amount + amountProfit,
           amountInUnits: formatUnits(acc[balance.token.address].amount + amountProfit, balance.token.decimals),
-          amountInUSD: (Number(acc[balance.token.address].amountInUSD) + amountProfitInUsd).toFixed(18),
+          amountInUSD: (Number(acc[balance.token.address].amountInUSD ?? 0) + amountProfitInUsd).toFixed(18),
         };
       });
     }
@@ -552,7 +554,7 @@ export function parseUserStrategiesFinancialData(userPositions: EarnPosition[] =
 
   const totalMonthlyEarnings = Object.values(monthlyEarnings).reduce((acc, amount) => {
     // eslint-disable-next-line no-param-reassign
-    return acc + Number(amount.amountInUSD) || 0;
+    return acc + Number(amount.amountInUSD ?? 0) || 0;
   }, 0);
 
   return {
