@@ -123,7 +123,7 @@ const PositionWarning = ({ position }: PositionWarningProps) => {
       <>
         <FormattedMessage
           description="rootstock_warning"
-          defaultMessage="Rootstock has been deprecated. Increases and deposits are disabled and swaps will not be executed. You can still withdraw and close your positions."
+          defaultMessage="Rootstock has been deprecated on Balmy. Increases and deposits are disabled and swaps will not be executed. You can still withdraw and close your positions."
         />
       </>
     );
