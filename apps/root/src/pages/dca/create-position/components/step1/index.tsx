@@ -24,12 +24,16 @@ import { useTokenBalance } from '@state/balances/hooks';
 import useActiveWallet from '@hooks/useActiveWallet';
 import useAvailableSwapIntervals from '@hooks/useAvailableSwapIntervals';
 import FormWalletSelector from '@common/components/form-wallet-selector';
+import { Chains } from '@balmy/sdk';
 
 const networkList = compact(
   orderBy(
     SUPPORTED_NETWORKS_DCA.map((chainId) => {
       const foundNetwork = find(NETWORKS, { chainId });
 
+      if (chainId === Chains.ROOTSTOCK.chainId) {
+        return null;
+      }
       if (!foundNetwork) {
         return null;
       }

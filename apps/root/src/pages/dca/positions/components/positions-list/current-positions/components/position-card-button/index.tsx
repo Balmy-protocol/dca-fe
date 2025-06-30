@@ -16,6 +16,7 @@ import useOpenConnectModal from '@hooks/useOpenConnectModal';
 import { getDisplayWallet } from '@common/utils/parsing';
 import useDcaTokens from '@hooks/useDcaTokens';
 import { WalletActionType } from '@services/accountService';
+import { Chains } from '@balmy/sdk';
 
 const StyledCardFooterButton = styled(Button).attrs({ variant: 'outlined' })``;
 
@@ -116,6 +117,7 @@ const PositionCardButton = ({
       !dcaTokens[`${chainId}-${position.from.underlyingTokens[0]?.address.toLowerCase()}` as TokenListId]) ||
     (toHasYield && !dcaTokens[`${chainId}-${position.to.underlyingTokens[0]?.address.toLowerCase()}` as TokenListId]) ||
     DCA_PAIR_BLACKLIST.includes(position.pairId) ||
+    position.chainId === Chains.ROOTSTOCK.chainId ||
     !shouldEnableFrequency(
       position.swapInterval.toString(),
       position.from.address,

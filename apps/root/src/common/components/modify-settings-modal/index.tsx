@@ -69,6 +69,7 @@ import useDcaAllowanceTarget from '@hooks/useDcaAllowanceTarget';
 import { abs } from '@common/utils/bigint';
 import ChangesSummary from './components/changes-summary';
 import { AddPositionToCalendarButton } from '../add-position-to-calendar';
+import { Chains } from '@balmy/sdk';
 
 const StyledSummaryContainer = styled.div`
   display: flex;
@@ -583,6 +584,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
 
   const minimumTokensNeeded = usdPriceToToken(from, minimumToUse, usdPrice);
 
+  const shouldDisableIncrease = position.chainId === Chains.ROOTSTOCK.chainId;
   let actions: {
     label: React.ReactNode;
     onClick: () => void;
@@ -607,7 +609,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
           />
         ),
         onClick: () => handleApproveToken(),
-        disabled: !!hasPendingApproval || shouldDisableByUsd,
+        disabled: !!hasPendingApproval || shouldDisableByUsd || shouldDisableIncrease,
         options: [
           {
             text: (
@@ -625,7 +627,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
                 }}
               />
             ),
-            disabled: !!hasPendingApproval || shouldDisableByUsd,
+            disabled: !!hasPendingApproval || shouldDisableByUsd || shouldDisableIncrease,
             onClick: () => handleApproveToken(true),
           },
         ],
@@ -666,7 +668,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
         variant: 'contained',
         label: <FormattedMessage description="modifyPositionPermit2" defaultMessage="Authorize and modify position" />,
         onClick: handleModifyRateAndSwaps,
-        disabled: !!cantFund || frequencyValue === '0' || shouldDisableByUsd,
+        disabled: !!cantFund || frequencyValue === '0' || shouldDisableByUsd || shouldDisableIncrease,
       },
     ];
   }
@@ -678,7 +680,8 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
         variant: 'contained',
         label: <FormattedMessage description="modifyPosition" defaultMessage="Modify position" />,
         onClick: handleModifyRateAndSwaps,
-        disabled: !!cantFund || frequencyValue === '0' || shouldDisableByUsd,
+        disabled:
+          !!cantFund || frequencyValue === '0' || shouldDisableByUsd || (isIncreasingPosition && shouldDisableIncrease),
       },
     ];
   }
@@ -690,7 +693,8 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
         variant: 'contained',
         label: <FormattedMessage description="modifyPositionSafe" defaultMessage="Authorize and modify position" />,
         onClick: handleModifyRateAndSwapsSafe,
-        disabled: !!cantFund || frequencyValue === '0' || shouldDisableByUsd,
+        disabled:
+          !!cantFund || frequencyValue === '0' || shouldDisableByUsd || (isIncreasingPosition && shouldDisableIncrease),
       },
     ];
   }
@@ -702,7 +706,8 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
         variant: 'contained',
         label: <FormattedMessage description="modifyPosition" defaultMessage="Modify position" />,
         onClick: handleModifyRateAndSwapsSafe,
-        disabled: !!cantFund || frequencyValue === '0' || shouldDisableByUsd,
+        disabled:
+          !!cantFund || frequencyValue === '0' || shouldDisableByUsd || (isIncreasingPosition && shouldDisableIncrease),
       },
     ];
   }

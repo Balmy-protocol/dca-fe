@@ -4,6 +4,7 @@ import { FormattedMessage } from 'react-intl';
 import { ContainerBox, ErrorOutlineIcon, Link, Typography, colors } from 'ui-library';
 import { AAVE_FROZEN_TOKENS, SONNE_FROZEN_TOKENS, YEARN_SONNE_FROZEN_TOKENS } from '@constants';
 import styled from 'styled-components';
+import { Chains } from '@balmy/sdk';
 
 interface PositionWarningProps {
   position: Position;
@@ -113,6 +114,17 @@ const PositionWarning = ({ position }: PositionWarningProps) => {
           <FormattedMessage description="clickhereForAnnouncementSonne" defaultMessage="their Twitter account." />
         </Link>
         <FormattedMessage description="positionSonneVulnerability2" defaultMessage="Please proceed with caution." />
+      </>
+    );
+  }
+
+  if (position.chainId === Chains.ROOTSTOCK.chainId) {
+    message = (
+      <>
+        <FormattedMessage
+          description="rootstock_warning"
+          defaultMessage="Rootstock has been deprecated. Increases and deposits are disabled and swaps will not be executed. You can still withdraw and close your positions."
+        />
       </>
     );
   }
