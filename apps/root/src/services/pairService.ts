@@ -251,8 +251,10 @@ export default class PairService extends EventsManager<PairServiceData> {
 
       const newMinSwapInterval = this.minSwapInterval;
 
-      newMinSwapInterval[chainId] =
-        sdkPair.pairs[0].swapIntervals[Object.keys(sdkPair.pairs[0].swapIntervals)[0]].seconds;
+      if (sdkPair.pairs.length > 0) {
+        newMinSwapInterval[chainId] =
+          sdkPair.pairs[0].swapIntervals[Object.keys(sdkPair.pairs[0].swapIntervals)[0]].seconds;
+      }
 
       this.minSwapInterval = newMinSwapInterval;
       return acc;
