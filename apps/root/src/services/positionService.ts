@@ -464,11 +464,9 @@ export default class PositionService extends EventsManager<PositionServiceData> 
   }
 
   async fetchPositionSwapsForCSV(position: Position) {
-    console.log('fetchPositionSwapsForCSV', position);
     const hub = HUB_ADDRESS[position.version][position.chainId];
     const positionId = `${position.chainId}-${hub}-${position.positionId}`;
     const apiData = await this.meanApiService.getDcaSwapsForExport([positionId]);
-    console.log('apiData', apiData, positionId, hub, position);
     return apiData.data;
   }
 
