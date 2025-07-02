@@ -297,7 +297,7 @@ const Navigation = ({ children }: React.PropsWithChildren) => {
         defaultMessage="We've made the difficult decision to begin sunsetting Balmy. Starting today, deposits and increases for recurring investments, as well as earn vaults, are paused. You can read more about this decision and how it will affect you and your open positions "
       />
       <Link
-        href="https://twitter.com/SonneFinance"
+        href="https://balmy.medium.com/sovereignt-bank-unwinding-balmy-24f2405062ff"
         target="_blank"
         sx={{
           display: 'inline-flex',
