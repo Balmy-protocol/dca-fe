@@ -136,7 +136,6 @@ const PositionSummaryControls = ({ show, pendingTransaction, position, ownerWall
   React.useEffect(() => {
     let downloadUrl: string | null = null;
     const fetchPositionCsv = async () => {
-      console.log('fetchPositionCsv', position);
       const rawContent = await positionService.fetchPositionSwapsForCSV(position);
       const blob = new Blob([rawContent], { type: 'text/csv' });
 
