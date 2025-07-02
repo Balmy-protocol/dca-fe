@@ -73,7 +73,14 @@ const EarnDepositCTAButton = ({
     !!asset && !!depositAmount && !!balance && parseUnits(depositAmount, asset.decimals) > BigInt(balance.amount);
 
   const shouldDisableApproveButton =
-    !asset || !depositAmount || cantFund || !balance || isLoading || allowanceErrors || Number(depositAmount) === 0;
+    true ||
+    !asset ||
+    !depositAmount ||
+    cantFund ||
+    !balance ||
+    isLoading ||
+    allowanceErrors ||
+    Number(depositAmount) === 0;
 
   const shouldDisableButton = shouldDisableApproveButton || !isApproved;
 

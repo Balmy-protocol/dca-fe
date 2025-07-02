@@ -14,7 +14,7 @@ import usePushToHistory from '@hooks/usePushToHistory';
 import { changeRoute } from '@state/tabs/actions';
 import { useRoute } from '@state/tabs/hooks';
 import React, { useCallback } from 'react';
-import { defineMessage, useIntl } from 'react-intl';
+import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import {
   Switch,
   Navigation as NavigationUI,
@@ -34,6 +34,9 @@ import {
   TrashIcon,
   MovingStarIcon,
   DollarSquareIcon,
+  Link,
+  Typography,
+  colors,
 } from 'ui-library';
 // import { setSwitchActiveWalletOnConnectionThunk, toggleTheme } from '@state/config/actions';
 // import { useSwitchActiveWalletOnConnection, useThemeMode } from '@state/config/hooks';
@@ -287,11 +290,34 @@ const Navigation = ({ children }: React.PropsWithChildren) => {
         ]
       : [];
 
+  const SunsetMessage = () => (
+    <Typography variant="bodySmallRegular" color={colors[mode].typography.white}>
+      <FormattedMessage
+        description="balmy_sunset"
+        defaultMessage="We've made the difficult decision to begin sunsetting Balmy. Starting today, deposits and increases for recurring investments, as well as earn vaults, are paused. You can read more about this decision and how it will affect you and your open positions "
+      />
+      <Link
+        href="https://balmy.medium.com/sovereignt-bank-unwinding-balmy-24f2405062ff"
+        target="_blank"
+        sx={{
+          display: 'inline-flex',
+          margin: ({ spacing }) => `0px ${spacing(1)}`,
+          color: colors[mode].typography.white,
+          textDecorationColor: colors[mode].typography.white,
+        }}
+      >
+        <FormattedMessage description="here" defaultMessage="here." />
+      </Link>
+    </Typography>
+  );
+
   return (
     <>
       <LevelUpModal />
       <NavigationUI
         extraHeaderTools={<TierPills />}
+        warning={<SunsetMessage />}
+        warningLevel="error"
         headerContent={
           <NetWorth
             variant={NetWorthVariants.nav}

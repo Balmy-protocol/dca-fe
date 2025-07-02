@@ -1,42 +1,34 @@
 import React, { useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Button, colors, ContainerBox, NotificationIcon, Typography } from 'ui-library';
-import styled from 'styled-components';
-import { FarmsWithAvailableDepositTokens } from '@hooks/earn/useAvailableDepositTokens';
-import useAnalytics from '@hooks/useAnalytics';
+// import styled from 'styled-components';
+//  import { FarmsWithAvailableDepositTokens } from '@hooks/earn/useAvailableDepositTokens';
+// import useAnalytics from '@hooks/useAnalytics';
 import NotifyEmailModal from './notify-email-modal';
-const StyledMigrationAmount = styled(ContainerBox).attrs({
-  alignItems: 'center',
-  justifyContent: 'center',
-})`
-  ${({ theme: { palette, spacing } }) => `
-    background-color: ${colors[palette.mode].accentPrimary};
-    border-radius: 100px;
-    width: ${spacing(4.5)};
-    height: ${spacing(4.5)};
-  `}
-`;
+// const StyledMigrationAmount = styled(ContainerBox).attrs({
+//   alignItems: 'center',
+//   justifyContent: 'center',
+// })`
+//   ${({ theme: { palette, spacing } }) => `
+//     background-color: ${colors[palette.mode].accentPrimary};
+//     border-radius: 100px;
+//     width: ${spacing(4.5)};
+//     height: ${spacing(4.5)};
+//   `}
+// `;
 
-const AllStrategiesHeading = ({
-  farmsWithDepositableTokens = [],
-  handleMigrationModalOpen,
-}: {
-  farmsWithDepositableTokens?: FarmsWithAvailableDepositTokens;
-  handleMigrationModalOpen?: () => void;
-}) => {
-  const { trackEvent } = useAnalytics();
+const AllStrategiesHeading = (
+  {
+    // farmsWithDepositableTokens = [],
+  }: {
+    // farmsWithDepositableTokens?: FarmsWithAvailableDepositTokens;
+  }
+) => {
+  // const { trackEvent } = useAnalytics();
   const [isNotifyEmailModalOpen, setIsNotifyEmailModalOpen] = useState(false);
-  const migrableTokensAmount = farmsWithDepositableTokens?.filter(
-    (farm) => Number(farm.balance.amountInUSD) > 1
-  ).length;
-
-  const onMigrationModalOpen = () => {
-    if (!handleMigrationModalOpen) {
-      return;
-    }
-    handleMigrationModalOpen();
-    trackEvent('Earn - One click migration - Table Toolbar - Open migration modal');
-  };
+  // const migrableTokensAmount = farmsWithDepositableTokens?.filter(
+  //   (farm) => Number(farm.balance.amountInUSD) > 1
+  // ).length;
 
   return (
     <>
@@ -55,7 +47,7 @@ const AllStrategiesHeading = ({
               />
             </ContainerBox>
           </Button>
-          <Button
+          {/* <Button
             variant="text"
             onClick={onMigrationModalOpen}
             sx={{ display: 'flex', gap: 1 }}
@@ -74,7 +66,7 @@ const AllStrategiesHeading = ({
               description="earn.all-strategies-table.migrate-investments"
               defaultMessage="Migrate Investments"
             />
-          </Button>
+          </Button> */}
         </ContainerBox>
       </ContainerBox>
     </>

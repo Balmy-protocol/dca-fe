@@ -107,9 +107,10 @@ const PositionCardButton = ({
   const fromHasYield = !!position.from.underlyingTokens.length;
   const toHasYield = !!position.to.underlyingTokens.length;
 
-  const canAddFunds = VERSIONS_ALLOWED_MODIFY.includes(position.version);
+  const canAddFunds = false && VERSIONS_ALLOWED_MODIFY.includes(position.version);
 
   const disabledIncrease =
+    true ||
     disabled ||
     !dcaTokens[`${chainId}-${position.from.address.toLowerCase()}` as TokenListId] ||
     !dcaTokens[`${chainId}-${position.to.address.toLowerCase()}` as TokenListId] ||

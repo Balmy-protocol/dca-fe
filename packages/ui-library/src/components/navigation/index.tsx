@@ -22,7 +22,7 @@ import { ListItemButton } from '../listitembutton';
 import { ListItemIcon } from '../listitemicon';
 import { ListItemText } from '../listitemtext';
 import { Container } from '../container';
-import { Link, Typography, useMediaQuery, useTheme } from '@mui/material';
+import { Alert, Link, Typography, useMediaQuery, useTheme } from '@mui/material';
 import BalmyLogoLight from '../../assets/balmy-logo-light';
 import BalmyLogoDark from '../../assets/balmy-logo-dark';
 import styled from 'styled-components';
@@ -73,6 +73,8 @@ type NavigationProps = React.PropsWithChildren<{
   headerContent?: React.ReactNode;
   promotedBanner?: React.ReactNode;
   shareReferralLink?: React.ReactNode;
+  warning?: React.ReactNode;
+  warningLevel?: 'info' | 'warning' | 'error';
 }>;
 
 const drawerWidthLg = 240;
@@ -344,6 +346,8 @@ const Navigation = ({
   headerContent,
   promotedBanner,
   shareReferralLink,
+  warning,
+  warningLevel,
 }: NavigationProps) => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const {
@@ -403,6 +407,18 @@ const Navigation = ({
           backgroundColor: colors[mode].background.secondary,
         }}
       >
+        {warning && (
+          <Alert
+            severity={warningLevel || 'info'}
+            variant="filled"
+            sx={{
+              backgroundColor: colors[mode].semantic.error.darker,
+              borderRadius: 0,
+            }}
+          >
+            {warning}
+          </Alert>
+        )}
         <Container>
           <Toolbar>
             <IconButton

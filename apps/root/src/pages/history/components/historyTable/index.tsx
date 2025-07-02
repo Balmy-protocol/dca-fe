@@ -562,6 +562,8 @@ const HistoryTable = ({ search, tokens, height, solid }: HistoryTableProps) => {
   const isLoadingWithoutEvents = isLoading && events.length === 0;
 
   const preFilteredEvents = React.useMemo(
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
     () => filterEventsByUnitIndexed(events, unitsByChainPercentages),
     [unitsByChainPercentages, events]
   );

@@ -152,7 +152,7 @@ const PositionSummaryControls = ({ show, pendingTransaction, position, ownerWall
     return () => {
       if (downloadUrl) URL.revokeObjectURL(downloadUrl);
     };
-  }, []);
+  }, [position]);
 
   const onTerminate = () => {
     setShowTerminateModal(true);

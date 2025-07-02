@@ -1,27 +1,33 @@
 import React from 'react';
 import useStoredTransactionHistory from './useStoredTransactionHistory';
 import { Address } from 'viem';
-import { IndexerUnits } from 'common-types';
-import { UnitsIndexedByChainPercentage, IncludedIndexerUnits } from '@common/utils/transaction-history';
+import { ChainId, IndexerUnits } from 'common-types';
 
 const INDEXER_ACCEPTANCE = 0.95; // 95%
 
 const EMPTY_INDEXER_UNITS = {
   [IndexerUnits.DCA]: {},
   [IndexerUnits.AGG_SWAPS]: {},
-  [IndexerUnits.ERC20_APPROVALS]: {},
-  [IndexerUnits.ERC20_TRANSFERS]: {},
-  [IndexerUnits.NATIVE_TRANSFERS]: {},
   [IndexerUnits.EARN]: {},
 };
+
+type IncludedIndexerUnits = Exclude<
+  IndexerUnits,
+  | IndexerUnits.CHAINLINK_REGISTRY
+  | IndexerUnits.NATIVE_TRANSFERS
+  | IndexerUnits.ERC20_APPROVALS
+  | IndexerUnits.ERC20_TRANSFERS
+>;
+
+export type UnitsIndexedByChainPercentage = Record<
+  Address,
+  Record<IncludedIndexerUnits, Record<ChainId, { percentage: number; isIndexed: boolean }>>
+>; // <IndexerUnits, Record<ChainId, boolean>>
 
 export const IncludedIndexerUnitsArrayTypes: IncludedIndexerUnits[] = [
   IndexerUnits.DCA,
   IndexerUnits.AGG_SWAPS,
-  IndexerUnits.ERC20_APPROVALS,
-  IndexerUnits.ERC20_TRANSFERS,
   IndexerUnits.EARN,
-  IndexerUnits.NATIVE_TRANSFERS,
 ] as const;
 
 export default function useIsSomeWalletIndexed(wallet?: Address) {
