@@ -34,8 +34,7 @@ const AllStrategiesTableToolbar = ({
   variant,
   strategiesCount,
   setPage,
-  farmsWithDepositableTokens,
-  handleMigrationModalOpen,
+  // farmsWithDepositableTokens,
 }: AllStrategiesTableToolbarProps) => {
   const intl = useIntl();
   const dispatch = useAppDispatch();
@@ -54,10 +53,7 @@ const AllStrategiesTableToolbar = ({
   return (
     <ContainerBox justifyContent="space-between" alignItems="end" flexWrap="wrap" gap={3}>
       {variant === StrategiesTableVariants.ALL_STRATEGIES ? (
-        <AllStrategiesHeading
-          farmsWithDepositableTokens={farmsWithDepositableTokens}
-          handleMigrationModalOpen={handleMigrationModalOpen}
-        />
+        <AllStrategiesHeading />
       ) : (
         <ContainerBox alignItems="center" gap={2}>
           <Typography variant="h3Bold" color={({ palette: { mode } }) => colors[mode].typography.typo1}>

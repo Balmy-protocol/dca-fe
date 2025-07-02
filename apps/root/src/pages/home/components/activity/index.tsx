@@ -330,10 +330,14 @@ const Activity = ({ selectedWalletOption }: ActivityProps) => {
 
   const filteredEvents = React.useMemo<typeof events>(() => {
     if (selectedWalletOption === ALL_WALLETS) {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       return filterEventsByUnitIndexed(events, unitsByChainPercentages);
     } else {
       return filterEventsByUnitIndexed(
         events.filter((event) => getTransactionInvolvedWallets(event).includes(selectedWalletOption)),
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
         unitsByChainPercentages
       );
     }

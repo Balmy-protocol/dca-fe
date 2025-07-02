@@ -99,6 +99,7 @@ const DcaButton = ({
   const swapsIsMax = BigInt(frequencyValue || '0') > maxUint32;
 
   const shouldDisableApproveButton =
+    true ||
     !from ||
     !to ||
     !fromValue ||
@@ -106,7 +107,7 @@ const DcaButton = ({
     cantFund ||
     !balance ||
     allowanceErrors ||
-    parseUnits(fromValue, from.decimals) <= 0 ||
+    parseUnits(fromValue, from?.decimals || 0) <= 0 ||
     BigInt(frequencyValue) <= 0 ||
     (shouldEnableYield && fromCanHaveYield && isUndefined(fromYield)) ||
     (shouldEnableYield && toCanHaveYield && isUndefined(toYield));
